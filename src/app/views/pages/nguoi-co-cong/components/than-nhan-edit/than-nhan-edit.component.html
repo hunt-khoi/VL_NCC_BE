@@ -1,0 +1,122 @@
+<form class="kt-form" [formGroup]="itemForm">
+	<div class="row">
+		<div class="col-lg-9 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="Họ tên thân nhân người có công" formControlName="HoTen" class="require" required #focusInput style="text-transform:capitalize" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Giới tính của thân nhân" formControlName="GioiTinh" required>
+					<mat-option [value]="gt.id" *ngFor="let gt of listgioitinh;">{{gt.title}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="Số hồ sơ của thân nhân" formControlName="SoHoSo" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Quan hệ với người có công" formControlName="Id_QHGiaDinh" class="require" required>
+					<mat-option [value]="object.id" *ngFor="let object of listquanhevoilietsy;">{{object.title}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="Ngày sinh của thân nhân" formControlName="NgaySinh" type="text" [matDatepicker]="picker" [max]="maxNS" (dateChange)="changeNS()">
+				<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+				<mat-datepicker #picker></mat-datepicker>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="Năm sinh của thân nhân" formControlName="NamSinh" type="text" (change)="changeNS(true)">
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="Số điện thoại của thân nhân" formControlName="SDT" />
+				<mat-error>
+					Số điện thoại của thân nhân
+					<strong *ngIf="itemForm.controls['SDT'].errors && itemForm.controls['SDT'].errors.pattern">
+						không hợp lệ
+					</strong>
+					<strong *ngIf="itemForm.controls['SDT'].errors && itemForm.controls['SDT'].errors.maxlength">
+						tối đa 20 ký tự
+					</strong>
+				</mat-error>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-12 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="Nguyên quán của thân nhân" formControlName="NguyenQuan" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-12 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="Trú quán của thân nhân" formControlName="DiaChi" />
+			</mat-form-field>
+		</div>
+		<!-- <div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="Địa chỉ email của thân nhân" formControlName="Email" />
+				<mat-error>
+					Địa chỉ email của thân nhân
+					<strong *ngIf="itemForm.controls['Email'].errors && itemForm.controls['Email'].errors.email">
+						không hợp lệ
+					</strong>
+				</mat-error>
+			</mat-form-field>
+		</div> -->
+		<div class="col-lg-12 m--margin-bottom-20-mobile">
+			<mat-checkbox formControlName="IsChet">Nhân thân đã mất</mat-checkbox>
+		</div>
+		<ng-container *ngIf="!itemForm.controls['IsCanCu'].value">
+			<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls['IsChet'].value">
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput placeholder="Ngày từ trần của thân nhân" formControlName="NgayChet" type="text" [matDatepicker]="picker2">
+					<mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+					<mat-datepicker #picker2></mat-datepicker>
+				</mat-form-field>
+			</div>
+			<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls['IsChet'].value">
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput placeholder="Số khai tử của thân nhân" formControlName="SoKhaiTu" />
+				</mat-form-field>
+			</div>
+			<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls['IsChet'].value">
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput placeholder="Ngày khai tử của thân nhân" formControlName="NgayKhaiTu" type="text" [matDatepicker]="picker3">
+					<mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+					<mat-datepicker #picker3></mat-datepicker>
+				</mat-form-field>
+			</div>
+			<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls['IsChet'].value">
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput placeholder="Nơi khai tử của thân nhân" formControlName="NoiKhaiTu" />
+				</mat-form-field>
+			</div>
+		</ng-container>
+		<div class="col-lg-12 m--margin-bottom-20-mobile">
+			<mat-checkbox formControlName="IsCanCu" [disabled]="true">Thân nhân căn cứ</mat-checkbox>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="!itemForm.controls['IsCanCu'].value">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Số bằng TQCC" formControlName="SoBangTQCC">
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="!itemForm.controls['IsCanCu'].value">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Số GCNTB" formControlName="SoGCNTB">
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="!itemForm.controls['IsCanCu'].value">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Tỉ lệ thương tật" formControlName="TLThuongTat">
+			</mat-form-field>
+		</div>
+	</div>
+</form>

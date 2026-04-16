@@ -1,0 +1,29 @@
+<td>
+	<mat-form-field class="mat-form-field-fluid">
+		<input matInput placeholder="Họ tên liệt sỹ" [formControl]="HoTen" style="text-transform:capitalize" >
+	</mat-form-field>
+</td>
+<td>
+	<mat-form-field class="mat-form-field-fluid">
+		<mat-select placeholder="Quan hệ" [formControl]="Id_QHGiaDinh">
+			<mat-option [value]="object.id" *ngFor="let object of listQH;">{{object.title}}</mat-option>
+		</mat-select>
+	</mat-form-field>
+</td>
+<td>
+	<mat-form-field class="mat-form-field-fluid">
+		<input matInput placeholder="Số bằng TQCC" [formControl]="SoBangTQCC">
+	</mat-form-field>
+</td>
+<td>
+	<mat-form-field class="mat-form-field-fluid">
+		<input matInput placeholder="Số GCNTB" [formControl]="SoGCNTB">
+	</mat-form-field>
+</td>
+<td>
+	<mat-form-field class="mat-form-field-fluid">
+		<input matInput placeholder="Tỉ lệ thương tật" [formControl]="TLThuongTat">
+	</mat-form-field>
+</td>
+<td><button mat-button mat-raised-button color="warn" (click)="close()" matTooltip="Xóa căn cứ">Xóa căn cứ</button></td>
+

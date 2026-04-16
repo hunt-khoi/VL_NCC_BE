@@ -1,0 +1,29 @@
+<style>
+	:host >>> .mat-tab-body-content {
+		height: auto;
+	}
+</style>
+<kt-portlet>
+	<mat-tab-group>
+		<mat-tab label="Loại hồ sơ">
+			<ng-template matTabContent>
+				<kt-danh-muc-khac-list></kt-danh-muc-khac-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Loại trợ cấp">
+			<ng-template matTabContent>
+				<kt-danh-muc-loai-tro-cap></kt-danh-muc-loai-tro-cap>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Nhóm quyết định">
+			<ng-template matTabContent>
+				<kt-loai-quyet-dinh-list></kt-loai-quyet-dinh-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Nội dung chi quỹ" *ngIf="filterprovinces != 61">
+			<ng-template matTabContent>
+				<kt-noi-dung-chi-list></kt-noi-dung-chi-list>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</kt-portlet>

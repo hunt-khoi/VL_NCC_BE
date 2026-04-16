@@ -1,0 +1,185 @@
+<style>
+	.rows2 {
+		max-width: 500px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+</style>
+<kt-portlet-header [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
+	<ng-container ktPortletTitle>
+		<div class="kt-form__filtration">
+			<h3 class="kt-portlet__head-title">
+				<span translate="OBJECT.LIST" [translateParams]="{name:this._name.toLowerCase()}"></span>
+			</h3>
+		</div>
+	</ng-container>
+	<ng-container ktPortletTools>
+		<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" color="accent" type="button">
+			<span translate="COMMON.CREATE"></span>
+		</button>
+		<kt-column-option [gridService]="gridService"></kt-column-option>
+	</ng-container>
+</kt-portlet-header>
+
+<kt-portlet-body>
+	<div class="mat-table__wrapper d-block" cdkDropListGroup [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}" >
+		<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" 
+			matSort #sort1="matSort" matSortActive="Priority" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
+			<ng-container matColumnDef="STT">
+				<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%"><span translate="COMMON.STT"></span></th>
+				<td mat-cell *matCellDef="let item;let vi = index" class="mat-column-vinCode stt-cell" style="flex: 0 0 6%">{{vi + 1}}</td>
+			</ng-container>
+			<ng-container matColumnDef="SoCanCu">
+				<th mat-header-cell *matHeaderCellDef>
+					<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="SoCanCu" column_title="{{ 'CANCU.SO' | translate }}"></kt-column-filter>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.SoCanCu}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="CanCu">
+				<th mat-header-cell *matHeaderCellDef style="width:500px">
+					<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="CanCu" column_title="{{ 'CANCU.NAME' | translate }}"></kt-column-filter>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					<a href="javascript:;"(click)="Edit(item, false)"><div class="rows2">{{item.CanCu}}</div></a>
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="IsHieuLuc">
+				<th mat-header-cell *matHeaderCellDef>
+					<kt-column-filter [gridService]="gridService" column_name="IsHieuLuc" column_title="{{ 'CANCU.IsHieuLuc' | translate }}"></kt-column-filter>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px;min-width: 100px;" *matCellDef="let item">
+					<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide {{getItemCssClassByStatus(item.IsHieuLuc)}}">{{getItemStatusString(item.IsHieuLuc)}}</span>
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="NgayBanHanh">
+				<th mat-header-cell *matHeaderCellDef>
+					<span translate="CANCU.NgayBanHanh"></span>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.NgayBanHanh}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="HieuLuc_From">
+				<th mat-header-cell *matHeaderCellDef>
+					<span translate="CANCU.HieuLuc_From"></span>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.HieuLuc_From}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="HieuLuc_To">
+				<th mat-header-cell *matHeaderCellDef>
+					<span translate="CANCU.HieuLuc_To"></span>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.HieuLuc_To}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="Priority">
+				<th mat-header-cell *matHeaderCellDef mat-sort-header>
+					<span translate="COMMON.PRIORITY"></span>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.Priority}}
+				</td>
+			</ng-container>
+
+			<ng-container matColumnDef="NguoiKy">
+				<th mat-header-cell *matHeaderCellDef>
+					<kt-column-filter [gridService]="gridService" column_name="NguoiKy" column_title="{{ 'CANCU.NguoiKy' | translate }}"></kt-column-filter>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.NguoiKy}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="CoQuanBanHanh">
+				<th mat-header-cell *matHeaderCellDef>
+					<kt-column-filter [gridService]="gridService" column_name="CoQuanBanHanh" column_title="{{ 'CANCU.CoQuanBanHanh' | translate }}"></kt-column-filter>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.CoQuanBanHanh}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="PhanLoai">
+				<th mat-header-cell *matHeaderCellDef>
+					<kt-column-filter [gridService]="gridService" column_name="PhanLoai" column_title="{{ 'CANCU.PhanLoai' | translate }}"></kt-column-filter>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.PhanLoai}}
+				</td>
+			</ng-container>
+			
+			<ng-container matColumnDef="actions">
+				<th mat-header-cell *matHeaderCellDef class="text-center" style="justify-content: center; width:170px">
+					<span translate="COMMON.TACVU"></span>
+				</th>
+				<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">
+					<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="info" type="button" matTooltip="{{ 'COMMON.DETAIL' | translate }}" (click)="Edit(item, false)">
+						<mat-icon>visibility</mat-icon>
+						<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
+					</button>
+					<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary" type="button" matTooltip="{{ 'COMMON.UPDATE' | translate }}" (click)="Edit(item)">
+						<mat-icon>edit</mat-icon>
+						<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
+					</button>
+					<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" type="button" (click)="delete(item)" matTooltip="{{ 'COMMON.DELETE' | translate }}">
+						<mat-icon>delete</mat-icon>
+						<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
+					</button>
+					<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" [matMenuTriggerFor]="menu" color="primary" *ngIf="item.path!=''">
+						<mat-icon>attach_file</mat-icon>
+						<span class="button-text">Tệp</span>
+					</button>
+					<mat-menu #menu="matMenu">
+						<a mat-menu-item href="viewer/file-dinh-kem/0?path={{item.path}}" target="_blank">
+							<mat-icon>visibility</mat-icon>
+							<span>Xem trước</span>
+						</a>
+						<button mat-menu-item (click)="Download(item)">
+							<mat-icon>cloud_download</mat-icon>
+							<span>{{ 'COMMON.DOWNLOAD' | translate }}</span>
+						</button>
+					</mat-menu>
+				</td>
+			</ng-container>
+
+			<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
+			<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
+		</table>
+
+		<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
+	</div>
+
+	<!-- start: BOTTOM -->
+	<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
+		<div class="flt-selected" *ngIf="gridService.model.haveFilter">
+			<mat-chip-list>
+				<ng-container *ngFor="let chip of gridService.model.lstChip">
+					<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
+						{{chip.title}}: {{chip.data}}
+						<mat-icon matChipRemove>cancel</mat-icon>
+					</mat-chip>
+					<ng-container *ngIf="chip.type==1">
+						<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
+							{{chip.title}}: {{item.name}}
+							<mat-icon matChipRemove>cancel</mat-icon>
+						</mat-chip>
+					</ng-container>
+				</ng-container>
+				<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
+					Đặt lại
+				</mat-chip>
+			</mat-chip-list>
+		</div>
+		<div class="flt-page">
+			<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+			<mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+		</div>
+	</div>
+	<!-- end: BOTTOM -->
+</kt-portlet-body>

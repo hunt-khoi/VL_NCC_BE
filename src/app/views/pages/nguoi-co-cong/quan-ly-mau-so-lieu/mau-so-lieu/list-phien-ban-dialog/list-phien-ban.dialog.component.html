@@ -1,0 +1,40 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id_row == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id_row == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" 
+			style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+		</div>
+	</div>
+
+	<div class="kt-portlet__body">
+		<div class="form-group kt-form__group row">
+			<div class="col-lg-12 m--margin-bottom-20-mobile">
+				<table class="mat-table table-bordered" width="100%">
+					<tr>
+						<th class="stt-cell" style="width:20%">STT</th>
+						<th class="text-center" style="width:50%">Phiên bản</th>
+						<th class="text-center" style="width:30%">Tác vụ</th>
+					</tr>
+					<tr *ngFor="let v of lstVer; let i=index">
+						<td class="stt-cell">{{i + 1}}</td>
+						<td>Mẫu năm {{v.title}}</td>
+						<td class="action-cell" [ngClass]="list_button ? 'list-button' : ''">
+							<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" 
+								color="warn" type="button" (click)="Delete(v)" matTooltip="{{ 'COMMON.DELETE' | translate }}">
+								<mat-icon>delete</mat-icon>
+								<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
+							</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

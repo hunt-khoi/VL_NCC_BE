@@ -1,0 +1,63 @@
+<kt-portlet [options]="{headLarge: true}">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]=loading$>
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">Báo cáo tình hình mua bảo hiểm</h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button class="show-view-sm" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+				Chức năng
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button type="button" mat-menu-item color="primary" (click)="view()">Xem</button>
+				<button mat-raised-button color="info" matTooltip="Xuất báo cáo" [matMenuTriggerFor]="menu">Tải về</button>&nbsp;
+				<mat-menu #menu="matMenu">
+					<!-- <button mat-menu-item (click)="in(3)">PDF</button>
+					<button mat-menu-item (click)="in(1)">Word</button> -->
+					<button mat-menu-item (click)="in(2)">Excel</button>
+				</mat-menu>
+				<button type="button" mat-menu-item color="primary" printSectionId="print-section" ngxPrint> In</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<button type="button" mat-raised-button color="primary" (click)="view()">Xem</button>
+				<button mat-raised-button color="info" matTooltip="Xuất báo cáo" [matMenuTriggerFor]="menu">Tải về</button>&nbsp;
+				<mat-menu #menu="matMenu">
+					<!-- <button mat-menu-item (click)="in(3)">PDF</button>
+					<button mat-menu-item (click)="in(1)">Word</button> -->
+					<button mat-menu-item (click)="in(2)">Excel</button>
+				</mat-menu>
+				<button type="button" mat-raised-button color="primary" printSectionId="print-section" ngxPrint>In</button>
+			</div>	
+		</ng-container>
+	</kt-portlet-header>
+	
+	<kt-portlet-body>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-3 kt--margin-bottom-20-mobile">
+				<mat-form-field class="mat-form-field-fluid ">
+					<mat-select placeholder="Loại báo cáo" [(ngModel)]="Loai">
+						<mat-option [value]="0">--- Chọn loại báo cáo ---</mat-option>
+						<mat-option [value]="1">Theo pháp lệnh</mat-option>
+						<mat-option [value]="2">Theo các nghị định, quyết định</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-2 kt-margin-bottom-10-mobile">
+				<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+					<input matInput placeholder="Tháng báo cáo" [(ngModel)]="TuThang" type="text" [matDatepicker]="pickerT">
+					<mat-datepicker-toggle matSuffix [for]="pickerT"></mat-datepicker-toggle>
+					<mat-datepicker #pickerT startView="multi-year"
+					(monthSelected)="chosenMonthHandler($event, pickerT)"></mat-datepicker>
+				</mat-form-field>
+			</div>
+		</div>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-2 kt-margin-bottom-10-mobile"></div>
+			<div id="print-section" class="col-md-10 kt-margin-bottom-10-mobile" *ngIf="strHtml">
+				<span [innerHtml]="strHtml"></span>
+			</div>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>

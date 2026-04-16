@@ -1,0 +1,191 @@
+<style>
+	:host .dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 2;
+		max-width: 300px;
+	}
+	.mw-100px {
+		min-width: 100px;
+	}
+	.mw-150px {
+		min-width: 150px;
+	}
+	.mw-200px {
+		min-width: 200px;
+	}
+	.mw-250px {
+		min-width: 250px;
+	}
+	.mw-300px {
+		min-width: 300px;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<kt-portlet [options]="{headLarge: true}" [loading$]="dataSource.loading$">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">{{_name}}</h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button (click)="ExportExcel()" mat-raised-button matTooltip="Xuất Excel" *ngIf="objectService.ReadOnlyControl" color="info" type="button">
+				Xuất Excel
+			</button>
+			<button (click)="printTicket('print-section-detail')" mat-raised-button color="accent" type="button">
+				{{ 'COMMON.PRINT' | translate }}
+			</button>
+			<kt-column-option [gridService]="gridService"></kt-column-option>
+		</ng-container>
+	</kt-portlet-header>
+
+	<div class="kt-portlet__body" style="min-height: 200px;">
+		<div class="mat-table__wrapper" id="print-section-detail">
+			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="HoTen" matSortDirection="asc" 
+				matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
+				<ng-container matColumnDef="STT">
+					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode"><span translate="COMMON.STT"></span></th>
+					<td mat-cell *matCellDef="let object;let vi = index" class="mat-column-vinCode">{{vi + 1}}</td>
+				</ng-container>
+				<ng-container matColumnDef="SoHoSo">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [enable_sort]="!print" [gridService]="gridService" column_name="SoHoSo" column_title="Số hồ sơ"></kt-column-filter>
+					</th>
+					<td mat-cell *matCellDef="let object">{{object.SoHoSo}}</td>
+				</ng-container>
+				<ng-container matColumnDef="HoTen">
+					<th nowrap mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [enable_sort]="!print" [gridService]="gridService" column_name="HoTen" column_title="Họ tên"></kt-column-filter>
+					</th>
+					<td nowrap mat-cell class="mw-150px" *matCellDef="let object">
+						<a href="javascript:;" (click)="click(object.Id)" matTooltip="{{ 'COMMON.DETAIL' | translate }}">{{object.HoTen}}</a>
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="NgaySinh">
+					<th mat-header-cell *matHeaderCellDef>Ngày sinh</th>
+					<td mat-cell *matCellDef="let object">{{object.NgaySinh}}</td>
+				</ng-container>
+				<ng-container matColumnDef="NamSinh">
+					<th mat-header-cell *matHeaderCellDef>Năm sinh</th>
+					<td mat-cell *matCellDef="let object">{{object.NamSinh}}</td>
+				</ng-container>
+				<ng-container matColumnDef="GioiTinh">
+					<th mat-header-cell *matHeaderCellDef>Giới tính</th>
+					<td mat-cell *matCellDef="let object">{{object.GioiTinh}}</td>
+				</ng-container>
+				<ng-container matColumnDef="NguoiThoCungLietSy">
+					<th mat-header-cell *matHeaderCellDef>Người thờ cúng liệt sỹ</th>
+					<td mat-cell class="mw-150px" *matCellDef="let object">{{object.NguoiThoCungLietSy}}</td>
+				</ng-container>
+				<ng-container matColumnDef="QuanHeVoiLietSy">
+					<th mat-header-cell *matHeaderCellDef>Quan hệ với liệt sỹ</th>
+					<td mat-cell *matCellDef="let object">{{object.QuanHeVoiLietSy}}</td>
+				</ng-container>
+				<ng-container matColumnDef="DoiTuong">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" column_name="DoiTuong" column_title="Đối tượng"></kt-column-filter>
+					</th>
+					<td mat-cell class="mw-300px" *matCellDef="let object">
+						<div class="dt-overflow" title="{{object.DoiTuong}}">{{object.DoiTuong}}</div>
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="LoaiHoSo">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" column_name="LoaiHoSo" column_title="Loại hồ sơ"></kt-column-filter>
+					</th>
+					<td mat-cell class="mw-300px" *matCellDef="let object">
+						<div class="dt-overflow" title="{{object.LoaiHoSo}}">{{object.LoaiHoSo}}</div>
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="strStatus">
+					<th mat-header-cell *matHeaderCellDef>Trạng thái</th>
+					<td mat-cell class="mw-100px" *matCellDef="let object">{{object.strStatus}}</td>
+				</ng-container>
+				<ng-container matColumnDef="Deadline">
+					<th mat-header-cell *matHeaderCellDef>Deadline</th>
+					<td mat-cell *matCellDef="let object">{{object.Deadline}}</td>
+				</ng-container>
+				<ng-container matColumnDef="DistrictName">
+					<th mat-header-cell *matHeaderCellDef>Huyện</th>
+					<td mat-cell class="mw-150px" *matCellDef="let object">{{object.DistrictName}}</td>
+				</ng-container>
+				<ng-container matColumnDef="Title">
+					<th mat-header-cell *matHeaderCellDef>Xã</th>
+					<td mat-cell class="mw-150px" *matCellDef="let object">{{object.Title}}</td>
+				</ng-container>
+				<ng-container matColumnDef="KhomAp">
+					<th mat-header-cell *matHeaderCellDef>Khóm/ấp</th>
+					<td mat-cell class="mw-150px" *matCellDef="let object">{{object.KhomAp}}</td>
+				</ng-container>
+				<ng-container matColumnDef="DiaChi">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" column_name="DiaChi" column_title="Địa chỉ"></kt-column-filter>
+					</th>
+					<td mat-cell class="mw-150px" *matCellDef="let object">{{object.DiaChi}}</td>
+				</ng-container>
+				<ng-container matColumnDef="CreatedBy">
+					<th mat-header-cell *matHeaderCellDef>Người tạo</th>
+					<td mat-cell class="mw-150px" *matCellDef="let object">{{object.CreatedBy}}</td>
+				</ng-container>
+				<ng-container matColumnDef="CreatedDate">
+					<th mat-header-cell *matHeaderCellDef style="justify-content: center">Ngày tạo</th>
+					<td mat-cell *matCellDef="let object" style="justify-content: center">{{object.CreatedDate }}</td>
+				</ng-container>
+
+				<ng-container matColumnDef="UpdatedBy">
+					<th mat-header-cell *matHeaderCellDef style="justify-content: center">Người cập nhật</th>
+					<td mat-cell class="mw-150px" *matCellDef="let item" style="justify-content: center">{{item.UpdatedBy}}</td>
+				</ng-container>
+				<ng-container matColumnDef="UpdatedDate">
+					<th mat-header-cell *matHeaderCellDef>Ngày cập nhật</th>
+					<td mat-cell *matCellDef="let item">{{item.UpdatedDate }}</td>
+				</ng-container>
+
+				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; "></tr>
+				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+			</table>
+
+			<!-- <div class="mat-table__message" *ngIf="productsResult.length==0"><span translate="COMMON.NO_RECORD_FOUND"></span></div> -->
+
+			<!-- start: BOTTOM -->
+			<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
+				<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
+					<mat-chip-list>
+						<ng-container *ngFor="let chip of gridService.model.lstChip">
+							<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
+								{{chip.title}}: {{chip.data}}
+								<mat-icon matChipRemove>cancel</mat-icon>
+							</mat-chip>
+							<ng-container *ngIf="chip.type==1">
+								<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
+									{{chip.title}}: {{item.name}}
+									<mat-icon matChipRemove>cancel</mat-icon>
+								</mat-chip>
+							</ng-container>
+						</ng-container>
+						<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
+							Đặt lại
+						</mat-chip>
+					</mat-chip-list>
+				</div>
+				<!-- <div class="flt-page" style="width: 50%;">
+					<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+					<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+				</div> -->
+			</div>
+			<!-- end: BOTTOM -->
+		</div>
+
+	</div>
+</kt-portlet>

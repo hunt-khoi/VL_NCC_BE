@@ -1,0 +1,140 @@
+<kt-portlet [options]="{headLarge: true}" [loading$]="dataSource.loading$">
+	<div class="kt-portlet__head kt-portlet__head--lg">
+		<div class="kt-portlet__head-label">
+			<h3 class="kt-portlet__head-title">{{_name}}</h3>
+		</div>
+		<div class="kt-portlet__head-toolbar">
+			<!-- <button (click)="AddWorkplace()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl && _user.AllowEdit && !_user.IsGiam" color="accent" type="button">
+				<span translate="COMMON.CREATE"></span>
+			</button> -->
+			<kt-column-option [gridService]="gridService"></kt-column-option>
+		</div>
+	</div>
+
+	<div class="kt-portlet__body">
+		<div class="mat-table__wrapper">
+			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="NgayChuyen" matSortDirection="desc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
+				<ng-container matColumnDef="STT">
+					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell"><span translate="COMMON.STT"></span></th>
+					<td mat-cell *matCellDef="let object; let vi = index" class="mat-column-vinCode stt-cell">{{vi + 1}}</td>
+				</ng-container>
+				<ng-container matColumnDef="Id_Tinh">
+					<th mat-header-cell *matHeaderCellDef>Tỉnh</th>
+					<td mat-cell *matCellDef="let object">{{object.ProvinceName}}</td>
+				</ng-container>
+				<ng-container matColumnDef="Id_Huyen">
+					<th mat-header-cell *matHeaderCellDef>Huyện</th>
+					<td mat-cell *matCellDef="let object">{{object.DistrictName}}</td>
+				</ng-container>
+				<ng-container matColumnDef="Id_Xa">
+					<th mat-header-cell *matHeaderCellDef>Xã</th>
+					<td mat-cell *matCellDef="let object">{{object.Xa}}</td>
+				</ng-container>
+				<ng-container matColumnDef="DiaChi">
+					<th mat-header-cell *matHeaderCellDef>Địa chỉ</th>
+					<td mat-cell *matCellDef="let object">{{object.DiaChi}}</td>
+				</ng-container>
+				<ng-container matColumnDef="NgayChuyen">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'DICHUYEN.ngaychuyen' | translate }}</th>
+					<td mat-cell *matCellDef="let object">{{object.NgayChuyen}}</td>
+				</ng-container>
+				<ng-container matColumnDef="SoQuyetDinh">
+					<th mat-header-cell *matHeaderCellDef>Quyết định</th>
+					<td mat-cell *matCellDef="let object">
+						<ng-container *ngIf="object.Id_QuyetDinh && object.Id_QuyetDinh>0">
+							<span>{{object.SoQuyetDinh}}</span>
+							<button (click)="in(object)" mat-icon-button matTooltip="In quyết định" color="primary" type="button">
+								<mat-icon>print</mat-icon>
+							</button>
+						</ng-container>
+						<button mat-icon-button color="primary" type="button" (click)="raQuyetDinh(object)"matTooltip="Tạo quyết định"
+							*ngIf="!object.Id_QuyetDinh || object.Id_QuyetDinh==0">
+							<mat-icon>input</mat-icon>
+						</button>
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="CreatedBy">
+					<th mat-header-cell *matHeaderCellDef>Người tạo</th>
+					<td mat-cell *matCellDef="let object">{{object.CreatedBy}}</td>
+				</ng-container>
+				<ng-container matColumnDef="CreatedDate">
+					<th mat-header-cell *matHeaderCellDef style="justify-content: center">Ngày tạo</th>
+					<td mat-cell *matCellDef="let object" style="justify-content: center">{{object.CreatedDate }}</td>
+				</ng-container>
+				<ng-container matColumnDef="UpdatedBy">
+					<th mat-header-cell *matHeaderCellDef style="justify-content: center">Người cập nhật</th>
+					<td mat-cell *matCellDef="let item" style="justify-content: center">{{item.UpdatedBy}}</td>
+				</ng-container>
+				<ng-container matColumnDef="UpdatedDate">
+					<th mat-header-cell *matHeaderCellDef>Ngày cập nhật</th>
+					<td mat-cell *matCellDef="let item">{{item.UpdatedDate }}</td>
+				</ng-container>
+
+				<ng-container matColumnDef="actions">
+					<th mat-header-cell *matHeaderCellDef style="width: 180px;">
+						<span translate="COMMON.TACVU"></span>
+					</th>
+					<td mat-cell *matCellDef="let object" class="action-cell" [ngClass]="list_button?'list-button':''">
+						<button (click)="Editobject(object, false)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" type="button">
+							<mat-icon>remove_red_eye</mat-icon>
+							<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
+						</button>
+						<ng-container *ngIf="(!object.Id_QuyetDinh || object.Id_QuyetDinh==0) && _user.AllowEdit"> 
+							<button (click)="Editobject(object)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="{{ 'COMMON.UPDATE' | translate }}" *ngIf="objectService.ReadOnlyControl && object.AllowEdit" color="primary" type="button">
+								<mat-icon>create</mat-icon>
+								<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
+							</button>
+							<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" type="button" (click)="DeleteWorkplace(object)" *ngIf="objectService.ReadOnlyControl && object.AllowEdit" matTooltip="{{ 'COMMON.DELETE' | translate }}">
+								<mat-icon>delete</mat-icon>
+								<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
+							</button>
+						</ng-container>
+						<button (click)="reviewDeNghiDC(object)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
+							matTooltip="{{ 'DICHUYEN.indenghi' | translate }}" color="info" type="button">
+							<mat-icon>local_printshop</mat-icon>
+							<span class="button-text">{{ 'DICHUYEN.indenghi' | translate }}</span>
+						</button>
+						<button (click)="reviewPhieuBaoDC(object)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" 
+							matTooltip="{{ 'DICHUYEN.inphieubao' | translate }}" color="info" type="button" *ngIf="object.Id_QuyetDinh && object.Id_QuyetDinh>0">
+							<mat-icon>local_printshop</mat-icon>
+							<span class="button-text">{{ 'DICHUYEN.inphieubao' | translate }}</span>
+						</button>
+					</td>
+				</ng-container>
+
+				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
+				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+			</table>
+
+			<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
+			<!-- start: BOTTOM -->
+			<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
+				<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
+					<mat-chip-list>
+						<ng-container *ngFor="let chip of gridService.model.lstChip">
+							<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
+								{{chip.title}}: {{chip.data}}
+								<mat-icon matChipRemove>cancel</mat-icon>
+							</mat-chip>
+							<ng-container *ngIf="chip.type==1">
+								<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
+									{{chip.title}}: {{item.name}}
+									<mat-icon matChipRemove>cancel</mat-icon>
+								</mat-chip>
+							</ng-container>
+						</ng-container>
+						<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
+							Đặt lại
+						</mat-chip>
+					</mat-chip-list>
+				</div>
+				<div class="flt-page" style="width: 50%;">
+					<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+					<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+				</div>
+			</div>
+			<!-- end: BOTTOM -->
+		</div>
+
+	</div>
+</kt-portlet>

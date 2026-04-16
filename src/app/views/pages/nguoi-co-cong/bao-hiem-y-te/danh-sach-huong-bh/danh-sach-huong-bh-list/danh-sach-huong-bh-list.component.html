@@ -1,0 +1,152 @@
+<kt-portlet [options]="{headLarge: true}">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">
+					<span translate="OBJECT.LIST" [translateParams]="{name:_name.toLowerCase()}"></span>
+				</h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button (click)="Export()" mat-raised-button matTooltip="Xuất danh sách" color="info" type="button">
+				Export
+			</button>
+
+			<kt-column-option [gridService]="gridService"></kt-column-option>
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<div class="kt-form">
+			<div class="kt-form__filtration">
+				<div class="row align-items-center">
+					<div class="col-md-3 kt--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="Loại đối tượng" [(ngModel)]="Loai" (selectionChange)=loadDataList()>
+								<mat-option [value]="1">Theo pháp lệnh</mat-option>
+								<mat-option [value]="2">Theo các nghị định, quyết định</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-md-3 kt-margin-bottom-10-mobile">
+						<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+							<input matInput placeholder="Chọn tháng" [(ngModel)]="TuThang" type="text" [matDatepicker]="pickerT">
+							<mat-datepicker-toggle matSuffix [for]="pickerT"></mat-datepicker-toggle>
+							<mat-datepicker #pickerT startView="multi-year"
+							(monthSelected)="chosenMonthHandler($event, pickerT)"></mat-datepicker>
+						</mat-form-field>
+					</div>
+					<div class="col-md-3 kt--margin-bottom-10-mobile" [hidden]="Capcocau!=1">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" (selectionChange)=filterDistrictID(filterdistrict)>
+								<mat-option [value]="0">Tất cả</mat-option>
+								<mat-option [value]="district.ID_Row" *ngFor="let district of listdistrict;">{{district.District}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-md-3 kt--margin-bottom-10-mobile" [hidden]="Capcocau!=2">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="{{ 'WARD.NAME' | translate }}" [(value)]="filterward" (selectionChange)=filterWardD(filterward)>
+								<mat-option [value]="0">Tất cả</mat-option>
+								<mat-option [value]="ward.ID_Row" *ngFor="let ward of listward;">{{ward.Ward}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter ? 'unset' : 'auto'}">
+			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort #sort1='matSort' matSortActive="Priority"
+				style="width: 100%;" matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" cdkDropListGroup>
+				<ng-container matColumnDef="STT">
+					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode">STT</th>
+					<td mat-cell class="stt-cell" *matCellDef="let item; let i=index">{{i+1}}</td>
+				</ng-container>
+				<ng-container matColumnDef="HoTen">
+					<th mat-header-cell *matHeaderCellDef style="flex: 0 0 25%;white-space: nowrap;">
+						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="HoTen" column_title="Họ tên"></kt-column-filter>
+					</th>
+					<td mat-cell *matCellDef="let item" style="flex: 0 0 25%">{{item.HoTen}}</td>
+				</ng-container>
+				<ng-container matColumnDef="NgaySinh">
+					<th mat-header-cell *matHeaderCellDef>Ngày sinh</th>
+					<td mat-cell *matCellDef="let item">{{item.NgaySinh}}</td>
+				</ng-container>
+				<ng-container matColumnDef="GioiTinh">
+					<th mat-header-cell *matHeaderCellDef>Giới tính</th>
+					<td mat-cell *matCellDef="let item">{{item.GioiTinh}}</td>
+				</ng-container>
+				<ng-container matColumnDef="DiaChi">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" column_name="DiaChi" column_title="Địa chỉ"></kt-column-filter>
+					</th>
+					<td mat-cell *matCellDef="let item">{{item.DiaChi}}</td>
+				</ng-container>
+				<ng-container matColumnDef="DoiTuong">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="DoiTuong" column_title="Đối tượng"></kt-column-filter>
+					</th>
+					<td mat-cell *matCellDef="let item" style="flex: 0 0 15%">{{item.DoiTuong}}</td>
+				</ng-container>
+				<ng-container matColumnDef="TheBaoHiem">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="TheBaoHiem" column_title="Thẻ bảo hiểm"></kt-column-filter>
+					</th>
+					<td mat-cell *matCellDef="let item">{{item.TheBaoHiem}}</td>
+				</ng-container>
+				<ng-container matColumnDef="MucDong">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Mức đóng/tháng</th>
+					<td mat-cell *matCellDef="let item">{{item.MucDong}}</td>
+				</ng-container>
+				<ng-container matColumnDef="SoTien">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header>Số tiền</th>
+					<td mat-cell *matCellDef="let item">{{item.SoTien}}</td>
+				</ng-container>
+				<ng-container matColumnDef="GhiChu">
+					<th mat-header-cell *matHeaderCellDef>Ghi chú</th>
+					<td mat-cell *matCellDef="let item">{{item.GhiChu}}</td>
+				</ng-container>
+
+				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
+				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
+			</table>
+
+			<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
+		</div>
+
+		<!-- start: BOTTOM -->
+		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
+			<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
+				<mat-chip-list>
+					<ng-container *ngFor="let chip of gridService.model.lstChip">
+						<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
+							{{chip.title}}: {{chip.data}}
+							<mat-icon matChipRemove>cancel</mat-icon>
+						</mat-chip>
+						<ng-container *ngIf="chip.type==1">
+							<mat-chip *ngFor="let item of chip.data" removable="true"
+								(removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
+								{{chip.title}}: {{item.name}}
+								<mat-icon matChipRemove>cancel</mat-icon>
+							</mat-chip>
+						</ng-container>
+					</ng-container>
+					<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll"
+						(click)="gridService.Clear()">
+						Đặt lại
+					</mat-chip>
+				</mat-chip-list>
+			</div>
+
+			<div class="flt-page" style="width: 50%;">
+				<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"
+					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+			</div>
+		</div>
+		<!-- end: BOTTOM -->
+
+	</kt-portlet-body>
+	<!-- end::Body -->
+</kt-portlet>

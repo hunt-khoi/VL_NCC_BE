@@ -1,0 +1,153 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-4 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-8 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right; " *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+			<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" 
+				[disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}" *ngIf="!item.Id_Detail && allowCreate">
+				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+	<form class="kt-form" [formGroup]="itemForm">
+		<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			Không thể lưu, vui lòng nhập đủ thông tin!
+		</kt-alert>
+
+		<div class="kt-portlet__body">
+			<div class="form-group kt-form__group row">
+				<div class="col-md-8 m--margin-bottom-20-mobile">
+					<ng-container *ngIf="item.IdSoLieu != 0">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput placeholder="{{ 'SO_LIEU.NAME' | translate }}" formControlName="SoLieuInp" class="require" />
+						</mat-form-field>
+					</ng-container>
+					<ng-container *ngIf="item.IdSoLieu == 0">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="{{ 'SO_LIEU.NAME' | translate }}" formControlName="SoLieu" class="require" 
+								(selectionChange)="getLoaiSoLieu(filterSoLieu)" [(ngModel)]="filterSoLieu" required>
+								<mat-option>
+									<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+										[(ngModel)]="FilterCtrl" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
+									</ngx-mat-select-search>
+								</mat-option>
+								<mat-option [value]="soLieu.id" *ngFor="let soLieu of listSoLieu|async;" title="{{soLieu.title}}">{{soLieu.title}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</ng-container>
+				</div>
+
+				<div class="col-md-4 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input [value]="titleLoaiSoLieu" matInput placeholder="{{ 'LOAI_SO_LIEU.NAME' | translate }}" formControlName="LoaiSoLieu" class="require" />
+					</mat-form-field>
+				</div>
+				<div class="col-md-4 m--margin-bottom-20-mobile" style="display:none">
+					<mat-form-field>
+						<input placeholder="{{ 'MAU_SO_LIEU.gtmacdinh' | translate }}" formControlName="default" type="text" matInput [disabled]="!allowEdit" 
+							mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+
+				<div class="col-md-12 m--margin-bottom-20-mobile">
+					<button type="button" color="primary" *ngIf="filterSoLieu > 0 || showBtnAddPhiSoLieu" 
+						(click)="EditObject(soLieuisSelected, true)" mat-raised-button matTooltip="{{ 'MAU_SO_LIEU.themnhapsl' | translate }}">
+						<span>{{ 'MAU_SO_LIEU.themnhapsl' | translate }}</span>
+					</button>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row">
+				<ng-container *ngFor="let dec of soLieuisSelected.Detail; let pos = index;">
+					<div class="col-md-10 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid " style="padding-left: 1.5rem;">
+							<input value="{{dec.PhiSoLieu + ' (' + getStrCachNhap(dec.CachNhap) +')'}}" matInput placeholder="{{ 'MAU_SO_LIEU.nhapsolieu' | translate }}" disabled />
+						</mat-form-field>
+					</div>
+					<div *ngIf="allowEdit" class="col-md-2 m--margin-bottom-20-mobile" style=" float: right;">
+						<button (click)="DeletePhiSoLieuIsSelected(soLieuisSelected, dec, pos)" color="warn" mat-icon-button style="float: right;" type="button" matTooltip="Xóa">
+							<mat-icon>delete</mat-icon>
+						</button>
+					</div>
+				</ng-container>
+				<ng-container *ngIf="item.SoLieuCon.length > 0 || listSoLieuChild.length > 0">
+					<div class="col-md-12 m--margin-bottom-20-mobile" style="padding-left: 0.8rem;">
+						<b>{{ 'MAU_SO_LIEU.slbosung' | translate }}:</b>
+					</div>
+					<ng-container *ngFor="let sl of listSoLieuChild; let i = index;">
+						<div class="col-md-10 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid " style="padding-left: 0.5rem;">
+								<input [value]="sl.SoLieu" matInput disabled />
+							</mat-form-field>
+						</div>
+						<ng-container *ngIf="allowEdit">
+							<div class="col-md-2 m--margin-bottom-20-mobile ">
+								<button mat-icon-button matTooltip="{{ 'MAU_SO_LIEU.themnhapsl' | translate }}" type="button" 
+									(click)="EditObject(sl, true)" color="primary" style="margin-left: 2.5rem;">
+									<mat-icon>create</mat-icon>
+								</button>
+								<ng-container *ngIf="!isCreate">
+									<button mat-icon-button color="warn" type="button" (click)="DeleteSoLieuCon(sl, i)" 
+										matTooltip="Xóa Số liệu dòng này" style=" float: right;">
+										<mat-icon>delete</mat-icon>
+									</button>
+								</ng-container>
+							</div>
+						</ng-container>
+						<ng-container *ngFor="let dec of sl.Detail; let pos = index;">
+							<div class="col-md-10 m--margin-bottom-20-mobile">
+								<mat-form-field class="mat-form-field-fluid " style="padding-left: 1.5rem;">
+									<input value="{{dec.PhiSoLieu + ' (' + getStrCachNhap(dec.CachNhap) +')'}}" matInput placeholder="Nhập số liệu" disabled />
+								</mat-form-field>
+							</div>
+							<div *ngIf="allowEdit" class="col-md-2 m--margin-bottom-20-mobile" style=" float: right;">
+								<button (click)="DeletePhiSoLieu(sl, pos)" color="warn" mat-icon-button style="float: right;" type="button" matTooltip="Xóa">
+									<mat-icon>delete</mat-icon>
+								</button>
+							</div>
+						</ng-container>
+					</ng-container>
+					<ng-container *ngFor="let sl of item.SoLieuCon; let i = index;">
+						<div class="col-md-10 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid " style="padding-left: 0.5rem;">
+								<input [value]="sl.SoLieu" matInput disabled />
+							</mat-form-field>
+						</div>
+						<ng-container *ngIf="allowEdit">
+							<div class="col-md-2 m--margin-bottom-20-mobile ">
+								<button mat-icon-button matTooltip="Thêm nhập số liệu" type="button" (click)="EditObject(sl, true)" color="primary" style="margin-left: 2.5rem;">
+									<mat-icon>create</mat-icon>
+								</button>
+								<button mat-icon-button color="warn" type="button" (click)="DeleteSoLieuCon(sl, i)" matTooltip="Xóa Số liệu dòng này" style=" float: right; ">
+									<mat-icon>delete</mat-icon>
+								</button>
+							</div>
+						</ng-container>
+						<ng-container *ngFor="let dec of sl.Detail; let pos = index;">
+							<div class="col-md-10 m--margin-bottom-20-mobile">
+								<mat-form-field class="mat-form-field-fluid " style="padding-left: 1.5rem;">
+									<input [value]="dec.PhiSoLieu" matInput placeholder="Nhập số liệu" disabled />
+								</mat-form-field>
+							</div>
+							<div *ngIf="allowEdit" class="col-md-2 m--margin-bottom-20-mobile" style=" float: right;">
+								<button (click)="DeleteDetailCon(dec, i, pos)" color="warn" mat-icon-button style="float: right;" type="button" matTooltip="Xóa">
+									<mat-icon>delete</mat-icon>
+								</button>
+							</div>
+						</ng-container>
+					</ng-container>
+				</ng-container>
+			</div>
+		</div>
+	</form>
+</div>

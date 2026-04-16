@@ -1,0 +1,79 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn"
+			title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-7 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-5 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button *ngIf="!data.isThaoluan" type="button" mat-raised-button color="primary" (click)="onSubmit()"
+				[disabled]="disabledBtn">
+				Lưu
+			</button>
+		</div>
+	</div>
+
+	<form class="kt-form" [formGroup]="QuaTrinhKhongCoNguoiDuyetForm">
+		<div class="kt-portlet__body">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true"
+					(close)="onAlertClose($event)">
+				Không thể lưu, vui lòng kiểm tra lại thông tin!
+			</kt-alert>
+
+			<div class="form-group kt-form__group row">
+				<div class="col-md-4 kt-margin-bottom-10-mobile">
+					<mat-label>Phiếu: </mat-label><b>{{item.ten_phieu}}</b>
+				</div>
+				<div class="col-md-4 kt-margin-bottom-10-mobile">
+					<mat-label>Số phiếu: </mat-label><b>{{item.so_phieu}}</b>
+				</div>
+				<div class="col-md-4 kt-margin-bottom-10-mobile">
+					<mat-label>Tình trạng: </mat-label><b>{{item.ten_tinh_trang}}</b>
+				</div>
+			</div>
+
+			<div class="form-group kt-form__group row">
+				<div class="col-md-6 kt-margin-bottom-10-mobile" *ngIf="!data.isThaoluan">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="Người duyệt" formControlName="nhanVien" required="required" multiple>
+							<mat-option *ngFor="let opt of listNV|async" value="{{opt.UserID}}">
+								{{opt.FullName}} ({{opt.UserName}})
+							</mat-option>
+						</mat-select>
+						<mat-error>Người duyệt<strong> là bắt buộc</strong></mat-error>
+					</mat-form-field>
+				</div>
+				<div class="col-md-12 form-group kt-margin-bottom-10-mobile" *ngIf="ListNguoiDuyet.length > 0">
+					Đang trong quá trình duyệt của: 
+					<span *ngFor="let item of ListNguoiDuyet; let l= last">
+						<b>{{ item.FullName }}</b>
+						<span *ngIf="!l">, </span>
+					</span>
+				</div>
+				<ng-container *ngIf="nguoiduyet.NguoiDuyetDon">
+					<div class="col-md-12 form-group kt-margin-bottom-10-mobile">
+						Đang trong quá trình duyệt của: <b>{{nguoiduyet.Hoten}}</b>
+					</div>
+				</ng-container>
+
+				<div class="col-md-12 form-group kt-margin-bottom-10-mobile" *ngIf="isShowNhacnho 
+					&& ((ListNguoiDuyet.length > 0) || (nguoiduyet.NguoiDuyetDon && userId != nguoiduyet.NguoiDuyetDon))">
+					<button [disabled]="guiduyet" class="btn btn-primary" (click)="GuiDeXuatDuyet()">
+						{{ !guiduyet ? 'Nhắc nhở' : 'Đã nhắc nhở'}}
+					</button>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row" *ngIf="data.isThaoluan">
+				<h5 style="border-bottom: solid 1px;">Bình luận</h5>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<kt-comment [Loai]="item.id_loai" [Id]="item.id_phieu"></kt-comment>
+				</div>
+			</div>
+		</div>
+	</form>
+
+</div>

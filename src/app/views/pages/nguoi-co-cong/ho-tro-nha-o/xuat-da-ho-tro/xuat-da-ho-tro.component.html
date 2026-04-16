@@ -1,0 +1,102 @@
+<kt-portlet>
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'"[viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">
+					<span>{{this._name}}</span>
+				</h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button class="show-view-sm" (click)="loadData()" *ngIf="allowExport==false" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+			<button class="show-view-sm" *ngIf="allowExport==true" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+				Chức năng
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput type="number" placeholder="Chọn năm" [(ngModel)]="Nam" [min]="0"/>
+				</mat-form-field>
+				<button mat-menu-item color="primary" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'}, 
+					th : {'border-bottom': '1px solid #dee2e6'}}" matTooltip="In" *ngIf="allowExport" printSectionId="print-section" ngxPrint>In</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</mat-menu>
+			<div class="hide-view-sm" style="display: contents;">
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput type="number" placeholder="Chọn năm" [(ngModel)]="Nam" [min]="0"/>
+				</mat-form-field>
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<button mat-raised-button color="primary" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'}, 
+					th : {'border-bottom': '1px solid #dee2e6'}}" matTooltip="In" *ngIf="allowExport" printSectionId="print-section" ngxPrint>In</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</div>
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive pd-0" *ngIf="display" id="print-section"> 
+		<table class="table-bordered table-sm" style="width:100%;">
+			<tr style="text-align: center;">
+				<th rowspan="3">STT</th>
+				<th rowspan="3">Họ và tên</th>
+				<th colspan="2">Năm sinh</th>
+				<th rowspan="3">Địa chỉ</th>
+				<th rowspan="3">Số hồ sơ</th>
+				<th rowspan="3">Đối tượng</th>
+				<th colspan="4">Nhu cầu hỗ trợ</th>
+				<th colspan="2">Kết quả thực hiện</th>
+				<th rowspan="3">Ghi chú</th>
+			</tr>
+			<tr style="text-align: center;">
+				<th rowspan="2">Nam</th>
+				<th rowspan="2">Nữ</th>
+				<th rowspan="2">Năm đề nghị</th>
+				<th rowspan="2">Xây mới (đồng)</th>
+				<th colspan="2">Sửa chữa</th>
+				<th rowspan="2">Năm hỗ trợ</th>
+				<th rowspan="2">Kinh phí (đồng)</th>
+			</tr>
+			<tr style="text-align: center;">
+				<th>Chi phí (đồng)</th>
+				<th>Nội dung sửa chữa</th>
+			</tr>
+
+			<ng-container *ngFor="let dv of dataThongKe">
+				<tr>
+					<th colspan="5">{{dv.TenDonVi}}</th>
+					<th style="text-align: right;">{{dv.SoLuong}}</th>
+					<th>&nbsp;</th>
+					<th>&nbsp;</th>
+					<th colspan="2" style="text-align: right;">{{dv.TTYeuCau | mask: 'separator':CommonService.thousandSeparator}}</th>
+					<th>&nbsp;</th>
+					<th>&nbsp;</th>
+					<th style="text-align: right;">{{dv.TTHoTro | mask: 'separator':CommonService.thousandSeparator}}</th>
+					<th>&nbsp;</th>
+				</tr>
+				<ng-container *ngFor="let ncc of dv.NCCs; let i=index">
+					<tr>
+						<td>{{i+1}}</td>
+						<td>{{ncc.HoTen}}</td>
+						<td>{{getNamSinh(ncc, 1)}}</td>
+						<td>{{getNamSinh(ncc, 2)}}</td>
+						<td>{{ncc.DiaChi}}</td>
+						<td>{{ncc.SoHoSo}}</td>
+						<td>{{ncc.DoiTuong}}</td>
+						<td style="text-align: center;">{{ncc.NamDeNghi}}</td>
+						<td style="text-align: right;">{{getTien(ncc, 2)}}</td>
+						<td style="text-align: right;">{{getTien(ncc, 1)}}</td>
+						<td>{{ncc.NoiDungHoTro}}</td>
+						<td style="text-align: center;">{{ncc.NamHoTro}}</td>
+						<td style="text-align: right;">{{ncc.TienHoTro  | mask: 'separator':CommonService.thousandSeparator}}</td>
+						<td>&nbsp;</td>
+					</tr>
+				</ng-container>
+			</ng-container>
+			<tr *ngIf="dataThongKe.length==0">
+				<td colspan="13" class="text-center"><b>Không có dữ liệu</b></td>
+			</tr>
+		</table>
+	</div>
+	</kt-portlet-body>
+</kt-portlet>
+

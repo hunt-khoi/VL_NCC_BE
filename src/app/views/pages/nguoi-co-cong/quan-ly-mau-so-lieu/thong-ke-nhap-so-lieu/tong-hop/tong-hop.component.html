@@ -1,0 +1,179 @@
+<kt-portlet-header [title]="getTitle()" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+	<ng-container ktPortletTools>
+		<mat-checkbox [(ngModel)]="IsMauTheoPhong" (change)="change()">{{ 'MAU_SO_LIEU.tktheophienban' | translate }}</mat-checkbox>&nbsp;&nbsp;&nbsp;
+		<mat-checkbox [(ngModel)]="IsDefault" title="Thống kê theo giá trị mặc định của mẫu">
+			{{ 'MAU_SO_LIEU.tktheogtmau' | translate }}
+		</mat-checkbox>
+		<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>
+		<button (click)="in()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+		<button mat-raised-button color="info" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{getTitle()}}
+			[printStyle]="{td : {'border-bottom': '1px solid #dee2e6'}, th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>
+			{{ 'COMMON.PRINT' | translate }}
+		</button>
+	</ng-container>
+</kt-portlet-header>
+<kt-portlet-body>
+	<div class="kt-form">
+		<div class="kt-form__filtration">
+			<div class="row align-items-center">
+				<div class="col-lg-3 kt--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select (selectionChange)="bindNgay()" disableOptionCentering placeholder="Danh sách mẫu số liệu" 
+							name="getIdDonvi" [(ngModel)]="mauSoLieuSelected">
+							<mat-option>
+								<ngx-mat-select-search  [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+									[(ngModel)]="FilterCtrl_mau" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option [value]="0">--Chọn mẫu số liệu--</mat-option>
+							<mat-option [value]="msl.id" *ngFor="let msl of listMauSL$ | async;" matTooltip="{{msl.title}}">{{msl.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<ng-container *ngIf="!IsDefault">
+					<div class="col-lg-1 kt--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="Thống kê theo" [(ngModel)]="theo" (selectionChange)="bindNgay()">
+								<mat-option [value]="0">Khoảng thời gian</mat-option>
+								<mat-option [value]="1">Tháng</mat-option>
+								<mat-option [value]="2">Quý</mat-option>
+								<mat-option [value]="3">Năm</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-1 m--margin-bottom-20-mobile" *ngIf="theo!=0">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input type="number" matInput placeholder="Năm" name="Nam" [(ngModel)]="nam" (ngModelChange)="bindNgay()" />
+						</mat-form-field>
+					</div>
+					<ng-container *ngIf="theo==0">
+						<div class="col-md-2 kt-margin-bottom-10-mobile">
+							<mat-form-field class="mat-form-field-fluid">
+								<input matInput [matDatepicker]="pickerbd_tungay" placeholder="Thời hạn từ ngày" [(ngModel)]="from" [max]="to" (ngModelChange)="bindNgay()">
+								<mat-datepicker-toggle matSuffix [for]="pickerbd_tungay"></mat-datepicker-toggle>
+								<mat-datepicker #pickerbd_tungay></mat-datepicker>
+								<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
+								<mat-error>Ngày hoặc khoảng thời gian <strong> không hợp lệ</strong></mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-md-2 kt-margin-bottom-10-mobile">
+							<mat-form-field class="mat-form-field-fluid">
+								<input matInput [matDatepicker]="pickerbd_denngay" placeholder="Đến ngày" [(ngModel)]="to" [min]="from" (ngModelChange)="bindNgay()">
+								<mat-datepicker-toggle matSuffix [for]="pickerbd_denngay"></mat-datepicker-toggle>
+								<mat-datepicker #pickerbd_denngay></mat-datepicker>
+								<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
+								<mat-error>Ngày hoặc khoảng thời gian <strong> không hợp lệ</strong></mat-error>
+							</mat-form-field>
+						</div>
+					</ng-container>
+					<div class="col-lg-1 kt--margin-bottom-20-mobile" *ngIf="theo==2">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="Quý" [(ngModel)]="quy" (selectionChange)="bindNgay()">
+								<mat-option [value]="1">Quý 1</mat-option>
+								<mat-option [value]="2">Quý 2</mat-option>
+								<mat-option [value]="3">Quý 3</mat-option>
+								<mat-option [value]="4">Quý 4</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-1 kt--margin-bottom-20-mobile" *ngIf="theo==1">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input type="number" matInput placeholder="Tháng" [(ngModel)]="thang" min="1" max="12" (ngModelChange)="bindNgay()" />
+						</mat-form-field>
+					</div>
+					<div class="col-lg-2 kt--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select disableOptionCentering placeholder="Đơn vị được giao" [(ngModel)]="dv">
+								<mat-option>
+									<ngx-mat-select-search  [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+										[(ngModel)]="FilterCtrl_mau" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter1()">
+									</ngx-mat-select-search>
+								</mat-option>
+								<mat-option [value]="0">--Tất cả--</mat-option>
+								<mat-option [value]="opt.Id_DonVi" *ngFor="let opt of lstDV$ | async;" matTooltip={{opt.Title}}>
+									{{opt.Title}}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-2 kt--margin-bottom-20-mobile" *ngIf="Capcocau==1 && dv==0">
+						<mat-checkbox [(ngModel)]="IsDVPhong">Lấy theo đơn vị phòng</mat-checkbox>
+					</div>
+					<div class="col-lg-2 kt--margin-bottom-20-mobile">
+						<mat-checkbox [(ngModel)]="ChuaDuyet">{{ 'MAU_SO_LIEU.gomslchuaduyet' | translate }}</mat-checkbox>
+					</div>
+				</ng-container>
+			</div>
+		</div>
+	</div>
+	<div class="example-container mat-table__wrapper table-responsive" id="print-section">
+		<table class="table-bordered table-sm" style="width:100%;" *ngIf="listDetail.length > 0">
+			<tr>
+				<th class="text-center sticky-body-col0" style="min-width: 20px">STT</th>
+				<th class="text-center sticky-body-col0" style="min-width: 200px">Nội dung</th>
+				<ng-container *ngIf="!IsDefault">
+					<th class="text-center" *ngFor="let col of DonVis">
+						{{col}}
+					</th>
+				</ng-container>
+				<th class="text-center">{{IsDefault ? 'Giá trị mặc định' : 'Tổng giá trị'}}</th>
+			</tr>
+
+			<ng-container *ngFor="let object of listDetail; let vi = index">
+				<tr>
+					<td class="sticky-body-col0 text-center">{{vi + 1}}</td>
+					<td class="sticky-body-col0"><b>{{object.SoLieu}}</b></td>
+					<ng-container *ngIf="!IsDefault">
+						<td class="text-center" *ngFor="let col of DonVis; let c=index">
+							{{object.DonVi[c]}}
+						</td>
+					</ng-container>
+					<td class="text-center">
+						{{IsDefault ? object.default : object.Tong}}
+					</td>
+				</tr>
+				<ng-container *ngFor="let child of object.Detail; let pos = index">
+					<tr>
+						<td class="sticky-body-col0"> </td>
+						<td class="sticky-body-col0">
+							<i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i>
+						</td>
+						<ng-container *ngIf="!IsDefault">
+							<td *ngFor="let col of DonVis; let c=index" class="text-center">
+								{{child.DonVi[c]}}
+							</td>
+						</ng-container>
+						<td class="text-center">{{IsDefault ? child.default : child.Tong}}</td>
+					</tr>
+				</ng-container>
+				<!-- Số liệu con -->
+				<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
+					<tr>
+						<td class="sticky-body-col0"> </td>
+						<td class="sticky-body-col0"><b>{{de.SoLieu}} </b></td>
+						<ng-container *ngIf="!IsDefault">
+							<td *ngFor="let col of DonVis; let c=index" class="text-center">
+								{{de.DonVi[c]}}
+							</td>
+						</ng-container>
+						<td class="text-center">{{IsDefault ? de.default : de.Tong}}</td>
+					</tr>
+					<ng-container >
+						<tr *ngFor="let child of de.Detail; let pos = index">
+							<td class="sticky-body-col0"> </td>
+							<td class="sticky-body-col0">
+								<i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i>
+							</td>
+							<ng-container *ngIf="!IsDefault">
+								<td *ngFor="let col of DonVis; let c=index" class="text-center">
+									{{child.DonVi[c]}}
+								</td>
+							</ng-container>
+							<td class="text-center">{{IsDefault ? child.default : child.Tong}}</td>
+						</tr>
+					</ng-container>
+				</ng-container>
+			</ng-container>
+		</table>
+	</div>
+</kt-portlet-body>

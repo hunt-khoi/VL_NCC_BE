@@ -1,0 +1,60 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+		</div>
+	</div>
+	<form class="kt-form">
+		<div class="kt-portlet__body">
+			<div class="row">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<h5>{{ 'QUA_TET.dot' | translate }}: {{item.DotTangQua}}</h5>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row overflow-auto">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<table style="width:100%" class="table-bordered">
+						<tr>
+							<th class="text-center stt-cell">STT</th>
+							<th class="text-center">Huyện</th>
+							<th class="text-center">Số tờ trình</th>
+							<th class="text-center">Ngày ra tờ trình</th>
+							<th class="text-center">Thao tác</th>
+						</tr>
+						<ng-container *ngIf="ready">
+							<tr *ngFor="let nh of lstNhom; let i=index">
+								<th class="text-center stt-cell">{{i+1}}</th>
+								<td>{{nh.District}}</td>
+								<td>
+									<mat-form-field>
+										<input matInput type="text" placeholder="Số tờ trình" [(ngModel)]="nh.SoTT" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
+										<span matSuffix>/TTr-LĐTBXH</span>
+									</mat-form-field>
+								</td>
+								<td>
+									<mat-form-field>
+										<input matInput type="text" placeholder="Ngày ra tờ trình" [(ngModel)]="nh.NgayTT" [matDatepicker]="picker2" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
+										<mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+										<mat-datepicker #picker2></mat-datepicker>
+									</mat-form-field>
+								</td>
+								<td>
+									<button (click)="onSubmit(nh)" mat-icon-button *ngIf="allowEdit" matTooltip="Lưu thay đổi" color="primary" type="button">
+										<mat-icon>save</mat-icon>
+									</button>
+								</td>
+							</tr>
+						</ng-container>
+					</table>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

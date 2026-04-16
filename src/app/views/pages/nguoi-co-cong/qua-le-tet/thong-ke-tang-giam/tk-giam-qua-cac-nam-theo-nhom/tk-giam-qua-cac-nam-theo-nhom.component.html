@@ -1,0 +1,80 @@
+<kt-portlet [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head--lg">
+		<div class="kt-portlet__head-label">
+			<h3 class="kt-portlet__head-title">
+				<span translate="OBJECT.LIST" [translateParams]="{name:this._name.toLowerCase()}"></span>
+			</h3>
+		</div>
+	</div>
+	<form class="kt-form" [formGroup]="itemForm" style="margin-left: 30px;">
+		<div class="kt-portlet-body">
+			<!-- Chọn các năm -->
+			<div class="form-group kt-form__group row">
+				<div class="col-md-2 kt-margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Chọn các năm..." multiple formControlName="Nam">
+							<mat-option [value]="tmp.id" *ngFor="let tmp of list10year;">
+								{{tmp.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-4 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select formControlName="NhomLeTet" placeholder="{{'NHOM_LE_TET.NAME' | translate }}" class="require" required>
+							<mat-option *ngFor="let opt of listNhomLeTet;" [value]="opt.id">
+								{{opt.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-4 kt-margin-bottom-10-mobile">
+					<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				</div>
+			</div>
+
+			<div class="form-group kt-form__group row">
+				<!-- Danh sách chi tiết -->
+				<div class="col-md-6 kt-margin-bottom-10-mobile">
+					<table class="table-bordered table-sm" style="width:100%;">
+						<tr>
+							<th>STT</th>
+							<th>Họ tên</th>
+							<th>Số hồ sơ</th>
+						</tr>
+						<ng-container *ngFor="let items of dataThongKe">
+							<tr>
+								<td colspan="3"><b>Nguồn kinh phí: {{items.NguonKinhPhi}}</b></td>
+							</tr>
+							<ng-container *ngFor="let dt of items.ThongKe">
+								<tr>
+									<td colspan="3"><b>Năm: {{items.Nam}} - Số lượng: {{items.SL}} </b></td>
+								</tr>
+								<ng-container *ngFor="let ncc of dt.DanhSach; let i=index">
+									<tr>
+										<td>{{i+1}}</td>
+										<td>{{ncc.HoTen}}</td>
+										<td>{{ncc.SoHoSo}}</td>
+									</tr>
+								</ng-container>
+							</ng-container>
+						</ng-container>
+					</table>
+				</div>
+				<!-- Biểu độ cột -->
+				<div class="col-md-4 kt-margin-bottom-10-mobile">
+					<h5>Biểu đồ cột thể hiện số lượng hồ sơ qua các năm</h5>
+					<canvas baseChart
+							[chartType]="'bar'"
+							[datasets]="chartData"
+							[labels]="labels"
+							[options]="chartOptions"
+							[legend]="true"
+							[colors]="colors">
+					</canvas>
+				</div>
+
+			</div>
+		</div>
+	</form>
+</kt-portlet>

@@ -1,0 +1,161 @@
+<style>
+	:host >>> .mat-tab-body-content {
+		height: auto;
+	}
+
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 1;
+	}
+
+	.d-revert{
+		display: revert!important;
+	}
+</style>
+<kt-portlet>
+	<mat-tab-group>
+		<mat-tab label="Thống kê tăng giảm">
+			<ng-template matTabContent>
+				<div class="kt-portlet__body">
+					<div class="form-group kt-form__group row">
+						<div class="col-md-1 kt-margin-bottom-10-mobile">
+							<mat-form-field class="mat-form-field-fluid">
+								<input matInput [(ngModel)]="nam" placeholder="Năm" type="number" (change)="loadData()" />
+							</mat-form-field>
+						</div>
+						<div class="col-md-2 kt-margin-bottom-10-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<mat-select [(ngModel)]="idHuyen" placeholder="Chọn huyện thống kê" (selectionChange)="loadData()" [disabled]="Capcocau>1">
+									<mat-option [value]="0" disabled>--Chọn huyện thống kê--</mat-option>
+									<mat-option *ngFor="let opt of listHuyen;" [value]="opt.ID_Row">{{opt.District}}</mat-option>
+								</mat-select>
+							</mat-form-field>
+						</div>
+						<div class="col-md-2 kt-margin-bottom-10-mobile">
+							<mat-form-field class="mat-form-field-fluid " *ngIf="Capcocau ==3">
+								<mat-select placeholder="Chọn xã thống kê" [(ngModel)]="idXa" disabled>
+									<mat-option [value]="0" disabled>--Chọn xã thống kê--</mat-option>
+									<mat-option [value]="item.ID_Row" *ngFor="let item of listXa">{{item.Ward}}</mat-option>
+								</mat-select>
+							</mat-form-field>
+						</div>
+						<div class="col-md-7 kt-margin-bottom-10-mobile text-right">
+							<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>&nbsp;
+							<button mat-raised-button color="info" matTooltip="Xuất danh sách" [matMenuTriggerFor]="menu">Export</button>&nbsp;
+							<mat-menu #menu="matMenu">
+								<button mat-menu-item (click)="exportExcel(3)">
+									PDF
+								</button>
+								<button mat-menu-item (click)="exportExcel(1)">
+									Word
+								</button>
+								<button mat-menu-item (click)="exportExcel(2)">
+									Excel
+								</button>
+							</mat-menu>
+							<button mat-raised-button color="info" matTooltip="In" *ngIf="data.length>0" printSectionId="print-section" ngxPrint
+									[printStyle]="{td : {'border-bottom': '1px solid #dee2e6','border-right': '1px solid #dee2e6'},
+									th : {'border-bottom': '1px solid #dee2e6'}, table : {'border': '1px solid #dee2e6' }}">
+								In
+							</button>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row table-responsive" id="print-section">
+						<table class="table-bordered" style="width: 100%;">
+							<tbody>
+								<tr>
+									<td class="d-revert" style="width: 17px; text-align: center;  display: none;"></td>
+									<td style="width: 17px; text-align: center;"><strong>STT</strong></td>
+									<td style="width: 63px; text-align: center;"><strong>Số hồ sơ</strong></td>
+									<td style="width: 63px; text-align: center;"><strong>Số sổ theo dõi</strong></td>
+									<td style="width: 92px; text-align: center;"><strong>Họ Tên Người Hưởng</strong></td>
+									<td style="width: 36px; text-align: center;"><strong>Năm sinh</strong></td>
+									<td style="width: 53px; text-align: center;"><strong>Ấp</strong></td>
+									<td style="width: 54px; text-align: center;"><strong>Xã</strong></td>
+									<td style="width: 69px; text-align: center;"><strong>Huyện</strong></td>
+									<td style="width: 164px; text-align: center;"><strong>Đối tượng</strong></td>
+									<td style="width: 36px; text-align: center;"><strong>Năm</strong></td>
+									<!-- <td style="width: 150px; text-align: center;"><strong>Dụng cụ</strong></td>
+									<td style="width: 150px; text-align: center;"><strong>Số tiền</strong></td> -->
+									<td style="width: 96px; text-align: center;"><strong>Họ Tên Liệt Sĩ</strong></td>
+									<td style="width: 56px; text-align: center;"><strong>Quan hệ với Liệt sĩ</strong></td>
+									<td style="width: 52px; text-align: center;"><strong>Ghi chú</strong></td>
+								</tr>
+								<ng-container *ngIf="data.length==0">
+									<tr><td colspan="14" class="text-center">Không có dữ liệu</td></tr>
+								</ng-container>
+								<ng-container *ngFor="let g of data">
+									<tr>
+										<td class="d-revert" style="text-align: center; display: none;">
+											<button mat-icon-button (click)="g.expanded=!g.expanded">
+												<mat-icon *ngIf="!g.expanded">add</mat-icon>
+												<mat-icon *ngIf="g.expanded">remove</mat-icon>
+											</button>
+										</td>
+										<td style="width: 261px;" colspan="6">
+											<strong>{{g.Title}}</strong>
+										</td>
+										<td style="width: 54px; text-align: center;"><strong>{{g.SL}}</strong></td>
+										<td style="width: 69px; text-align: center;"><strong>đối tượng</strong></td>
+										<td style="width: 164px;"></td>
+										<td style="width: 36px;"></td>								
+										<td style="width: 96px;"></td>
+										<td style="width: 56px;"></td>
+										<td style="width: 52px;"></td>
+									</tr>
+									<ng-container *ngFor="let xa of g.Xas; let i=index">
+										<tr *ngIf="g.expanded">
+											<td class="d-revert" style="text-align: center; display: none;">
+												<button mat-icon-button (click)="xa.expanded=!xa.expanded">
+													<mat-icon *ngIf="!xa.expanded">add</mat-icon>
+													<mat-icon *ngIf="xa.expanded">remove</mat-icon>
+												</button>
+											</td>
+											<td style="width: 17px; text-align: center; ">
+												<strong>{{i+1}}</strong>
+											</td>
+											<td style="width: 191px;" colspan="4"><strong>{{xa.Title}}</strong></td>
+											<td style="width: 53px;"> </td>
+											<td style="width: 54px; text-align: center; "><strong>{{xa.SL}}</strong></td>
+											<td style="width: 69px; text-align: center; "><strong>đối tượng</strong></td>
+											<td style="width: 164px;"> </td>
+											<td style="width: 36px;"> </td>								
+											<td style="width: 96px;"> </td>
+											<td style="width: 56px;"> </td>
+											<td style="width: 52px;"> </td>
+										</tr>
+										<ng-container *ngFor="let ncc of xa.NCCs; let j=index">
+											<tr *ngIf="xa.expanded">
+												<td class="d-revert" style="width: 17px; text-align: center; display: none; "></td>
+												<td style="width: 17px; text-align: center; ">{{j+1}}</td>
+												<td style="width: 63px;">{{ncc.SoHoSo}}</td>
+												<td style="width: 63px;">{{ncc.SoTheoDoi}}</td>
+												<td style="width: 92px;">{{ncc.HoTen}}</td>
+												<td style="width: 36px;">{{ncc.NamSinh}}</td>
+												<td style="width: 53px; text-align: center; ">{{ncc.KhomAp}}</td>
+												<td style="width: 54px; text-align: center; ">{{ncc.Title}}</td>
+												<td style="width: 69px; text-align: center; ">{{ncc.DistrictName}}</td>
+												<td style="width: 164px; text-align: center; "><div class="dt-overflow" title="{{ncc.DoiTuong}}">{{ncc.DoiTuong}}</div></td>
+												<td style="width: 36px; text-align: center; ">{{ncc.Nam}}</td>
+												<td style="width: 96px;"> {{ncc.HoTenThanNhan}}</td>
+												<td style="width: 56px;"> {{ncc.QHGiaDinh}}</td>
+												<td style="width: 52px; text-align: center;">{{ncc.GhiChuGiam}}</td>
+											</tr>
+										</ng-container>
+									</ng-container>
+								</ng-container>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</kt-portlet>

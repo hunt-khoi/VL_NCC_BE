@@ -1,0 +1,137 @@
+<style>
+	.rowGroup {
+		background-color: #c7d3ec;
+		font-weight: bold;
+	}
+	.rowGroup:hover {
+		background-color: #a4bcee;
+		font-weight: normal;
+	}
+	.txt-right {
+		text-align: right;
+	}
+	.txt-right:hover {
+		font-weight: bold;
+		font-size: 1.1em;
+	}
+</style>
+<kt-portlet [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<kt-portlet-header [sticky]="true" [title]="'Thống kê số lượng hồ sơ'" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTools>
+			<button class="d-none" printTitle="Thống kê số lượng hồ sơ" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'}, 
+				th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint #printme></button> 
+
+			<button class="show-view-sm" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+				{{ 'COMMON.CHUCNANG' | translate }}
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button mat-menu-item>
+					<mat-form-field class="mat-form-field-fluid " (click)="$event.stopPropagation();">
+						<mat-select placeholder="Thống kê theo" [(value)]="loai" (selectionChange)="loadDataList()">
+							<mat-option value="" disabled="true">--Chọn--</mat-option>
+							<mat-option value="0">Đơn vị</mat-option>
+							<mat-option value="1">Người nhập</mat-option>
+							<mat-option value="2">Người duyệt</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</button>
+				<button mat-menu-item matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="primary" (click)="loadDataList()">{{'COMMON.DETAIL'|translate}}</button>
+				<button mat-menu-item matTooltip="{{ 'COMMON.EXPORT' | translate }}" color="info" (click)="export()">{{ 'COMMON.EXPORT' | translate }}</button>
+				<button mat-menu-item matTooltip="{{ 'COMMON.PRINT' | translate }}" color="info" (click)="print()">{{ 'COMMON.PRINT' | translate }}</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<mat-form-field class="mat-form-field-fluid ">
+					<mat-select placeholder="Thống kê theo" [(value)]="loai" (selectionChange)="loadDataList()">
+						<mat-option value="" disabled="true">--Chọn--</mat-option>
+						<mat-option value="0">Đơn vị</mat-option>
+						<mat-option value="1">Người nhập</mat-option>
+						<mat-option value="2">Người duyệt</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button mat-raised-button matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="primary" (click)="loadDataList()">{{'COMMON.DETAIL'|translate}}</button>
+				<button mat-raised-button matTooltip="{{ 'COMMON.EXPORT' | translate }}" color="info" (click)="export()">{{ 'COMMON.EXPORT' | translate }}</button>
+				<button mat-raised-button matTooltip="{{ 'COMMON.PRINT' | translate }}" color="info" (click)="print()">{{ 'COMMON.PRINT' | translate }}</button>
+			</div>	
+		</ng-container>
+	</kt-portlet-header>
+
+	<div class="kt-portlet__body">
+		<div class="kt-form">
+			<div class="kt-form__filtration">
+				<div class="row align-items-center">
+					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="Capcocau==1">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict">
+								<mat-option value="">Tất cả</mat-option>
+								<mat-option value="{{district.ID_Row}}" *ngFor="let district of listdistrict;">{{district.District}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-md-2 kt-margin-bottom-10-mobile">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput [matDatepicker]="pickerbd_tungay" placeholder="Thời hạn từ ngày" [(ngModel)]="from" [max]="to">
+							<mat-datepicker-toggle matSuffix [for]="pickerbd_tungay"></mat-datepicker-toggle>
+							<mat-datepicker #pickerbd_tungay></mat-datepicker>
+							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
+							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong></mat-error>
+						</mat-form-field>
+					</div>
+					<div class="col-md-2 kt-margin-bottom-10-mobile">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput [matDatepicker]="pickerbd_denngay" placeholder="Đến ngày" [(ngModel)]="to" [min]="from" [max]="now">
+							<mat-datepicker-toggle matSuffix [for]="pickerbd_denngay"></mat-datepicker-toggle>
+							<mat-datepicker #pickerbd_denngay></mat-datepicker>
+							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
+							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong></mat-error>
+						</mat-form-field>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group kt-form__group row" id="print-section">
+				<div class="col-md-12 kt-margin-bottom-10-mobile table-responsive" *ngIf="loai!=''">
+					<table class="table-bordered table-sm w-100">
+						<tr>
+							<th style="width:20px">STT</th>
+							<th style="min-width: 150px;">{{loai=='0' ? 'Đơn vị' : 'Họ tên'}}</th>
+							<th style="width: 150px; text-align: center;">Trước hạn</th>
+							<th style="width: 150px; text-align: center;">Hoàn thành đúng hạn</th>
+							<th style="width: 150px; text-align: center;">Hoàn thành muộn</th>
+							<th style="width: 150px; text-align: center;">Đang xử lý trong hạn</th>
+							<th style="width: 150px; text-align: center;">Đang xử lý trễ hạn</th>
+							<th style="width: 150px; text-align: center;">Tổng cộng</th>
+						</tr>
+						<ng-container *ngFor="let items of dataThongKe; let j=index">
+							<tr [ngClass]="{'rowGroup': loai=='0'}">
+								<td><span *ngIf="loai!='0'">{{j + 1}}</span></td>
+								<td>{{items.title}}</td>
+								<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(items, 0)">{{items.SoLuong.HTTruoc}}</a></td>
+								<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(items, 1)">{{items.SoLuong.HTDungHan}}</a></td>
+								<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(items, 2)">{{items.SoLuong.HTTreHan}}</a></td>
+								<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(items, 3)">{{items.SoLuong.DangLam}}</a></td>
+								<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(items, 4)">{{items.SoLuong.TreHan}}</a></td>
+								<td style="text-align:right; font-weight:bold"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(items, -1)">{{items.SoLuong.Tong}}</a></td>
+							</tr>
+							<ng-container *ngIf="items.Xas">
+								<tr *ngFor="let item of items.Xas; let i=index">
+									<td>{{i + 1}}</td>
+									<td>{{item.title}}</td>
+									<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(item, 0, items.id)">{{item.SoLuong.HTTruoc}}</a></td>
+									<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(item, 1, items.id)">{{item.SoLuong.HTDungHan}}</a></td>
+									<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(item, 2, items.id)">{{item.SoLuong.HTTreHan}}</a></td>
+									<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(item, 3, items.id)">{{item.SoLuong.DangLam}}</a></td>
+									<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(item, 4, items.id)">{{item.SoLuong.TreHan}}</a></td>
+									<td style="text-align:right; font-weight:bold"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(item, -1, items.id)">{{item.SoLuong.Tong}}</a></td>
+								</tr>
+							</ng-container>
+						</ng-container>
+						<tr *ngIf="dataThongKe.length==0">
+							<td colspan="7" style="text-align: center;">Không có dữ liệu</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</kt-portlet>

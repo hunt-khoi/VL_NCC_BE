@@ -1,0 +1,168 @@
+<style>
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 1;
+	}
+	.min-th {
+		min-width: 160px;
+	}
+	.min-width-200px {
+		min-width: 200px;
+	}
+</style>
+<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+	<ng-container ktPortletTools>
+		<button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+			<button class="show-view-sm" *ngIf="allowExport" mat-raised-button [matMenuTriggerFor]="chucnang1" color="primary">
+				Chức năng
+			</button>
+			<mat-menu #chucnang1="matMenu">
+				<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-menu-item color="primary" matTooltip="In danh sách" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách">Export</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</div>
+	</ng-container>
+</kt-portlet-header>
+
+<kt-portlet-body>
+	<div class="form-group kt-form__group row">
+		<div class="col-md-3 kt-margin-bottom-10-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Loại thống kê" [(ngModel)]="loaitk" (selectionChange)="hiddenExport()">
+					<mat-option [value]="1">Theo kỳ năm</mat-option>
+					<mat-option [value]="2">Theo kỳ quý</mat-option>
+					<mat-option [value]="3">Theo kỳ tháng</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-md-2 kt-margin-bottom-10-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput type="number" placeholder="Năm" [(ngModel)]="Nam" [min]="0" (change)="hiddenExport()"/>
+			</mat-form-field>
+		</div>
+		<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="loaitk == 2">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Quý" [(ngModel)]="quy" (selectionChange)="hiddenExport()">
+					<mat-option [value]="t" *ngFor="let t of lstThang | slice:0:4">
+						Quý {{t}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="loaitk == 3">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Tháng" [(ngModel)]="thang" (selectionChange)="hiddenExport()">
+					<mat-option [value]="t" *ngFor="let t of lstThang">
+						Tháng {{t}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+	</div>
+	<div id="print-section" *ngIf="display">
+		<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive">
+			<table class="table-bordered table-sm" style="width:100%;">
+				<tr class="text-center">
+					<th rowspan="2">STT</th>
+					<th rowspan="2">NỘI DUNG</th>
+					<th [attr.colspan]="col+1">Quỹ đền ơn đáp nghĩa</th>
+					<th rowspan="2">Quỹ đền ơn đáp nghĩa <br/> Cấp trên hỗ trợ <br/> (không tính so với kế hoạch)</th>
+					<th rowspan="2">Tổng cộng</th>
+				</tr>
+				<tr class="text-center">
+					<th><i>Cộng</i></th>
+					<th><i>Cấp xã</i></th>
+					<th *ngIf="Capcocau <= 2"><i>Cấp huyện</i></th>
+					<th *ngIf="Capcocau == 1"><i>Cấp tỉnh</i></th>
+				</tr>
+				<tr>
+					<th>1</th>
+					<td><b>Kỳ trước chuyển sang</b></td>
+					<td style="text-align: right;">{{sumCap("TonTrucTiep")}}</td>
+					<td style="text-align: right;">
+						<span *ngIf="Capcocau == 3">{{getValue("TonTrucTiep")}}</span>
+						<span *ngIf="Capcocau < 3">{{getValueCapDuoi("TonTrucTiep", 3)}}</span>
+					</td>
+					<td *ngIf="Capcocau <= 2" style="text-align: right;">
+						<span *ngIf="Capcocau == 2">{{getValue("TonTrucTiep")}}</span>
+						<span *ngIf="Capcocau == 1">{{getValueCapDuoi("TonTrucTiep", 2)}}</span>
+					</td>
+					<td *ngIf="Capcocau == 1" style="text-align: right;">{{getValue("TonTrucTiep")}}</td>
+					<td style="text-align: right;">{{getValue("TonGianTiep")}}</td>
+					<td style="text-align: right;">{{sumTongCap("TonTrucTiep", "TonGianTiep")}}</td>
+				</tr>
+				<tr>
+					<th>2</th>
+					<td><b>Vận động trong kỳ</b></td>
+					<td style="text-align: right;">{{sumCap("TienVDTrongKy")}}</td>
+					<td style="text-align: right;">
+						<span *ngIf="Capcocau == 3">{{getValue("TienVDTrongKy")}}</span>
+						<span *ngIf="Capcocau < 3">{{getValueCapDuoi("TienVDTrongKy", 3)}}</span>
+					</td>
+					<td *ngIf="Capcocau <= 2" style="text-align: right;">
+						<span *ngIf="Capcocau == 2">{{getValue("TienVDTrongKy")}}</span>
+						<span *ngIf="Capcocau == 1">{{getValueCapDuoi("TienVDTrongKy", 2)}}</span>
+					</td>
+					<td *ngIf="Capcocau == 1" style="text-align: right;">{{getValue("TienVDTrongKy")}}</td>
+					<td style="text-align: right;">{{getValue("TienHTTrongKy")}}</td>
+					<td style="text-align: right;">{{sumTongCap("TienVDTrongKy", "TienHTTrongKy")}}</td>
+				</tr>
+				<tr>
+					<th>3</th>
+					<td><b>Sử dụng trong kỳ</b></td>
+					<td style="text-align: right;">{{sumCap("TienSDTrongKy")}}</td>
+					<td style="text-align: right;">
+						<span *ngIf="Capcocau == 3">{{getValue("TienSDTrongKy")}}</span>
+						<span *ngIf="Capcocau < 3">{{getValueCapDuoi("TienSDTrongKy", 3)}}</span>
+					</td>
+					<td *ngIf="Capcocau <= 2" style="text-align: right;">
+						<span *ngIf="Capcocau == 2">{{getValue("TienSDTrongKy")}}</span>
+						<span *ngIf="Capcocau == 1">{{getValueCapDuoi("TienSDTrongKy", 2)}}</span>
+					</td>
+					<td *ngIf="Capcocau == 1" style="text-align: right;">{{getValue("TienSDTrongKy")}}</td>
+					<td style="text-align: right;">{{getValue("TienSDTuTren")}}</td>
+					<td style="text-align: right;">{{sumTongCap("TienSDTrongKy", "TienSDTuTren")}}</td>
+				</tr>
+				<tr>
+					<th>4</th>
+					<td><b>Kinh phí còn lại chuyển sang kỳ sau</b></td>
+					<td style="text-align: right;">{{tienKySauCap()}}</td>
+					<td style="text-align: right;">
+						<span *ngIf="Capcocau == 3">{{sumValue()}}</span>
+						<span *ngIf="Capcocau < 3">{{sumValueCapDuoi(3)}}</span>
+					</td>
+					<td *ngIf="Capcocau <= 2" style="text-align: right;">
+						<span *ngIf="Capcocau == 2">{{sumValue()}}</span>
+						<span *ngIf="Capcocau == 1">{{sumValueCapDuoi(2)}}</span>
+					</td>
+					<td *ngIf="Capcocau == 1" style="text-align: right;">{{sumValue()}}</td>
+					<td style="text-align: right;">{{sumValue2()}}</td>
+					<td style="text-align: right;">{{tienKySauTongCap()}}</td>
+				</tr>
+
+				<tr *ngIf="dataThongKe.data.length==0">
+					<td [attr.colspan]="col+4" class="text-center"><b>Không có dữ liệu</b></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</kt-portlet-body>

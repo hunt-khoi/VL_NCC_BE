@@ -1,0 +1,182 @@
+<div class="kt-grid kt-grid--desktop kt-grid--ver kt-grid--ver-desktop kt-app">
+	<!--Begin:: App Aside Mobile Toggle-->
+	<button class="kt-app__aside-close" id="kt_user_profile_aside_close">
+		<i class="la la-close"></i>
+	</button>
+	<!--End:: App Aside Mobile Toggle-->
+	<!--Begin:: App Aside-->
+	<div class="kt-grid__item kt-app__toggle kt-app__aside" style="width: 17%;">
+		<div class="kt-portlet" style="height: 100%;max-height: 80.3vh;">
+			<div class="kt-portlet__head  kt-portlet__head--noborder">
+				<div class="kt-portlet__head-label">
+					<h3 class="kt-portlet__head-title">
+					</h3>
+				</div>
+				<div class="kt-portlet__head-toolbar">
+					<button (click)="back()" mat-raised-button matTooltip="{{ 'COMMON.BACK' | translate }}" type="button">
+						<span translate="COMMON.BACK"></span>
+					</button>
+				</div>
+			</div>
+			<div class="kt-portlet__body kt-portlet__body--fit-y">
+				<!--begin::Widget -->
+				<div class="kt-widget kt-widget--user-profile-1">
+					<div class="kt-widget__head">
+						<div class="kt-widget__content">
+							<div class="kt-widget__section">
+								<a href="#" class="kt-widget__username">
+									{{_user.HoTen}}
+									<i class="flaticon2-correct kt-font-success" *ngIf="_user.Status==2"></i>
+								</a>
+								<span class="kt-widget__subtitle">
+									{{_user.SoHoSo}}
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="kt-widget__body">
+						<div class="kt-widget__items">
+							<a [routerLink]="['./']" [routerLinkActiveOptions]="{exact:true}"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+								<span class="kt-widget__section">
+									<span class="kt-widget__desc">Hồ sơ</span>
+								</span>
+							</a>
+							<a [routerLink]="['./than-nhan']"
+								class="kt-widget__item" routerLinkActive="kt-widget__item--active">
+								<span class="kt-widget__section">
+									<span class="kt-widget__desc">Thân nhân</span>
+								</span>
+							</a>
+							<a [routerLink]="['./giay-to']"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+								<span class="kt-widget__section">
+									<span class="kt-widget__desc">Giấy tờ</span>
+								</span>
+							</a>
+							<a [routerLink]="['./qua-trinh-hoat-dong']"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+								<span class="kt-widget__section">
+									<span class="kt-widget__desc">Quá trình hoạt động</span>
+								</span>
+							</a>
+							<a [routerLink]="['./tro-cap']"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+								<span class="kt-widget__section">
+									<span class="kt-widget__desc">Trợ cấp</span>
+								</span>
+							</a>
+							<a [routerLink]="['./di-chuyen']"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+								<span class="kt-widget__section">
+									<span class="kt-widget__desc">Di chuyển</span>
+								</span>
+							</a>
+							<a [routerLink]="['./dinh-chinh-thong-tin']"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+								<span class="kt-widget__section">
+									<span class="kt-widget__desc">Đính chính thông tin</span>
+								</span>
+							</a>
+						</div>
+					</div>
+				</div>
+				<!--end::Widget -->
+			</div>
+		</div>
+	</div>
+	<!--End:: App Aside-->
+	
+	<div id="page" class="kt-grid__item kt-grid__item--fluid kt-app__content" style="display: flex;margin-left: 10px">
+		<button type="button" class="btn btn-label-brand btn-sm btn-icon btn-icon-md view-mobile" [matMenuTriggerFor]="menuleft" style="position: absolute;top: 15px;right: 25px;z-index: 10;"
+				aria-haspopup="true" aria-expanded="false">
+			<i class="flaticon2-gear"></i>
+		</button>
+		<div class="kt-portlet" >			
+			<div>			
+				<mat-menu #menuleft style="height: 100%;">
+					<div class="kt-widget kt-widget--user-profile-1" style="padding:15px;min-width:200px">
+						<div class="kt-widget__head">
+							<div class="kt-widget__content">
+								<div class="kt-widget__section">
+									<a href="#" class="kt-widget__username">
+										{{_user.HoTen}}
+										<i class="flaticon2-correct kt-font-success"></i>
+									</a>
+									<span class="kt-widget__subtitle">
+										{{_user.SoHoSo}}
+									</span>
+								</div>
+							</div>
+						</div>
+		
+						<div class="kt-widget__body">
+							<div class="kt-widget__items">
+								<a [routerLink]="['./']" [routerLinkActiveOptions]="{exact:true}"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+									<span class="kt-widget__section">
+										<span class="kt-widget__desc">Hồ sơ</span>
+									</span>
+								</a>
+								<a [routerLink]="['./than-nhan']"
+								class="kt-widget__item" routerLinkActive="kt-widget__item--active">
+									<span class="kt-widget__section">
+										<span class="kt-widget__desc">Thân nhân</span>
+									</span>
+								</a>
+								<a [routerLink]="['./giay-to']"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+									<span class="kt-widget__section">
+										<span class="kt-widget__desc">Giấy tờ</span>
+									</span>
+								</a>
+								<a [routerLink]="['./qua-trinh-hoat-dong']"
+								class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+									<span class="kt-widget__section">
+										<span class="kt-widget__desc">Quá trình hoạt động</span>
+									</span>
+								</a>
+								<ng-container *ngIf="_user.Status==2">
+									<a [routerLink]="['./tro-cap']"
+									class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+										<span class="kt-widget__section">
+											<span class="kt-widget__desc">Trợ cấp</span>
+										</span>
+									</a>
+									<a [routerLink]="['./di-chuyen']"
+									class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+										<span class="kt-widget__section">
+											<span class="kt-widget__desc">Di chuyển</span>
+										</span>
+									</a>
+									<a [routerLink]="['./dinh-chinh-thong-tin']"
+									class="kt-widget__item " routerLinkActive="kt-widget__item--active">
+										<span class="kt-widget__section">
+											<span class="kt-widget__desc">Đính chính thông tin</span>
+										</span>
+									</a>
+								</ng-container>
+							</div>
+						</div>	
+					</div>	
+				</mat-menu>
+			</div>
+		</div>
+
+		<div class="kt-portlet" style="height: 100%; width: 100%; max-height: 80.3vh; overflow-y: auto">
+			<div class="router-outlet">
+				<router-outlet></router-outlet>
+			</div>
+		</div>
+
+		<div class="hidden" style="width: 40%; margin-left: 10px; max-height: 80.3vh">
+			<div class="kt-portlet" style="padding: 15px; min-width: fit-content; height: 100%; overflow-y: auto;"> 
+				<h5 style="border-bottom: solid 1px;">Trao đổi trong quá trình giải quyết hồ sơ</h5>
+				<div class="col-lg-12 m--margin-bottom-20-mobile" style="padding: 10px; display: unset;">
+					<kt-comment [Loai]="2" [Id]="objectId" [disabledInput]="_user.IsGiam"></kt-comment>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>

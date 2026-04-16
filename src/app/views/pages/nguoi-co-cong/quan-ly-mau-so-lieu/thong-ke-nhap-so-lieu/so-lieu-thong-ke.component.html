@@ -1,0 +1,19 @@
+<style>
+	:host >>> .mat-tab-body-content {
+		height: auto;
+	}
+</style>
+<kt-portlet>
+	<mat-tab-group>
+		<mat-tab label="Tổng hợp số liệu theo mẫu">
+			<ng-template matTabContent>
+				<kt-tong-hop></kt-tong-hop>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Tổng hợp số liệu theo giai đoạn">
+			<ng-template matTabContent>
+				<kt-theo-giai-doan></kt-theo-giai-doan>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</kt-portlet>

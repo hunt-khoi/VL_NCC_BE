@@ -1,0 +1,189 @@
+<style>
+	.icon {
+		cursor: pointer;
+		width: 40px;
+		height: 40px;
+	}
+
+	::ng-deep .icon-select-container .mat-form-field-infix {
+		max-height: 14px;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="trolai()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{isZoomSize ? '9' : '7'}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getComponentTitle()}}</h3>
+		</div>
+		<div class="col-md-{{isZoomSize ? '3' : '5'}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button (click)="luuvacapnhat(true)" [disabled]="disabledBtn" mat-raised-button matTooltip="Lưu" color="accent" class="primary" type="button" *ngIf="allowEdit">
+				Lưu<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+	<form [formGroup]="itemForm" class="kt-form">
+		<div class="kt-portlet__body">
+			<div class="kt-portlet__body-progress">
+				<mat-spinner [diameter]="20"></mat-spinner>
+			</div>
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+				Không thể lưu, vui lòng kiểm tra lại thông tin!
+			</kt-alert>
+			<div class="form-group kt-form__group row">
+				<div class="{{item.ProcessmethodLoai==1?'col-md-5':'col-md-6'}} m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput placeholder="{{ 'QUY_TRINH_DUYET.tencapduyet' | translate }}" required id="id" formControlName="tenCapDuyet">
+						<mat-error *ngIf="itemForm.controls['tenCapDuyet'].errors">
+							{{ 'QUY_TRINH_DUYET.tencapduyet' | translate }}
+							<strong *ngIf="itemForm.controls['tenCapDuyet'].errors.required"> bắt buộc nhập</strong>
+							<strong *ngIf="itemForm.controls['tenCapDuyet'].errors.maxlength"> tối đa {{itemForm.controls['tenCapDuyet'].errors.maxlength.requiredLength}} ký tự</strong>
+						</mat-error>
+					</mat-form-field>
+				</div>
+				<div class="col-md-1 m--margin-bottom-10-mobile" *ngIf="item.ProcessmethodLoai==1">
+					<mat-form-field class="mat-form-field-fluid icon-select-container">
+						<mat-select placeholder="Icon" required formControlName="icon">
+							<mat-select-trigger>
+								<mat-icon color="primary">{{itemForm.controls["icon"].value}}</mat-icon>
+							</mat-select-trigger>
+							<mat-option value="{{item.icon}}" *ngFor="let item of listIcon">
+								<mat-icon color="primary">{{item.icon}}</mat-icon>
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="Cấp duyệt" required (selectionChange)="loadChange(id_capduyet)" [(value)]="id_capduyet"
+							[disabled]="!allowEdit">
+							<mat-option value="{{hv.ID_Row}}" *ngFor="let hv of listCapDuyet">
+								{{hv.Title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput placeholder="{{ 'QUY_TRINH_DUYET.songayxl' | translate }}" required formControlName="SoNgayXuLy" type="number">
+						<mat-error *ngIf="itemForm.controls['SoNgayXuLy'].errors">
+							{{ 'QUY_TRINH_DUYET.songayxl' | translate }}
+							<strong *ngIf="itemForm.controls['SoNgayXuLy'].errors.required"> bắt buộc nhập</strong>
+							<strong *ngIf="itemForm.controls['SoNgayXuLy'].errors.min"> phải lớn hơn 0</strong>
+						</mat-error>
+					</mat-form-field>
+				</div>
+				<div class="col-md-6 m--margin-bottom-10-mobile" *ngIf="showCapQuanLyMax">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="{{ 'QUY_TRINH_DUYET.capduyetmax' | translate }}" [(value)]="id_capduyetmax">
+							<mat-option value="{{hv.ID_Row}}" *ngFor="let hv of listCapDuyetMax">
+								{{hv.Title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row" *ngIf="showQuyen">
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="Nhóm quyền" required class="require" formControlName="nhomQuyen" (selectionChange)="setListQuyen($event.value)">
+							<mat-option value="{{hv.Code}}" *ngFor="let hv of listNhomQuyen">
+								{{hv.Name}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="Quyền" required formControlName="quyen">
+							<mat-option value="{{hv.Code}}" *ngFor="let hv of listQuyen">
+								{{hv.Name}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row" *ngIf="showChucVu">
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<m-dropdown-tree [data]="datatree" [FieldTitle]="'title'" [FieldId]="'id'" [FieldChildren]="'data'" [DropdownTitle]="'Cơ cấu tổ chức'" (SelectedItemTree)="GetValueNode($event)" formControlName="drp">
+					</m-dropdown-tree>
+				</div>
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="{{ 'QUY_TRINH_DUYET.chucdanh' | translate }}" (selectionChange)="loadChucDanhChange(id_cd)" [(value)]="id_cd">
+							<mat-option value="{{hv.ID}}" *ngFor="let hv of listChucDanh">
+								{{hv.Title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="{{ 'QUY_TRINH_DUYET.chucvu' | translate }}" required formControlName="chucVu">
+							<mat-option value="{{hv.ID}}" *ngFor="let hv of listChucVu">
+								{{hv.Title}}
+							</mat-option>
+						</mat-select>
+						<mat-hint>{{ 'QUY_TRINH_DUYET.chucvuhint' | translate }}</mat-hint>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row" *ngIf="showChucDanh">
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="Chức danh" formControlName="chucDanh">
+							<mat-option value="{{hv.ID}}" *ngFor="let hv of listChucDanhLite">
+								{{hv.Title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row">
+				<div class="col-md-12 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput placeholder="Ghi chú" formControlName="ghiChu">
+						<mat-error *ngIf="itemForm.controls['ghiChu'].errors">
+							Ghi chú
+							<strong *ngIf="itemForm.controls['ghiChu'].errors.maxlength"> tối đa {{itemForm.controls['ghiChu'].errors.maxlength.requiredLength}} ký tự</strong>
+						</mat-error>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row" *ngIf="id_capduyet != '' && enableDuyetSS()">
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-checkbox formControlName="duyetSS">{{ 'QUY_TRINH_DUYET.duyetssmota' | translate }}</mat-checkbox>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row" *ngIf="item.Processmethod=='2'">
+				<div class="col-md-6 m--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="{{ 'QUY_TRINH_DUYET.khongduyetrave' | translate }}" required class="require" formControlName="id_back">
+							<mat-option value="{{item.id}}" *ngFor="let item of listCapDuyetQT">
+								{{item.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row">
+				<div class="col-md-12">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput placeholder="{{ 'QUY_TRINH_DUYET.dsnhanthongbao' | translate }}" readonly="true" [value]="listNguoiNhanEmail.length>0?' ':''">
+						<mat-chip-list #chipList>
+							<mat-chip *ngFor="let fruit of listNguoiNhanEmail" (removed)="removethemnguoinhanemail(fruit)">
+								{{fruit.HoTen}}
+								<mat-icon matChipRemove>cancel</mat-icon>
+							</mat-chip>
+						</mat-chip-list>
+						<img matSuffix src="https://img.icons8.com/color/96/000000/plus.png" class="icon" *ngIf="allowEdit"
+							(click)="themnguoinhanemail()" matTooltip="{{ 'QUY_TRINH_DUYET.themnguoinhanemail' | translate }}">
+					</mat-form-field>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

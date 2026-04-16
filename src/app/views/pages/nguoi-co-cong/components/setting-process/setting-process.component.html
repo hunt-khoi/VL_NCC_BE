@@ -1,0 +1,232 @@
+<style>
+	.form-container {
+		box-shadow: 0px 0px 15px 5px #14141450;
+		padding: 20px;
+		margin-bottom: 10px;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-7 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-5 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+		</div>
+	</div>
+	<div class="kt-form">
+		<div class="kt-portlet__body">
+			<mat-tab-group mat-align-tabs="start">
+				<mat-tab label="Quá trình giải quyết">
+					<table class="table table-hover table-bordered">
+						<thead>
+							<tr>
+								<th class="text-center">STT</th>
+								<th class="text-center">Ngày</th>
+								<th class="text-center">Người gửi</th>
+								<th class="text-center">Ý kiến xử lý</th>
+								<th class="text-center">Người nhận</th>
+								<th class="text-center">Thời hạn</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr *ngFor="let row of ListXL; let i=index">
+								<td class="text-center">{{i+1}}</td>
+								<td>{{row.CreatedDate}}</td>
+								<td>{{row.NguoiTao.hoten}}</td>
+								<td>{{row.comment}}</td>
+								<td>{{row.strNguoiNhan}}</td>
+								<td>{{row.Deadline}}</td>
+							</tr>
+							<tr *ngIf="ListXL.length == 0">
+								<td colspan="6" style="text-align: center;">Không có dữ liệu hiển thị</td>
+							</tr>
+						</tbody>
+					</table>
+					<table class="table table-hover table-bordered" *ngIf="curr!=null">
+						<thead>
+							<tr>
+								<th colspan="4">Bước xử lý hiện tại</th>
+							</tr>
+							<tr>
+								<th class="text-center">Người xử lý</th>
+								<th class="text-center">Tình trạng xử lý</th>
+								<th class="text-center">Kết quả xử lý</th>
+								<th class="text-center">Thời hạn</th>
+							</tr>
+						</thead>
+						<tbody *ngIf="curr!=null">
+							<tr>
+								<td>(Cấp duyệt: {{curr.title}}) <br/>{{curr.strNguoiNhan}}</td>
+								<td style="color: red;">Chưa xử lý</td>
+								<td></td>
+								<td style="color: red;">{{curr.Deadline}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</mat-tab>
+				<mat-tab label="Sơ đồ xử lý">
+					<div class="row">
+						<div class="col-md-8 kt-margin-bottom-20-mobile">
+							<kt-canvas-demo [API]="apiData" [ReadOnly]="true" [showViewCheckers]="true" (viewChecker)="viewCheckers($event)"></kt-canvas-demo>
+						</div>
+						<div class="col-md-4 kt-margin-bottom-20-mobile"
+							[ngClass]="{ 'kt-portlet kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading1 }">
+							<div class="row">
+								<!-- <div class="col-lg-12 text-center">
+									<p style="color: #5d78ff;">{{dataInPA.processError?'Thêm liên kết đến':'Bước xử lý'}}</p>
+								</div> -->
+								<div class="col-lg-12 kt-margin-bottom-20-mobile" *ngFor="let item of dataChecker">
+									<h4>
+										{{item.Title}} <span *ngIf="item.CheckDate" style="color: red;">
+											- Xử lý ngày
+											{{item.CheckDate}}
+										</span>
+									</h4>
+									<p style="margin-left: 30px;" *ngFor="let checker of item.Checkers; let i=index">
+										<span *ngIf="!checker.Checked">
+											{{i+1}}. {{checker.FullName}} -
+											{{checker.TenPhuongXa}}- ({{checker.TrangThaiUser}})
+											<span *ngIf="checker.CheckDate">
+												- Xử lý ngày {{checker.CheckDate}}
+											</span>
+										</span>
+										<span style="color: red;" *ngIf="checker.Checked">
+											{{i+1}}. {{checker.FullName}} -
+											{{checker.TenPhuongXa}} - ({{checker.TrangThaiUser}})
+											<span *ngIf="checker.CheckDate">
+												- Xử lý ngày {{checker.CheckDate}}
+											</span>
+										</span>
+									</p>
+									<div *ngIf="item.AllowAddUser">
+										<p>
+											<button type="button" mat-raised-button color="primary"
+												matTooltip="Thêm người xử lý" (click)="themNguoi(item)" *ngIf="!showForm">
+												Thêm người xử lý
+											</button>
+										</p>
+										<div id="formContainer{{item.IdPro}}"></div>
+									</div>
+								</div>
+								<div class="col-lg-12 kt-margin-bottom-20-mobile" *ngIf="showForm">
+									<form class="kt-form form-container" [formGroup]="itemForm" #form>
+										<!-- <kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true"
+											(close)="onAlertClose($event)">
+											Vui lòng kiểm tra lại thông tin
+										</kt-alert> -->
+										<div class="row">
+											<div class="col-lg-12 kt-margin-bottom-20-mobile">
+												<mat-form-field class="mat-form-field-fluid">
+													<mat-select formControlName="next" placeholder="Liên kết đến bước" required
+																disabled="true">
+														<mat-option *ngFor="let node of lstStep" [value]="node.id">
+															{{node.title}}
+														</mat-option>
+													</mat-select>
+													<mat-error>Bước xử lý<strong> là bắt buộc</strong></mat-error>
+													<mat-hint align="start">Vui lòng chọn<strong> bước xử lý</strong></mat-hint>
+												</mat-form-field>
+											</div>
+											<!--<div class="col-lg-6 kt-margin-bottom-20-mobile">
+												<mat-form-field class="mat-form-field-fluid">
+													<input matInput placeholder="Tên nút xử lý" formControlName="buttonText" type="text" required readonly>
+													<mat-error *ngIf="itemForm.controls['buttonText'].errors">
+														Tên nút xử lý
+														<strong *ngIf="itemForm.controls['buttonText'].errors.required">
+															bắt buộc nhập
+														</strong>
+														<strong *ngIf="itemForm.controls['buttonText'].errors.maxlength">
+															tối đa {{itemForm.controls['buttonText'].errors.maxlength.requiredLength}} ký tự
+														</strong>
+													</mat-error>
+													<mat-hint align="start">
+														Vui lòng nhập<strong> tên nút xử lý</strong>
+													</mat-hint>
+												</mat-form-field>
+											</div>-->
+										</div>
+										<div class="row">
+											<!--<div class="col-lg-6 col-xs-12 kt-margin-bottom-20-mobile">
+												<mat-form-field class="mat-form-field-fluid">
+													<mat-select placeholder="Cấp quản lý" formControlName="capQuanLy" (selectionChange)="filterDVXL()">
+														<mat-option value="0">[Tất cả]</mat-option>
+														<mat-option *ngFor="let item of lstCapQuanLy" [value]="item.id">
+															{{item.id}}
+														</mat-option>
+													</mat-select>
+												</mat-form-field>
+											</div>
+											<div class="col-lg-6 col-xs-12 kt-margin-bottom-20-mobile">
+												<mat-form-field class="mat-form-field-fluid">
+													<mat-select placeholder="Đơn vị" formControlName="donvi" (selectionChange)="filterNguoiXuLy()">
+														<mat-option value="0">[Tất cả]</mat-option>
+														<mat-option *ngFor="let item of lstdonViXuLy" [value]="item.id">
+															{{item.title}}
+														</mat-option>
+													</mat-select>
+												</mat-form-field>
+											</div>
+
+											<div class="col-lg-6 col-xs-12 kt-margin-bottom-20-mobile">
+												<mat-form-field class="mat-form-field-fluid">
+													<input matInput placeholder="Nhập từ khóa và nhấn tìm"
+														   formControlName="keyword" type="text">
+													<button mat-icon-button (click)="filterNguoiXuLy()" matSuffix
+															matTooltip="Tìm">
+														<mat-icon>search</mat-icon>
+													</button>
+												</mat-form-field>
+											</div>-->
+											<div class="col-lg-12 kt-margin-bottom-20-mobile">
+												<mat-form-field class="mat-form-field-fluid">
+													<mat-select formControlName="checker" multiple placeholder="Người xử lý" required>
+														<mat-select-trigger>
+															{{itemForm.controls['checker'].value&& itemForm.controls['checker'].value.length>0 ? itemForm.controls['checker'].value[0].FullName : ''}}
+															<span *ngIf="itemForm.controls['checker'].value?.length > 1">
+																(+{{itemForm.controls['checker'].value.length - 1}} khác)
+															</span>
+														</mat-select-trigger>
+														<mat-option *ngFor="let item of lstNguoiDung" [value]="item">
+															{{item.FullName}}
+														</mat-option>
+													</mat-select>
+													<mat-error>Người xử lý<strong> là bắt buộc</strong></mat-error>
+													<mat-hint align="start">
+														<strong>
+															Vui lòng chọn người xử lý
+														</strong>
+
+													</mat-hint>
+												</mat-form-field>
+											</div>
+											<div class="col-lg-12 kt-margin-bottom-20-mobile">
+												<ng-container *ngFor="let item of itemForm.controls['checker'].value; let i=index">
+													<p>{{i+1}}. {{item.FullName}}({{item.TenPhuongXa}})</p>
+												</ng-container>
+											</div>
+										</div>
+										<div class="row kt-margin-top-20">
+											<div class="col-lg-12 text-center">
+												<button type="button" mat-raised-button color="primary" (click)="onSubmit()" [disabled]="viewLoading" matTooltip="Lưu">
+													Lưu
+												</button>&nbsp;&nbsp;
+												<button type="button" mat-raised-button (click)="closeCheckers()" [disabled]="viewLoading" matTooltip="Đóng">
+													Đóng
+												</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</mat-tab>
+			</mat-tab-group>
+		</div>
+	</div>
+</div>

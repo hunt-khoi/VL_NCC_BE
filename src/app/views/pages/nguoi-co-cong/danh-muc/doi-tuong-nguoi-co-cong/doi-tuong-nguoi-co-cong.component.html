@@ -1,0 +1,34 @@
+<style>
+	:host >>> .mat-tab-body-content {
+		height: auto;
+	}
+</style>
+<kt-portlet>
+	<mat-tab-group>
+		<mat-tab label="Danh sách đối tượng người có công">
+			<ng-template matTabContent>
+				<kt-doi-tuong-nguoi-co-cong-list></kt-doi-tuong-nguoi-co-cong-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Danh sách đối tượng nhận quà">
+			<ng-template matTabContent>
+				<kt-dm-doi-tuong-nhan-qua-list></kt-dm-doi-tuong-nhan-qua-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Đối tượng nhận quà - mức quà">
+			<ng-template matTabContent>
+				<kt-dm-doi-tuong-nhan-qua-muc-qua-list></kt-dm-doi-tuong-nhan-qua-muc-qua-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Danh sách đối tượng bảo hiểm y tế" *ngIf="filterprovinces != 61">
+			<ng-template matTabContent>
+				<kt-dm-doi-tuong-bao-hiem-list></kt-dm-doi-tuong-bao-hiem-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Danh sách đối tượng dụng cụ chỉnh hình" *ngIf="filterprovinces != 61">
+			<ng-template matTabContent>
+				<kt-dm-doi-tuong-dung-cu-list></kt-dm-doi-tuong-dung-cu-list>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</kt-portlet >

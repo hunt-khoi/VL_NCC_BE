@@ -1,0 +1,100 @@
+<kt-portlet [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<kt-portlet-header [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">
+					<span>{{this._name}}</span>
+				</h3>
+			</div>
+		</ng-container>
+	</kt-portlet-header>
+	<form class="kt-form" [formGroup]="itemForm" style="margin-left: 30px;">
+		<div class="kt-portlet-body">
+			<!-- Chọn các năm -->
+			<div class="form-group kt-form__group row" style="margin-left: 30px;">
+				<div class="col-m-6 kt-margin-bottom-10-mobile">
+					<p>Chọn các năm muốn xem thống kê</p>
+					<ng-container *ngFor="let tmp of list10year; index as i">
+						<mat-checkbox [value]="tmp.id" (change)="onCheckboxChange($event)">{{tmp.title}}</mat-checkbox>&nbsp;&nbsp;&nbsp;
+					</ng-container><br>
+				</div>
+			</div>
+
+			<div class="form-group kt-form__group row" style="margin-left: 30px;">
+				<div class="col-md-3 kt-margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select formControlName="NhomLeTet" placeholder="{{'NHOM_LE_TET.NAME' | translate }}" class="require" required (selectionChange)="dataThongKe=[]">
+							<mat-option *ngFor="let opt of listNhomLeTet;" [value]="opt.id">
+								{{opt.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-3 kt-margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Chọn tăng/giảm" formControlName="TangGiam" (selectionChange)="dataThongKe=[]">
+							<mat-option value="asc">Danh sách tăng</mat-option>
+							<mat-option value="desc">Danh sách giảm</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-4 kt-margin-bottom-10-mobile">
+					<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>&nbsp;
+					<button mat-raised-button color="primary" matTooltip="Xuất danh sách" *ngIf="allowExport==true" printTitle={{_name}} [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>In</button>&nbsp;
+					<button (click)="exportExcel()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport==true">Export</button>
+				</div>
+			</div>
+
+
+			<div class="form-group kt-form__group row">
+				<!-- Danh sách chi tiết -->
+				<div class="col-md-6 kt-margin-bottom-10-mobile" id="print-section">
+					<table class="table-bordered table-sm" style="width:100%;">
+						<tr>
+							<th style="width:50px;">STT</th>
+							<th>Họ tên</th>
+							<th>Số hồ sơ</th>
+							<th class="text-center" *ngIf="itemForm.controls.TangGiam.value == 'desc'">Lý do giảm</th>
+							<th class="text-center" *ngIf="itemForm.controls.TangGiam.value == 'desc'">Ghi chú giảm</th>
+						</tr>
+						<ng-container *ngFor="let items of dataThongKe">
+							<tr>
+								<td *ngIf="itemForm.controls.TangGiam.value == 'desc'" colspan="5"><b>	Nguồn kinh phí: {{items.NguonKinhPhi}}</b></td>
+								<td *ngIf="itemForm.controls.TangGiam.value != 'desc'" colspan="3"><b>	Nguồn kinh phí: {{items.NguonKinhPhi}}</b></td>
+							</tr>
+							<ng-container *ngFor="let dt of items.ThongKe">
+								<tr>
+									<td></td>
+									<td *ngIf="itemForm.controls.TangGiam.value == 'desc'" colspan="4"><b>Năm: {{dt.Nam}} - Số lượng: {{dt.SL}} </b></td>
+									<td *ngIf="itemForm.controls.TangGiam.value != 'desc'" colspan="2"><b>Năm: {{dt.Nam}} - Số lượng: {{dt.SL}} </b></td>
+								</tr>
+								<ng-container *ngFor="let ncc of dt.DanhSach; let i=index">
+									<tr>
+										<td>{{i+1}}</td>
+										<td>{{ncc.HoTen}}</td>
+										<td>{{ncc.SoHoSo}}</td>
+										<td *ngIf="itemForm.controls.TangGiam.value == 'desc'">{{ncc.strLyDo}}</td>
+										<td *ngIf="itemForm.controls.TangGiam.value == 'desc'">{{ncc.GhiChuGiam}}</td>
+									</tr>
+								</ng-container>
+							</ng-container>
+						</ng-container>
+					</table>
+				</div>
+				<!-- Biểu độ cột -->
+				<div class="col-md-4 kt-margin-bottom-10-mobile" hidden>
+					<h5>Biểu đồ cột thể hiện số lượng hồ sơ qua các năm</h5>
+					<canvas baseChart
+							[chartType]="'bar'"
+							[datasets]="chartData"
+							[labels]="labels"
+							[options]="chartOptions"
+							[legend]="true"
+							[colors]="colors">
+					</canvas>
+				</div>
+
+			</div>
+		</div>
+	</form>
+</kt-portlet>

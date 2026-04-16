@@ -1,0 +1,120 @@
+<kt-portlet [ngClass]="{ 'kt-portlet--body-progress' : viewLoading }">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'"[viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title"><span>{{this._name}}</span></h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button class="show-view-sm" (click)="loadData()" *ngIf="allowExport==false" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>
+			<button class="show-view-sm" *ngIf="allowExport==true" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+				{{ 'COMMON.CHUCNANG' | translate }}
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>
+				<button mat-menu-item color="primary" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}"
+				 	matTooltip="In" *ngIf="allowExport" printSectionId="print-section" ngxPrint>{{ 'COMMON.PRINT' | translate }}</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>
+				<button mat-raised-button color="primary" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}"
+				 	matTooltip="In" *ngIf="allowExport" printSectionId="print-section" ngxPrint>{{ 'COMMON.PRINT' | translate }}</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</div>	
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<form class="kt-form" [formGroup]="itemForm">
+			<div class="form-group kt-form__group row">
+				<div class="col-md-2 kt-margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select formControlName="DotTangQua" placeholder="Chọn đợt tặng quà">
+							<mat-option [value]="0" disabled>--Chọn đợt tặng quà--</mat-option>
+							<mat-option *ngFor="let opt of listDotQua;" [value]="opt.id">
+								{{opt.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-2 kt-margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Loại thống kê" formControlName="thongKe" (selectionChange)="changeLoai($event)">
+							<mat-option *ngIf="Capcocau == 1" value="0">Thống kê theo tỉnh</mat-option>
+							<mat-option value="1" *ngIf="Capcocau <=2">Thống kê theo huyện</mat-option>
+							<mat-option value="2" *ngIf="Capcocau <=3">Thống kê theo xã</mat-option>
+							<mat-option value="3">Thống kê theo ấp</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-2 kt-margin-bottom-10-mobile" [hidden]="true">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select [value]="filterprovinces" (selectionChange)="loadHuyen()" formControlName="Tinh" [disabled]="true">
+							<mat-option [value]="list.id_row" *ngFor="let list of listTinh">{{list.Province}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau <=2 && (thongKe==1 || thongKe==2|| thongKe==3)">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select formControlName="Huyen" placeholder="Chọn huyện thống kê" [(value)]="filterdistrict" (selectionChange)="loadXa()" [disabled]="Capcocau == 2" >
+							<mat-option [value]="0" disabled>--Chọn huyện thống kê--</mat-option>
+							<mat-option *ngFor="let opt of listHuyen;" [value]="opt.ID_Row">{{opt.District}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau <=3 && (thongKe==2 || thongKe==3)">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Chọn xã thống kê" [(value)]="filterWard" formControlName="Xa" (selectionChange)="loadAp()" [disabled]="Capcocau == 3">
+							<mat-option [value]="0" disabled>--Chọn xã thống kê--</mat-option>
+							<mat-option [value]="item.ID_Row" *ngFor="let item of listXa">{{item.Ward}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau <=3 && thongKe==3">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Chọn ấp thống kê" formControlName="Ap">
+							<mat-option [value]="0" disabled>--Chọn ấp thống kê--</mat-option>
+							<mat-option [value]="item.id" *ngFor="let item of listAp">{{item.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-2 kt--margin-bottom-20-mobile">
+					<mat-checkbox formControlName="LocTrung">{{ 'QUA_TET.loctrung' | translate }}</mat-checkbox>
+				</div>
+			</div>
+		</form>
+		
+		<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive pd-0" *ngIf="display" id="print-section"> 
+			<table class="table-bordered table-sm" style="width:100%;">
+				<tr style="text-align: center;">
+					<th>STT</th>
+					<th>Họ tên người nhận quà</th>
+					<th>Số hồ sơ</th>
+					<th>Địa chỉ</th>
+					<th>Ấp-khóm</th>
+					<th>Họ tên liệt sỹ</th>
+					<th>Quan hệ với liệt sỹ</th>
+					<th *ngFor="let ng of lstNguon;">{{ng.NguonKinhPhi}}</th>
+				</tr>
+				<ng-container *ngFor="let dt of dataThongKe; let i=index">
+					<tr>
+						<td style="text-align: center;">{{i+1}}</td>
+						<td>{{dt.HoTen}}</td>
+						<td>{{dt.SoHoSo}}</td>
+						<td>{{dt.DiaChi}}</td>
+						<td>{{dt.KhomAp}}</td>
+						<td>{{dt.ThanNhan}}</td>
+						<td>{{dt.QHGiaDinh}}</td>
+						<td style="text-align: right;" *ngFor="let ng of lstNguon;">{{dt['Nguon'+ng.Id]}}</td>
+					</tr>
+				</ng-container>
+				<tr *ngIf="dataThongKe.length==0">
+					<td [attr.colspan]="7+lstNguon.length" class="text-center"><b>Không có dữ liệu</b></td>
+				</tr>
+			</table>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>
+

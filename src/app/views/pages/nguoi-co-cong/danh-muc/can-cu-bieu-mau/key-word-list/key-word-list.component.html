@@ -1,0 +1,31 @@
+<div class="mat-table__wrapper">
+	<mat-form-field class="mat-form-field-fluid ">
+		<input matInput placeholder="Từ khóa" [(ngModel)]="keyword" (change)="filter()"/>
+	</mat-form-field>
+	<table mat-table [dataSource]="dataSource">
+		<ng-container matColumnDef="stt">
+			<th mat-header-cell *matHeaderCellDef>STT</th>
+			<td mat-cell *matCellDef="let element; let index = index" style="width:60px">{{index + 1}} </td>
+		</ng-container>
+		<ng-container matColumnDef="keys">
+			<th mat-header-cell *matHeaderCellDef>Từ khóa</th>
+			<td mat-cell *matCellDef="let element" style="width:200px">{{element.key}}</td>
+		</ng-container>
+		<ng-container matColumnDef="desciption">
+			<th mat-header-cell *matHeaderCellDef>Mô tả</th>
+			<td mat-cell *matCellDef="let element" style="width:250px">{{element.description}}</td>
+		</ng-container>
+		<ng-container matColumnDef="format">
+			<th mat-header-cell *matHeaderCellDef [hidden]="!IsFull">Định dạng</th>
+			<td mat-cell *matCellDef="let element" style="width:200px" [hidden]="!IsFull">{{element.format}}</td>
+		</ng-container>
+		<ng-container matColumnDef="default">
+			<th mat-header-cell *matHeaderCellDef [hidden]="!IsFull">Dữ liệu mặc định</th>
+			<td mat-cell *matCellDef="let element" [hidden]="!IsFull">{{element._default}}</td>
+		</ng-container>
+
+		<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+		<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+	</table>
+	<mat-paginator #paginator [pageSize]="20" [pageSizeOptions]="[10, 20, 50, 100]" [showFirstLastButtons]="true"></mat-paginator>
+</div>

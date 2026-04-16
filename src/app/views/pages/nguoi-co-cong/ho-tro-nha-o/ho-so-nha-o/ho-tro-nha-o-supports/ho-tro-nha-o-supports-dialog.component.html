@@ -1,0 +1,129 @@
+<style>
+	:host .dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 2;
+		max-width: 300px;
+	}
+	.mw-100px {
+		min-width: 100px;
+	}
+	.mw-150px {
+		min-width: 150px;
+	}
+	.mw-200px {
+		min-width: 200px;
+	}
+	.mw-250px {
+		min-width: 250px;
+	}
+	.mw-300px {
+		min-width: 300px;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<kt-portlet [options]="{headLarge: true}" >
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-5 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-5 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button type="button" mat-raised-button color="accent" (click)="hotros()" [disabled]="disabledBtn" 
+				matTooltip="{{'COMMON.LUU_DONG' | translate}}" *ngIf="!IsDuyet">
+				<span translate="COMMON.LUU_DONG"></span>
+			</button>
+			<button type="button" mat-raised-button color="primary" (click)="duyets()" [disabled]="disabledBtn" 
+				matTooltip="Duyệt" *ngIf="IsDuyet">
+				Duyệt
+			</button>
+		</div>
+	</div>
+
+	<div class="kt-portlet__body" style="min-height: 200px;">
+		<div class="mat-table__wrapper" id="print-section-detail">
+			<table mat-table class="lmat-elevation-z8" [dataSource]="item" >
+				<ng-container matColumnDef="STT">
+					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell"><span translate="COMMON.STT"></span></th>
+					<td mat-cell *matCellDef="let object;let vi = index" class="mat-column-vinCode stt-cell">{{vi + 1}}</td>
+				</ng-container>
+
+				<ng-container matColumnDef="SoHoSo">
+					<th mat-header-cell *matHeaderCellDef>Số hồ sơ</th>
+					<td mat-cell *matCellDef="let object">{{object.SoHoSo}}</td>
+				</ng-container>
+				<ng-container matColumnDef="HoTen">
+					<th nowrap mat-header-cell *matHeaderCellDef>Họ tên</th>
+					<td mat-cell *matCellDef="let object">{{object.HoTen}}</td>
+				</ng-container>
+				<ng-container matColumnDef="Xa">
+					<th nowrap mat-header-cell *matHeaderCellDef>Xã</th>
+					<td mat-cell *matCellDef="let object">{{object.Title}}</td>
+				</ng-container>
+				<ng-container matColumnDef="Huyen">
+					<th nowrap mat-header-cell *matHeaderCellDef>Huyện</th>
+					<td mat-cell *matCellDef="let object">{{object.DistrictName}}</td>
+				</ng-container>
+				<ng-container matColumnDef="HinhThuc">
+					<th nowrap mat-header-cell *matHeaderCellDef>Hình thức</th>
+					<td mat-cell *matCellDef="let object">{{object.strHinhThuc}}</td>
+				</ng-container>
+				<ng-container matColumnDef="ChiPhiYeuCau">
+					<th nowrap mat-header-cell *matHeaderCellDef>Số tiền yêu cầu</th>
+					<td mat-cell *matCellDef="let object">{{object.ChiPhiYeuCau | mask: 'separator':tsSeparator}}</td>
+				</ng-container>
+				<ng-container matColumnDef="TienHoTro">
+					<th nowrap mat-header-cell *matHeaderCellDef>Số tiền đã hỗ trợ</th>
+					<td mat-cell *matCellDef="let object">{{object.TienHoTro | mask: 'separator':tsSeparator}}</td>
+				</ng-container>
+				<ng-container matColumnDef="SoTien">
+					<th nowrap mat-header-cell *matHeaderCellDef>Số tiền</th>
+					<td mat-cell *matCellDef="let object">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput mask="separator,3" thousandSeparator="{{tsSeparator}}"
+							(focusout)="updateSL($event.target.value, object, 'SoTien')" value="{{object.SoTien != null ? object.SoTien: ''}}">
+						</mat-form-field>
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="Nguon">
+					<th nowrap mat-header-cell *matHeaderCellDef>Nguồn</th>
+					<td mat-cell *matCellDef="let object">
+						<mat-form-field class="mat-form-field-fluid">
+							<mat-select [(ngModel)]="object.NguonKinhPhi" (selectionChange)="loadNguon($event.value, object)">
+								<mat-option [value]="1">Ngân sách Nhà nước</mat-option>
+								<mat-option [value]="2">Nguồn Xã hội hóa</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="GhiChu">
+					<th nowrap mat-header-cell *matHeaderCellDef>Ghi chú</th>
+					<td mat-cell *matCellDef="let object">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput (focusout)="updateSL($event.target.value, object, 'GhiChu')" 
+								value="{{object.GhiChu != null ? object.GhiChu: ''}}">
+						</mat-form-field>
+					</td>
+				</ng-container>
+				
+				<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+				<tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="row.highlighted = !row.highlighted" [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+			</table>
+
+			<div class="mat-table__message" *ngIf="item.length == 0">
+				<span translate="COMMON.NO_RECORD_FOUND"></span>
+			</div>
+
+		</div>
+
+	</div>
+</kt-portlet>

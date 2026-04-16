@@ -1,0 +1,163 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-4 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{ 'MAU_SO_LIEU.nhapsolieu' | translate }}</h3>
+		</div>
+		<div class="col-md-8 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+			<!--<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>-->
+		</div>
+		<div class="col-md-3 kt-margin-bottom-10-mobile">
+			<button style="margin: 10px 10px 0 0; float: right" (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách">Export</button>
+		</div>
+	</div>
+
+	<form class="kt-form" #nhapSoLieuForm="ngForm">
+		<div class="kt-portlet__body">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+				Không thể lưu, vui lòng nhập đủ thông tin!
+			</kt-alert>
+
+			<div class="form-group kt-form__group row">
+				<ng-container *ngIf="data._item.Id <= 0 && newNhapSoLieu == false">
+					<div class="col-lg-12 kt--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="Danh sách mẫu số liệu" name="getIdDonvi" 
+								(selectionChange)="filterMauSoLieu(mauSoLieuSelected)" [(ngModel)]="mauSoLieuSelected">
+								<mat-option [value]="msl" *ngFor="let msl of listMauSoLieu;">{{msl.Nam}} - {{msl.MauSoLieu}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</ng-container>
+				<ng-container *ngIf="isCreateForm == true">
+					<div class="col-lg-12 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input type="text" matInput placeholder="{{ 'MAU_SO_LIEU.NAME' | translate }}" name="MauSoLieu" [(ngModel)]="mauSoLieuEdit.MauSoLieu" [disabled]="true" />
+						</mat-form-field>
+					</div>
+					<div class="col-lg-2 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input type="text" matInput placeholder="Thứ tự" name="Priority" [(ngModel)]="mauSoLieuEdit.Priority" [disabled]="true" />
+						</mat-form-field>
+					</div>
+					<div class="col-lg-4 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input type="text" matInput placeholder="Thời gian" name="ThoiGian" type="text" [matDatepicker]="picker" [(ngModel)]="mauSoLieuEdit.ThoiGian" [disabled]="true">
+							<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+							<mat-datepicker #picker></mat-datepicker>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-6 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<textarea type="text" rows="1" matInput placeholder="Mô Tả" name="MoTa" [(ngModel)]="mauSoLieuEdit.MoTa" [disabled]="true"></textarea>
+						</mat-form-field>
+					</div>
+
+					<div class="col-lg-12 m--margin-bottom-20-mobile">
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<mat-label>Danh sách Chi tiết mẫu số liệu</mat-label>
+							<table class="table-bordered table-sm" style="width:100%;">
+								<tr>
+									<th class="stt-cell text-center">STT</th>
+									<th class="text-center">Nội dung</th>
+									<th class="text-center" style="width: 100px;">Số liệu</th>
+									<th class="text-center" style="width: 100px;">Số liệu<br />thay đổi</th>
+									<th class="text-center" style="width: 200px;">Ghi chú</th>
+								</tr>
+								<ng-container *ngFor="let object of listDetail; let vi = index">
+									<tr>
+										<td class="text-center">{{vi + 1 }}</td>
+										<td>{{object.SoLieu}}</td>
+										<td>{{object.default | mask:'separator':commonService.thousandSeparator}}</td>
+										<td>
+											<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+												<input matInput type="text" required [name]="'value'+vi" [(ngModel)]="object.NhapSoLieu.Value" (input)="toggleMask($event,object)" [disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+											</mat-form-field>
+										</td>
+										<td>
+											<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
+												<input matInput type="text" [name]="'note'+vi" [(ngModel)]="object.NhapSoLieu.Note" [disabled]="!allowEdit" />
+											</mat-form-field>
+										</td>
+									</tr>
+									<!-- Object detail -->
+									<ng-container *ngIf="object.Detail.length > 0;">
+										<ng-container *ngFor="let ch of object.Detail; let inx = index">
+											<tr>
+												<td colspan="1"> </td>
+												<!-- <td colspan="1"><i>{{ch.PhiSoLieu + ' (' + getStrCachNhap(ch.CachNhap) +')'}}</i> </td> -->
+												<td colspan="1"><i>{{ch.PhiSoLieu + ' (' + ch.CachNhap +')'}}</i> </td>
+												<td>{{ch.default|mask:'separator':commonService.thousandSeparator}}</td>
+												<td>
+													<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+														<input type="text" matInput [(ngModel)]="ch.NhapSoLieu.Value" (input)="toggleMask($event,ch)" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+													</mat-form-field>
+												</td>
+												<td>
+													<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
+														<input type="text" matInput [(ngModel)]="ch.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
+													</mat-form-field>
+												</td>
+											</tr>
+										</ng-container>
+									</ng-container>
+									<!-- Số liệu con -->
+									<ng-container *ngIf="object.SoLieuCon.length > 0;">
+										<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
+											<tr>
+												<td colspan="1"> </td>
+												<td colspan="1"><b>{{de.SoLieu}} </b></td>
+												<td>{{de.default|mask:'separator':commonService.thousandSeparator}}</td>
+												<td>
+													<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+														<input type="text" matInput required [name]="'valueDetail'+i" [(ngModel)]="de.NhapSoLieu.Value" (input)="toggleMask($event,de)" 
+															[disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+													</mat-form-field>
+												</td>
+												<td>
+													<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
+														<input type="text" matInput [(ngModel)]="de.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
+													</mat-form-field>
+												</td>
+											</tr>
+											<ng-container *ngFor="let child of de.Detail; let pos = index">
+												<tr>
+													<td colspan="1"> </td>
+													<!-- <td colspan="1"><i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i> </td> -->
+													<td colspan="1"><i>{{child.PhiSoLieu + ' (' + child.CachNhap +')'}}</i> </td>
+													<td>{{child.default|mask:'separator':commonService.thousandSeparator}}</td>
+													<td>
+														<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+															<input type="text" matInput [name]="'valueChild'+pos+i" [(ngModel)]="child.NhapSoLieu.Value" (input)="toggleMask($event,child)" 
+																[disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+														</mat-form-field>
+													</td>
+													<td>
+														<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
+															<input type="text" matInput [(ngModel)]="child.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
+														</mat-form-field>
+													</td>
+												</tr>
+											</ng-container>
+										</ng-container>
+									</ng-container>
+								</ng-container>
+							</table>
+						</div>
+					</div>
+				</ng-container>
+
+			</div>
+		</div>
+	</form>
+</div>

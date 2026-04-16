@@ -1,0 +1,131 @@
+<kt-portlet-header [sticky]="true" [title]="getTitle()" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+	<ng-container ktPortletTools>
+		<mat-checkbox [(ngModel)]="IsMauTheoPhong" (change)="change()">{{ 'MAU_SO_LIEU.tktheophienban' | translate }}</mat-checkbox>&nbsp;&nbsp;&nbsp;
+		<mat-checkbox [(ngModel)]="IsDefault" title="Thống kê theo giá trị mặc định của mẫu" *ngIf="IsMauTheoPhong">
+			{{ 'MAU_SO_LIEU.tktheogtmau' | translate }}
+		</mat-checkbox>
+		<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>
+		<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{getTitle()}}
+			[printStyle]="{td : {'border-bottom': '1px solid #dee2e6'}, th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>
+			{{ 'COMMON.PRINT' | translate }}
+		</button>
+		<button (click)="in()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+	</ng-container>
+</kt-portlet-header>
+<kt-portlet-body>
+	<div class="kt-form">
+		<div class="kt-form__filtration">
+			<div class="row align-items-center">
+				<div class="col-lg-3 kt--margin-bottom-20-mobile">		
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select (selectionChange)="bindNgay()" disableOptionCentering placeholder="Danh sách mẫu số liệu" 
+							name="getIdDonvi" [(ngModel)]="mauSoLieuSelected">
+							<mat-option>
+								<ngx-mat-select-search  [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+									[(ngModel)]="FilterCtrl_mau" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option [value]="0">--Chọn mẫu số liệu--</mat-option>
+							<mat-option [value]="msl.id" *ngFor="let msl of listMauSL$ | async;" matTooltip="{{msl.title}}">{{msl.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-1 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input type="number" matInput placeholder="Năm" name="Nam1" [(ngModel)]="nam1" (ngModelChange)="bindNgay()" />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-1 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input type="number" matInput placeholder="Năm" name="Nam2" [(ngModel)]="nam2" (ngModelChange)="bindNgay()" />
+					</mat-form-field>
+				</div>
+				<ng-container *ngIf="!IsDefault">
+					<div class="col-lg-2 kt--margin-bottom-20-mobile" [hidden]="!isTrongPhamVi">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select disableOptionCentering placeholder="Đơn vị được giao" [(ngModel)]="dv">
+								<mat-option>
+									<ngx-mat-select-search  [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+										[(ngModel)]="FilterCtrl_mau" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter1()">
+									</ngx-mat-select-search>
+								</mat-option>
+								<mat-option [value]="0">--Tất cả--</mat-option>
+								<mat-option [value]="opt.Id_DonVi" *ngFor="let opt of lstDV$ | async;" matTooltip={{opt.Title}}>
+									{{opt.Title}}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-2 kt--margin-bottom-20-mobile">
+						<mat-checkbox [(ngModel)]="ChuaDuyet">{{ 'MAU_SO_LIEU.gomslchuaduyet' | translate }}</mat-checkbox>
+					</div>
+				</ng-container>
+			</div>
+		</div>
+	</div>
+	<div class="example-container mat-table__wrapper table-responsive" id="print-section">
+		<table class="table-bordered table-sm" style="width:100%;" *ngIf="listDetail.length > 0">
+			<tr>
+				<th class="text-center sticky-body-col0" style="min-width: 20px">STT</th>
+				<th class="text-center sticky-body-col0" style="min-width: 200px">Nội dung</th>
+				<th style="width: 100px;text-align:center;" *ngFor="let col of Nams">
+					Năm {{col}}
+				</th>
+				<th style="width: 100px;text-align:center;">Giai đoạn</th>
+			</tr>
+
+			<ng-container *ngFor="let object of listDetail; let vi = index">
+				<tr>
+					<td class="sticky-body-col0 text-center">{{vi + 1}}</td>
+					<td class="sticky-body-col0"><b>{{object.SoLieu}}</b></td>
+					<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
+						{{object.Nam[c]}}
+					</td>
+					<td style="text-align:center;">{{object.Tong}}</td>
+				</tr>
+				<ng-container *ngIf="object.Detail.length > 0;">
+					<ng-container *ngFor="let child of object.Detail; let pos = index">
+						<tr>
+							<td class="sticky-body-col0"> </td>
+							<td class="sticky-body-col0">
+								<i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i>
+							</td>
+							<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
+								{{child.Nam[c]}}
+							</td>
+							<td style="text-align:center;">{{child.Tong}}</td>
+						</tr>
+					</ng-container>
+				</ng-container>
+				
+				<!-- Số liệu con -->
+				<ng-container *ngIf="object.SoLieuCon.length > 0;">
+					<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
+						<tr>
+							<td class="sticky-body-col0"> </td>
+							<td class="sticky-body-col0"><b>{{de.SoLieu}} </b></td>
+							<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
+								{{de.Nam[c]}}
+							</td>
+							<td style="text-align:center;">{{de.Tong}}</td>
+						</tr>
+						<ng-container *ngFor="let child of de.Detail; let pos = index">
+							<tr>
+								<td class="sticky-body-col0"> </td>
+								<td class="sticky-body-col0">
+									<i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i>
+								</td>
+								<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
+									{{child.Nam[c]}}
+								</td>
+								<td style="text-align:center;">{{child.Tong}}</td>
+							</tr>
+						</ng-container>
+					</ng-container>
+				</ng-container>
+
+			</ng-container>
+		</table>
+
+	</div>
+</kt-portlet-body>

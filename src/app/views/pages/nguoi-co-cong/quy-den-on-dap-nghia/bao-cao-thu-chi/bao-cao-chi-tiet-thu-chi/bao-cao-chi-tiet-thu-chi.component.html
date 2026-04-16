@@ -1,0 +1,113 @@
+<style>
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 1;
+	}
+	.min-th {
+		min-width: 160px;
+	}
+	.min-width-200px {
+		min-width: 200px;
+	}
+</style>
+<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+	<ng-container ktPortletTools>
+		<button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+			<button class="show-view-sm" *ngIf="allowExport" mat-raised-button [matMenuTriggerFor]="chucnang1" color="primary">
+				Chức năng
+			</button>
+			<mat-menu #chucnang1="matMenu">
+				<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-menu-item color="primary" matTooltip="In danh sách" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách">Export</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</div>
+	</ng-container>
+</kt-portlet-header>
+
+<kt-portlet-body>
+	<div class="kt-form">
+		<div class="kt-form__filtration">
+			<div class="row align-items-center">
+				<div class="col-md-2 kt-margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput [matDatepicker]="pickerbd_tungay" placeholder="Từ ngày" [(ngModel)]="from" [max]="to">
+						<mat-datepicker-toggle matSuffix [for]="pickerbd_tungay"></mat-datepicker-toggle>
+						<mat-datepicker #pickerbd_tungay></mat-datepicker>
+						<mat-error>Thời gian <strong>không hợp lệ</strong></mat-error>
+					</mat-form-field>
+				</div>
+				<div class="col-md-2 kt-margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput [matDatepicker]="pickerbd_denngay" placeholder="Đến ngày" [(ngModel)]="to" [min]="from">
+						<mat-datepicker-toggle matSuffix [for]="pickerbd_denngay"></mat-datepicker-toggle>
+						<mat-datepicker #pickerbd_denngay></mat-datepicker>
+						<mat-error>Thời gian <strong>không hợp lệ</strong></mat-error>
+					</mat-form-field>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="print-section" *ngIf="display">
+		<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive">
+			<table class="table-bordered table-sm" style="width:100%;">
+				<tr>
+					<th rowspan="2" style="text-align: center;width:30px;">STT</th>
+					<th rowspan="2" class="text-center">Ngày thu chi</th>
+					<th rowspan="2" class="text-center">Mô tả</th>
+					<th colspan="2" class="text-center">Số tiền</th>
+					<th rowspan="2" class="text-center">Tồn quỹ</th>
+				</tr>
+				<tr>
+					<td class="text-center">Thu</td>
+					<td class="text-center">Chi</td>
+				</tr>
+				<tr *ngIf="dataThongKe.sum">
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td style="text-align: right;"><b>{{dataThongKe.sum.TongThu | mask:'separator':tsSeparator}}</b></td>
+					<td style="text-align: right;"><b>{{dataThongKe.sum.TongChi | mask:'separator':tsSeparator}}</b></td>
+					<td style="text-align: right;"><b>{{dataThongKe.sum.Ton | mask:'separator':tsSeparator}}</b></td>
+				</tr>
+				<ng-container *ngIf="dataThongKe.data.length > 0">
+					<tr *ngFor="let item of dataThongKe.data; let i=index">
+						<td class="text-center">{{i + 1}}</td>
+						<td>{{item.Ngay}}</td>
+						<td>{{item.MoTa}}</td>
+						<td style="text-align: right;">
+							<span *ngIf="item.Loai == 1 || item.Loai == 2">{{item.SoTien | mask:'separator':tsSeparator}}</span>
+						</td>
+						<td style="text-align: right;">
+							<span *ngIf="item.Loai == 3 || item.Loai == 4">{{item.SoTien | mask:'separator':tsSeparator}}</span>
+						</td>
+						<td>&nbsp;</td>
+					</tr>
+				</ng-container>
+				
+				<tr *ngIf="dataThongKe.data.length == 0">
+					<td [attr.colspan]="5" class="text-center"><b>Không có dữ liệu</b></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</kt-portlet-body>

@@ -1,0 +1,24 @@
+<style>
+	:host >>> .mat-tab-body-content {
+		height: auto;
+	}
+</style>
+<kt-portlet>
+	<mat-tab-group>
+		<mat-tab label="{{'DISTRICT.NAME' | translate}}">
+			<ng-template matTabContent>
+				<m-district-list></m-district-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="{{'WARD.NAME' | translate}}">
+			<ng-template matTabContent>
+				<m-ward-list></m-ward-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Khóm, ấp">
+			<ng-template matTabContent>
+				<kt-khom-ap-list></kt-khom-ap-list>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</kt-portlet>

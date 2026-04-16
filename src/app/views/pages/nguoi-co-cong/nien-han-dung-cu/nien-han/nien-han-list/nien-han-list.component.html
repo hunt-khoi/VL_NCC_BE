@@ -1,0 +1,79 @@
+<kt-portlet>
+	<mat-tab-group [selectedIndex]="selectedTab" *ngIf="CapCoCau == 2 && range == 1">
+		<mat-tab label="Danh sách xã nhập">
+			<ng-template matTabContent>
+				<div class="row">
+					<div class="col-md-4">
+						<kt-portlet-header [sticky]="true" [title]="'Đơn vị hành chánh'" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+						</kt-portlet-header>
+						<!-- end::Header -->
+						<div class="row" style="padding-left: 20px;">
+							<div class="col-md-12">
+								<mat-form-field style="width: 50px;">
+									<input matInput [(ngModel)]="nam" placeholder="Năm" (change)="changeNam()" />
+								</mat-form-field>
+								<mat-form-field>
+									<mat-select [(ngModel)]="dot">
+										<mat-option [value]="0">Tất cả</mat-option>
+										<mat-option [value]="opt.id" *ngFor="let opt of lstDotNienHan">{{opt.title}}</mat-option>
+									</mat-select>
+								</mat-form-field>
+							</div>
+						</div>
+						<m-tree-don-vi *ngIf="dataTreeDonVi ? dataTreeDonVi.length > 0 : false" [showCheck]="false" [classIconLeaf]="'fas fa-torii-gate'" [classIconRoot]="'fas fa-landmark'" 
+							[nameNode]="'text'" [propNameChild]="'children'" [valuePhanQuyen]="dataTreeDonVi" [textFeildRoof]="'Tất cả'"
+							[idRoleKey]="'IdGroup'" (NodeActiveChange)="treeDonViChanged($event)">
+						</m-tree-don-vi>
+					</div>
+					<div class="col-md-8">
+						<m-nien-han-xa-list [donvi]="donvi" [nam]="nam" [dot]="dot"></m-nien-han-xa-list>
+					</div>
+				</div>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Danh sách huyện nhập">
+			<ng-template matTabContent>
+				<m-nien-han-huyen-list [donvi]="donvi" [nam]="nam" [dot]="dot"></m-nien-han-huyen-list>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+	
+	<div class="row" *ngIf="CapCoCau == 2 && range != 1">
+		<div class="col-md-12" style="overflow-x: auto; display: flex">			
+			<m-nien-han-huyen-list style="width: 100%;" [donvi]="donvi" [nam]="nam" [dot]="dot"></m-nien-han-huyen-list>
+		</div>
+	</div>
+
+	<div class="row" *ngIf="CapCoCau!=2" style="width: 100%; display: flex">
+		<div class="col-md-3" *ngIf="CapCoCau==1" >
+			<kt-portlet-header [sticky]="true" [title]="'Đơn vị hành chánh'" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+			</kt-portlet-header>
+			<!-- end::Header -->
+			<div class="row" style="padding-left: 20px;">
+				<div class="col-md-12">
+					<mat-form-field style="width: 50px;">
+						<input matInput [(ngModel)]="nam" placeholder="Năm" (change)="changeNam()" />
+					</mat-form-field>
+					<mat-form-field>
+						<mat-select [(ngModel)]="dot">
+							<mat-option [value]="0">Tất cả</mat-option>
+							<mat-option [value]="opt.id" *ngFor="let opt of lstDotNienHan">{{opt.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+			<m-tree-don-vi *ngIf="dataTreeDonVi ? dataTreeDonVi.length > 0 : false" [showCheck]="false" [classIconLeaf]="'fas fa-torii-gate'" 
+				[classIconRoot]="'fas fa-landmark'" [nameNode]="'text'" [propNameChild]="'children'" [valuePhanQuyen]="dataTreeDonVi" 
+				[textFeildRoof]="'Tất cả'" [idRoleKey]="'IdGroup'" (NodeActiveChange)="treeDonViChanged($event)">
+			</m-tree-don-vi>
+		</div>
+		<div class="{{CapCoCau == 1 ? 'col-md-9' : 'col-md-12'}}" style="overflow-x: auto; display: flex">			
+			<ng-container *ngIf="CapCoCau==1" >
+				<m-nien-han-huyen-list style="width: 100%;" [donvi]="donvi" [nam]="nam" [dot]="dot"></m-nien-han-huyen-list>
+			</ng-container>
+			<ng-container *ngIf="CapCoCau!=1">
+				<m-nien-han-xa-list style="width: 100%;" [donvi]="donvi" [nam]="nam" [dot]="dot"></m-nien-han-xa-list>
+			</ng-container> 
+		</div>
+	</div>
+</kt-portlet>

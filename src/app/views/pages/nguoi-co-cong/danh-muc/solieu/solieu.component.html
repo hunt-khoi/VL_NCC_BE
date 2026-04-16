@@ -1,0 +1,29 @@
+<style>
+	:host >>> .mat-tab-body-content {
+		height: auto;
+	}
+</style>
+<kt-portlet>
+	<mat-tab-group>
+		<mat-tab label="Số liệu">
+			<ng-template matTabContent>
+				<m-solieu-list></m-solieu-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Nhập số liệu">
+			<ng-template matTabContent>
+				<kt-phi-so-lieu-list></kt-phi-so-lieu-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Cách nhập">
+			<ng-template matTabContent>
+				<m-cachnhap-list></m-cachnhap-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Trích xuất">
+			<ng-template matTabContent>
+				<kt-filter></kt-filter>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</kt-portlet>

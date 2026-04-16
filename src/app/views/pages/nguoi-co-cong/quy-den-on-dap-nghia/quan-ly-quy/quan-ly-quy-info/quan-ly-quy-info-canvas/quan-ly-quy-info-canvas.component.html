@@ -1,0 +1,43 @@
+<style>
+	.details {
+		line-height: 1.5; 
+		font-size: 15.5px;
+		margin: 6px 6px 6px 12px;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom" style="display: flex; justify-content: space-between;">
+		<div class="col-md-3 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+	</div>
+	<div class="kt-portlet__body">
+		<div class="form-group kt-form__group row">
+			<div class="col-lg-4 m--margin-bottom-20-mobile">
+				<div *ngIf="ischi" class="details">
+					<p><b>Tổng chi: </b>{{item.TongChi | mask:'separator':tsSeparator}}</p>
+					<p>- Chi không từ hỗ trợ: {{item.Chi | mask:'separator':tsSeparator}}</p>
+					<p>- Chi từ hỗ trợ: {{item.ChiTuHoTro | mask:'separator':tsSeparator}}</p>
+					<p>- Chi hỗ trợ: {{item.ChiHoTro | mask:'separator':tsSeparator}}</p>
+				</div>
+				<div *ngIf="!ischi" class="details">
+					<p><b>Tổng thu: </b>{{item.TongThu | mask:'separator':tsSeparator}}</p>
+					<p>- Vận động đóng góp: {{item.Thu | mask:'separator':tsSeparator}}</p>
+					<p>- Nhận hỗ trợ: {{item.NhanHoTro | mask:'separator':tsSeparator}}</p>
+				</div>
+			</div>
+			<div class="col-lg-8 m--margin-bottom-20-mobile">
+				<canvas baseChart [data]="pieChartData" [legend]="pieChartLegend"
+					[labels]="pieChartLabel" [chartType]="pieChartType"
+					[options]="pieChartOptions" [colors]="pieChartColor">
+				</canvas>
+			</div>
+			
+		</div>
+	</div>
+</div>

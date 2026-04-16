@@ -1,0 +1,74 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn"
+			title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{isZoomSize ? '9' : '7'}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{isZoomSize ? '3' : '5'}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="onSubmit(true)">
+				Lưu và đóng
+			</button>
+			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="onSubmit()">
+				Lưu và tiếp tục
+			</button>
+		</div>
+	</div>
+	<!-- end::Header -->
+	<kt-portlet-body>
+		<div class="kt-portlet__body-progress">
+			<mat-spinner [diameter]="20"></mat-spinner>
+		</div>
+		<form class="kt-form" [formGroup]="itemForm">
+			<div class="kt-portlet__body">
+				<div class="row">
+					<div class="col-md-6">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput type="text" placeholder="Số quyết định" formControlName="SoQD" />
+						</mat-form-field>
+					</div>
+					<div class="col-md-6">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput type="text" placeholder="Ngày ra quyết định" formControlName="NgayQD" [matDatepicker]="picker" />
+							<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+							<mat-datepicker #picker></mat-datepicker>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput type="text" placeholder="Số công văn" formControlName="SoCV" />
+						</mat-form-field>
+					</div>
+					<div class="col-md-6">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput type="text" placeholder="Ngày ra công văn" formControlName="NgayCV" [matDatepicker]="picker1" />
+							<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+							<mat-datepicker #picker1></mat-datepicker>
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput type="text" placeholder="Số tờ trình" formControlName="SoTT" />
+						</mat-form-field>
+					</div>
+					<div class="col-md-6">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput type="text" placeholder="Ngày ra tờ trình" formControlName="NgayTT" [matDatepicker]="picker2" />
+							<mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+							<mat-datepicker #picker2></mat-datepicker>
+						</mat-form-field>
+					</div>
+				</div>
+			</div>
+		</form>
+	</kt-portlet-body>
+	<!-- end::Body -->
+</div>

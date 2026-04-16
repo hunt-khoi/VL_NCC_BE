@@ -1,0 +1,84 @@
+<kt-portlet [options]="{headLarge: true}">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'">
+		<ng-container ktPortletTools>
+			<button mat-raised-button [matMenuTriggerFor]="chucnang" color="primary">
+				Xuất danh sách
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button mat-menu-item color="primary" (click)="xuatQD(1)">Word</button>
+			</mat-menu>
+		</ng-container>
+	</kt-portlet-header>
+	
+	<div class="kt-portlet__body">
+		<div class="kt-form">
+			<div class="kt-form__filtration">
+				<div class="row align-items-center">
+					<div class="col-md-2 kt--margin-bottom-10-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="Loại danh sách" [(value)]="loaids" class="require" required>
+								<mat-option [value]="0">Chọn loại danh sách xuất</mat-option>
+								<mat-option [value]="1">Danh sách thờ cúng</mat-option>
+								<mat-option [value]="2" *ngIf="Capcocau==1">Danh sách khám</mat-option>
+								<mat-option [value]="3">Danh sách truy tặng BMVNAH</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-md-2 kt-margin-bottom-10-mobile">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput [matDatepicker]="pickerbd_tungay" placeholder="Từ ngày" [(ngModel)]="from" [max]="to">
+							<mat-datepicker-toggle matSuffix [for]="pickerbd_tungay"></mat-datepicker-toggle>
+							<mat-datepicker #pickerbd_tungay></mat-datepicker>
+							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
+							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong>
+							</mat-error>
+						</mat-form-field>
+					</div>
+					<div class="col-md-2 kt-margin-bottom-10-mobile">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput [matDatepicker]="pickerbd_denngay" placeholder="Đến ngày" [(ngModel)]="to" [min]="from">
+							<mat-datepicker-toggle matSuffix [for]="pickerbd_denngay"></mat-datepicker-toggle>
+							<mat-datepicker #pickerbd_denngay></mat-datepicker>
+							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
+							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong>
+							</mat-error>
+						</mat-form-field>
+					</div>
+					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids==1 || loaids==3">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" (selectionChange)="filterDistrictID(filterdistrict)" [disabled]="Capcocau >= 2">
+								<mat-option [value]="0">Tất cả</mat-option>
+								<mat-option [value]="district.ID_Row" *ngFor="let district of listdistrict;">
+									{{district.District}}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids==1 || loaids==3">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="{{ 'WARD.NAME' | translate }}" [(value)]="filterward" [disabled]="Capcocau == 3">
+								<mat-option [value]="0">Tất cả</mat-option>
+								<mat-option [value]="ward.ID_Row" *ngFor="let ward of listward;">
+									{{ward.Ward}}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids==2">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="Loại đối tượng" [(value)]="loaidt">
+								<mat-option [value]="0">Chọn loại đối tượng</mat-option>
+								<mat-option [value]="dt.id" *ngFor="let dt of lstLoaiDT;" matTooltip="{{dt.title}}">
+									{{dt.title}}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="example-container mat-table__wrapper" id="print-section">
+			
+		</div>
+	</div>
+</kt-portlet>

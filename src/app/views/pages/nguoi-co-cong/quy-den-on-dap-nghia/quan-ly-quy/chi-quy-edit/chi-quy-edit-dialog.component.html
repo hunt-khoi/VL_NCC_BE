@@ -1,0 +1,82 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-3 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-9 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+
+	<div class="kt-portlet__body" style="max-height: 85vh;">
+		<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			Không thể lưu, vui lòng nhập đủ thông tin!
+		</kt-alert>
+		
+		<form class="kt-form" [formGroup]="itemForm" *ngIf="itemForm">
+			<div class="form-group kt-form__group row">
+				<ng-container *ngIf="!IsChiHoTro">
+					<div class="col-md-{{Capcocau == 1 ? '12' : '8'}} m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<mat-select placeholder="Nội dung chi quỹ" formControlName="Id_NoiDung" require>
+								<mat-option value="{{dv.id}}" *ngFor="let dv of listND">
+									{{dv.title}}
+								</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-4 m--margin-bottom-20-mobile" *ngIf="Capcocau != 1">
+						<mat-checkbox [(ngModel)]="IsTuCapTren" [ngModelOptions]="{standalone: true}">
+							<span *ngIf="Capcocau == 2">Từ nguồn hỗ trợ quỹ cấp Tỉnh</span>
+							<span *ngIf="Capcocau == 3">Từ nguồn hỗ trợ quỹ cấp Huyện</span>
+						</mat-checkbox>
+					</div>
+					<ng-container *ngIf="IsTuCapTren">
+						<div class="col-lg-6 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="Số tiền được hỗ trợ" disabled="true" [(ngModel)]="sotienht"
+									mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" [ngModelOptions]="{standalone: true}"/>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-6 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="Số tiền đã chi từ hỗ trợ" disabled="true" [(ngModel)]="sotienchi"
+									mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" [ngModelOptions]="{standalone: true}"/>
+							</mat-form-field>
+						</div>
+					</ng-container>
+				</ng-container>
+
+				<div class="col-md-6 m--margin-bottom-20-mobile" *ngIf="IsChiHoTro">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Quỹ đền ơn đáp nghĩa hỗ trợ" formControlName="Id_Quy" require>
+							<mat-option value="{{dv.id}}" *ngFor="let dv of listQuyCon">
+								{{dv.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Số tiền" formControlName="SoTien" require
+							mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="!IsChiHoTro">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Ghi chú" formControlName="GhiChu" />
+					</mat-form-field>
+				</div>
+
+			</div>
+		</form>
+	</div>
+</div>

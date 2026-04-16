@@ -1,0 +1,190 @@
+<style>
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 1;
+	}
+
+	.color-red {
+		color: rgb(255,0,0);
+	}
+
+	.color-blue {
+		color: rgb(34,0,255);
+	}
+
+	.min-th {
+		min-width: 160px;
+	}
+
+	.min-width-200px {
+		min-width: 200px;
+	}
+</style>
+<kt-portlet>
+	<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTools>
+	
+			<button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+			<button class="show-view-sm" *ngIf="display" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+				Chức năng
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput type="number" placeholder="Năm hỗ trợ" [(ngModel)]="Nam" [min]="0"/>
+				</mat-form-field>
+				<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách">Export excel</button>
+				<button mat-menu-item color="primary" matTooltip="In danh sách" printTitle={{this._name}}
+						[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput type="number" placeholder="Năm hỗ trợ" [(ngModel)]="Nam" [min]="0"/>
+				</mat-form-field>
+				<!-- <div class="form-group kt-form__group row">
+					<div class="col-md-3 kt-margin-bottom-10-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput type="number" placeholder="Năm hỗ trợ" [(ngModel)]="Nam" [min]="0"/>
+						</mat-form-field>
+					</div>
+				</div> -->
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" *ngIf="display" matTooltip="Xuất danh sách">Export excel</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="display" printTitle={{this._name}}
+						[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+			</div>	
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+		<div id="print-section" *ngIf="display">
+			<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive">
+				<table class="table-bordered table-sm" style="width:100%;">
+					<tr>
+						<th rowspan="4" >STT</th>
+						<th rowspan="4" nowrap>Đơn vị</th>
+						<th style="text-align: center;" colspan="4">Hỗ trợ sửa chữa</th>
+						<th style="text-align: center;" colspan="4">Hỗ trợ xây mới</th>
+						<th style="text-align: center;" colspan="3" rowspan="2">Tổng kinh phí</th>
+					</tr>
+					<tr style="text-align: center;">
+						<th rowspan="3">Số căn</th>
+						<th colspan="3">Kinh phí</th>
+						<th rowspan="3">Số căn</th>
+						<th colspan="3">Kinh phí</th>
+					</tr>
+					<tr style="text-align: center;">
+						<ng-container *ngFor="let number of [0,1,2]">
+							<td rowspan="2">Cộng</td>
+							<td [attr.colspan]="lstNguon.length">Trong đó:</td>
+						</ng-container>
+					</tr>
+					<tr style="text-align: center;">
+						<ng-container *ngFor="let number of [0,1,2]">
+							<ng-container *ngFor="let ng of lstNguon">
+								<td rowspan="1">{{ng.title}}</td>
+							</ng-container>
+						</ng-container>
+					</tr>
+	
+					<ng-container *ngIf="Capcocau == 1">
+						<tr>
+							<th class="text-center" [attr.colspan]="7+lstNguon.length*3">TỔNG CẢ TỈNH</th>
+						</tr>
+						<tr>
+							<th>&nbsp;</th>
+							<th class="text-center">Tổng cộng:</th>
+							<ng-container *ngFor="let ht of lstHT">
+								<td style="text-align: right;">
+									<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(0, ht.id)">{{getTongHT(ht.id, 'SoCan', dataTong)}}</a>		
+								</td>
+								<td style="text-align: right;">{{getTongHT(ht.id, 'SoTien', dataTong)}}</td>
+								<ng-container *ngFor="let dt of lstNguon">
+									<td style="text-align: right;">{{sumNguon(dt.id, ht.id, dataTong)}}</td>
+								</ng-container>
+							</ng-container>
+							<td style="text-align: right;">
+								<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem()">{{dataTong.TongCan}}</a>		
+							</td>
+							<ng-container *ngFor="let dt of lstNguon">
+								<td style="text-align: right;">{{getTongTien(dt.id, dataTong)}}</td>
+							</ng-container>
+						</tr>
+						<tr *ngFor="let cap of dataCap; let i=index">
+							<td class="text-center">{{i+1}}</td>
+							<td>{{cap.TenCap}} hỗ trợ</td>
+							<ng-container *ngFor="let ht of lstHT">
+								<td style="text-align: right;">
+									<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(cap.IdCap, ht.id)">{{getValueHT(ht.id, 'SoCan', cap)}}</a>	
+								</td>
+								<td style="text-align: right;">{{getValueHT(ht.id, 'SoTien', cap)}}</td>
+								<ng-container *ngFor="let dt of lstNguon">
+									<td style="text-align: right;">{{getNguon(dt.id, ht.id, cap)}}</td>
+								</ng-container>
+							</ng-container>
+							<td style="text-align: right;">
+								<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(cap.IdCap)">{{cap.TongCan}}</a>
+							</td>
+							<ng-container *ngFor="let dt of lstNguon">
+								<td style="text-align: right;">{{getTongCap(dt.id, cap)}}</td>
+							</ng-container>
+						</tr>
+						<tr>
+							<th class="text-center" [attr.colspan]="7+lstNguon.length*3">CHI TIẾT TỪNG HUYỆN THỊ XÃ, THÀNH PHỐ</th>
+						</tr>
+					</ng-container>
+					<ng-container *ngFor="let item of dataThongKe.data; let i=index">
+						<tr>
+							<th class="text-center">{{CommonService.romanize(i+1)}}</th>
+							<th>{{item.Huyen}}</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+						</tr>
+						<tr *ngFor="let cap of item.ThongKe; let j=index">
+							<td class="text-center">{{j+1}}</td>
+							<td>{{cap.TenCap}} hỗ trợ</td>
+							<ng-container *ngFor="let ht of lstHT">
+								<td style="text-align: right;">
+									<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(cap.IdCap, ht.id, item.Id_Huyen)">{{getValueHT(ht.id, 'SoCan', cap)}}</a>	
+								</td>
+								<td style="text-align: right;">{{getValueHT(ht.id, 'SoTien', cap)}}</td>
+								<ng-container *ngFor="let dt of lstNguon">
+									<td style="text-align: right;">{{getNguon(dt.id, ht.id, cap)}}</td>
+								</ng-container>
+							</ng-container>
+							<td style="text-align: right;">
+								<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(cap.IdCap, 0, item.Id_Huyen)">{{cap.TongCan}}</a>
+							</td>
+							<ng-container *ngFor="let dt of lstNguon">
+								<td style="text-align: right;">{{getTongCap(dt.id, cap)}}</td>
+							</ng-container>
+						</tr>
+					</ng-container>
+					<tr *ngIf="dataThongKe.data.length==0">
+						<td [attr.colspan]="7+lstNguon.length*3" class="text-center"><b>Không có dữ liệu</b></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>

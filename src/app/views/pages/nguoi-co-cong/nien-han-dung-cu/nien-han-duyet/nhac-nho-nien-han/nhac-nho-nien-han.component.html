@@ -1,0 +1,125 @@
+<div class="kt-form">
+	<div class="kt-form__filtration">
+		<div class="row align-items-center">
+			<div class="col-xl-3">
+				<mat-form-field class="mat-form-field-fluid">
+					<mat-select [(ngModel)]="dot" placeholder="Chọn đợt nhập niên hạn" (selectionChange)="loadDataList(false)">
+						<mat-option [value]="0" disabled>--Chọn đợt nhập niên hạn--</mat-option>
+						<mat-option *ngFor="let opt of lstDot" [value]="opt.id">{{opt.title}}</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-xl-3" *ngIf="dot>0">
+				<button mat-raised-button color="primary" (click)="nhacnhos()"
+					matTooltip="Nhắc nhở nhập niên hạn" class="mat-button-mt-4">
+					Nhắc nhở
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div [hidden]="istonghop && dot==0">
+	<div class="mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}">
+		<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort #sort1='matSort' matSortActive="Deadline_Duyet"
+			style="width: 100%;" matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" cdkDropListGroup>
+			<ng-container matColumnDef="STT">
+				<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell">STT</th>
+				<td mat-cell class="stt-cell" *matCellDef="let item;let i=index">{{i + 1}}</td>
+			</ng-container>
+			<ng-container matColumnDef="DotNienHan">
+				<th mat-header-cell *matHeaderCellDef style="flex: 0 0 25%; white-space: nowrap;">
+					<kt-column-filter [gridService]="gridService" column_name="DotNienHan" column_title="Đợt nhập niên hạn"></kt-column-filter>
+				</th>
+				<td mat-cell *matCellDef="let item" style="flex: 0 0 25%">
+					{{item.DotNienHan}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="{{isxa ? 'Xa': 'DistrictName'}}">
+				<th mat-header-cell *matHeaderCellDef style="justify-content: center" mat-sort-header>
+					{{isxa ? 'Xã': 'Huyện'}}
+				</th>
+				<td mat-cell *matCellDef="let item" style="justify-content: center;white-space: nowrap;">
+					{{isxa ? item.Xa : item.DistrictName}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="Nam">
+				<th mat-header-cell *matHeaderCellDef style="justify-content: center">
+					Năm
+				</th>
+				<td mat-cell *matCellDef="let item" style="justify-content: center">{{item.Nam}}</td>
+			</ng-container>
+			<ng-container matColumnDef="TongSo">
+				<th mat-header-cell *matHeaderCellDef style="justify-content: center">
+					Tổng số
+				</th>
+				<td mat-cell *matCellDef="let item" style="flex: 0 0 15%">{{item.TongSo}}</td>
+			</ng-container>
+			<ng-container matColumnDef="TongTien">
+				<th mat-header-cell *matHeaderCellDef style="justify-content: center">
+					Tổng tiền
+				</th>
+				<td mat-cell *matCellDef="let item" style="flex: 0 0 15%">{{item.TongTien | mask:'separator':CommonService.thousandSeparator}}</td>
+			</ng-container>
+			
+			<ng-container matColumnDef="actions">
+				<th mat-header-cell *matHeaderCellDef style="width: 100px;">
+					<span translate="COMMON.TACVU"></span>
+				</th>
+				<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">
+					<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary" 
+						(click)="nhacnho(item)" *ngIf="item.Id==null" matTooltip="Nhắc nhở nhập niên hạn">
+						<mat-icon>notifications_active</mat-icon>
+						<span class="button-text">Nhắc nhở {{isxa ? 'xã': 'huyện'}}</span>
+					</button>
+					<ng-container *ngIf="item.Id>0">
+						<a [routerLink]="['/duyet-nien-han/nien-han',item.Id,false]" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info">
+							<mat-icon>remove_red_eye</mat-icon>
+							<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
+						</a>
+						<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" type="button" (click)="DuyetNienHan(item,false)" matTooltip="Thảo luận" color="primary">
+							<mat-icon>insert_comment</mat-icon>
+							<span class="button-text">Thảo luận</span>
+						</button>
+						<button type="button" (click)="timeline(item)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary" matTooltip="Xem sơ đồ">
+							<mat-icon>timeline</mat-icon>
+							<span class="button-text">Xem sơ đồ</span>
+						</button>
+					</ng-container>
+				</td>
+			</ng-container>
+
+			<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
+			<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" [ngClass]="{'row-return': row.IsReturn, error:row.IsTre}"></tr>
+		</table>
+	</div>
+
+	<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}" [hidden]="istonghop">
+		<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
+			<mat-chip-list>
+				<ng-container *ngFor="let chip of gridService.model.lstChip">
+					<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
+						{{chip.title}}: {{chip.data}}
+						<mat-icon matChipRemove>cancel</mat-icon>
+					</mat-chip>
+					<ng-container *ngIf="chip.type==1">
+						<mat-chip *ngFor="let item of chip.data" removable="true"
+								  (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
+							{{chip.title}}: {{item.name}}
+							<mat-icon matChipRemove>cancel</mat-icon>
+						</mat-chip>
+					</ng-container>
+				</ng-container>
+				<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll"
+					(click)="gridService.Clear()">
+					Đặt lại
+				</mat-chip>
+			</mat-chip-list>
+		</div>
+
+		<div class="flt-page" style="width: 50%;">
+			<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+			<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"
+				[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+		</div>
+	</div> 
+</div>

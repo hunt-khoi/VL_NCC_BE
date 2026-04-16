@@ -1,0 +1,110 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+
+			<button class="show-view-sm float-right" mat-raised-button [matMenuTriggerFor]="chucnang" color="primary">
+				{{ 'COMMON.CHUCNANG' | translate }}
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button mat-menu-item (click)="displayKeyword()" matTooltip="{{ 'BIEUMAU.SHOWKEY' | translate }}" color="accent" type="button" *ngIf="!isZoomSize">
+					{{ 'BIEUMAU.SHOWKEY' | translate }}
+				</button>
+				<button mat-menu-item (click)="displayKeyword()" matTooltip="{{ 'BIEUMAU.HIDEKEY' | translate }}" color="accent" type="button" *ngIf="isZoomSize">
+					{{ 'BIEUMAU.HIDEKEY' | translate }}
+				</button>
+				<ng-container *ngIf="allowEdit">
+					<button mat-menu-item type="button" color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+						<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+					</button>
+					<button mat-menu-item color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+						<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+					</button>
+				</ng-container>
+			</mat-menu>
+
+			<div class="hide-view-sm">
+				<button (click)="displayKeyword()" mat-raised-button matTooltip="{{ 'BIEUMAU.SHOWKEY' | translate }}" color="accent" type="button" *ngIf="!isZoomSize">
+					{{ 'BIEUMAU.SHOWKEY' | translate }}
+				</button>
+				<button (click)="displayKeyword()" mat-raised-button matTooltip="{{ 'BIEUMAU.HIDEKEY' | translate }}" color="accent" type="button" *ngIf="isZoomSize">
+					{{ 'BIEUMAU.HIDEKEY' | translate }}
+				</button>
+				<ng-container *ngIf="allowEdit">
+					<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+						<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+					</button>
+					<button mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+						<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+					</button>
+				</ng-container>
+			</div>
+
+		</div>
+	</div>
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<div class="row">
+				<div class="col-lg-{{isZoomSize?8:12}}">
+					<div class="row">
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="{{ 'BIEUMAU.NAME' | translate }}" formControlName="BieuMau" class="require" required readonly />
+								<mat-error *ngIf="itemForm.controls['BieuMau'].errors">
+									{{ 'BIEUMAU.NAME' | translate }} <strong> bắt buộc nhập</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="Phiên bản hiện tại" formControlName="curVersion" readonly />
+							</mat-form-field>
+						</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="{{ 'BIEUMAU.VERSION' | translate }}" formControlName="Version" required />
+								<mat-error *ngIf="itemForm.controls['Version'].errors">
+									{{ 'BIEUMAU.VERSION' | translate }} <strong> bắt buộc nhập</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="w-100" *ngIf="allowEdit && arr">
+							<div class="col-lg-12 m--margin-bottom-20-mobile">
+								<mat-label>Nội dung</mat-label>
+							</div>
+							<div class="col-lg-12 m--margin-bottom-20-mobile" *ngFor="let content of arr; let i=index">
+								<ckeditor formControlName="content{{i}}" [config]="commonService.ckeditor"></ckeditor>
+							</div>
+						</div>
+						<div *ngIf="!allowEdit" class="col-lg-12 m--margin-bottom-20-mobile" style="overflow: scroll;">
+							<b>Xem trước</b>
+							<hr />
+							<span [innerHtml]="strHtml"></span>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4" [hidden]="!isZoomSize">
+					<div class="row">
+						<div class="col-lg-12 m--margin-bottom-20-mobile text-right">
+							<button (click)="viewKeyword()" mat-raised-button matTooltip="{{ 'BIEUMAU.DSKHOA' | translate }}" color="accent" type="button">
+								{{ 'BIEUMAU.DSKHOA' | translate }}
+							</button>
+						</div>
+
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<kt-key-word-list [IsFull]="false" [IsQua]="true"></kt-key-word-list>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

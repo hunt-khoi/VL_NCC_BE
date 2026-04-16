@@ -1,0 +1,61 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-7 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<button style="margin: 10px;" mat-raised-button color="info" matTooltip="Xuất chi tiết hỗ trợ" (click)="Export()"
+		*ngIf="listLS.length > 0">
+			Xuất
+		</button>
+	</div>
+	<div class="kt-portlet__body">
+		<table class="table table-hover table-bordered">
+			<tr>
+				<th class="text-center">STT</th>
+				<th class="text-center">Thời gian hỗ trợ</th>
+				<th class="text-center">Người hỗ trợ</th>
+				<th class="text-center">Cấp hỗ trợ</th>
+				<th class="text-center">Nguồn kinh phí</th>
+				<th class="text-center">Ghi chú</th>
+				<th class="text-center">Số tiền</th>
+				<th class="text-center">Thời gian sửa</th>
+				<th *ngIf="isAction"></th>
+			</tr>
+			<tr *ngFor="let row of listLS; let i=index">
+				<td class="text-center">{{i + 1}}</td>
+				<td>{{row.CreatedDate}}</td>
+				<td>{{row.CreatedBy}}</td>
+				<td>{{row.CapHoTro}}</td>
+				<td>{{row.NguonKinhPhi}}</td>
+				<td>{{row.GhiChu}}</td>
+				<td style="text-align: right;">{{row.SoTien | mask:'separator':commonService.thousandSeparator}}</td>
+				<td>{{row.UpdatedDate}}</td>
+				<td *ngIf="isAction">
+					<ng-container *ngIf="row.AllowEdit">
+						<button mat-icon-button color="warn" (click)="DeleteWorkplace(row)" type="button" matTooltip="{{ 'COMMON.DELETE' | translate }}">
+							<mat-icon>delete</mat-icon>
+						</button>
+						<button (click)="EditObject(row)" mat-icon-button color="primary" type="button" matTooltip="{{ 'COMMON.UPDATE' | translate }}">
+							<mat-icon>create</mat-icon>
+						</button>
+					</ng-container>
+				</td>
+			</tr>
+		
+			<tr *ngIf="listLS.length > 0">
+				<th style="text-align: left;" colspan="6">Tổng cộng</th>
+				<th style="text-align: right;">{{tongHoTro | mask:'separator':commonService.thousandSeparator}}</th>
+				<td>&nbsp;</td>
+			</tr>
+
+			<tr *ngIf="listLS.length == 0">
+				<td colspan="8" style="text-align: center;">Không có dữ liệu hiển thị</td>
+			</tr>
+		</table>
+	</div>
+</div>

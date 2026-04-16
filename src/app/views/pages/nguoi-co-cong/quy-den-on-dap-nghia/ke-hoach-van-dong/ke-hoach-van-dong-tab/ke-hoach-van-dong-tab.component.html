@@ -1,0 +1,19 @@
+<kt-portlet>
+	<ng-container *ngIf="UserInfo.Capcocau != 1">
+		<mat-tab-group [selectedIndex]="1">
+			<mat-tab label="Danh sách được giao">
+				<ng-template matTabContent>
+					<kt-ke-hoach-van-dong-list-giao></kt-ke-hoach-van-dong-list-giao>
+				</ng-template>
+			</mat-tab>
+			<mat-tab label="Danh sách">
+				<ng-template matTabContent>
+					<kt-ke-hoach-van-dong-list></kt-ke-hoach-van-dong-list>
+				</ng-template>
+			</mat-tab>
+		</mat-tab-group>
+	</ng-container>
+	<ng-container *ngIf="UserInfo.Capcocau == 1">
+		<kt-ke-hoach-van-dong-list></kt-ke-hoach-van-dong-list>
+	</ng-container>
+</kt-portlet>

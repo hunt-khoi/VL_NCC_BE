@@ -1,0 +1,19 @@
+<kt-portlet>
+	<mat-tab-group [selectedIndex]="selectedTab">
+		<mat-tab label="Thông tin">
+			<ng-template matTabContent>
+				<m-quan-ly-quy-info></m-quan-ly-quy-info>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Đóng góp">
+			<ng-template matTabContent>
+				<m-dong-gop-quy-list></m-dong-gop-quy-list>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Chi quỹ">
+			<ng-template matTabContent>
+				<m-chi-quy-list></m-chi-quy-list>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</kt-portlet>

@@ -1,0 +1,69 @@
+<kt-portlet [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">
+					<span>{{_name}}</span>
+				</h3>
+			</div>
+		</ng-container>
+	</kt-portlet-header>
+	<form class="kt-form" [formGroup]="itemForm" style="margin-left: 30px;">
+		<div class="kt-portlet-body">
+			<!-- Chọn các năm -->
+			<div class="form-group kt-form__group row" style="margin-left: 30px;">
+				<div class="col-m-6 kt-margin-bottom-10-mobile">
+					<p>Chọn các năm muốn xem thống kê</p>
+					<ng-container *ngFor="let tmp of list10year; index as i">
+						<mat-checkbox [value]="tmp.id" (change)="onCheckboxChange($event)">{{tmp.title}}</mat-checkbox>&nbsp;&nbsp;&nbsp;
+					</ng-container><br>
+				</div>
+			</div>
+
+			<div class="form-group kt-form__group row" style="margin-left: 30px;">
+				<div class="col-md-4 kt-margin-bottom-10-mobile">
+					<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>&nbsp;
+					<button mat-raised-button color="primary" matTooltip="Xuất danh sách" *ngIf="allowExport==true" printTitle={{_name}} [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>In</button>&nbsp;
+					<button (click)="exportExcel()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport==true">Export</button>
+				</div>
+			</div>
+
+			<div class="form-group kt-form__group row">
+				<!-- Danh sách chi tiết -->
+				<div class="col-md-6 kt-margin-bottom-10-mobile" id="print-section">
+					<table class="table-bordered table-sm" style="width:100%;">
+						<tr style="text-align: center;">
+							<th>STT</th>
+							<th>Nhóm lễ tết</th>
+							<ng-container *ngFor="let dt of listYearChoose">
+								<th>Năm {{dt}}</th>
+							</ng-container>
+						</tr>
+						<ng-container *ngFor="let items of dataThongKe, let i=index">
+							<tr style="text-align: center;">
+								<td>{{i+1}}</td>
+								<td><b>{{items.NhomLeTet}}</b></td>
+								<ng-container *ngFor="let dt of items.ThongKe">
+									<td><b>{{dt.SL}} </b></td>
+								</ng-container>
+							</tr>
+						</ng-container>
+					</table>
+				</div>
+				<!-- Biểu độ cột -->
+				<div class="col-md-4 kt-margin-bottom-10-mobile">
+					<h5>Biểu đồ cột thể hiện số lượng người nhận qua các năm</h5>
+					<canvas baseChart
+							[chartType]="'bar'"
+							[datasets]="chartData"
+							[labels]="labels"
+							[options]="chartOptions"
+							[legend]="true"
+							[colors]="colors">
+					</canvas>
+				</div>
+
+			</div>
+		</div>
+	</form>
+</kt-portlet>

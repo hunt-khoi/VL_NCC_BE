@@ -1,0 +1,74 @@
+<kt-portlet [options]="{headLarge: true}">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]=loading$>
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">{{ 'QUA_TET.quyetdinhhuyen' | translate }}</h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button class="show-view-sm" mat-raised-button [matMenuTriggerFor]="chucnang" color="primary">
+				{{ 'COMMON.CHUCNANG' | translate }}
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button mat-menu-item (click)="$event.stopPropagation();">
+				</button>
+				<button type="button" mat-menu-item color="primary" (click)="view()">{{ 'COMMON.DETAIL' | translate }}</button>
+				<ng-container *ngIf="strHtml">
+					<button type="button" mat-menu-item color="primary" (click)="in()">{{ 'COMMON.TAIVE' | translate }}</button>
+					<button type="button" mat-menu-item color="primary" printSectionId="print-section" ngxPrint> In</button>
+				</ng-container>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<button type="button" mat-raised-button color="primary" (click)="view()">{{ 'COMMON.DETAIL' | translate }}</button>
+				<ng-container *ngIf="strHtml">
+					<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" [matMenuTriggerFor]="menu">
+						{{ 'COMMON.TAIVE' | translate }}
+					</button>
+					<mat-menu #menu="matMenu">
+						<button mat-menu-item (click)="in(3)">PDF</button>
+						<button mat-menu-item (click)="in(1)">Word</button>
+						<button mat-menu-item (click)="in(2)">Excel</button>
+					</mat-menu>
+					<button type="button" mat-raised-button color="primary" printSectionId="print-section" ngxPrint>{{ 'COMMON.PRINT' | translate }}</button>
+				</ng-container>
+			</div>
+		</ng-container>
+	</kt-portlet-header>
+	
+	<kt-portlet-body>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-3">
+				<mat-form-field class="mat-form-field-fluid">
+					<mat-select [(ngModel)]="IdDotTangQua" placeholder="Chọn đợt tặng quà">
+						<mat-option [value]="0">--Chọn đợt tặng quà--</mat-option>
+						<mat-option [value]="opt.id" *ngFor="let opt of lstDot">{{opt.title}}</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-3">
+				<mat-form-field class="mat-form-field-fluid ">
+					<mat-select [(ngModel)]="idHuyen" placeholder="Chọn huyện" [disabled]="Capcocau>=2">
+						<mat-option [value]="0" disabled>--Chọn huyện--</mat-option>
+						<mat-option *ngFor="let opt of listHuyen;" [value]="opt.ID_Row">{{opt.District}}</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-3">
+				<mat-form-field class="mat-form-field-fluid ">
+					<mat-select [(ngModel)]="idLoaiMau" placeholder="Chọn mẫu in">
+						<mat-option [value]="0" disabled>--Chọn mẫu in--</mat-option>
+						<mat-option [value]="1">Trung ương</mat-option>
+						<mat-option [value]="2">Địa phương</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+		</div>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-3"></div>
+			<div id="print-section" class="col-md-6" *ngIf="strHtml">
+				<span [innerHtml]="strHtml"></span>
+			</div>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>

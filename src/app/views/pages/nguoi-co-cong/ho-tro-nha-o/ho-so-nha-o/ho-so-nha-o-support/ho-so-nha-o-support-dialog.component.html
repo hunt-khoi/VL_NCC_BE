@@ -1,0 +1,45 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit()" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+	<div class="kt-portlet__body">
+		<form class="kt-form" [formGroup]="itemForm">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+				Không thể lưu, vui lòng kiểm tra lại thông tin!
+			</kt-alert>
+			<div class="row">
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput placeholder="Số tiền hỗ trợ" formControlName="SoTien" class="require" required
+						 mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}"/>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="Nguồn kinh phí hỗ trợ" formControlName="NguonKinhPhi" class="require" required>
+							<mat-option [value]="1">Ngân sách Nhà nước</mat-option>
+							<mat-option [value]="2">Nguồn Xã hội hóa</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput placeholder="Ghi chú" formControlName="GhiChu" />
+					</mat-form-field>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

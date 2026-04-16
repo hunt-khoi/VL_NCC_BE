@@ -1,0 +1,82 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn"
+			title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet"
+	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" [hidden]="!isDuyet"
+			 style="margin-top: 10px; text-align: right;">
+			<!-- *ngIf="allowEdit" -->
+			<ng-container *ngIf="!isReturn">
+				<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)" [disabled]="!item.IsEnable_Duyet ||disabledBtn"
+					matTooltip="Duyệt">
+					Duyệt
+				</button>
+				<button type="button" mat-raised-button color="warn" (click)="onSubmit(false)" [disabled]="!item.IsEnable_Duyet ||disabledBtn"
+					matTooltip="Không duyệt">
+					Không duyệt
+				</button>
+			</ng-container>
+			<button type="button" mat-raised-button color="warn" (click)="traLai()"
+				matTooltip="Trả lại" *ngIf="isReturn">
+				Trả lại
+			</button>
+		</div>
+	</div>
+	<div class="kt-portlet__body">
+		<form class="kt-form" [formGroup]="itemForm" *ngIf="isReturn">
+			<div class="row" [hidden]="disabledBtn">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<textarea matInput rows="3" placeholder="Ghi chú trả lại xã" required
+							formControlName="GhiChu" #focusInput></textarea>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<dl-image-control formControlName="FileDinhKem" [multiple]="false" nameButton="Chọn tệp đính kèm" [disabled]="disabledBtn">
+					</dl-image-control>
+				</div>
+			</div>
+		</form>
+		<form class="kt-form" [formGroup]="itemForm" *ngIf="!isReturn">
+			<div class="row" [hidden]="!isDuyet || !item.IsEnable_Duyet ||disabledBtn">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<textarea matInput rows="3" placeholder="Ghi chú duyệt"
+							formControlName="GhiChu" #focusInput></textarea>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<dl-image-control formControlName="FileDinhKem" [multiple]="false" nameButton="Chọn tệp đính kèm" [disabled]="disabledBtn">
+					</dl-image-control>
+				</div>
+			</div>
+			<div class="row" *ngIf="item.CurrentChecker">
+				<div class=" {{userId != item.NguoiDuyetDon?'col-lg-7':'col-lg-12'}}  m--margin-bottom-20-mobile">
+					Đang trong quá trình duyệt của: <b>{{item.CurrentChecker}}</b><br />
+					<ng-container *ngIf="item.Deadline">
+						Thời hạn <b *ngIf="item.Deadline.IsTre" style="color:red;">{{item.Deadline.Ngay}}</b> <b *ngIf="!item.Deadline.IsTre">{{item.Deadline.Ngay}}</b>
+					</ng-container>
+				</div>
+				<div class="col-lg-5 m--margin-bottom-20-mobile" *ngIf="userId != item.NguoiDuyetDon && isShowNhacnho">
+					<button [disabled]="guiduyet" class="btn btn-primary float-right" (click)="GuiDuyet()">
+						{{!guiduyet? 'Nhắc nhở' : 'Đã nhắc nhở'}}
+					</button>
+				</div>
+			</div>
+		</form>
+		<div class="form-group kt-form__group row">
+			<h5 style="border-bottom: solid 1px;">Bình luận</h5>
+			<div class="col-lg-12 m--margin-bottom-20-mobile">
+				<kt-comment [Loai]="4" [Id]="item.Id"></kt-comment>
+			</div>
+		</div>
+	</div>
+</div>

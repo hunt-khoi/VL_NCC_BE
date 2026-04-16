@@ -1,0 +1,9 @@
+{
+	"extends": "./tsconfig.app.json",
+	"compilerOptions": {
+		"target": "es2015",
+		"sourceMap": false,
+		"incremental": true,
+		"tsBuildInfoFile": "../.tsbuildinfo"
+	}
+}

@@ -1,0 +1,30 @@
+<!-- <router-outlet></router-outlet> -->
+<style>
+	:host >>> .mat-tab-body-content {
+		height: auto;
+	}
+</style>
+<kt-portlet>
+	<mat-tab-group>
+		<mat-tab label="Phân bổ số lượng quà tết">
+			<ng-template matTabContent>
+				<m-tk-phan-bo></m-tk-phan-bo>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Đối tượng người có công">
+			<ng-template matTabContent>
+				<m-tk-theo-doi-tuong-new></m-tk-theo-doi-tuong-new>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Mức quà">
+			<ng-template matTabContent>
+				<m-tk-theo-muc-qua></m-tk-theo-muc-qua>
+			</ng-template>
+		</mat-tab>
+		<mat-tab label="Tổng hợp">
+			<ng-template matTabContent>
+				<m-tk-tong-hop></m-tk-tong-hop>
+			</ng-template>
+		</mat-tab>
+	</mat-tab-group>
+</kt-portlet>

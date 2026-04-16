@@ -1,0 +1,167 @@
+<style>
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 1;
+	}
+	.min-th {
+		min-width: 160px;
+	}
+	.min-width-200px {
+		min-width: 200px;
+	}
+</style>
+<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+	<ng-container ktPortletTools>
+		<button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+			<button class="show-view-sm" *ngIf="allowExport" mat-raised-button [matMenuTriggerFor]="chucnang1" color="primary">
+				Chức năng
+			</button>
+			<mat-menu #chucnang1="matMenu">
+				<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-menu-item color="primary" matTooltip="In danh sách" printTitle={{this._name}}
+						[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách">Export</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{this._name}}
+						[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</div>
+	</ng-container>
+</kt-portlet-header>
+<kt-portlet-body>
+	<div class="form-group kt-form__group row">
+		<div class="col-md-3 kt-margin-bottom-10-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Loại thống kê" [(ngModel)]="loaitk">
+					<mat-option [value]="1">Thống kê năm</mat-option>
+					<mat-option [value]="2">Thống kê quý</mat-option>
+					<mat-option [value]="3">Thống kê tháng</mat-option>
+					<mat-option [value]="4">Thống kê ngày hiện tại</mat-option>
+					<mat-option [value]="5">Thống kê khoảng thời gian</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="loaitk <= 3">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput type="number" placeholder="Năm" [(ngModel)]="Nam" [min]="0"/>
+			</mat-form-field>
+		</div>
+		<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="loaitk == 2">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Quý" [(ngModel)]="quy">
+					<mat-option [value]="t" *ngFor="let t of lstThang | slice:0:4">
+						Quý {{t}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="loaitk == 3">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Tháng" [(ngModel)]="thang">
+					<mat-option [value]="t" *ngFor="let t of lstThang">
+						Tháng {{t}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<ng-container *ngIf="loaitk == 5">
+			<div class="col-md-2 kt-margin-bottom-10-mobile">
+				<mat-form-field class="mat-form-field-fluid">
+					<input matInput [matDatepicker]="pickerTN" placeholder="Từ ngày" [(ngModel)]="from" [max]="to">
+					<mat-datepicker-toggle matSuffix [for]="pickerTN"></mat-datepicker-toggle>
+					<mat-datepicker #pickerTN></mat-datepicker>
+				</mat-form-field>
+			</div>
+			<div class="col-md-2 kt-margin-bottom-10-mobile">
+				<mat-form-field class="mat-form-field-fluid">
+					<input matInput [matDatepicker]="pickerDN" placeholder="Đến ngày" [(ngModel)]="to" [min]="from">
+					<mat-datepicker-toggle matSuffix [for]="pickerDN"></mat-datepicker-toggle>
+					<mat-datepicker #pickerDN></mat-datepicker>
+				</mat-form-field>
+			</div>
+		</ng-container>
+		<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau == 1">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Chọn huyện thống kê" [(value)]="filterDistrict" [(ngModel)]="filterDistrict"
+					[disabled]="Capcocau >= 2" (selectionChange)="display=false">
+					<mat-option [value]="0">Tất cả</mat-option>
+					<mat-option [value]="list.ID_Row" *ngFor="let list of listHuyen">{{list.District}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau > 1">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Chọn xã thống kê" [(value)]="filterWard" [disabled]="Capcocau == 3">
+					<mat-option [value]="0">Tất cả</mat-option>
+					<mat-option [value]="item.ID_Row" *ngFor="let item of listXa">{{item.Ward}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+	</div>
+	<div id="print-section" *ngIf="display">
+		<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive">
+			<table class="table-bordered table-sm" style="width:100%;">
+				<tr>
+					<th style="width: 5%; text-align: center;" rowspan="2">STT</th>
+					<th style="width: 20%; text-align: center;" rowspan="2">Tên đơn vị</th>
+					<th style="width: 25%; text-align: center;" colspan="2">Chưa hỗ trợ</th>
+					<th style="width: 25%; text-align: center;" colspan="3">Đang hỗ trợ</th>
+					<th style="width: 25%; text-align: center;" colspan="3">Đã hỗ trợ</th>					
+				</tr>
+				<tr>
+					<th style="width: 12.5%; text-align: center;" >Số lượng</th>
+					<th style="width: 12.5%; text-align: center;">Tiền yêu cầu</th>
+
+					<th style="width: 8.33%; text-align: center;" >Số lượng</th>
+					<th style="width: 8.33%; text-align: center;">Tiền yêu cầu</th>
+					<th style="width: 8.33%; text-align: center;">Tiền hỗ trợ</th>		
+
+					<th style="width: 8.33%; text-align: center;" >Số lượng</th>
+					<th style=" width: 8.33%; text-align: center;">Tiền yêu cầu</th>
+					<th style=" width: 8.33%; text-align: center;">Tiền hỗ trợ</th>	
+				</tr>
+				<ng-container *ngIf="dataThongKe.length==0">
+					<tr><td colspan="12" class="text-center">Không có dữ liệu</td></tr>
+				</ng-container>
+				<ng-container *ngFor="let dt of dataThongKe; let i=index">
+					<tr *ngIf="dataThongKe.length!=0">
+						<td style="width: 17px; text-align: center;">{{i+1}}</td>
+						<td>{{dt.TenDonVi}}</td>
+						<td style="text-align: right;">
+							<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(dt.Id_Donvi, 0)">{{dt.cht_sl}}</a>
+							
+						</td>
+						<td style="text-align: right;"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(dt.Id_Donvi, 0, 1)"> {{dt.cht_tt| mask: 'separator':tsSeparator}}</a></td>
+
+						<td style="text-align: right;">
+							<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(dt.Id_Donvi, 1, 0)">{{dt.dangHT_sl}}</a>							
+						</td>
+						<td style="text-align: right;"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(dt.Id_Donvi, 1, 1)">{{dt.dangHT_yc| mask: 'separator':tsSeparator}}</a></td>
+						<td style="text-align: right;"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(dt.Id_Donvi, 1, 2)">{{dt.dangHT_tt | mask: 'separator':tsSeparator}}</a></td>
+
+						<td style="text-align: right;">
+							<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(dt.Id_Donvi, 2, 0)">{{dt.daHT_sl}}</a>							
+						</td>
+						<td style="text-align: right;"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(dt.Id_Donvi, 2, 1)">{{dt.daHT_yc | mask: 'separator':tsSeparator}}</a></td>
+						<td style="text-align: right;"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(dt.Id_Donvi, 2, 2)">{{dt.daHT_tt | mask: 'separator':tsSeparator}}</a></td>
+					
+					</tr>
+				</ng-container>
+			</table>
+		</div>
+	</div>
+</kt-portlet-body>

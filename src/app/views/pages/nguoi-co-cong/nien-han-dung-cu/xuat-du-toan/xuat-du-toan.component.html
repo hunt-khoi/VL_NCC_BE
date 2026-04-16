@@ -1,0 +1,99 @@
+
+<kt-portlet>
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'"[viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title"><span>{{this._name}}</span></h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button class="show-view-sm" (click)="loadData()" *ngIf="!allowExport" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+			<button class="show-view-sm" *ngIf="allowExport==true" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+				Chức năng
+			</button>
+			<mat-menu #chucnang="matMenu">
+			<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<button mat-menu-item color="primary" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" 
+					matTooltip="In" *ngIf="allowExport" printSectionId="print-section" ngxPrint>In</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</mat-menu>
+			<div class="hide-view-sm" style="display: contents;">
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<button mat-raised-button color="primary" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" 
+					matTooltip="In" *ngIf="allowExport" printSectionId="print-section" ngxPrint>In</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</div>
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-2 kt-margin-bottom-10-mobile">
+				<mat-form-field class="mat-form-field-fluid ">
+					<input matInput type="number" placeholder="Chọn năm" [(ngModel)]="Nam" [min]="0"/>
+				</mat-form-field>
+			</div>
+			<div class="col-md-2 kt-margin-bottom-10-mobile">
+				<mat-form-field class="mat-form-field-fluid ">
+					<mat-select placeholder="Dụng cụ" [(value)]="id_dc">
+						<mat-option [value]="0" >-- Tất cả --</mat-option>
+						<mat-option *ngFor="let dc of listDC;" [value]="dc.id" matTooltip="{{dc.title}}">
+							{{dc.title}}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-1 kt-margin-bottom-10-mobile" style="text-align: center; margin-top: 15pt;">
+				<mat-checkbox [checked]="showSL" (change)="showSL = !showSL">Số lượng</mat-checkbox>
+			</div>
+			<div class="col-md-1 kt-margin-bottom-10-mobile" style="text-align: center; margin-top: 15pt;">
+				<mat-checkbox [checked]="showKP" (change)="showKP = !showKP">Kinh phí</mat-checkbox>
+			</div>
+		</div>
+		<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive pd-0" *ngIf="display" id="print-section"> 
+			<table class="table-bordered table-sm" style="width:100%;">
+				<tr style="text-align: center;">
+					<th rowspan="3" class="sticky-body-col0" style="min-width: 180px;">Tên đơn vị</th>
+					<th rowspan="3" style="min-width: 120px;">Tổng số đối tượng được cấp</th>
+					<th [attr.colspan]="(showSL && showKP) ? dataThongKe.length*2 : dataThongKe.length" *ngIf="showSL || showKP">Loại phương tiện được cấp</th>
+					<th rowspan="3" style="min-width: 120px;">Tổng dự toán kinh phí</th>
+				</tr>
+				<tr style="text-align: center;">
+					<ng-container *ngFor="let dc of dataThongKe">
+						<th [attr.colspan]="(showSL && showKP) ? 2 : 1" *ngIf="showSL || showKP">{{dc.DungCu}}</th>
+					</ng-container>
+				</tr>
+				<tr style="text-align: center;">
+					<ng-container *ngFor="let dc of dataThongKe">
+						<th *ngIf="showSL">Số đối tượng</th>
+						<th *ngIf="showKP">Kinh phí</th>
+					</ng-container>
+				</tr>
+				<ng-container *ngFor="let dv of datalength.Donvis" >
+					<tr>
+						<td class="sticky-body-col0">{{dv.Huyen}}</td>
+						<td style="text-align: right;">{{dv.TongSL}}</td>
+						<ng-container *ngFor="let h of dataThongKe">
+							<td *ngIf="showSL" style="text-align: right;">{{getValue(dv.Id, 'SL', h.ThongKe)}}</td>
+							<td *ngIf="showKP" style="text-align: right;">{{getValue(dv.Id, 'KP', h.ThongKe)}}</td>
+						</ng-container>
+						<td style="text-align: right;">{{CommonService.f_currency_V2(dv.TongKP)}}</td>
+					</tr>
+				</ng-container>
+				<tr>
+					<th class="sticky-body-col0">Tổng cộng: </th>
+					<th style="text-align: right;">{{lstSum.TongSL}}</th>
+					<ng-container *ngFor="let h of dataThongKe">
+						<th *ngIf="showSL" style="text-align: right;">{{h.TongSL}}</th>
+						<th *ngIf="showKP" style="text-align: right;">{{CommonService.f_currency_V2(h.TongKP)}}</th>
+					</ng-container>
+					<th style="text-align: right;">{{CommonService.f_currency_V2(lstSum.TongKP)}}</th>
+				</tr>
+				<tr *ngIf="dataThongKe.length==0">
+					<td [attr.colspan]="4+dataThongKe.length" class="text-center"><b>Không có dữ liệu</b></td>
+				</tr>
+			</table>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>
+

@@ -1,0 +1,232 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn"
+			title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet"
+	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn"
+					matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+			<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn"
+					*ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+	<div class="kt-form">
+		<div class="kt-portlet__body">
+			<div class="row">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-checkbox [(ngModel)]="isThanNhan" [disabled]="!checkTN">{{'DINHCHINH.thannhan' | translate }}</mat-checkbox>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Ghi chú" [(ngModel)]="GhiChu" [disabled]="!allowEdit"/>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group" *ngIf="!isThanNhan">
+				<div class="row">
+					<div class="col-md-8">{{'DINHCHINH.danhsachtt' | translate }}</div>
+					<div class="col-md-4 text-right">
+						<button (click)="AddColum()" *ngIf="!(!allowEdit)" mat-button mat-raised-button color="primary">
+							{{'DINHCHINH.themthongtin' | translate }}
+						</button>
+					</div>
+				</div>
+				<div class="row" *ngFor="let lstCol of ListColumn;let i = index">
+					<div class="col-lg-6 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid">
+							<mat-select [disabled]="!allowEdit" placeholder="{{'DINHCHINH.thongtin' | translate }}" required
+									[(ngModel)]="ListColumn[i].ColumnName">
+								<mat-option [value]="lst.ID_Row" (click)="SetupType(lst,i)"
+									*ngFor="let lst of checkShow(i);">{{lst.Title}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-5 m--margin-bottom-20-mobile" *ngIf=" !(TypeOfColumn(lstCol.Type)=='year')">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput [disabled]="!allowEdit" *ngIf="!(TypeOfColumn(lstCol.Type)=='dropdown')"
+								type={{TypeOfColumn(lstCol.Type)}} placeholder="Giá trị mới" required
+								[(ngModel)]="ListColumn[i].GiaTriMoi" />
+							<!-- bỏ loại đính chính gt là dropdown -->
+							<!-- <mat-select [disabled]="!allowEdit" *ngIf="(TypeOfColumn(lstCol.Type)=='dropdown')"
+										placeholder="Giá trị mới" [(ngModel)]="ListColumn[i].GiaTriMoi">
+								<mat-option>lstCol.ColumnName</mat-option>
+								<ng-container *ngIf="(lstCol.ColumnName=='id_doituongncc')">
+									<mat-option>
+										<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'"
+											[noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'"
+											[(ngModel)]="FilterCtrl" [ngModelOptions]="{standalone: true}"
+											(ngModelChange)="filter()">
+										</ngx-mat-select-search>
+									</mat-option>
+									<mat-option value="{{item.id}}"
+												*ngFor="let item of listdoituongncc | async;">
+										{{item.title}}
+									</mat-option>
+								</ng-container>
+								<ng-container *ngIf="(lstCol.ColumnName=='gioitinh')">
+									<mat-option value="2">Nam</mat-option>
+									<mat-option value="1">Nữ</mat-option>
+								</ng-container>
+								<ng-container *ngIf="(lstCol.ColumnName=='Mo')">
+									<mat-option value="1">Nghĩa trang</mat-option>
+									<mat-option value="2">Gia đình quản lý</mat-option>
+									<mat-option value="3">Không có thông tin</mat-option>
+								</ng-container> 
+							</mat-select> -->
+						</mat-form-field>
+					</div>
+					<div class="col-lg-5 m--margin-20-mobile" *ngIf=" (TypeOfColumn(lstCol.Type)=='year')">
+						<mat-form-field class="w-100" appearance="fill">
+							<input matInput [(ngModel)]="ListColumn[i].GiaTriMoi" [matDatepicker]="dp"
+								   [max]="_maxyear" readonly />
+							<mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+							<mat-datepicker #dp startView="multi-year" (yearSelected)="chosenYearHandler($event, dp,i)">
+							</mat-datepicker>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-1 text-right text-danger" style="padding-top: 20px;">
+						<mat-icon (click)="DeleteCol(i)" matTooltip="Xóa dòng" class="url">close</mat-icon>
+					</div>
+				</div>
+			</div>
+			<div class="form-group kt-form__group" *ngIf="isThanNhan">
+				<div class="row">
+					<div class="col-md-8">{{'DINHCHINH.danhsachtt' | translate }}</div>
+					<div class="col-md-4 text-right">
+						<button (click)="AddColum()" *ngIf="!(!allowEdit)" mat-button mat-raised-button color="primary">
+							{{'DINHCHINH.themthongtin' | translate }}
+						</button>
+					</div>
+				</div>
+				<div class="row" *ngFor="let lstCol of ListColumn;let i = index">
+					<div class="col-lg-3 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid">
+							<mat-select [disabled]="!allowEdit" placeholder="{{'DINHCHINH.thongtin' | translate }}" required
+								[(ngModel)]="ListColumn[i].ColumnName">
+								<mat-option [value]="lst.ID_Row" (click)="SetupType(lst,i)"
+									*ngFor="let lst of checkShow(i);">{{lst.Title}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-lg-3 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput [disabled]="!allowEdit"
+								type={{TypeOfColumn(lstCol.Type)}} placeholder="{{'DINHCHINH.giatricu' | translate }}" required
+								[(ngModel)]="ListColumn[i].GiaTriCu" />
+						</mat-form-field>
+					</div>
+					<div class="col-lg-3 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid">
+							<input matInput [disabled]="!allowEdit"
+								type={{TypeOfColumn(lstCol.Type)}} placeholder="{{'DINHCHINH.giatrimoi' | translate }}" required
+								[(ngModel)]="ListColumn[i].GiaTriMoi" />
+						</mat-form-field>
+					</div>
+					<div class="col-lg-1 text-right text-danger" style="padding-top: 20px;">
+						<mat-icon (click)="DeleteCol(i)" matTooltip="Xóa dòng" class="url">close</mat-icon>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group kt-form__group">
+				<div class="row">
+					<div class="col-md-8">
+						<mat-label>Danh sách giấy tờ</mat-label>
+					</div>
+					<div class="col-md-4 text-right">
+						<button (click)="AddRow_formGiayTo()" *ngIf="!(!allowEdit)" mat-button mat-raised-button 
+							color="primary" matTooltip="Thêm giấy tờ mới">Thêm giấy tờ
+						</button>
+					</div>
+					<div class="col-md-12">
+						<table style="width:100%" class="mat-table table-bordered table-hover">
+							<thead>
+								<tr>
+									<th>Loại</th>
+									<th>Số giấy tờ</th>
+									<th>Tên giấy tờ</th>
+									<th>Ngày cấp</th>
+									<th>Nơi cấp</th>
+									<th>File</th>
+									<th *ngIf="allowEdit"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let item of formGiayTo;let i = index">
+									<td>
+										<mat-form-field class="example-full-width">
+											<mat-select [disabled]="!allowEdit" [(ngModel)]="formGiayTo[i].Id_LoaiGiayTo">
+												<mat-option [value]="lgt.id" *ngFor="let lgt of listLoaiGiayTo;">{{lgt.title }}</mat-option>
+											</mat-select>
+										</mat-form-field>
+									</td>
+									<td scope="row">
+										<mat-form-field class="example-full-width">
+											<input matInput [disabled]="!allowEdit" [(ngModel)]="formGiayTo[i].So" autocomplete="off">
+										</mat-form-field>
+									</td>
+									<td>
+										<mat-form-field class="example-full-width">
+											<input matInput [disabled]="!allowEdit" [(ngModel)]="formGiayTo[i].GiayTo" autocomplete="off">
+										</mat-form-field>
+									</td>
+									<td>
+										<mat-form-field class="example-full-width">
+											<input [disabled]="!allowEdit" [(ngModel)]="formGiayTo[i].NgayCap" matInput type="date">
+										</mat-form-field>
+									</td>
+									<td>
+										<mat-form-field class="example-full-width">
+											<input [disabled]="!allowEdit" matInput [(ngModel)]="formGiayTo[i].NoiCap">
+										</mat-form-field>
+									</td>
+									<td>
+										<div class="attach-item show-action" *ngIf="formGiayTo[i].FileDinhKem">
+											<div class="attach-item-name" *ngIf="item.Id > 0 ">
+												<p>{{formGiayTo[i].FileDinhKem.filename}}</p>
+												<span>
+													<a href="viewer/file-dinh-kem/0?path={{formGiayTo[i].FileDinhKem.src}}" target="_blank"> Preview</a>&nbsp;&middot;&nbsp;
+													<a href="javascript:;" (click)="DownloadFile(formGiayTo[i].FileDinhKem.src)">Download</a>
+												</span>
+											</div>
+										</div>
+										<input [disabled]="!allowEdit" placeholder="Chọn file" type="file" name="fileUpload1" (change)="FileSelected($event, i)">
+										<!-- <dl-image-control [(ngModel)]="formGiayTo[i].src" [multiple]="false" nameButton="Chọn tệp giấy tờ" [disabled]="!allowEdit">
+										</dl-image-control> -->
+									</td>
+									<td class="text-danger" *ngIf="allowEdit">
+										<mat-icon (click)="DeleteRowTable(i)" matTooltip="Xóa dòng" class="url">close</mat-icon>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="row" *ngIf="allowDuyet">
+					<div class="col-md-12" *ngIf="item.IsDuyet == null">
+						<button (click)="DuyetTin(true)" mat-button mat-raised-button color="primary">{{'COMMON.DUYET' | translate }}</button>
+						<button (click)="DuyetTin(false)" mat-button mat-raised-button color="warn">{{'COMMON.KODUYET' | translate }}</button>
+					</div>
+					<div *ngIf="!item.IsDuyet" class="text-center text-danger col-12">Từ chối duyệt</div>
+					<div *ngIf="item.IsDuyet" class="text-center text-success col-12">Đã duyệt</div>
+				</div>
+			</div>
+		</div>
+	</div>

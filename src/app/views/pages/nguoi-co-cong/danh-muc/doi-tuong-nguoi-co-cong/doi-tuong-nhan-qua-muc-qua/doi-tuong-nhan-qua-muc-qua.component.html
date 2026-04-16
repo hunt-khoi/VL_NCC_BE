@@ -1,0 +1,47 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit()" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+	
+	<form class="kt-form">
+		<div class="kt-portlet__body">
+			<div class="form-group kt-form__group row">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<h5>Đối tượng: <span *ngIf="item.MaDoiTuong">{{item.MaDoiTuong}} -</span>{{item.DoiTuong}}</h5>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row overflow-auto">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<table style="width:100%" class="table-bordered">
+						<tr>
+							<th class="text-center">Nhóm lễ tết</th>
+							<th class="text-center" *ngFor="let ng of lstNguon">{{ng.title}}</th>
+						</tr>
+						<ng-container *ngIf="ready">
+							<tr *ngFor="let nh of lstNhom; let i=index">
+								<td>{{nh.title}}</td>
+								<th *ngFor="let ng of lstNguon;let j=index;">
+									<mat-form-field>
+										<input matInput [value]="getValue(nh.id, ng.id)" (change)="changeMuc($event,nh.id, ng.id)" placeholder="Mức quà" mask="separator,3" thousandSeparator="{{danhMucService.thousandSeparator}}" [disabled]="!allowEdit"/>
+									</mat-form-field>
+								</th>
+							</tr>
+						</ng-container>
+					</table>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

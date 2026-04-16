@@ -1,0 +1,500 @@
+import { TableService } from '../../../../../partials/table/table.service';
+import { TableModel } from '../../../../../partials/table/table.model';
+import { HoSoNhaODuyetService } from '../Services/ho-so-nha-o-duyet.service';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { MatDialog, MatPaginator, MatSort } from '@angular/material';
+import { SelectionModel } from '@angular/cdk/collections';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { CommonService } from '../../../services/common.service';
+import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
+import { ReviewExportComponent, SettingProcessComponent } from '../../../components';
+import { HuongDanNhaODataSource } from '../Model/data-sources/huong-dan.datasource';
+import { HoSoNhaOHoanThienDialogComponent } from '../ho-so-nha-o-huong-dan/ho-so-nha-o-huong-dan-dialog.component';
+import { HoSoNhaOHistoryComponent } from '../../ho-so-nha-o/ho-so-nha-o-history/ho-so-nha-o-history.component';
+import { CookieService } from 'ngx-cookie-service';
+
+@Component({
+	selector: 'kt-ho-so-nha-o-hd-list',
+	templateUrl: './ho-so-nha-o-hd-list.component.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
+})
+
+export class HoSoNhaOHDListComponent implements OnInit {
+	// Table fields
+	dataSource: HuongDanNhaODataSource;
+
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	// Filter fields
+	filterStatus = '';
+	filterType = ''
+
+	// Selection
+	selection = new SelectionModel<any>(true, []);
+	productsResult: any[] = [];
+	// tslint:disable-next-line:variable-name
+	_name = '';
+	// filter District
+	filterprovinces: number;
+	listprovinces: any[] = [];
+	filterdistrict = '';
+	listdistrict: any[] = [];
+	filterward = '';
+	listward: any[] = [];
+	visibleGuiDuyet: boolean;
+	visibleThuHoi: boolean;
+	IsVisible_Duyet: boolean;
+	Capcocau: number;
+	// khoi tao grildModel
+	gridModel: TableModel;
+	gridService: TableService;
+	list_button: boolean;
+	
+	constructor(
+		public objectService: HoSoNhaODuyetService,
+		public dialog: MatDialog,
+		private route: ActivatedRoute,
+		private layoutUtilsService: LayoutUtilsService,
+		private changeDetectorRefs: ChangeDetectorRef,
+		private ref: ApplicationRef,
+		private commonService: CommonService,
+		private cookieService: CookieService,
+		private translate: TranslateService,
+		private tokenStorage: TokenStorage,
+		private router: Router) {
+		this._name = 'Hồ sơ người có công';
+	}
+
+	/** LOAD DATA */
+	ngOnInit() {
+		this.list_button = CommonService.list_button();
+		this.selection = new SelectionModel<any>(true, []);
+		this.commonService.GetAllProvinces().subscribe(res => {
+			this.listprovinces = res.data;
+		});
+		this.tokenStorage.getUserInfo().subscribe(res => {
+			this.filterprovinces = res.IdTinh;
+			this.loadGetListDistrictByProvinces(this.filterprovinces);
+			if (res.Capcocau == 2) {
+				this.Capcocau = res.Capcocau;
+				this.filterdistrict = '' + res.ID_Goc_Cha;
+				this.commonService.GetListWardByDistrict(this.filterdistrict).subscribe(res => {
+					if (res && res.status == 1)
+						this.listward = res.data;
+				})
+			}
+		})
+		if (this.objectService !== undefined) {
+			this.objectService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'SoHoSo', 0, 10));
+		}
+
+		// filter
+		this.gridModel = new TableModel();
+		this.gridModel.clear();
+		this.gridModel.haveFilter = true;
+		this.gridModel.filterText.HoTen = '';
+		this.gridModel.filterText.DiaChi = '';
+		this.gridModel.filterText.SoHoSo = '';
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
+		this.gridModel.filterGroupDataChecked['TinhTrang'] = [{
+			name: 'Đã duyệt',
+			value: 'True',
+			checked: false
+		}, {
+			name: 'Chưa duyệt',
+			value: 'False',
+			checked: false
+		}];
+		this.gridModel.filterGroupDataChecked['IsTre'] = [{
+			name: 'Trễ hạn',
+			value: 'True',
+			checked: false
+		}, {
+			name: 'Chưa trễ hạn',
+			value: 'False',
+			checked: false
+		}];
+		this.gridModel.filterGroupDataChecked['IsTre_Duyet'] = [{
+			name: 'Trễ hạn',
+			value: 'True',
+			checked: false
+		}, {
+			name: 'Chưa trễ hạn',
+			value: 'False',
+			checked: false
+		}];
+
+		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
+
+		// create availableColumns
+		const availableColumns = [
+			//{
+			//	stt: 0,
+			//	name: 'select',
+			//	displayName: 'Chọn',
+			//	alwaysChecked: true,
+			//	isShow: true,
+			//},
+			{
+				stt: 1,
+				name: 'STT',
+				displayName: 'STT',
+				alwaysChecked: false,
+				isShow: true,
+			},
+			{
+				stt: 2,
+				name: 'ngay_tao',
+				displayName: 'Ngày hướng dẫn',
+				alwaysChecked: false,
+				isShow: true,
+			},
+			{
+				stt: 2,
+				name: 'SoHoSo',
+				displayName: 'Số Hồ Sơ',
+				alwaysChecked: false,
+				isShow: true,
+			},
+			{
+				stt: 3,
+				name: 'HoTen',
+				displayName: 'Họ tên',
+				alwaysChecked: false,
+				isShow: true,
+			},
+			{
+				stt: 4,
+				name: 'NgaySinh',
+				displayName: 'Ngày sinh',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 5,
+				name: 'DiaChi',
+				displayName: 'Địa chỉ',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 6,
+				name: 'KhomAp',
+				displayName: 'Khóm/ấp ',
+				alwaysChecked: false,
+				isShow: true,
+			},
+			{
+				stt: 7,
+				name: 'Title',
+				displayName: 'Phường/Xã ',
+				alwaysChecked: false,
+				isShow: true,
+			},
+			{
+				stt: 8,
+				name: 'DistrictName',
+				displayName: 'Quận/Huyện',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 9,
+				name: 'Id_HinhThuc',
+				displayName: 'Hình thức hỗ trợ',
+				alwaysChecked: false,
+				isShow: true,
+			},
+			{
+				stt: 10,
+				name: 'ChiPhiYeuCau',
+				displayName: 'Chi phí yêu cầu',
+				alwaysChecked: false,
+				isShow: true,
+			},
+			{
+				stt: 11,
+				name: 'NoiDungHoTro',
+				displayName: 'Nội dung hỗ trợ',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 12,
+				name: 'IsTre_Duyet',
+				displayName: 'Thời hạn cá nhân',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 13,
+				name: 'IsTre',
+				displayName: 'Thời hạn',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 95,
+				name: 'CreatedBy',
+				displayName: 'Người tạo',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 96,
+				name: 'CreatedDate',
+				displayName: 'Ngày tạo',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 97,
+				name: 'UpdatedBy',
+				displayName: 'Người cập nhật',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 98,
+				name: 'UpdatedDate',
+				displayName: 'Ngày cập nhật',
+				alwaysChecked: false,
+				isShow: false,
+			},
+			{
+				stt: 99,
+				name: 'actions',
+				displayName: 'Tác vụ',
+				alwaysChecked: true,
+				isShow: true,
+			}
+		];
+		this.gridModel.availableColumns = availableColumns.sort(
+			(a, b) => a.stt - b.stt
+		);
+
+		this.gridModel.selectedColumns = new SelectionModel<any>(
+			true,
+			this.gridModel.availableColumns
+		);
+
+		this.gridService = new TableService(
+			this.layoutUtilsService,
+			this.ref,
+			this.gridModel,
+			this.cookieService
+		);
+		this.gridService.cookieName = 'displayedColumns_hosonhaoHD'
+
+		// apply gridService
+		this.gridService.showColumnsInTable();
+		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_hosonhaoHD'));
+
+		// If the user changes the sort order, reset back to the first page.
+		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+
+		/* Data load will be triggered in two cases:
+		- when a pagination event occurs => this.paginator.page
+		- when a sort event occurs => this.sort.sortChange
+		**/
+		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+			.pipe(
+				tap(() => {
+					this.loadDataList();
+				})
+			)
+			.subscribe();
+		// Init DataSource
+		this.dataSource = new HuongDanNhaODataSource(this.objectService);
+		let queryParams = new QueryParamsModel({});
+
+		// Read from URL itemId, for restore previous state
+		this.route.queryParams.subscribe(params => {
+			queryParams = this.objectService.lastFilter$.getValue();
+			// First load
+			this.dataSource.loadList(queryParams);
+		});
+		this.dataSource.entitySubject.subscribe(res => {
+			this.productsResult = res;
+			if (this.productsResult != null) {
+				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
+					this.loadDataList(false);
+				}
+			}
+		});
+	}
+
+	loadDataList(holdCurrentPage: boolean = true) {
+		this.selection.clear();
+		const queryParams = new QueryParamsModel(
+			this.filterConfiguration(),
+			this.sort.direction,
+			this.sort.active,
+			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
+			this.paginator.pageSize,
+			this.gridService.model.filterGroupData
+		);
+		this.dataSource.loadList(queryParams);
+	}
+	filterDistrictID(id: any) {
+		this.filterdistrict = id;
+		this.filterward = '';
+		this.loadDataList();
+		this.commonService.GetListWardByDistrict(id).subscribe(res => {
+			if (res && res.status == 1)
+				this.listward = res.data;
+		})
+	}
+	filterWardID(id: any) {
+		this.filterward = id;
+		this.loadDataList();
+	}
+
+	filterConfiguration(): any {
+		const filter: any = {};
+		if (this.filterdistrict) {
+			filter.DistrictID = +this.filterdistrict;
+		}
+		if (this.filterward) {
+			filter.Id_Xa = +this.filterward;
+		}
+		if (this.gridService.model.filterText) {
+			filter.DiaChi = this.gridService.model.filterText.DiaChi;
+			filter.HoTen = this.gridService.model.filterText.HoTen;
+			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
+		}
+
+		return filter;
+	}
+
+	/* UI */
+	getItemStatusString(status: boolean = true): string {
+		switch (status) {
+			case true:
+				return 'Đã duyệt';
+			case false:
+				return 'Chưa duyệt';
+		}
+	}
+
+	getItemCssClassByStatus(status: boolean = true): string {
+		switch (status) {
+			case true:
+				return 'success';
+			case false:
+				return 'metal';
+		}
+	}
+	loadGetListDistrictByProvinces(idProvince: any) {
+		this.commonService.GetListDistrictByProvinces(idProvince).subscribe(res => {
+			this.listdistrict = res.data;
+			this.changeDetectorRefs.detectChanges();
+		});
+	}
+
+	restoreState(queryParams: QueryParamsModel, id: number) {
+		if (id > 0) {
+		}
+
+		if (!queryParams.filter) {
+			return;
+		}
+	}
+
+	/** SELECTION */
+	isAllSelected() {
+		const numSelected = this.selection.selected.length;
+		const numRows = this.productsResult.filter(row => !row.IsEnable_Duyet).length;
+		return numSelected === numRows;
+	}
+
+	/** Selects all rows if they are not all selected; otherwise clear selection. */
+	masterToggle() {
+		if (this.isAllSelected()) {
+			this.selection.clear();
+		} else {
+			this.productsResult.forEach(row => {
+				if (!row.IsEnable_Duyet)
+					this.selection.select(row)
+			});
+		}
+	}
+
+	Duyet(item: any, isDuyet: boolean = true) {
+		//let saveMessageTranslateParam = '';
+		//saveMessageTranslateParam += 'OBJECT.DUYET.MESSAGE';
+		//const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
+
+		// let _item = Object.assign({}, item);
+		// const dialogRef = this.dialog.open(HoSoNhaODuyetDialogComponent, { data: { _item, isDuyet } });
+		// dialogRef.afterClosed().subscribe(res => {
+		// 	if (!res) {
+		// 	} else {
+		// 		this.loadDataList();
+		// 	}
+		// });
+	}
+
+	Download(object) {
+		window.open(object.path, '_blank');
+	}
+	historyHoTro(item: any) {
+		const dialogRef = this.dialog.open(HoSoNhaOHistoryComponent, { data: { item } });
+		dialogRef.afterClosed().subscribe(res => {
+			if (!res) {
+				return;
+			}
+		});
+	}
+	timeline(QuaTrinhKhongCoNguoiDuyet: any) {
+		var data = { id_phieu: QuaTrinhKhongCoNguoiDuyet.Id };
+		const dialogRef = this.dialog.open(SettingProcessComponent, { data: { data: data, Type: 2 } });
+		dialogRef.afterClosed().subscribe(res => {
+			if (!res) {
+				return;
+			}
+		});
+	}
+
+	inhuongdan(id_quatrinh_lichsu) {
+		this.commonService.getHuongDan(id_quatrinh_lichsu, 5).subscribe(res => {
+			if (res && res.status == 1) {
+				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
+				dialogRef.afterClosed().subscribe(res2 => {
+					if (!res2) {
+					} else {
+						this.commonService.exportHuongDan(id_quatrinh_lichsu, 5, res2.loai).subscribe(response => {
+							const headers = response.headers;
+							const filename = headers.get('x-filename');
+							const type = headers.get('content-type');
+							const blob = new Blob([response.body], { type });
+							const fileURL = URL.createObjectURL(blob);
+							const link = document.createElement('a');
+							link.href = fileURL;
+							link.download = filename;
+							link.click();
+						}, err => {
+							this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
+						});
+					}
+				});
+			} else
+				this.layoutUtilsService.showError(res.error.message);
+		})
+	}
+
+	capNhat(id_quatrinh_lichsu) {
+		let item = { id_quytrinh_lichsu: id_quatrinh_lichsu };
+		const dialogRef = this.dialog.open(HoSoNhaOHoanThienDialogComponent, { data: {item} });
+		dialogRef.afterClosed().subscribe(res2 => {
+			if (!res2) {
+			} else {
+				this.loadDataList();
+			}
+		});
+	}
+}

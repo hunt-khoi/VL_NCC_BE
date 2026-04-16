@@ -1,0 +1,75 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet"
+	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.RowID == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.RowID == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" [disabled]="disabledBtn"
+				(click)="onSubmit(true)" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+			<button class="hide-view-sm" type="button" mat-raised-button color="primary" [disabled]="disabledBtn"
+				(click)="onSubmit(false)" *ngIf="!viewLoading" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+				Không thể lưu, vui lòng nhập đủ thông tin!
+			</kt-alert>
+
+			<div class="form-group kt-form__group row">
+				<div class="col-md-12 kt--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select formControlName="tinh" placeholder="{{'PROVINCE.NAME' | translate}}" [disabled]="true"
+							(selectionChange)="loadTinhThanhChange(id_provinces)" required [(value)]="id_provinces">
+							<mat-option value="{{hv.id_row}}" *ngFor="let hv of listTinh">
+								{{hv.Province}}
+							</mat-option>
+						</mat-select>
+						<mat-error>{{'PROVINCE.NAME'|translate : {name:this._name} }}</mat-error>
+					</mat-form-field>
+				</div>
+				<div class="col-md-12 kt--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select formControlName="huyen" placeholder="{{'DISTRICT.NAME' | translate}}" required
+							(selectionChange)="loadHuyenChange(id_district)" [(value)]="id_district">
+							<mat-option value="{{hv.ID_Row}}" *ngFor="let hv of listHuyen">
+								{{hv.District}}
+							</mat-option>
+						</mat-select>
+						<mat-error>{{'DISTRICT.NAME'|translate : {name:this._name} }}</mat-error>
+					</mat-form-field>
+				</div>
+				<div class="col-md-12 kt--margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select formControlName="xa" placeholder="{{'WARD.NAME' | translate}}" required>
+							<mat-option value="{{hv.ID_Row}}" *ngFor="let hv of listXa">
+								{{hv.Ward}}
+							</mat-option>
+						</mat-select>
+						<mat-error>{{'WARD.NAME'|translate : {name:this._name} }}</mat-error>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 kt--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Tên khóm, ấp"
+							formControlName="wardName" class="require" required #focusInput />
+						<mat-error>Tên khóm, ấp</mat-error>
+					</mat-form-field>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

@@ -1,0 +1,68 @@
+<style>
+	.row_tang {
+		background-color: lightgreen;
+	}
+</style>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<h3 class="kt-portlet__head-title">{{_name}}</h3>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button mat-raised-button (click)="Back()">Trở lại</button>
+			<button mat-raised-button (click)="capAll()" color="accent" matTooltip="Cấp cho tất cả đối tượng" *ngIf="lstNCC.length>0">Cấp tiền</button>
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-12">
+				<table class="table-bordered table-sm" style="width:100%;">
+					<tr>
+						<th class="text-center">STT</th>
+						<th class="text-center">Họ tên</th>
+						<th class="text-center">Số hồ sơ</th>
+						<th class="text-center">Sổ theo dõi</th>
+						<th class="text-center">Địa chỉ</th>
+						<th class="text-center">Dụng cụ chỉnh hình</th>
+						<th class="text-center">Họ tên liệt sỹ</th>
+						<th class="text-center">Quan hệ với liệt sỹ</th>
+						<th class="text-center">Số tiền</th>
+						<th class="text-center">Người nhận</th>
+						<th class="text-center">Thời gian</th>
+					</tr>
+					<ng-container *ngFor="let dt of DanhSach;let i=index">
+						<tr>
+							<th colspan="7"><i>{{dt.DoiTuong}}</i></th>
+							<th>Số lượng: {{tongSL[i]}}</th>
+							<th class="text-right">{{tienDaPhat[i] | mask: 'separator':danhMucService.thousandSeparator }}</th>
+							<th></th>
+						</tr>
+						<ng-container *ngFor="let ncc of dt.NCCs; let j=index">
+							<tr [ngClass]="{'row_tang':ncc.IsTang}">
+								<td>{{j+1}}</td>
+								<td>{{ncc.HoTen}}</td>
+								<td>{{ncc.SoHoSo}}</td>
+								<td>{{ncc.SoTheoDoi}}</td>
+								<td>{{ncc.DiaChi}}</td>
+								<td>{{ncc.strDungCu}}</td>
+								<td>{{ncc.HoTenThanNhan}}</td>
+								<td>{{ncc.QuanHeVoiLietSy}}</td>
+								<td class="text-right">{{ncc.SoTien | mask: 'separator':danhMucService.thousandSeparator}}</td>
+								<td>
+									<ng-container *ngIf="ncc.NgayCap != null; else nhanqua">
+										{{ncc.NguoiNhan}} 
+									</ng-container>
+									<ng-template #nhanqua>
+										<button class="btn btn-primary btn-sm" matTooltip="Cấp phát tiền" (click)="capQua(ncc)">Cấp</button>
+									</ng-template>
+								</td>
+								<td>{{ncc.NgayCap | date:'dd/MM/yyyy HH:mm'}}</td>
+							</tr>
+						</ng-container>
+					</ng-container>
+				</table>
+			</div>
+		</div>
+	</kt-portlet-body>
+</div>

@@ -1,0 +1,73 @@
+<div class="btn-close-container">
+    <button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn"
+        title="Đóng">
+        <mat-icon>clear</mat-icon>
+    </button>
+</div>
+<div class="kt-portlet"
+    [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+    <div class="kt-portlet__head kt-portlet__head__custom">
+        <div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+            style="margin-top: 20px;">
+            <h3 class="kt-portlet__head-title">{{_name}}</h3>
+        </div>
+        <div class="kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+            <button type="button" mat-raised-button color="primary" (click)="onSubmit(true)"
+                matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+                <span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn"
+                    class="spinner-button-pad"></div>
+            </button>
+        </div>
+    </div>
+    <div class="kt-form">
+        <div class="kt-portlet__body">
+            <div class="form-group kt-form__group row">
+                <div class="form-group col-3">
+                    <mat-form-field class="mat-form-field-fluid ">
+                        <input matInput placeholder="Mã đối tượng NCC" disabled [(ngModel)]="item.MaDoiTuong" />
+                    </mat-form-field>
+                </div>
+                <div class="form-group col-9">
+                    <mat-form-field class="mat-form-field-fluid ">
+                        <input matInput placeholder="Đối tượng NCC" disabled [(ngModel)]="item.DoiTuong" />
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <mat-form-field class="mat-form-field-fluid ">
+                        <mat-select placeholder="Biểu mẫu hồ sơ" [(ngModel)]="item.Id_Template">
+                            <mat-option [value]="item.id" *ngFor="let item of listBieumau">
+                                {{item.title}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <mat-form-field class="mat-form-field-fluid ">
+                        <mat-select placeholder="Biểu mẫu hồ sơ dành cho thân nhân"[(ngModel)]="item.Id_Template_ThanNhan">
+                            <mat-option [value]="item.id" *ngFor="let item of listBieumau">
+                                {{item.title}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <mat-form-field class="mat-form-field-fluid ">
+                        <mat-select placeholder="Biểu mẫu công nhận"[(ngModel)]="item.Id_Template_CongNhan">
+                            <mat-option [value]="item.id" *ngFor="let item of listBieumau_congnhan">
+                                {{item.title}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12">
+                    <mat-form-field class="mat-form-field-fluid ">
+                        <mat-select placeholder="Biểu mẫu di chuyển"[(ngModel)]="item.Id_Template_DiChuyen">
+                            <mat-option [value]="item.id" *ngFor="let item of listBieumau_dichuyen">
+                                {{item.title}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

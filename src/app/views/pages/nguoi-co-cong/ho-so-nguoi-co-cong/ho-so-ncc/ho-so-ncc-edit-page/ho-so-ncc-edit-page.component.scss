@@ -1,0 +1,44 @@
+::ng-deep .mat-tab-group.vertical {
+	flex-direction: row;
+
+	.mat-tab-header {
+		border-bottom: none;
+		width: 100%;
+	}
+
+	.mat-tab-list {
+		width: 100%;
+	}
+
+	.mat-tab-labels {
+		flex-direction: column;
+
+		.mat-tab-label {
+			justify-content: left;
+
+			&.mat-tab-label-active {
+				background-color: #0274b5;
+				color: white;
+			}
+
+			.mat-tab-label-content {
+				width: 100%;
+				display: contents;
+
+				label {
+					margin-bottom: 0;
+					display: block;
+					/* display: -webkit-box; */
+					overflow: hidden !important;
+					text-overflow: ellipsis;
+					-webkit-line-clamp: 2;
+					max-width: 100%;
+				}
+			}
+		}
+	}
+
+	.mat-ink-bar {
+		display: none;
+	}
+}

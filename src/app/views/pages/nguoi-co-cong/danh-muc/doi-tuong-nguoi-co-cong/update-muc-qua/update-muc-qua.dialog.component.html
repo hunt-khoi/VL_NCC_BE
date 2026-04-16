@@ -1,0 +1,80 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn"
+			title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet"
+	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-7 kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-5 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+				Không thể lưu, vui lòng nhập đủ thông tin!
+			</kt-alert>
+
+			<div class="form-group kt-form__group row">
+				<div class="col-lg-3 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select formControlName="Id_NhomLeTet" placeholder="{{'NHOM_LE_TET.NAME' | translate }}" class="require" required>
+							<mat-option *ngFor="let opt of listNhomLeTet;" [value]="opt.id">
+								{{opt.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-3 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select formControlName="Id_NguonKinhPhi" placeholder="{{'NGUONKINHPHI.NAME' | translate }}" class="require" required>
+							<mat-option *ngFor="let opt of listNguon;" [value]="opt.id">
+								{{opt.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-3 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{'MUCQUA.NAME' | translate }}" formControlName="SoTien" class="require" required  mask="separator,3" thousandSeparator="{{danhMucService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="row">
+				<span class="kt-portlet__head-title">{{'MUCQUA.dshuong' | translate }}</span>
+				<table mat-table style="width: 100%;" [dataSource]="datasource">
+					<ng-container matColumnDef="select">
+						<th mat-header-cell *matHeaderCellDef class="mat-column-checkbox" style="padding-right: 20px;">
+							<mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'" [disabled]="thaotac==0">
+							</mat-checkbox>
+						</th>
+						<td mat-cell *matCellDef="let row" class="mat-column-checkbox" style="padding-right: 20px;">
+							<mat-checkbox [(ngModel)]="row.selected" [ngModelOptions]="{standalone: true}" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [color]="'primary'">
+							</mat-checkbox>
+						</td>
+					</ng-container>
+					<ng-container matColumnDef="STT">
+						<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell">STT</th>
+						<td mat-cell class="stt-cell" *matCellDef="let item; let i=index">{{i+1}}</td>
+					</ng-container>
+					<ng-container matColumnDef="DoiTuong">
+						<th mat-header-cell *matHeaderCellDef style="justify-content: center">Đối tượng</th>
+						<td mat-cell *matCellDef="let opt" style="justify-content: center">{{opt.title}}</td>
+					</ng-container>
+					<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+					<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+				</table>
+			</div>
+
+		</div>
+	</form>
+</div>

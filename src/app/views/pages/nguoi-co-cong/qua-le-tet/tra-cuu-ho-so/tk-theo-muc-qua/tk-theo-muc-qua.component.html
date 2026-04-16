@@ -1,0 +1,59 @@
+<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+	<ng-container ktPortletTools>
+		<button class="show-view-sm" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+			{{ 'COMMON.CHUCNANG' | translate }}
+		</button>
+		<mat-menu #chucnang="matMenu">
+			<button mat-menu-item (click)="$event.stopPropagation();">
+				<mat-form-field class="mat-form-field-fluid">
+					<mat-select [(ngModel)]="IdDotTangQua" placeholder="Chọn đợt tặng quà" [ngModelOptions]="{standalone: true}">
+						<mat-option [value]="0">--Chọn đợt tặng quà--</mat-option>
+						<mat-option [value]="opt.id" *ngFor="let opt of lstDot">{{opt.title}}</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</button>				
+			<button (click)="loadData()"mat-menu-item color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>
+			<button mat-menu-item color="primary" matTooltip="In danh sách" printTitle={{this._name}} 
+				printSectionId="print-section" [printStyle]="style_print" ngxPrint *ngIf="allowExport">{{ 'COMMON.PRINT' | translate }}</button>
+			<button (click)="xuatDanhSach()"mat-menu-item color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+		</mat-menu>
+		<!-- view nhỏ hơn 768 bị ẩn -->
+		<div class="hide-view-sm" style="display: contents;">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select [(ngModel)]="IdDotTangQua" placeholder="Chọn đợt tặng quà" [ngModelOptions]="{standalone: true}">
+					<mat-option [value]="0">--Chọn đợt tặng quà--</mat-option>
+					<mat-option [value]="opt.id" *ngFor="let opt of lstDot">{{opt.title}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+			<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>
+			<button mat-raised-button color="primary" matTooltip="In danh sách" printTitle={{this._name}} 
+				printSectionId="print-section" [printStyle]="style_print" ngxPrint *ngIf="allowExport">{{ 'COMMON.PRINT' | translate }}</button>
+			<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+		</div>	
+	</ng-container>
+</kt-portlet-header>
+
+<kt-portlet-body>
+	<div class="form-group kt-form__group row" *ngIf="display" id="print-section">
+		<div class="col-lg-12 kt-margin-bottom-20-mobile">
+			<table class="table-bordered table-sm" style="width:100%;">
+				<tr style="text-align: center;">
+					<th style="text-align:center;width:30px;">STT</th>
+					<th>Mức quà</th>
+					<th style="width:150px;">Số tiền</th>
+					<th style="width:150px;">Số lượng</th>
+					<th style="width:150px;">Thành tiền</th>
+				</tr>
+				<ng-container *ngFor="let dt of dataThongKe; let i=index">
+					<tr>
+						<td style="text-align: center;">{{i+1}}</td>
+						<td>{{dt.MucQua}}</td>
+						<td style="text-align: right;">{{dt.SoTien}}</td>
+						<td style="text-align: right;">{{dt.SoLuong}}</td>
+						<td style="text-align: right;">{{dt.ThanhTien}}</td>
+					</tr>
+				</ng-container>
+			</table>
+		</div>
+	</div>
+</kt-portlet-body>

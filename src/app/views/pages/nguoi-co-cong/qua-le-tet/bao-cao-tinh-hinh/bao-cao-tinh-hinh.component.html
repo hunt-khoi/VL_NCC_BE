@@ -1,0 +1,49 @@
+<kt-portlet [options]="{headLarge: true}">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]=loading$>
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">{{ 'QUA_TET.tinhhinh' | translate }}</h3>
+			</div>
+		</ng-container>
+
+		<ng-container ktPortletTools>
+			<button class="show-view-sm" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+				{{ 'COMMON.CHUCNANG' | translate }}
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button mat-menu-item (click)="$event.stopPropagation();">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select [(ngModel)]="IdDotTangQua" placeholder="{{ 'QUA_TET.dot' | translate }}">
+							<mat-option [value]="0">--Chọn đợt tặng quà--</mat-option>
+							<mat-option [value]="opt.id" *ngFor="let opt of lstDot">{{opt.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</button>
+				<button type="button" mat-menu-item color="primary" (click)="view()">{{ 'COMMON.DETAIL' | translate }}</button>
+				<button type="button" mat-menu-item color="primary" (click)="in()">{{ 'COMMON.TAIVE' | translate }}</button>
+				<button type="button" mat-menu-item color="primary" printSectionId="print-section" ngxPrint>{{ 'COMMON.PRINT' | translate }}</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<mat-form-field class="mat-form-field-fluid">
+					<mat-select [(ngModel)]="IdDotTangQua" placeholder="{{ 'QUA_TET.dot' | translate }}">
+						<mat-option [value]="0">--Chọn đợt tặng quà--</mat-option>
+						<mat-option [value]="opt.id" *ngFor="let opt of lstDot">{{opt.title}}</mat-option>
+					</mat-select>
+				</mat-form-field>
+				<button type="button" mat-raised-button color="primary" (click)="view()">{{ 'COMMON.DETAIL' | translate }}</button>
+				<button type="button" mat-raised-button color="primary" (click)="in()">{{ 'COMMON.TAIVE' | translate }}</button>
+				<button type="button" mat-raised-button color="primary" printSectionId="print-section" ngxPrint>{{ 'COMMON.PRINT' | translate }}</button>
+			</div>	
+		</ng-container>
+	</kt-portlet-header>
+	
+	<kt-portlet-body>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-3"></div>
+			<div id="print-section" class="col-md-6" *ngIf="strHtml">
+				<span [innerHtml]="strHtml"></span>
+			</div>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>

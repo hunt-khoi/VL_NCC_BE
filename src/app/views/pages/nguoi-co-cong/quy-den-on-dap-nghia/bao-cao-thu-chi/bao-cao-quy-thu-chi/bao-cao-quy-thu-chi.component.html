@@ -1,0 +1,127 @@
+<style>
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 1;
+	}
+	.min-th {
+		min-width: 160px;
+	}
+	.min-width-200px {
+		min-width: 200px;
+	}
+</style>
+<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+	<ng-container ktPortletTools>
+		<button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+			<button class="show-view-sm" *ngIf="allowExport" mat-raised-button [matMenuTriggerFor]="chucnang1" color="primary">
+				Chức năng
+			</button>
+			<mat-menu #chucnang1="matMenu">
+				<mat-form-field class="mat-form-field-fluid">
+					<input matInput [(ngModel)]="nam" placeholder="Năm" type="number" />
+				</mat-form-field>
+				<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-menu-item color="primary" matTooltip="In danh sách" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách">Export</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<mat-form-field class="mat-form-field-fluid">
+					<input matInput [(ngModel)]="nam" placeholder="Năm" type="number" />
+				</mat-form-field>
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</div>
+	</ng-container>
+</kt-portlet-header>
+<kt-portlet-body>
+	<div id="print-section" *ngIf="display">
+		<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive">
+			<table class="table-bordered table-sm" style="width:100%;">
+				<tr>
+					<th rowspan="2" style="text-align: center;width:30px;">STT</th>
+					<th rowspan="2" class="text-center min-width-200px">Đơn vị</th>
+					<th rowspan="2" class="text-center">Tổng cộng: </th>
+					<th colspan="12" class="text-center">Cụ thể từng tháng</th>
+					<th rowspan="2" class="text-center">Ghi chú</th>
+				</tr>
+				<tr>
+					<ng-container *ngFor="let t of lstThang">
+						<td class="text-center">Tháng {{t}}</td>
+					</ng-container>
+				</tr>
+				<ng-container *ngIf="dataThongKe.data.length > 0">
+					<ng-container *ngFor="let ti of lstTieuDe">
+						<tr>
+							<th>{{ti.id}}</th>
+							<th>{{ti.title}}</th>
+							<th style="text-align: right;">{{sumTong(ti.col_sum)}}</th>
+							<ng-container *ngFor="let t of lstThang">
+								<td style="text-align: right;">{{sumValueTong(t, ti.col)}}</td>
+							</ng-container>
+							<th>&nbsp;</th>
+						</tr>
+						<ng-container *ngIf="Capcocau != 3">
+							<tr>
+								<th>I</th>
+								<th>
+									<span *ngIf="Capcocau == 1">CẤP TỈNH</span>
+									<span *ngIf="Capcocau == 2">CẤP HUYỆN</span>
+								</th>
+								<th style="text-align: right;">{{lstSumTinh[ti.col_sum] | mask:'separator':tsSeparator}}</th>
+								<ng-container *ngFor="let t of lstTinhMonth[ti.col]">
+									<td style="text-align: right;">{{t | mask:'separator':tsSeparator}}</td>
+								</ng-container>
+								<th>&nbsp;</th>
+							</tr>
+							<tr>
+								<th>II</th>
+								<th>
+									<span *ngIf="Capcocau == 1">CẤP HUYỆN</span>
+									<span *ngIf="Capcocau == 2">CẤP XÃ</span>
+								</th>
+								<th style="text-align: right;">{{sumTongH(ti.col_sum)}}</th>
+								<ng-container *ngFor="let t of lstThang">
+									<td style="text-align: right;">{{sumValueH(t, ti.col)}}</td>
+								</ng-container>
+								<th>&nbsp;</th>
+							</tr>
+						</ng-container>
+						<ng-container *ngFor="let item of dataThongKe.data; let i=index">
+							<tr>
+								<td class="text-center">{{i+1}}.</td>
+								<td>
+									<span *ngIf="Capcocau == 1">{{item.TenHuyen}}</span>
+									<span *ngIf="Capcocau == 2">{{item.TenXa}}</span>
+								</td>
+								<td style="text-align: right;">{{lstSumHuyen[ti.col_sum][item.Id_Huyen] | mask:'separator':tsSeparator}}</td>
+								<ng-container *ngFor="let t of lstHuyenMonth[ti.col][item.Id_Huyen]">
+									<td style="text-align: right;">{{t | mask:'separator':tsSeparator}}</td>
+								</ng-container>
+								<td>&nbsp;</td>
+							</tr>
+						</ng-container>
+					</ng-container>
+				</ng-container>
+				
+				<tr *ngIf="dataThongKe.data.length == 0">
+					<td [attr.colspan]="16" class="text-center"><b>Không có dữ liệu</b></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</kt-portlet-body>

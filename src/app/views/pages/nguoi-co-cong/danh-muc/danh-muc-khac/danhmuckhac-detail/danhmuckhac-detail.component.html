@@ -1,0 +1,107 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+			<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<div class="form-group kt-form__group row">
+				<div class="col-lg-3 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Mã loại hồ sơ" formControlName="MaLoaiHoSo"
+							class="require" required #focusInput />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-9 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'DM_KHAC.LOAIHOSO' | translate }}" formControlName="LoaiHoSo"
+							class="require" required #focusInput readonly />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<textarea matInput placeholder="Mô tả" formControlName="MoTa" rows="1"></textarea>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row">
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<h5 style="color: #5867dd;">Áp dụng cho đối tượng</h5>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile text-right" hidden>
+					<button type="button" mat-raised-button color="accent" (click)="chonDT()" [disabled]="disabledBtn" matTooltip="Chọn đối tượng được áp dụng">
+						Chọn
+					</button>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<table style="width:100%" class="table-bordered">
+						<tr>
+							<th class="text-center stt-cell">STT</th>
+							<th class="text-center">Đối tượng</th>
+							<th class="text-center" colspan="3">Các biểu mẫu áp dụng</th>
+						</tr>
+						<ng-container *ngFor="let dt of item.DoiTuongs; let i=index">
+							<tr>
+								<td class="text-center stt-cell" style="font-weight: bold;">{{i+1}}</td>
+								<td style="font-weight: bold;">{{dt.DoiTuong}}</td>
+								<td class="text-center" colspan="3">
+									<button type="button" mat-raised-button color="accent" *ngIf="allowEdit" 
+										(click)="chonBM(dt.Id)" [disabled]="disabledBtn" matTooltip="Chọn các biểu mẫu áp dụng">
+										Chọn
+									</button>
+								</td>
+							</tr>
+							<ng-container *ngIf="dt.BieuMaus.length>0">
+								<tr *ngFor="let bm of dt.BieuMaus; let j=index">
+									<td colspan="2"></td>
+									<td class="text-center stt-cell">{{j+1}}</td>
+									<td>{{bm.BieuMau}}</td>
+									<td class="text-center stt-cell">
+										<button type="button" color="warn" mat-icon-button matTooltip="Xóa biểu mẫu" *ngIf="allowEdit"
+										(click)="xoaBM(j, dt.Id)"><mat-icon>delete</mat-icon>
+										</button>
+									</td>
+								</tr>
+							</ng-container>
+							
+							<tr *ngIf="dt.BieuMaus && dt.BieuMaus.length==0"><td colspan="6" class="text-center">Chưa có quyết định</td></tr>
+						</ng-container>
+						
+					</table>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<h5 style="color: #5867dd;">Các giấy tờ cần thiết</h5>
+					<table style="width:100%" class="table-bordered">
+						<tr>
+							<th class="text-center stt-cell">Chọn</th>
+							<th class="text-center">Loại giấy tờ</th>
+							<th class="text-center">Bắt buộc nhập</th>
+						</tr>
+						<tr *ngFor="let loai of listLoaiGiayTo">
+							<td class="text-center"><mat-checkbox [(ngModel)]="loai.Checked" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit || loai.Disabled" (change)="change($event,loai)"></mat-checkbox></td>
+							<td>{{loai.title}}</td>
+							<td class="text-center"><mat-checkbox [(ngModel)]="loai.IsRequired" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit || loai.Disabled || !loai.Checked" color="warn"></mat-checkbox></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

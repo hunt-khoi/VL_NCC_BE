@@ -1,0 +1,74 @@
+<style>
+	.row_nguon {
+		background-color: #dee2e6;
+		color: red;
+	}
+	.row_tang {
+		background-color: lightgreen;
+	}
+</style>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button mat-raised-button (click)="Back()">Trở lại</button>
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-12">
+				<table class="table-bordered table-sm" style="width:100%;">
+					<tr>
+						<th class="text-center">STT</th>
+						<th class="text-center">Họ tên</th>
+						<th class="text-center">Số hồ sơ</th>
+						<th class="text-center">Cư trú</th>
+						<th class="text-center">Thẻ BHYT</th>
+						<th class="text-center">Mã KCB</th>
+						<th class="text-center">Nơi đăng ký KCB</th>
+						<th class="text-center">Tiền lương</th>
+						<th class="text-center">Mức NSNN đóng</th>
+						<th class="text-center">Thao tác</th>
+					</tr>
+					<ng-container *ngFor="let ng of DanhSach; let i=index">
+						<tr class="row_nguon">
+							<td colspan="10"><b>{{ng.LoaiDoiTuong}}</b></td>
+						</tr>
+						<ng-container *ngFor="let dt of ng.DoiTuongs; let j=index">
+							<tr>
+								<td colspan="7"><b><i>{{dt.DoiTuong}}</i></b></td>
+								<td class="text-right"><b>SL: {{this.tongSL[i][j]}}</b></td>
+								<td class="text-right"><b>{{this.tongTien[i][j]}} </b></td>
+								<td></td>
+							</tr>
+							<ng-container *ngFor="let ncc of dt.NCCs; let k=index">
+								<tr [ngClass]="{'row_tang':ncc.IsTang}">
+									<td>{{k+1}}</td>
+									<td>{{ncc.HoTen}}</td>
+									<td>{{ncc.SoHoSo}}</td>
+									<td>{{ncc.DiaChi}}</td>
+									<td>
+										<mat-form-field class="mat-form-field-fluid" style="max-width: 150px;">
+											<input matInput title="Nhập mã thẻ BHYT" mask="SS 0 00 0000000000"
+											value="{{ncc.MaTheBHYT}}" (focusout)="updateMa(ncc, $event)">
+										</mat-form-field>
+									</td>
+									<td>{{ncc.MaKCB}}</td>
+									<td>{{ncc.NoiDangKyKCB}}</td>
+									<td class="text-right">{{ncc.TienLuong}}</td>
+									<td class="text-right">{{ncc.SoTien}}</td>
+									<td>
+										<button class="btn btn-primary btn-sm" (click)="Luu(ncc)" *ngIf="ncc.IsEditCode">Lưu</button>
+									</td>
+								</tr>
+							</ng-container>
+						</ng-container>
+					</ng-container>
+				</table>
+			</div>
+		</div>
+	</kt-portlet-body>
+</div>

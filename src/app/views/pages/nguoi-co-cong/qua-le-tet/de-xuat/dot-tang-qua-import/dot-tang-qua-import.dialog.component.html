@@ -1,0 +1,59 @@
+<style>
+    .kt-portlet__head-title {
+        font-size: medium;
+        font-family: sans-serif;
+    }
+</style>
+<div class="btn-close-container">
+    <button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn"
+        title="Đóng">
+        <mat-icon>clear</mat-icon>
+    </button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
+    <div class="kt-portlet__head kt-portlet__head__custom">
+        <div class="kt-portlet__head-label">
+            <h3 class="kt-portlet__head-title">Import chi tiết đợt tặng quà</h3>
+        </div>
+    </div>
+    <form class="kt-form" [formGroup]="item">
+        <div class="kt-portlet__body">
+            <div class="form-group kt-form__group row">
+                <div class="col-md-6 kt-margin-bottom-10-mobile" style="color: red;"
+                    [innerHTML]="item.controls['ErrorMessage'].value">
+                </div>
+                <div class="col-md-8 kt-margin-bottom-10-mobile">
+                    <mat-form-field class="mat-form-field-fluid">
+                        <input matInput placeholder="Chọn file dữ liệu*" formControlName="FileDuLieu" readonly
+                            type="text">
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-4 kt-margin-bottom-10-mobile">
+                    <mat-form-field class="mat-form-field-fluid" appearance="none">
+                        <input matInput placeholder="" formControlName="FileDuLieu" style="display:none;" readonly
+                            (click)="selectFile()">
+                        <button mat-raised-button style="padding: 0px 20px;" color="primary" (click)="selectFile()"
+                            type="button">
+                            Chọn file
+                        </button>&nbsp;&nbsp;
+                        <button style="padding: 0px 20px;" type="button" mat-raised-button color="warn"
+                            (click)="reviewFile()">
+                            Review
+                        </button>
+                        <input placeholder="Chọn file" #fileUpload id="fileUploadExcel" type="file" name="fileUpload"
+                            accept=".xls,.xlsx" (change)="FileSelected($event)" style="display: none">
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-6 kt-margin-bottom-10-mobile" style="margin-top: 2%">
+                    <button style="padding: 0px 20px;" type="button" color="primary" *ngIf="item.controls['ErrorMessage'].value==''
+                        && item.controls['FileDuLieu'].value!='' && allowImport == true" mat-raised-button
+                        (click)="luuImport()">
+                        Import dữ liệu
+                    </button>&nbsp;
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

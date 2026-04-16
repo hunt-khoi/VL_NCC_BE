@@ -1,0 +1,174 @@
+<style>
+	:host .overflow-gc {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 2;
+		max-width: 200px;
+	}
+</style>
+<kt-portlet [options]="{headLarge: true}">
+	<div class="kt-portlet__head kt-portlet__head--lg">
+		<div class="kt-portlet__head-label">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="kt-portlet__head-toolbar">
+			<button type="button" mat-raised-button (click)="close()" matTooltip="Quay lại">
+				<span>Quay lại</span>
+			</button>
+		</div>
+	</div>
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<h3 *ngIf="!item.IsVisible_Duyet">Bạn không có quyền duyệt hồ sơ này</h3>
+			<div class="duyeths" *ngIf="item.IsVisible_Duyet">
+				<div class="form-group kt-form__group row">
+					<div class="col-md-6 m--margin-bottom-20-mobile">
+						<h3>{{getTitle()}}</h3>
+					</div>
+					<div class="col-md-6 m--margin-bottom-20-mobile {{getWidth() > 767?'text-right':''}}" *ngIf="item.IsEnable_Duyet">
+						<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)" matTooltip="{{ 'COMMON.DUYET' | translate }}" [disabled]="disabledBtn">
+							<span>{{ 'COMMON.DUYET' | translate }}</span>
+						</button>&nbsp;
+						<button type="button" mat-raised-button color="warn" (click)="onSubmit(false)" matTooltip="{{ 'COMMON.KODUYET' | translate }}" [disabled]="disabledBtn">
+							<span>{{ 'COMMON.KODUYET' | translate }}</span>
+						</button>
+					</div>
+				</div>
+				<div class="form-group kt-form__group row">
+					<div class="col-lg-12 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput placeholder="Ghi chú" formControlName="note" #focusInput />
+						</mat-form-field>
+					</div>
+					<div class="col-lg-12 m--margin-bottom-20-mobile">
+						<dl-image-control formControlName="FileDinhKem" [multiple]="false" nameButton="Chọn tệp đính kèm" [disabled]="disabledBtn">
+						</dl-image-control>
+					</div>
+					<div class="col-lg-12 m--margin-bottom-20-mobile" *ngIf="item.CurrentChecker">
+						Đang trong quá trình duyệt của: <b>{{item.CurrentChecker}}</b><br />
+						<ng-container *ngIf="item.Deadline">
+							Thời hạn <b *ngIf="item.Deadline.IsTre" style="color:red;">{{item.Deadline.Ngay}}</b> <b *ngIf="!item.Deadline.IsTre">{{item.Deadline.Ngay}}</b>
+						</ng-container>
+					</div>
+				</div>
+				<mat-accordion>
+					<mat-expansion-panel [expanded]="true">
+						<mat-expansion-panel-header>
+							<mat-panel-title>Chi tiết số liệu</mat-panel-title>
+						</mat-expansion-panel-header>
+						<div class="form-group kt-form__group row">
+							<div class="col-lg-2 m--margin-bottom-20-mobile">Mẫu số liệu:</div>
+							<div class="col-lg-4 m--margin-bottom-20-mobile">
+								<b>{{item.MauSoLieu}}</b>
+							</div>
+							<div class="col-lg-2 m--margin-bottom-20-mobile">Năm:</div>
+							<div class="col-lg-4 m--margin-bottom-20-mobile">
+								<b>{{item.Nam}}</b>
+							</div>
+						</div>
+						<div class="form-group kt-form__group row">
+							<div class="col-lg-2 m--margin-bottom-20-mobile">Đơn vị:</div>
+							<div class="col-lg-4 m--margin-bottom-20-mobile">
+								<b>{{item.DonVi}}</b>
+							</div>
+						</div>
+						<div class="form-group kt-form__group row">
+							<div class="col-lg-12 m--margin-bottom-20-mobile">
+								<table class="table-bordered table-sm" style="width:100%;">
+									<tr>
+										<th class="stt-cell">STT</th>
+										<th class="text-center" style="min-width: 150px;">Nội dung</th>
+										<th class="text-center" style="width: 100px;">Số liệu</th>
+										<th class="text-center" style="width: 100px;">Số liệu<br />thay đổi</th>
+										<th class="text-center" style="width: 150px;">Ghi chú</th>
+									</tr>
+
+									<ng-container *ngFor="let object of item.Detail; let vi = index">
+										<tr>
+											<td><b>{{vi + 1 }}</b></td>
+											<td><b>{{object.SoLieu}}</b></td>
+											<td>{{object.default| mask:'separator': commonService.thousandSeparator}}</td>
+											<td style="color:rgb(255, 67, 67)">
+												{{object.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
+											</td>
+											<td>
+												<span class="overflow-gc" title="{{object.NhapSoLieu.Note}}">{{object.NhapSoLieu.Note}}</span>
+											</td>
+										</tr>
+										<!-- Số liệu con -->
+										<ng-container *ngIf="object.SoLieuCon.length > 0;">
+											<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
+												<tr>
+													<td></td>
+													<td><b>{{de.SoLieu}}</b></td>
+													<td>{{de.default| mask:'separator': commonService.thousandSeparator}}</td>
+													<td style="color:rgb(255, 67, 67)">
+														{{de.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
+													</td>
+													<td>
+														<span class="overflow-gc" title="{{de.NhapSoLieu.Note}}">
+															{{de.NhapSoLieu.Note}}
+														</span>
+													</td>
+												</tr>
+												<ng-container *ngFor="let child of de.Detail; let pos = index">
+													<tr>
+														<td></td>
+														<td>{{child.PhiSoLieu}} ({{child.CachNhap}})</td>
+														<td>{{child.default| mask:'separator': commonService.thousandSeparator}}</td>
+														<td style="color:rgb(255, 67, 67)">
+															{{child.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
+														</td>
+														<td>
+															<span class="overflow-gc" title="{{child.NhapSoLieu.Note}}">
+																{{child.NhapSoLieu.Note}}
+															</span>
+														</td>
+													</tr>
+												</ng-container>
+											</ng-container>
+										</ng-container>
+
+										<ng-container *ngIf="object.Detail.length > 0;">
+											<ng-container *ngFor="let child of object.Detail; let pos = index">
+												<tr>
+													<td></td>
+													<td>{{child.PhiSoLieu}} ({{child.CachNhap}})</td>
+													<td>{{child.default| mask:'separator': commonService.thousandSeparator}}</td>
+													<td style="color:red">
+														{{child.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
+													</td>
+													<td>
+														<span class="overflow-gc" title="{{child.NhapSoLieu.Note}}">
+															{{child.NhapSoLieu.Note}}
+														</span>
+													</td>
+												</tr>
+											</ng-container>
+										</ng-container>
+									</ng-container>
+								</table>
+							</div>
+						</div>
+					</mat-expansion-panel>
+					<mat-expansion-panel>
+						<mat-expansion-panel-header>
+							<mat-panel-title>{{ 'COMMON.COMMENT' | translate }}</mat-panel-title>
+						</mat-expansion-panel-header>
+						<div class="form-group kt-form__group row">
+							<div class="col-lg-12 m--margin-bottom-20-mobile">
+								<kt-comment [Loai]="3" [Id]="item.Id"></kt-comment>
+							</div>
+						</div>
+					</mat-expansion-panel>
+				</mat-accordion>
+			</div>
+		</div>
+	</form>
+</kt-portlet>

@@ -1,0 +1,195 @@
+<style>
+	.kt-portlet__body {
+		background: #e4e6eb;
+		padding-top: 0;
+	}
+
+	.cls-loai {
+		padding-left: 10px;
+		line-height: 40px;
+		cursor: pointer;
+		color: #0008ff;
+	}
+
+	.cls-loai .dot {
+		margin-right: 10px;
+		/* color: #7a7c81; */
+		color: #0008ff
+	}
+
+	.cls-loai.active {
+		background-color: #dde0f8;
+		color: #0008ff;
+		font-weight: bold;
+	}
+
+	.cls-loai.active .dot {
+		color: #0008ff;
+	}
+
+	.cls-loai:hover {
+		background-color: #dde0f8;
+		color: #5866da;
+	}
+
+	.cls-loai:hover .dot {
+		color: #5866da;
+	}
+
+	.cus-expansion .mat-expansion-panel {
+		box-shadow: none;
+		border-bottom: solid 1px #e4e6eb;
+	}
+
+	.cus-expansion .mat-expansion-panel-header {
+		background: #f5f5f5;
+		height: 100% !important;
+		padding-top: 3px;
+		padding-bottom: 3px;
+	}
+
+	.cus-expansion div .mat-expansion-panel-header:hover {
+		background-color: #ececec;
+	}
+
+	:host>>>.cus-expansion .mat-expansion-panel-body {
+		background: #f5f5f5;
+		padding-bottom: 10px;
+	}
+
+	.cus-expansion .mat-expansion-panel .mat-expansion-panel-header-title {
+		color: #0008ff;
+	}
+
+	.cus-expansion .mat-expansion-panel.active .mat-expansion-panel-header-title {
+		color: #0008ff;
+		font-weight: bold;
+	}
+
+	.cus-expansion .mat-expansion-panel-spacing {
+		margin: 0px;
+	}
+
+	.cus-expansion .mat-expansion-panel-header-description {
+		flex-basis: 0;
+		justify-content: flex-end;
+	}
+
+	.pad-duoi {
+		padding-bottom: 80px;
+	}
+
+	.material-icons {
+		font-size: 24px !important;
+	}
+
+	:host>>>.mat-tab-label-active .mat-tab-label-content {
+		color: #5867dd;
+	}
+
+	:host>>>.kt-portlet__head--lg {
+		background-color: #e4e6eb !important;
+		border-bottom: none !important
+	}
+
+	:host>>>.mat-input-element.require,
+	:host>>>.mat-select-required .mat-select-value,
+	:host>>>m-datetime-picker[required] {
+		/* color: #3699ff !important; */
+		color: rgb(12, 12, 12);
+	}
+
+	:host>>>.mat-form-field {
+		color: rgb(12, 12, 12);
+		margin-bottom: -0.95em;
+	}
+
+	:host>>>.mat-form-field-label {
+		color: #0008ff;
+	}
+
+	:host>>>.mat-form-field-underline {
+		background-color: #0008ff;
+	}
+
+	:host>>>.mat-focused {
+		color: #0008ff;
+	}
+
+	:host>>>.mat-form-field.mat-focused .mat-form-field-label {
+		color: #0008ff;
+	}
+
+	:host>>>.mat-form-field.mat-form-field-invalid .mat-form-field-label {
+		color: #fd397a;
+	}
+
+	::ng-deep .timkiem .mat-form-field .mat-form-field-label {
+		font-weight: bold;
+	}
+</style>
+<kt-portlet [options]="{headLarge: true}">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">
+					<span>Tiếp nhận hồ sơ</span>
+				</h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn"
+				matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>
+			</button>
+			<button mat-raised-button matTooltip="{{ 'COMMON.THOAT' | translate }}" (click)="back()">
+				<span translate="COMMON.THOAT"></span>
+			</button>
+		</ng-container>
+	</kt-portlet-header>
+	<div class="kt-portlet__body">
+		<div class="row">
+			<div class="col-md-3">
+				<mat-accordion class="cus-expansion" cdkDropList [cdkDropListData]="lstLoai"
+					(cdkDropListDropped)="drop($event)">
+					<mat-expansion-panel disabled style="height: 61px;">
+						<mat-expansion-panel-header>
+							<mat-panel-title *ngIf="isExpand">
+								<span style="font-weight:bold; color: #0008ff;">Chọn loại hồ sơ</span>
+							</mat-panel-title>
+							<div class="timkiem">
+								<mat-form-field class="mat-form-field-fluid" style="width: 350px" *ngIf="!isExpand">
+									<input matInput [(ngModel)]="tenloai" placeholder="Đối tượng"
+										(change)="filterBanks()" (keydown)="handleInput($event)" />
+								</mat-form-field>
+							</div>
+						</mat-expansion-panel-header>
+					</mat-expansion-panel>
+					<div style="max-height: 80vh; overflow: auto;">
+						<mat-expansion-panel *ngFor="let dt of lstLoai; let i=index"
+							[ngClass]="{'active': _item.Id_DoiTuongNCC==dt.id}" (opened)="clearAllBut(dt.id)"
+							(closed)="reloadListLoai()" #panel hideToggle cdkDrag>
+							<mat-expansion-panel-header>
+								<mat-panel-title>
+									<mat-icon *ngIf="panel.expanded" style="padding-right: 3.2px;">keyboard_arrow_left</mat-icon>
+									{{dt.title}}
+								</mat-panel-title>
+								<mat-panel-description>
+									<mat-icon *ngIf="!panel.expanded">keyboard_arrow_right</mat-icon>
+								</mat-panel-description>
+							</mat-expansion-panel-header>
+							<div *ngFor="let l of dt.data;" (click)="changeTab(l.id, dt.id)" class="cls-loai"
+								[ngClass]="{'active': _item.Id_LoaiHoSo==l.id && _item.Id_DoiTuongNCC==dt.id}">
+								<span class="dot">&#9632;</span>{{l.title}}
+							</div>
+						</mat-expansion-panel>
+					</div>
+				</mat-accordion>
+			</div>
+			<div class="col-md-9" style="background-color:white; border-radius: 3px; min-height: 80vh;">
+				<lib-dynamic-component [childComponentType]="childComponentType" [data]="childComponentData"
+					(getInstance)="getInstance($event)" *ngIf="childComponentType"></lib-dynamic-component>
+			</div>
+		</div>
+	</div>
+</kt-portlet>

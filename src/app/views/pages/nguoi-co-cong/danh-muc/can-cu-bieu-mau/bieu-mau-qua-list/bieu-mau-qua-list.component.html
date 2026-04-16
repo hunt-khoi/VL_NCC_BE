@@ -1,0 +1,113 @@
+<style>
+	.rows2 {
+		max-width: 500px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+</style>
+<kt-portlet-header [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
+	<ng-container ktPortletTitle>
+		<div class="kt-form__filtration">
+			<h3 class="kt-portlet__head-title">
+				<span translate="OBJECT.LIST" [translateParams]="{name:this._name.toLowerCase()}"></span>
+			</h3>
+		</div>
+	</ng-container>
+	<ng-container ktPortletTools>
+		<kt-column-option [gridService]="gridService"></kt-column-option>
+	</ng-container>
+</kt-portlet-header>
+
+<kt-portlet-body >
+	<div class="mat-table__wrapper d-block" cdkDropListGroup  [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}" >
+		<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" matSort #sort1="matSort" 
+			matSortActive="BieuMau" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
+			<ng-container matColumnDef="STT">
+				<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%"><span translate="COMMON.STT"></span></th>
+				<td mat-cell *matCellDef="let item;let vi = index" class="mat-column-vinCode stt-cell" style="flex: 0 0 6%">{{vi + 1}}</td>
+			</ng-container>
+			<ng-container matColumnDef="BieuMau">
+				<th mat-header-cell *matHeaderCellDef style="width:500px;">
+					<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="BieuMau" column_title="{{ 'BIEUMAU.NAME' | translate }}"></kt-column-filter>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					<a href="javascript:;" (click)="Edit(item, false)"><div class="rows2">{{item.BieuMau}}</div></a>
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="Version">
+				<th mat-header-cell *matHeaderCellDef>
+					<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Version" column_title="{{ 'BIEUMAU.VERSION' | translate }}"></kt-column-filter>
+				</th>
+				<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let item">
+					{{item.Version}}
+				</td>
+			</ng-container>
+			<ng-container matColumnDef="UpdatedBy">
+				<th mat-header-cell *matHeaderCellDef style="justify-content: center">
+					<span translate="COMMON.UPDATED_BY"></span>
+				</th>
+				<td mat-cell *matCellDef="let item" style="justify-content: center">{{item.UpdatedBy}}</td>
+			</ng-container>
+			<ng-container matColumnDef="UpdatedDate">
+				<th mat-header-cell *matHeaderCellDef style="justify-content: center">
+					<span translate="COMMON.UPDATED_DATE"></span>
+				</th>
+				<td mat-cell *matCellDef="let item" style="justify-content: center">{{item.UpdatedDate}}/td>
+			</ng-container>
+
+			<ng-container matColumnDef="actions">
+				<th mat-header-cell *matHeaderCellDef class="text-center" style="justify-content: center; width:170px">
+					<span translate="COMMON.TACVU"></span>
+				</th>
+				<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">
+					<div class="d-flex">
+						<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="info" type="button" matTooltip="{{ 'COMMON.DETAIL' | translate }}" (click)="Edit(item, false)">
+							<mat-icon>visibility</mat-icon>
+							<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
+						</button>
+						<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary" type="button" matTooltip="{{ 'COMMON.UPDATE' | translate }}" (click)="Edit(item)">
+							<mat-icon>edit</mat-icon>
+							<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
+						</button>
+					</div>
+				</td>
+			</ng-container>
+
+			<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
+			<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
+		</table>
+
+		<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
+	</div>
+
+	<!-- start: BOTTOM -->
+	<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
+		<div class="flt-selected" *ngIf="gridService.model.haveFilter">
+			<mat-chip-list>
+				<ng-container *ngFor="let chip of gridService.model.lstChip">
+					<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
+						{{chip.title}}: {{chip.data}}
+						<mat-icon matChipRemove>cancel</mat-icon>
+					</mat-chip>
+					<ng-container *ngIf="chip.type==1">
+						<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
+							{{chip.title}}: {{item.name}}
+							<mat-icon matChipRemove>cancel</mat-icon>
+						</mat-chip>
+					</ng-container>
+				</ng-container>
+				<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
+					Đặt lại
+				</mat-chip>
+			</mat-chip-list>
+		</div>
+		<div class="flt-page">
+			<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+			<mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+		</div>
+	</div>
+	<!-- end: BOTTOM -->
+</kt-portlet-body>

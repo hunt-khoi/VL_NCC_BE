@@ -1,0 +1,186 @@
+<style>
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 2;
+		max-width: 200px;
+		word-break: break-all;
+	}
+</style>
+<kt-portlet [options]="{headLarge: true}">
+	<div class="kt-portlet__head kt-portlet__head--lg">
+		<div class="kt-portlet__head-label">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="kt-portlet__head-toolbar">
+			<button type="button" mat-raised-button (click)="close()" matTooltip="Quay lại">
+				<span>Quay lại</span>
+			</button>
+		</div>
+	</div>
+	<kt-portlet-body>
+		<h3 *ngIf="!item.IsVisible_Duyet">Bạn không có quyền duyệt hồ sơ này</h3>
+		<div class="duyeths" *ngIf="item.IsVisible_Duyet">
+			<div class="form-group kt-form__group row">
+				<div class="col-md-6 m--margin-bottom-20-mobile">
+					<h3>{{getTitle()}}</h3>
+				</div>
+				<div class="col-md-6 m--margin-bottom-20-mobile {{getWidth() > 767?'text-right':''}} ">
+					<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)" matTooltip="Duyệt" [disabled]="!item.IsEnable_Duyet || disabledBtn">
+						Duyệt
+					</button>&nbsp;
+					<button type="button" mat-raised-button color="warn" (click)="onSubmit(false)" matTooltip="Không duyệt" [disabled]="!item.IsEnable_Duyet || disabledBtn">
+						Không Duyệt
+					</button>&nbsp;
+					<button type="button" *ngIf="item.AllowHoTro" mat-raised-button color="info" (click)="HoTro()" matTooltip="Hỗ trợ" [disabled]="!item.IsEnable_Duyet || disabledBtn">
+						Hỗ Trợ
+					</button>
+				</div>
+			</div>
+			<form class="kt-form" [formGroup]="itemForm">
+				<div class="form-group kt-form__group row">
+					<div class="col-lg-12 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput placeholder="Ghi chú duyệt" formControlName="note" #focusInput />
+						</mat-form-field>
+					</div>
+					<div class="col-lg-12 m--margin-bottom-20-mobile">
+						<dl-image-control formControlName="FileDinhKem" [multiple]="false" nameButton="Chọn tệp đính kèm" [disabled]="disabledBtn">
+						</dl-image-control>
+					</div>
+					<ng-container *ngIf="item.AllowHoTro">
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<h5>Thông tin hỗ trợ (nếu có)</h5>
+						</div>
+						<div class="col-lg-6 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="Số tiền hỗ trợ" formControlName="SoTien" [min]="0" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+							</mat-form-field>
+						</div>
+						<div class="col-lg-6 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<mat-select placeholder="Nguồn kinh phí hỗ trợ" formControlName="NguonKinhPhi">
+									<mat-option [value]="1">Ngân sách Nhà nước</mat-option>
+									<mat-option [value]="2">Nguồn Xã hội hóa</mat-option>
+									<!-- <mat-option [value]="3">QUỹ Đền ơn đáp nghĩa</mat-option> -->
+								</mat-select>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="Ghi chú" formControlName="GhiChu" />
+							</mat-form-field>
+						</div>
+					</ng-container>
+					<div class="col-lg-12 m--margin-bottom-20-mobile" *ngIf="item.CurrentChecker">
+						Đang trong quá trình duyệt của: <b>{{item.CurrentChecker}}</b><br />
+						<ng-container *ngIf="item.Deadline">
+							Thời hạn <b *ngIf="item.Deadline.IsTre" style="color:red;">{{item.Deadline.Ngay}}</b> <b *ngIf="!item.Deadline.IsTre">{{item.Deadline.Ngay}}</b>
+						</ng-container>
+					</div>
+				</div>
+			</form>
+			<mat-accordion>
+				<mat-expansion-panel [expanded]="true">
+					<mat-expansion-panel-header>
+						<mat-panel-title>Chi tiết hồ sơ</mat-panel-title>
+					</mat-expansion-panel-header>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Họ tên:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.HoTen}}</b>
+						</div>
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Số hồ sơ:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.SoHoSo}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Địa chỉ:</div>
+						<div class="col-lg-10 m--margin-bottom-20-mobile">
+							<b>{{item.DiaChi}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Ngày sinh:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.strNgaySinh}}</b>
+						</div>
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Ghi chú:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.GhiChu}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Chi phí yêu cầu:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.ChiPhiYeuCau | mask:'separator':commonService.thousandSeparator}}</b>
+						</div>
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Tiền đã hỗ trợ:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.TienHoTro | mask:'separator':commonService.thousandSeparator}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Hình thức hỗ trợ:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.strHinhThuc}}</b>
+						</div>
+					</div>
+				</mat-expansion-panel>
+
+				<mat-expansion-panel>
+					<mat-expansion-panel-header>
+						<mat-panel-title>Chi tiết hỗ trợ</mat-panel-title>
+					</mat-expansion-panel-header>
+					<div class="form-group kt-form__group row">
+						<table class="table table-hover table-bordered" matSort matSortActive="CreatedDate" matSortDirection="desc" (matSortChange)="getFiles($event)">
+							<thead>
+								<tr>
+									<th scope="col">STT</th>
+									<th scope="col">Thời gian hỗ trợ</th>
+									<th scope="col">Người hỗ trợ</th>
+									<th scope="col">Cấp hỗ trợ</th>
+									<th scope="col">Nguồn kinh phí</th>
+									<th scope="col">Số tiền</th>
+									<th scope="col">Ghi chú</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let ht of item.HoTros; let i = index">
+									<td scope="row">{{i + 1}}</td>
+									<td>{{ht.CreatedDate}}</td>
+									<td>{{ht.CreatedBy}}</td>
+									<td>{{ht.CapHoTro}}</td>
+									<td>{{ht.NguonKinhPhi}}</td>
+									<td style="text-align: right;">{{ht.SoTien | mask:'separator':commonService.thousandSeparator}}</td>
+									<td>{{ht.GhiChu}}</td>
+								</tr>
+								<tr *ngIf="item.HoTros.length == 0">
+									<td colspan="7" style="text-align: center;">Không có dữ liệu hiển thị</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</mat-expansion-panel>
+
+				<mat-expansion-panel>
+					<mat-expansion-panel-header>
+						<mat-panel-title>Trao đổi trong quá trình giải quyết hồ sơ</mat-panel-title>
+					</mat-expansion-panel-header>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<kt-comment [Loai]="5" [Id]="item.Id" (inserted)="addComment($event)"></kt-comment>
+						</div>
+					</div>
+				</mat-expansion-panel>
+			</mat-accordion>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>

@@ -1,0 +1,74 @@
+//
+// Global Components And 3rd-party Plugin Customizations
+//
+
+
+
+// 3rd-party plugins customizations
+@import "integration/plugins/perfect-scrollbar";
+@import "integration/plugins/dropzone";
+@import "integration/plugins/fontawesome5";
+@import "integration/plugins/sweetalert2";
+@import "integration/plugins/quill";
+@import "integration/plugins/tagify";
+@import "integration/plugins/tinymce";
+@import "integration/plugins/ckeditor";
+@import "integration/plugins/kanban";
+
+// Base components
+@import "components/base/container";
+@import "components/base/page-loader";
+@import "components/base/normalize";
+@import "components/base/animations";
+@import "components/base/helpers";
+@import "components/base/mixins/grid";
+@import "components/base/grid";
+@import "components/base/portlet";
+@import "components/base/datatable";
+@import "components/base/scrolltop";
+@import "components/base/form";
+@import "components/base/input-icon";
+@import "components/base/checkbox";
+@import "components/base/radio";
+@import "components/base/switch";
+@import "components/base/option";
+@import "components/base/avatar";
+@import "components/base/spinner";
+@import "components/base/loader";
+@import "components/base/pulse";
+@import "components/base/dialog";
+@import "components/base/mixins/wave";
+
+// General components
+@import "components/general/grid-nav";
+@import "components/general/head";
+@import "components/general/list-timeline";
+@import "components/general/nav";
+@import "components/general/notification";
+@import "components/general/notification-v2";
+@import "components/general/user-card";
+@import "components/general/media";
+
+// Layout components
+@import "components/layout/demo-panel";
+@import "components/layout/offcanvas-panel";
+@import "components/layout/quick-panel";
+@import "components/layout/quick-search";
+@import "components/layout/scroll";
+@import "components/layout/sticky-toolbar";
+@import "components/layout/app";
+@import "components/layout/subheader";
+
+// Typography components
+@import "components/typography/badge";
+@import "components/typography/heading";
+@import "components/typography/section";
+@import "components/typography/separator";
+@import "components/typography/svg-icon";
+
+// Widget components
+@import "components/widgets/dashboard/widget2";
+@import "components/widgets/dashboard/widget4";
+@import "components/widgets/dashboard/widget12";
+
+@import "components/widgets/general/profile-1";

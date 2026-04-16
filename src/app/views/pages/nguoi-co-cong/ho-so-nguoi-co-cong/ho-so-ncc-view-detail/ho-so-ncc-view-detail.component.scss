@@ -1,0 +1,21 @@
+@media only screen and (max-width: 1024px){
+    .hidden{ 
+      //  display: none;
+      height: 100%; 
+      width: 100% !important;
+      margin-left: unset !important;
+      margin-top: unset !important;
+
+     }
+     .router-outlet{
+      width: 100% !important;
+     }
+     #page{
+      display: unset !important;
+     }
+  }
+
+// .hidden{
+//    max-height: calc(100% - 20px);
+// }
+

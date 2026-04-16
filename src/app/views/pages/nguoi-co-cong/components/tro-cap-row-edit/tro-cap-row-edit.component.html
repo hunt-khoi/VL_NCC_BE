@@ -1,0 +1,201 @@
+<div class="form-group kt-form__group row" style="margin-top: -1.6em">
+	<div class="col-lg-3 m--margin-bottom-20-mobile">
+		<h5 style="font-weight: bold; color: #f83333;">
+			{{title}}
+		</h5>
+	</div>
+</div>
+<div class="form-group kt-form__group row" style="padding-left: 190px; margin-top: -4.8em">
+	<!-- <div class="col-lg-3 m--margin-bottom-20-mobile">
+		<h5 style="font-weight: bold; color: #f83333;">
+			{{title}}
+		</h5>
+	</div> -->
+	<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="hiddenTienTC">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Trợ cấp" [formControl]="TroCap" class="require" required #focusInput mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="isLyDoKhongGiaiQuyet">
+		<mat-form-field class="mat-form-field-fluid">
+			<textarea matInput placeholder="Lý do không giải quyết trợ cấp 1 lần bằng 3 tháng" [formControl]="LyDoKhongGiaiQuyet" rows="1"></textarea>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="isLyDoKhongMaiTangPhi">
+		<mat-form-field class="mat-form-field-fluid">
+			<textarea matInput placeholder="Lý do không mai táng phí" [formControl]="LyDoKhongMaiTangPhi" rows="1"></textarea>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="isPhuCap">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Phụ cấp" [formControl]="PhuCap" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+		</mat-form-field>
+	</div>
+	<!-- <div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="hideMuaBao">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Tiền mua báo" [formControl]="TienMuaBao" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+		</mat-form-field>
+	</div> -->
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="hideNuoiDuong">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Trợ cấp nuôi dưỡng" [formControl]="TroCapNuoiDuong" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTCDenThang">
+		<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+			<input matInput placeholder="Trợ cấp đã nhận đến tháng" [formControl]="ThangDaNhan" type="text" [matDatepicker]="pickerDN">
+			<mat-datepicker-toggle matSuffix [for]="pickerDN"></mat-datepicker-toggle>
+			<mat-datepicker #pickerDN startView="multi-year"
+			(monthSelected)="chosenMonthHandler4($event, pickerDN)"></mat-datepicker>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTCTuNgay">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Trợ cấp từ ngày" [formControl]="NgayCap" type="text" [matDatepicker]="picker" (dateChange)="changeNamCap()">
+			<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+			<mat-datepicker #picker></mat-datepicker>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTCTuThang">
+		<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+			<input matInput placeholder="Trợ cấp từ tháng" [formControl]="TuThang" type="text" [matDatepicker]="pickerT">
+			<mat-datepicker-toggle matSuffix [for]="pickerT"></mat-datepicker-toggle>
+			<mat-datepicker #pickerT startView="multi-year"
+			(monthSelected)="chosenMonthHandler($event, pickerT)"></mat-datepicker>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTCTuNam">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Trợ cấp từ năm" [formControl]="TuNam" type="number" (change)="changeNamCap(true)" [min]="0">
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTiLeTC">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Tỉ lệ trợ cấp" [formControl]="TiLeTroCap" type="number" [min]="0">
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showSLTroCap">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Số lần trợ cấp" [formControl]="SLTroCap" type="number" [min]="0">
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showSoThangTC">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Số tháng trợ cấp" [formControl]="SoThang" type="number" [min]="0"/>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTruyLinhFrom">
+		<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+			<input matInput placeholder="Truy lĩnh từ tháng" [formControl]="TruyLinh_From" type="text" [matDatepicker]="pickerFrom">
+			<mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+			<mat-datepicker #pickerFrom startView="multi-year"
+			(monthSelected)="chosenMonthHandler1($event, pickerFrom)"></mat-datepicker>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTruyLinhTo">
+		<!-- <mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Truy lĩnh đến tháng" [formControl]="TruyLinh_To" type="text" mask="M0/0000">
+		</mat-form-field> -->
+		<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+			<input matInput placeholder="Truy lĩnh đến tháng" [formControl]="TruyLinh_To" type="text" [matDatepicker]="pickerTo">
+			<mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+			<mat-datepicker #pickerTo startView="multi-year"
+			(monthSelected)="chosenMonthHandler2($event, pickerTo)"></mat-datepicker>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTruyLinh">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Số tháng truy lĩnh" [formControl]="SoThangTruyLinh" type="number" [min]="0" />
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTruyLinhCT">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Số tháng truy lĩnh cụ thể" [formControl]="STTruyLinhCuThe" title="Vd nhập: Tháng 3,4/5/2020 "/>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showNDTruyLinh">
+		<mat-form-field class="mat-form-field-fluid">
+			<textarea matInput placeholder="Nội dung truy lĩnh" [formControl]="NDTruyLinh" rows="1" matTooltip="Người dùng nhập đoạn nội dung như sau:
+			Từ tháng 01/2013 đến tháng 6/2013 là 06 tháng x 748.000 đồng = 4.488.000 đồng
+			Từ tháng ...
+			...
+			Số tiền: 89.328.000 đồng
+			(Bằng chữ: Tám mươi chín triệu ba trăm hai mươi tám nghìn đồng.)"></textarea>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showNgayCat">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Cắt trợ cấp từ ngày" [(ngModel)]="item.NgayCat" [ngModelOptions]="{standalone: true}" type="text" [matDatepicker]="pickerCat" [min]="NgayCap.value" (dateChange)="changeNamCat()">
+			<mat-datepicker-toggle matSuffix [for]="pickerCat"></mat-datepicker-toggle>
+			<mat-datepicker #pickerCat></mat-datepicker>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showThangCat">
+		<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+			<input matInput placeholder="Cắt trợ cấp từ tháng" [formControl]="ThangCat" type="text" [matDatepicker]="pickerCT">
+			<mat-datepicker-toggle matSuffix [for]="pickerCT"></mat-datepicker-toggle>
+			<mat-datepicker #pickerCT startView="multi-year"
+			(monthSelected)="chosenMonthHandler3($event, pickerCT)"></mat-datepicker>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showNamCat">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Cắt trợ cấp từ năm" [(ngModel)]="item.NamCat" [ngModelOptions]="{standalone: true}" type="number" (change)="changeNamCat(true)">
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showThangThuHoi">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Tháng thu hồi" [formControl]="ThangThuHoi" type="text" title="Vd nhập: Tháng 3,4/5/2020"/>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showDinhChi">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Tạm đình chỉ từ ngày" [formControl]="NgayDinhChi" type="text" [matDatepicker]="pickerdc" [min]="NgayCap.value">
+			<mat-datepicker-toggle matSuffix [for]="pickerdc"></mat-datepicker-toggle>
+			<mat-datepicker #pickerdc></mat-datepicker>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="isTienDCTruyThu">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Số tiền đình chỉ truy thu" [formControl]="TienDCTruyThu" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showDinhChiLyDo">
+		<mat-form-field class="mat-form-field-fluid">
+			<textarea matInput placeholder="Lý do đình chỉ" [formControl]="LyDoDinhChi" rows="1"></textarea>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showTamDinhChiLyDo">
+		<mat-form-field class="mat-form-field-fluid">
+			<textarea matInput placeholder="Lý do tạm đình chỉ" [formControl]="LyDoTamDC" rows="1"></textarea>
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showThuHoiTu">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Thu hồi ĐC từ năm" [formControl]="ThuHoiDCTu" type="number" [min]="0" [max]="Den" [(ngModel)]="Tu" (change)="changeNamThuHoi()">
+		</mat-form-field>
+	</div>
+	<div class="col-lg-3 m--margin-bottom-20-mobile" *ngIf="showThuHoiDen">
+		<mat-form-field class="mat-form-field-fluid">
+			<input matInput placeholder="Thu hồi ĐC đến năm" [formControl]="ThuHoiDCDen" type="number" [min]="Tu" [(ngModel)]="Den" (change)="changeNamThuHoi(false)">
+		</mat-form-field>
+	</div>
+</div>
+
+<!-- <div class="col-lg-3 m--margin-bottom-20-mobile">
+		<mat-form-field class="mat-form-field-fluid">
+			<mat-select placeholder="Loại trợ cấp" [formControl]="Id_LoaiTroCap">
+				<mat-option [value]="loaitc"></mat-option>
+			</mat-select>
+		</mat-form-field>
+</div>-->
+
+<!-- <button mat-button mat-raised-button color="warn" (click)="close()" matTooltip="Xóa trợ cấp">Xóa TC</button> -->
+
+<!-- <div class="col-lg-3 m--margin-bottom-20-mobile">
+	<mat-form-field class="mat-form-field-fluid">
+		<mat-select placeholder="Loại trợ cấp" [formControl]="Id_LoaiTroCap" class="require" required (selectionChange)="chonTroCap($event.value)">
+			<mat-option [value]="lgt.id" *ngFor="let lgt of listLoaiTroCap;">{{lgt.title}}</mat-option>
+		</mat-select>
+	</mat-form-field>
+</div> -->

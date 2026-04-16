@@ -1,0 +1,40 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+	</div>
+
+	<div class="kt-portlet__body">
+		<div class="form-group kt-form__group row">
+			<div class="col-lg-12 m--margin-bottom-20-mobile">
+				<table class="table-bordered table-sm" style="width:100%;">
+					<tr>
+						<th class="text-center" style="width:50px">STT</th>
+						<th class="text-center">Tên đơn vị</th>
+						<th class="text-center">Trạng thái</th>
+						<th class="text-center">Người tạo</th>
+						<th class="text-center">Ngày tạo</th>
+					</tr>
+					<ng-container *ngFor="let dv of ListDV; let vi = index">
+						<tr>
+							<td class="text-center">{{vi+1}}</td>
+							<td>{{dv.title}}</td>
+							<td class="text-center">
+								<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide 
+									kt-badge--{{getStatusString(dv.Status)}}">{{dv.strStatus}}</span>
+							</td>
+							<td class="text-center">{{item.CreatedBy}}</td>
+							<td class="text-center">{{item.CreatedDate}}</td>
+						</tr>
+					</ng-container>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

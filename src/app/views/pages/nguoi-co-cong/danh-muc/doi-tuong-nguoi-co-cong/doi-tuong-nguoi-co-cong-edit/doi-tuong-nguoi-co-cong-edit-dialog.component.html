@@ -1,0 +1,78 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+			<button class="hide-view-sm" type="button" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<div class="form-group kt-form__group row">
+				<div class="col-lg-2 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'DOITUONG_NCC.MADOITUONG' | translate }}" formControlName="MaDoiTuong" class="require" required #focusInput />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-10 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'DOITUONG_NCC.DOITUONG' | translate }}" formControlName="DoiTuong" class="require" required/>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="form-group kt-form__group row">
+				<div class="col-lg-2 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'DOITUONG_NCC.PRIORITY' | translate }}" formControlName="Priority" />
+					</mat-form-field>
+					<mat-error *ngIf="hasFormErrors">
+						<span *ngIf="itemForm.controls.Priority.value === '' || +itemForm.controls.Priority.value <= 0 ">
+							Thứ tự
+						</span>
+						<strong *ngIf="itemForm.controls.Priority.value === ''">bắt buộc nhập</strong>
+						<strong *ngIf="+itemForm.controls.Priority.value <= 0">phải lớn hơn 0</strong>
+					</mat-error>
+				</div>
+				<div class="col-md-8 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select formControlName="Loai" placeholder="{{ 'DOITUONG_NCC.NHOMLOAIDOITUONGNCC' | translate }}">
+							<mat-option [value]="0" [disabled]="true">-- Chọn --</mat-option>
+							<mat-option *ngFor="let opt of lstNhomLoaiDoiTuongNCC" [value]="opt.id">
+								{{opt.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-2 m--margin-bottom-20-mobile" style=" margin-top: 20px;">
+					<mat-checkbox formControlName="IsThanNhan">Dành cho thân nhân</mat-checkbox>
+				</div>
+				<div class="col-md-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Nhóm quyết định" formControlName="Id_LoaiQuyetDinh" required class="require">
+							<mat-option [value]="item.id" *ngFor="let item of listLoaiQD">
+								{{item.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<textarea matInput rows="3" placeholder="{{ 'DOITUONG_NCC.MOTA' | translate }}" formControlName="MoTa"></textarea>
+					</mat-form-field>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

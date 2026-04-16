@@ -1,0 +1,322 @@
+<style>
+	.row_nguon {
+		background-color: #dee2e6;
+		color: red;
+	}
+
+	.row_tang {
+		background-color: lightgreen;
+	}
+
+	.row_muc {
+		background-color: #dee2e6;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn"
+			title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet"
+	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button type="button" mat-raised-button color="info" (click)="export()" matTooltip="Xuất danh sách" *ngIf="item.Id>0">
+				Export
+			</button>
+			<ng-container *ngIf="allowEdit">
+				<button type="button" mat-raised-button color="primary" (click)="addDoiTuong()" matTooltip="Thêm đối tượng vào danh sách" *ngIf="!visibleTangGiam">
+					Thêm đối tượng
+				</button>
+				<button type="button" mat-raised-button color="accent" (click)="addDoiTuong(true)" matTooltip="Thêm đối tượng vào danh sách và báo tăng" *ngIf="visibleTangGiam">
+					Thêm ĐT và báo tăng
+				</button>
+				<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}" *ngIf="!(visibleTangGiam && item.Id>0)">
+					<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+				</button>
+			</ng-container>
+		</div>
+	</div>
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+				Không thể lưu, vui lòng nhập đủ thông tin!
+			</kt-alert>
+
+			<div class="row">
+				<div class="{{allowEdit?'col-md-8 m--margin-bottom-20-mobile':'col-md-4 m--margin-bottom-20-mobile'}}">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Tên danh sách" formControlName="TenDanhSach" class="require" required />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-4 m--margin-bottom-20-mobile" *ngIf="!allowEdit">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Tháng nhập" formControlName="ThangNhap" />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-4 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput [(ngModel)]="Filter" [ngModelOptions]="{standalone: true}" placeholder="Tìm kiếm theo số hồ sơ, họ tên, thân nhân, địa chỉ" (input)="filterText()" />
+						<button mat-icon-button matSuffix (click)="clearFilter($event)" matTooltip="Xóa tìm kiếm">
+							<mat-icon>clear</mat-icon>
+						</button>
+					</mat-form-field>
+				</div>
+			</div>
+
+			<div class="row" *ngIf="!allowEdit">
+				<div class="col-md-12">
+					<mat-tab-group [selectedIndex]="selected_tab" (selectedIndexChange)="changed_tab($event)">
+						<mat-tab label="Danh sách người nhận"></mat-tab>
+						<mat-tab label="Danh sách tăng"></mat-tab>
+						<mat-tab label="Danh sách giảm"></mat-tab>
+					</mat-tab-group>
+					<div class="table-responsive">
+						<table class="table-bordered table-sm " style="width:100%;">
+							<tr>
+								<th class="text-center">STT</th>
+								<th class="text-center">Họ tên</th>
+								<th class="text-center">Số hồ sơ</th>
+								<th class="text-center">Cư trú</th>
+								<th class="text-center">Thẻ BHYT</th>
+								<th class="text-center">Mã KCB</th>
+								<th class="text-center">Nơi đăng ký KCB</th>
+								<th class="text-center">Tiền lương</th>
+								<th class="text-center">Mức NSNN đóng</th>
+								<th class="text-center">Ghi chú</th>
+							</tr>
+							<ng-container *ngFor="let ng of treeNguoiNhan;let j=index;">
+								<tr class="row_nguon">
+									<td colspan="10"><b>{{ng.LoaiDoiTuong}}</b></td>
+								</tr>
+								<ng-container *ngFor="let dt of ng.DoiTuongs; let i=index">
+									<tr>
+										<td colspan="7"><b><i>{{dt.DoiTuong}}</i></b></td>
+										<td>Số lượng: <b>{{tongSL[j][i]}}</b></td>
+										<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
+										<td></td>
+									</tr>
+									<ng-container *ngFor="let ncc of dt.NCCs; let k=index">
+										<tr [ngClass]="{'row_tang':ncc.IsTang}" *ngIf="checkDisplay(ncc)">
+											<td>{{k+1}}</td>
+											<td>{{ncc.HoTen}}</td>
+											<td>{{ncc.SoHoSo}}</td>
+											<td>{{ncc.DiaChi}}</td>
+											<td>{{ncc.TheBaoHiem}}</td>
+											<td>{{ncc.MaKCB}}</td>
+											<td>{{ncc.NoiDangKyKCB}}</td>
+											<td class="text-right">{{ncc.TienLuong}}</td>
+											<td class="text-right">{{ncc.SoTien}}</td>
+											<td>{{ncc.IsGiam ? ncc.GhiChuGiam: ncc.GhiChuTang}}</td>
+										</tr>
+									</ng-container>
+								</ng-container>
+							</ng-container>
+							<tr style=" color: red;">
+								<td colspan="7"><b>Tổng số</b></td>
+								<td>Số lượng: <b>{{TongSo}}</b></td>
+								<td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+								<td></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="row" *ngIf="allowEdit && !visibleTangGiam">
+				<!-- ko hiện tăng giảm do là đợt gốc, isGoc=1 => api trả về false -->
+				<div class="col-md-12">
+					<mat-label>Danh sách người nhận</mat-label>
+					<div class="table-responsive">
+						<table class="table-bordered table-sm" style="width:100%; overflow-y: hidden;">
+							<tr>
+								<th class="text-center">Chọn</th>
+								<th class="text-center">Họ tên</th>
+								<th class="text-center">Số hồ sơ</th>
+								<th class="text-center">Cư trú</th>
+								<th class="text-center">Thẻ BHYT</th>
+								<th class="text-center">Mã KCB</th>
+								<th class="text-center">Nơi đăng ký KCB</th>
+								<th class="text-center">Tiền lương</th>
+								<th class="text-center">Mức NSNN đóng</th>
+								<th class="text-center">Ghi chú</th>
+							</tr>
+							<ng-container *ngFor="let ng of treeNguoiNhan; let j=index;">
+								<tr class="row_nguon">
+									<td colspan="10"><b>{{ng.LoaiDoiTuong}}</b></td>
+								</tr>
+								<ng-container *ngFor="let dt of ng.DoiTuongs; let i=index">
+									<tr>
+										<td colspan="7"><b><i>{{dt.DoiTuong}}</i></b></td>
+										<td>Số lượng: <b>{{tongSL[j][i]}}</b></td>
+										<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
+										<td></td>
+									</tr>
+									<ng-container *ngFor="let ncc of dt.NCCs;">
+										<tr [ngClass]="{'row_tang':ncc.IsTang}" *ngIf="ncc.Checked || (!ncc.Checked && allowEdit)">
+											<td class="text-center">
+												<mat-checkbox [(ngModel)]="ncc.Checked" [ngModelOptions]="{standalone: true}" 
+												[disabled]="!allowEdit" (change)="chon(ncc, j, i)"></mat-checkbox>
+											</td>
+											<td>{{ncc.HoTen}}</td>
+											<td>{{ncc.SoHoSo}}</td>
+											<td>{{ncc.DiaChi}}</td>
+											<td>{{ncc.TheBaoHiem}}</td>
+											<td>{{ncc.MaKCB}}</td>
+											<td>{{ncc.NoiDangKyKCB}}</td>
+											<td class="text-right">{{ncc.TienLuong}}</td>
+											<td class="text-right">{{ncc.SoTien}}</td>
+											<td>{{ncc.GhiChuTang}}</td>
+										</tr>
+									</ng-container>
+								</ng-container>
+							</ng-container>
+							<tr style=" color: red;">
+								<td colspan="7"><b>Tổng số</b></td>
+								<td>Số lượng: <b>{{TongSo}}</b></td>
+								<td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+								<td></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<ng-container *ngIf="allowEdit && visibleTangGiam"> 
+				<!-- hiện tăng giảm -->
+				<div class="row">
+					<div class="col-md-12">
+						<mat-label>Danh sách người nhận</mat-label>
+						<div class="table-responsive">
+							<table class="table-bordered table-sm" style="width:100%;">
+								<tr>
+									<th class="text-center">Chọn</th>
+									<th class="text-center">Họ tên</th>
+									<th class="text-center">Số hồ sơ</th>
+									<th class="text-center">Cư trú</th>
+									<th class="text-center">Thẻ BHYT</th>
+									<th class="text-center">Mã KCB</th>
+									<th class="text-center">Nơi đăng ký KCB</th>
+									<th class="text-center">Tiền lương</th>
+									<th class="text-center">Mức NSNN đóng</th>
+									<th class="text-center"><span *ngIf="visibleTangGiam">Báo giảm</span></th>
+									<th class="text-center" style="width:180px"><span *ngIf="visibleTangGiam">Ghi chú giảm</span></th>
+								</tr>
+								<ng-container *ngFor="let ng of treeNguoiNhan; let j=index">
+									<tr class="row_nguon">
+										<td colspan="11"><b>{{ng.LoaiDoiTuong}}</b></td>
+									</tr>
+									<ng-container *ngFor="let dt of ng.DoiTuongs; let i=index">
+										<tr>
+											<td class="text-center"></td>
+											<td colspan="7"><b><i>{{dt.DoiTuong}}</i></b></td>
+											<td>Số lượng: <b>{{tongSL[j][i]}}</b></td>
+											<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
+											<td></td>
+										</tr>
+										<ng-container *ngFor="let ncc of dt.NCCs;">
+											<tr *ngIf="(ncc.Checked && !(ncc.IsTang && ncc.Id_Nhap==item.Id)) 
+											|| (!ncc.Checked && allowEdit &&!visibleTangGiam)">
+												<td class="text-center">
+													<mat-checkbox [(ngModel)]="ncc.Checked" [ngModelOptions]="{standalone: true}" 
+													(change)="huybaotang(ncc, j, i)" [disabled]="!ncc.IsTang && (!allowEdit || visibleTangGiam)"></mat-checkbox>
+												</td>
+												<td>{{ncc.HoTen}}</td>
+												<td>{{ncc.SoHoSo}}</td>
+												<td>{{ncc.DiaChi}}</td>
+												<td>{{ncc.TheBaoHiem}}</td>
+												<td>{{ncc.MaKCB}}</td>
+												<td>{{ncc.NoiDangKyKCB}}</td>
+												<td class="text-right">{{ncc.TienLuong}}</td>
+												<td class="text-right">{{ncc.SoTien}}</td>
+												<td class="text-center">
+													<div *ngIf="visibleTangGiam">
+														<mat-form-field style="width: 80px;">
+															<mat-select placeholder="Lý do" [ngModelOptions]="{standalone: true}" 
+															[(ngModel)]="ncc.LyDo" [disabled]="ncc.DisabledGiam" (selectionChange)="updateLyDo(ncc)">
+																<mat-option *ngFor="let opt of lydos" [value]="opt.id">{{opt.title}}</mat-option>
+															</mat-select>
+														</mat-form-field>
+													</div>
+												</td>
+												<td class="text-center">
+													<mat-form-field style="width:140px;">
+														<input matInput [(ngModel)]="ncc.GhiChuGiam" placeholder="Ghi chú giảm" 
+														[ngModelOptions]="{standalone: true}" *ngIf="visibleTangGiam" [disabled]="ncc.DisabledGiam" />
+													</mat-form-field>&nbsp;
+													<mat-checkbox color="warn" [(ngModel)]="ncc.IsGiam" [ngModelOptions]="{standalone: true}" 
+													[disabled]="ncc.DisabledGiam" (click)="baoGiam($event, ncc, j, i)"></mat-checkbox>
+												</td>
+											</tr>
+										</ng-container>
+									</ng-container>
+								</ng-container>
+								<tr style=" color: red;">
+									<td colspan="8"><b>Tổng số</b></td>
+									<td>Số lượng: <b>{{TongSo}}</b></td>
+									<td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+									<td></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="form-group kt-form__group row">
+					<div class="col-md-12">
+						<mat-label>Danh sách tăng</mat-label>
+						<div class="table-responsive">
+							<table class="table-bordered table-sm" style="width:100%;">
+								<tr>
+									<th class="text-center">Họ tên</th>
+									<th class="text-center">Số hồ sơ</th>
+									<th class="text-center">Cư trú</th>
+									<th class="text-center">Thẻ BHYT</th>
+									<th class="text-center">Mã KCB</th>
+									<th class="text-center">Nơi đăng ký KCB</th>
+									<th class="text-center">Tiền lương</th>
+									<th class="text-center">Mức NSNN đóng</th>
+									<th class="text-center">Ghi chú</th>
+									<th class="text-center">Chọn</th>
+								</tr>
+								<ng-container *ngFor="let ng of treeNguoiNhan; let j=index;">
+									<tr class="row_nguon">
+										<td colspan="10"><b>{{ng.LoaiDoiTuong}}</b></td>
+									</tr>
+									<ng-container *ngFor="let dt of ng.DoiTuongs; ">
+										<tr>
+											<td class="text-center"></td>
+											<td colspan="9"><b><i>{{dt.DoiTuong}}</i></b></td>
+										</tr>
+										<ng-container *ngFor="let ncc of dt.NCCs; let i=index">
+											<tr *ngIf="!ncc.Checked || (ncc.IsTang && ncc.Id_Nhap==item.Id)">
+												<td>{{ncc.HoTen}}</td>
+												<td>{{ncc.SoHoSo}}</td>
+												<td>{{ncc.DiaChi}}</td>
+												<td>{{ncc.TheBaoHiem}}</td>
+												<td>{{ncc.MaKCB}}</td>
+												<td>{{ncc.NoiDangKyKCB}}</td>
+												<td class="text-right">{{ncc.TienLuong}}</td>
+												<td class="text-right">{{ncc.SoTien}}</td>
+												<td class="text-center" style="width:140px;">
+													<mat-form-field class="mat-form-field-fluid">
+														<input matInput [(ngModel)]="ncc.GhiChuTang" placeholder="Ghi chú tăng" [ngModelOptions]="{standalone: true}" />
+													</mat-form-field>
+												</td>
+												<td class="text-center"><mat-checkbox [(ngModel)]="ncc.IsTang" [ngModelOptions]="{standalone: true}" (change)="baoTang($event, ncc, j, i)"></mat-checkbox></td>
+											</tr>
+										</ng-container>
+									</ng-container>
+								</ng-container>
+							</table>
+						</div>
+					</div>
+				</div>
+			</ng-container>
+		</div>
+	</form>
+</div>

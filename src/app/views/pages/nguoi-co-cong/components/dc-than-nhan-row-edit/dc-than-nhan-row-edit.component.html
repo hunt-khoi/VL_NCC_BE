@@ -1,0 +1,37 @@
+<td>
+	<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+		<input matInput placeholder="Họ tên đúng" [formControl]="HoTenDung" style="text-transform:capitalize" >
+	</mat-form-field>
+</td>
+<td>
+	<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+		<input matInput placeholder="Năm sinh đúng" [formControl]="NamSinhDung" type="number" [min]="0">
+	</mat-form-field>
+</td>
+<td *ngIf="showCuTru">
+	<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+		<input matInput placeholder="Cư trú đúng" [formControl]="CuTruDung">
+	</mat-form-field>
+</td>
+<td>
+	<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+		<input matInput placeholder="Họ tên sai" [formControl]="HoTenSai" style="text-transform:capitalize" >
+	</mat-form-field>
+</td>
+<td>
+	<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+		<input matInput placeholder="Năm sinh sai" [formControl]="NamSinhSai" type="number" [min]="0">
+	</mat-form-field>
+</td>
+<td *ngIf="showCuTru">
+	<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+		<input matInput placeholder="Cư trú sai" [formControl]="CuTruSai">
+	</mat-form-field>
+</td>
+<td *ngIf="showGhiChu">
+	<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+		<input matInput placeholder="Ghi chú" [formControl]="GhiChu">
+	</mat-form-field>
+</td>
+<td  *ngIf="showDel"><button mat-button mat-raised-button color="warn" (click)="close()" matTooltip="Xóa đính chính">Xóa ĐC</button></td>
+

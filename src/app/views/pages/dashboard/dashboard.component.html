@@ -1,0 +1,83 @@
+<div class="row" style="margin-left: 0px; margin-right: 0px; margin-bottom: 12px;" *ngIf="ThongKeDashboard && ThongKeDashboard.length">
+	<ngb-carousel interval="50000" style="width: 100%;" [showNavigationArrows]="false" [showNavigationIndicators]="false">
+		<ng-template *ngFor="let it of data_thongke" ngbSlide>
+			<div style="display: flex; width: 100%; padding: 0;">
+				<div class="dl-tk-dashboard" style="width: 25%; padding: 0 7px 0 7px;"
+					*ngFor="let item of it">
+					<div class="dl-tk-item {{item.color}}" *ngIf="item.list && item.list.length>0">
+						<div class="title">
+							<i nowrap class="{{item.icon}}"></i> {{item.name}}
+						</div>
+						<div class="item-status" *ngFor="let st of item.list">
+							<div nowrap class="txt">{{st.Description}}</div>
+							<div class="num">{{st.Quantity}}</div>
+						</div>
+					</div>
+					<div style="height: 20px"></div>
+				</div>
+			</div>
+		</ng-template>
+	</ngb-carousel>
+</div>
+
+<div class="row">
+	<div class="col-xl-12">
+		<div class="dl-tk-dashboard row">
+			<div class="dl-tk-item success col-xl-6 kt-padding-top-10" style="margin-top: 0px;">
+				<div style="display: block;overflow-y: scroll; max-height: 500px; position: relative; padding: 0 15px" 
+					[perfectScrollbar]="{wheelPropagation: true}">
+					<div class="row">
+						<ng-container *ngFor="let it of pieChartData; let vi = index">
+							<div class="col-xl-6 kt-padding-20">
+								<div class="title">{{dataTitle[vi]}}</div>
+								<canvas baseChart [data]="it" [labels]="pieChartLabels" [chartType]="pieChartType"
+									[options]="optionsTmp" [legend]="pieChartLegend">
+								</canvas>
+							</div>
+						</ng-container>
+					</div>
+
+				</div>
+			</div>
+			<div class="dl-tk-item col-xl-6" style="padding-left: 0; padding-right: 0;margin-top: 0px;">
+				<div style="display: block;" class="feedback-dashboard">
+					<div class="title fb-title" style="padding:0 15px;">
+						<span matBadge="{{pageTotalFB}}" matBadgeColor="warn">
+							<i class="fa fa-comment"></i>&nbsp; Phản hồi mới nhất &nbsp;&nbsp;
+						</span>
+					</div>
+					<div class="list-feedback" style="max-height: 500px; position: relative; padding: 0 15px" #scrollView
+						(scroll)="scrollViewHandler()" [perfectScrollbar]="{wheelPropagation: true}">
+						<div class="item-feedback" *ngFor="let item of lastestFeedback" (click)="ReadFeedBack(item)">
+
+							<div class="fd-avt">
+								<ngx-avatar size="45" src="{{item.NguoiGui_Img}}"
+									*ngIf="item.NguoiGui_Img; else bindText"></ngx-avatar>
+								<ng-template #bindText>
+									<ngx-avatar size="45"
+										bgColor="{{commonService.get_colorByName(item.NguoiGui_Name)}}"
+										[name]="item.NguoiGui_Name"></ngx-avatar>
+								</ng-template>
+							</div>
+
+							<div class="fr-feedback">
+								<div class="item-name">
+									<div class="name">{{item.NguoiGui_FullName}}</div>
+									<div class="date"><i class="fa fa-clock"
+										aria-hidden="true"></i>&nbsp;{{item.CreatedDate}}</div>
+								</div>
+								<div class="item-content">{{item.NoiDung}}</div>
+								<div class="btn-detail" matTooltip="Xem chi tiết">
+									<i class="fa fa-share"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div *ngIf="scrollTop" class="new-notify" (click)="ScrollTop()" matTooltip="Xem tin mới nhất">
+						<i class="fa fa-angle-up"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

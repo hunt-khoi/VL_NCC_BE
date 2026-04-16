@@ -1,0 +1,79 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button type="button" mat-raised-button color="accent" (click)="giao()" [disabled]="disabledBtn" matTooltip="{{ 'MAU_SO_LIEU.giao' | translate }}">
+				<span translate="MAU_SO_LIEU.giao"></span>
+			</button>
+		</div>
+	</div>
+
+	<div class="kt-portlet__body">
+		<div class="form-group kt-form__group row">
+			<div class="col-lg-12 m--margin-bottom-20-mobile">
+				<h6>{{ 'MAU_SO_LIEU.dslangiao' | translate }}</h6>
+				<table class="table-bordered table-sm" style="width:100%;">
+					<tr>
+						<th class="text-center" style="width:50px">STT</th>
+						<th class="text-center">Phiên bản</th>
+						<th class="text-center">Thời gian</th>
+						<th class="text-center">Số đơn vị giao</th>
+						<th class="text-center" style="width:100px;">Thao tác</th>
+					</tr>
+					<ng-container *ngFor="let giao of ListGiao; let vi = index">
+						<tr>
+							<td class="text-center">{{vi+1}}</td>
+							<td>{{giao.NamVer ? 'Mẫu năm ' + giao.NamVer : 'Mẫu gốc'}}</td>
+							<td class="text-center">{{getStringDate(giao.ThoiGian)}}</td>
+							<td>
+								<div class="row">
+									<div class="col-md-{{Capcocau==3 ? '12': '3'}} text-center">
+										<b matTooltip="SL đã nhập">
+											<a href="javascript:;" *ngIf="giao.SLNhap >0 && Capcocau==1; else nonhap" (click)="viewGiao(giao)">{{giao.SLNhap}}</a>
+											<ng-template #nonhap>{{giao.SLNhap}}</ng-template>
+										</b>/{{giao.SLGiao}}
+									</div>
+									<div class="col-md-9" *ngIf="Capcocau<3">
+										<ngb-progressbar height="8px" type="{{getColorProgressBar(giao.PTHoanThanh)}}"
+										[value]="giao.PTHoanThanh" style="width: 100px;"></ngb-progressbar>
+										<b [ngStyle]="{ 'color' : getColor(giao.PTHoanThanh) }">{{giao.PTHoanThanh}} %</b>
+									</div>
+								</div>
+							</td>
+							<td class="action-cell" [ngClass]="list_button?'list-button':''">
+								<ng-container *ngIf="giao.SLNhap < giao.SLGiao">
+									<button (click)="EditObject(giao)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" 
+										matTooltip="{{ 'COMMON.UPDATE' | translate }}" color="primary" type="button">
+										<mat-icon>create</mat-icon>
+										<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
+									</button>
+									<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" 
+										type="button" (click)="DeleteWorkplace(giao)" matTooltip="{{ 'COMMON.DELETE' | translate }}" [disabled]="giao.SLNhap>0">
+										<mat-icon>delete</mat-icon>
+										<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
+									</button>
+								</ng-container>
+								<ng-container *ngIf="giao.SLNhap != giao.SLGiao">
+									<button (click)="NhacNho(giao)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" 
+										matTooltip="Nhắc nhở nhập số liệu" color="primary" type="button">
+										<span class="button-text">Nhắc nhở</span>
+									</button>
+								</ng-container>
+							</td>
+						</tr>
+					</ng-container>
+					<tr *ngIf="ListGiao.length == 0">
+						<td colspan="5" class="text-center">Chưa giao nhập số liệu</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

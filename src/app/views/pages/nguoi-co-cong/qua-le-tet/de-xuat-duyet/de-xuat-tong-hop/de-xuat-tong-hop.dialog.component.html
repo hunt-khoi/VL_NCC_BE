@@ -1,0 +1,106 @@
+<style>
+	.row_nguon {
+		background-color: #dee2e6;
+		color: red;
+	}
+
+	.row_tang {
+		background-color: lightgreen;
+	}
+
+	.row_muc {
+		background-color: #dee2e6;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" 
+		[disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{isZoomSize ? '9' : '7'}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">Tổng hợp đề xuất</h3>
+		</div>
+		<div class="col-md-{{isZoomSize ? '3' : '5'}} kt-margin-bottom-10-mobile"
+			style="margin-top: 10px; text-align: right;">
+			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="duyets()" *ngIf="allowEdit">
+				Duyệt
+			</button>
+		</div>
+	</div>
+
+	<kt-portlet-body>
+		<div class="kt-portlet__body-progress">
+			<mat-spinner [diameter]="20"></mat-spinner>
+		</div>
+		<form class="kt-form" id="print-section-review-export">
+			<div class="form-group kt-form__group row">
+				<div class="col-md-12" *ngIf="allowEdit">
+					<mat-form-field class="mat-form-field-fluid ">
+						<textarea matInput [(ngModel)]="note" [ngModelOptions]="{standalone: true}" placeholder="Ghi chú duyệt"></textarea>
+					</mat-form-field>
+				</div>
+				<div class="col-md-12">
+					<mat-tab-group [selectedIndex]="selected_tab" (selectedIndexChange)="changed_tab($event)">
+						<mat-tab label="{{ 'DE_XUAT.danhsachnhan' | translate }}"></mat-tab>
+						<mat-tab label="{{ 'DE_XUAT.danhsachtang' | translate }}"></mat-tab>
+						<mat-tab label="{{ 'DE_XUAT.danhsachgiam' | translate }}"></mat-tab>
+					</mat-tab-group>
+					<div class="table-responsive">
+						<table class="table-bordered table-sm" style="width:100%;">
+							<tr>
+								<th class="text-center">STT</th>
+								<th class="text-center">Họ tên</th>
+								<th class="text-center">Số hồ sơ</th>
+								<th class="text-center">Cư trú</th>
+								<th class="text-center">Họ tên liệt sỹ</th>
+								<th class="text-center">Quan hệ với liệt sỹ</th>
+								<th class="text-center">Số tiền</th>
+								<th class="text-center">Ghi chú</th>
+							</tr>
+							<ng-container *ngFor="let ng of treeNguoiNhan; let j=index;">
+								<tr class="row_nguon">
+									<td colspan="5">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+									<td>Số lượng:<b>{{sumSL(j, ng.Details.length)}}</b></td>
+									<td class="text-right"><b>{{sumTien(j, ng.Details.length)}}</b></td>
+									<td></td>
+								</tr>
+								<ng-container *ngFor="let muc of ng.Details; let i=index">
+									<tr class="row_muc">
+										<td colspan="5"><b>Mức {{muc.MucQua | mask: 'separator':commonService.thousandSeparator}} vnđ</b></td>
+										<td>Số lượng:<b>{{tongSL[j][i]}}</b></td>
+										<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
+										<td></td>
+									</tr>
+									<ng-container *ngFor="let dt of muc.DoiTuongs">
+										<tr>
+											<td colspan="8"><b><i>{{dt.DoiTuong}}</i></b></td>
+										</tr>
+										<ng-container *ngFor="let ncc of checkDisplay2(dt.NCCs); let k=index">
+											<tr [ngClass]="{'row_tang': ncc.IsTang}">
+												<td>{{k+1}}</td>
+												<td>{{ncc.HoTen}}</td>
+												<td>{{ncc.SoHoSo}}</td>
+												<td>{{ncc.DiaChi}}</td>
+												<td>{{ncc.NguoiThoCungLietSy}}</td>
+												<td>{{ncc.QuanHeVoiLietSy}}</td>
+												<td class="text-right">{{ncc.SoTien}}</td>
+												<td>{{ncc.IsGiam ? ncc.GhiChuGiam: ncc.GhiChuTang}}</td>
+											</tr>
+										</ng-container>
+									</ng-container>
+								</ng-container>
+							</ng-container>
+							<tr *ngIf="treeNguoiNhan.length == 0">
+								<td colspan="8" class="text-center">Không có dữ liệu</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</form>
+	</kt-portlet-body>
+	
+</div>

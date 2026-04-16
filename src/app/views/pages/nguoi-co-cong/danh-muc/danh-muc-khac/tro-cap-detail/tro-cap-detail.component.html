@@ -1,0 +1,122 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+			<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+
+	<div class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<div class="form-group kt-form__group row">
+				<div class="col-2">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'TROCAP.MA' | translate }}" disabled formControlName="MaTroCap" class="require" required #focusInput />
+					</mat-form-field>
+				</div>
+				<div class="col-10">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'TROCAP.LOAI' | translate }}" disabled formControlName="TroCap" class="require" required />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-2 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'LOAI_GT.KEYID' | translate }}" formControlName="Keys_ID" />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Đối tượng NCC" formControlName="Id_LoaiHoSo" (selectionChange)="loadDM($event.value)">
+							<mat-option [value]="0">--Chọn--</mat-option>
+							<mat-option [value]="lgt.id" *ngFor="let lgt of listLoaiHoSo;">{{lgt.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-10 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Dựa trên trợ cấp cha" formControlName="Id_Parent" (selectionChange)="chooseParent($event.value)">
+							<mat-option [value]="0">--Chọn--</mat-option>
+							<ng-container *ngFor="let lgt of listLoaiTroCapCha;">
+								<mat-option [value]="lgt.id" *ngIf="lgt.id!=item.Id">{{lgt.title}}</mat-option>
+							</ng-container>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-2 m--margin-bottom-20-mobile" [hidden]="itemForm.controls['Id_Parent'].value == 0">
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput placeholder="Số tháng dựa trên trợ cấp cha" formControlName="SoThang" type="number" min="1" 
+							(change)="chooseParent(itemForm.controls['Id_Parent'].value, true)" />
+					</mat-form-field>
+				</div>
+				<div class="col-md-6">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'TROCAP.TienTroCap' | translate }}" formControlName="TienTroCap" [readonly]="itemForm.controls['Id_Parent'].value>0" 
+							mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+				<div class="col-md-6">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'TROCAP.PhuCap' | translate }}" formControlName="PhuCap" mask="separator,3" 
+							thousandSeparator="{{commonService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+				<div class="col-md-6">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'TROCAP.TienMuaBao' | translate }}" formControlName="TienMuaBao" mask="separator,3" 
+							thousandSeparator="{{commonService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+				<div class="col-md-6">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'TROCAP.TroCapND' | translate }}" formControlName="TroCapNuoiDuong" mask="separator,3" 
+							thousandSeparator="{{commonService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="{{ 'TROCAP.SoThang' | translate }}" formControlName="SoThangTC" type="number" min="1" />
+					</mat-form-field>
+				</div>
+				<div class="col-12">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select disableOptionCentering placeholder="Biểu mẫu trợ cấp" formControlName="Id_Template">
+							<mat-option>
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrl" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option [value]="0">--Chọn--</mat-option>
+							<mat-option [value]="item.id" *ngFor="let item of listBieumau | async;">{{item.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-12">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select disableOptionCentering placeholder="Biểu mẫu thôi trả trợ cấp" formControlName="Id_Template_Cat">
+							<mat-option>
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrl1" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter1()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option [value]="0">--Chọn--</mat-option>
+							<mat-option [value]="item.id" *ngFor="let item of listBieumauCat | async;">{{item.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

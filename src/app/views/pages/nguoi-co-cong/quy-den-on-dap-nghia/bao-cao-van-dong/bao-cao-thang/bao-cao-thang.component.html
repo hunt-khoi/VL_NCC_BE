@@ -1,0 +1,154 @@
+<style>
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 1;
+	}
+	.min-th {
+		min-width: 160px;
+	}
+	.min-width-200px {
+		min-width: 200px;
+	}
+</style>
+<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+	<ng-container ktPortletTools>
+		<button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+			<button class="show-view-sm" *ngIf="allowExport" mat-raised-button [matMenuTriggerFor]="chucnang1" color="primary">
+				Chức năng
+			</button>
+			<mat-menu #chucnang1="matMenu">
+				<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+					<input matInput placeholder="Chọn tháng" [(ngModel)]="ThangBaoCao" 
+					type="text" [matDatepicker]="pickerDN1" [ngModelOptions]="{standalone: true}">
+					<mat-datepicker-toggle matSuffix [for]="pickerDN1"></mat-datepicker-toggle>
+					<mat-datepicker #pickerDN1 startView="multi-year"
+					(monthSelected)="chosenMonthHandler($event, pickerDN1)"></mat-datepicker>
+				</mat-form-field>
+				<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-menu-item color="primary" matTooltip="In danh sách" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>In
+				</button>
+				<button (click)="xuatDanhSach()" mat-menu-item color="info" matTooltip="Xuất danh sách">Export</button>
+			</mat-menu>
+			<!-- view nhỏ hơn 768 bị ẩn -->
+			<div class="hide-view-sm" style="display: contents;">
+				<mat-form-field class="mat-form-field-fluid" monthDateFormats>
+					<input matInput placeholder="Chọn tháng" [(ngModel)]="ThangBaoCao" 
+					type="text" [matDatepicker]="pickerDN2" [ngModelOptions]="{standalone: true}">
+					<mat-datepicker-toggle matSuffix [for]="pickerDN2"></mat-datepicker-toggle>
+					<mat-datepicker #pickerDN2 startView="multi-year"
+					(monthSelected)="chosenMonthHandler($event, pickerDN2)"></mat-datepicker>
+				</mat-form-field>
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">Xem thống kê</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>In
+				</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</div>
+	</ng-container>
+</kt-portlet-header>
+
+<kt-portlet-body>
+	<div id="print-section" *ngIf="display">
+		<div class="col-lg-12 kt-margin-bottom-10-mobile table-responsive">
+			<table class="table-bordered table-sm" style="width:100%;">
+				<tr>
+					<th rowspan="2" style="text-align: center;width:30px;">STT</th>
+					<th rowspan="2" class="text-center min-width-200px">Đơn vị</th>
+					<th rowspan="2" class="text-center">Chỉ tiêu vận động trong năm</th>
+					<th colspan="2" class="text-center">Số tiền vận động quỹ đền ơn đáp nghĩa</th>
+					<th rowspan="2" class="text-center">Tỷ lệ (%) đạt so với kế hoạch</th>
+					<th rowspan="2" class="text-center">Ghi chú</th>
+				</tr>
+				<tr>
+					<td class="text-center">Số tiền vận động trong tháng</td>
+					<td class="text-center">Lũy kế từ đầu năm</td>
+				</tr>
+				<ng-container *ngIf="Capcocau < 3">
+					<tr>
+						<th colspan="2" class="text-center">TỔNG CỘNG (I+II)</th>
+						<th style="text-align: right;">{{dataThongKe.Tongs.TienChiTieu | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{dataThongKe.Tongs.TienThang | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{dataThongKe.Tongs.TienLuyKe | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{replace(dataThongKe.Tongs.TiLe)}}</th>
+						<th>&nbsp;</th>
+					</tr>
+					<tr>
+						<th class="text-center">I</th>
+						<th>{{rowTinh.CapQuy}}</th>
+						<th style="text-align: right;">{{rowTinh.TienChiTieu | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{rowTinh.TienThang | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{rowTinh.TienLuyKe | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{replace(rowTinh.TiLe)}}</th>
+						<th>&nbsp;</th>
+					</tr>
+					<tr>
+						<th class="text-center">II</th>
+						<th>{{rowHuyen.CapQuy}}</th>
+						<th style="text-align: right;">{{rowHuyen.TienChiTieu | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{rowHuyen.TienThang | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{rowHuyen.TienLuyKe | mask:'separator':tsSeparator}}</th>
+						<th style="text-align: right;">{{replace(rowHuyen.TiLe)}}</th>
+						<th>&nbsp;</th>
+					</tr>
+					<ng-container *ngIf="Capcocau == 1">
+						<tr *ngFor="let cap of lstCap">
+							<td>&nbsp;</td>
+							<td>{{cap.Title}}</td>
+							<td style="text-align: right;">{{getValueH(cap.Id, 'TienChiTieu')}}</td>
+							<td style="text-align: right;">{{getValueH(cap.Id, 'TienThang')}}</td>
+							<td style="text-align: right;">{{getValueH(cap.Id, 'TienLuyKe')}}</td>
+							<td style="text-align: right;">{{replace(getValueH(cap.Id, 'TiLe', false))}}</td>
+							<td>&nbsp;</td>
+						</tr>
+					</ng-container>
+					<tr>
+						<th colspan="7" class="text-center">Chi tiết từng đơn vị</th>
+					</tr>
+					<ng-container *ngFor="let item of dataThongKe.data; let i=index">
+						<tr>
+							<th class="text-center">{{i+1}}</th>
+							<th>{{item.TenHuyen}}</th>
+							<th style="text-align: right;">{{item.TienChiTieu | mask:'separator':tsSeparator}}</th>
+							<th style="text-align: right;">{{item.TienThang | mask:'separator':tsSeparator}}</th>
+							<th style="text-align: right;">{{item.TienLuyKe | mask:'separator':tsSeparator}}</th>
+							<th style="text-align: right;">{{replace(item.TiLe)}}</th>
+							<th>&nbsp;</th>
+						</tr>
+						<ng-container *ngIf="item.ThongKes.length > 0">
+							<tr *ngFor="let cap of lstCap">
+								<td>&nbsp;</td>
+								<td>{{cap.Title}}</td>
+								<td style="text-align: right;">{{getValue(item, cap.Id, 'TienChiTieu')}}</td>
+								<td style="text-align: right;">{{getValue(item, cap.Id, 'TienThang')}}</td>
+								<td style="text-align: right;">{{getValue(item, cap.Id, 'TienLuyKe')}}</td>
+								<td style="text-align: right;">{{replace(getValue(item, cap.Id, 'TiLe', false))}}</td>
+								<td>&nbsp;</td>
+							</tr>
+						</ng-container>
+					</ng-container>
+				</ng-container>
+				
+				<tr *ngIf="Capcocau == 3">
+					<td>1</td>
+					<td>{{dataThongKe.data.TenXa}}</td>
+					<td style="text-align: right;">{{dataThongKe.data.TienChiTieu | mask:'separator':tsSeparator}}</td>
+					<td style="text-align: right;">{{dataThongKe.data.TienThang | mask:'separator':tsSeparator}}</td>
+					<td style="text-align: right;">{{dataThongKe.data.TienLuyKe | mask:'separator':tsSeparator}}</td>
+					<td style="text-align: right;">{{replace(dataThongKe.data.TiLe)}}</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr *ngIf="dataThongKe.data.length==0">
+					<td [attr.colspan]="7" class="text-center"><b>Không có dữ liệu</b></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</kt-portlet-body>

@@ -1,0 +1,52 @@
+<form class="kt-form" [formGroup]="itemForm">
+	<div class="row" [hidden]="hideOther">
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Cấp bậc" formControlName="CapBac" [readonly]="itemForm.controls.TinhTrang.value==3" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Chức vụ" formControlName="ChucVu" [readonly]="itemForm.controls.TinhTrang.value==3" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Đơn vị" formControlName="DonVi" [readonly]="itemForm.controls.TinhTrang.value==3" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Địa bàn" formControlName="DiaBan" [readonly]="itemForm.controls.TinhTrang.value==3" />
+			</mat-form-field>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{itemForm.controls.TinhTrang.value==3 ? 'Ngày từ trần' : 'Từ ngày'}}" formControlName="TuNgay" 
+					type="text" [matDatepicker]="picker" [(ngModel)]="ngay1" class="require" required>
+				<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+				<mat-datepicker #picker></mat-datepicker>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{itemForm.controls.TinhTrang.value==3 ? 'Ngày khai giấy tử' : 'Đến ngày'}}" formControlName="DenNgay" 
+					type="text" [(ngModel)]="ngay2" [matDatepicker]="picker1">
+				<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+				<mat-datepicker #picker1></mat-datepicker>
+			</mat-form-field>
+		</div>
+		<div class="col-md-3 kt-margin-bottom-10-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="Tình trạng" formControlName="TinhTrang" [disabled]="item.Id > 0 || hideOther">
+					<mat-option [value]="0">--Chọn tình trạng--</mat-option>
+					<mat-option [value]="1">Đã nghỉ hưu</mat-option>
+					<!--<mat-option [value]="2">Chưa nghỉ hưu</mat-option>-->
+					<mat-option [value]="3">Đã mất</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+	</div>
+</form>

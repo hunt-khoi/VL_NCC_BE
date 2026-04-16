@@ -1,0 +1,101 @@
+<style>
+	.row_nguon {
+		background-color: #dee2e6;
+		color: red;
+	}
+	.row_tang {
+		background-color: lightgreen;
+	}
+	.row_muc {
+		background-color: #dee2e6;
+	}
+</style>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTitle>
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button mat-raised-button (click)="Back()">{{ 'COMMON.BACK' | translate }}</button>
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<div class="form-group kt-form__group row">
+			<div class="col-md-12">
+				<mat-label>{{ 'DE_XUAT.danhsachnhan' | translate }}</mat-label>
+				<table class="table-bordered table-sm" style="width:100%;">
+					<tr>
+						<th class="text-center">STT</th>
+						<th class="text-center">Họ tên</th>
+						<th class="text-center">Số hồ sơ</th>
+						<th class="text-center">Cư trú</th>
+						<th class="text-center">Người thờ cúng liệt sỹ</th>
+						<th class="text-center">Quan hệ với liệt sỹ</th>
+						<th class="text-center">Số tiền</th>
+						<th class="text-center">Người nhận</th>
+						<th class="text-center">Thời gian</th>
+					</tr>
+					<ng-container *ngFor="let ng of DanhSach;let j=index">
+						<tr class="row_nguon">
+							<td class="d-revert" style="text-align: center; color: black">
+								<button mat-icon-button (click)="ng.expanded=!ng.expanded">
+									<mat-icon *ngIf="!ng.expanded">add</mat-icon>
+									<mat-icon *ngIf="ng.expanded">remove</mat-icon>
+								</button>
+							</td>
+							<td colspan="9">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+						</tr>
+						<ng-container *ngFor="let muc of ng.data; let i=index">
+							<ng-container *ngIf="ng.expanded">
+								<tr class="row_muc">
+									<td class="d-revert" style="width: 17px; text-align: center; background-color: #fff;"></td>
+									<td colspan="5"><b>Mức {{muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
+									<td class="text-right"><b matTooltip="Tiền trợ cấp">{{this.tongMuc[j][i]}}</b></td>
+									<td class="text-right"><b matTooltip="Tiền đã phát">{{this.tienDaPhat[j][i]}} </b></td>
+									<td></td>
+									<td></td>
+								</tr>
+								<ng-container *ngFor="let dt of muc.DoiTuongs">
+									<tr>
+										<td class="d-revert" style="width: 17px; text-align: center;"></td>
+										<td colspan="9"><b><i>{{dt.DoiTuong}}</i></b></td>
+									</tr>
+									<ng-container *ngFor="let ncc of dt.NCCs; let i=index">
+										<tr>
+											<td class="d-revert" style="width: 17px; text-align: center;"></td>
+											<td>{{i+1}}</td>
+											<td>{{ncc.HoTen}}</td>
+											<td>{{ncc.SoHoSo}}</td>
+											<td>{{ncc.DiaChi}}</td>
+											<td>{{ncc.NguoiThoCungLietSy}}</td>
+											<td>{{ncc.QuanHeVoiLietSy}}</td>
+											<td class="text-right">{{ncc.SoTien}}</td>
+											<td>
+												<ng-container *ngIf="( ncc.Received);else nhanqua">
+													{{ncc.NguoiNhan}}
+												</ng-container>
+												<ng-template #nhanqua>
+													<button class="btn btn-primary btn-sm" (click)="Nhanqua(ncc)">Phát quà</button>
+												</ng-template>
+											</td>
+											<td>{{ncc.ThoiGianNhan |date:'dd/MM/yyyy HH:mm'}}</td>
+										</tr>
+									</ng-container>
+								</ng-container>
+							</ng-container>
+						</ng-container>
+					</ng-container>
+					<tr style=" color: red;">
+						<td colspan="4"><b>Tổng số</b></td>
+						<td>Số lượng: <b>{{TongSo}}</b></td>
+						<td class="text-right"><b matTooltip="Tiền trợ cấp">{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+						<td class="text-right"><b matTooltip="Tiền đã phát">{{TongPhat | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</kt-portlet-body>
+</div>

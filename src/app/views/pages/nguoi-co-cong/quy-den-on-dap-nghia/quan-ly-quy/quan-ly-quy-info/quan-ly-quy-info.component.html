@@ -1,0 +1,87 @@
+<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'">
+	<ng-container ktPortletTitle>
+		<div class="kt-form__filtration">
+			<h3 class="kt-portlet__head-title">Thông tin quỹ</h3>
+		</div>
+	</ng-container>
+	<ng-container ktPortletTools>
+		<div *ngIf="!khoiTao" class="row"> 
+			<mat-checkbox [(ngModel)]="IsAll" style="margin-top: 15px" (change)="loadDataList(false)">
+				Xét tất cả
+			</mat-checkbox>&nbsp;&nbsp;&nbsp;&nbsp;
+			<ng-container *ngIf="!IsAll">
+				<mat-form-field class="mat-form-field-fluid" style="padding-right: 30px">
+					<input (ngModelChange)="modelChanged($event)" matInput [matDatepicker]="pickerbd_tungay" 
+						placeholder="Từ ngày" [(ngModel)]="from" [max]="to">
+					<mat-datepicker-toggle matSuffix [for]="pickerbd_tungay"></mat-datepicker-toggle>
+					<mat-datepicker #pickerbd_tungay></mat-datepicker>
+				</mat-form-field>
+				<mat-form-field class="mat-form-field-fluid">
+					<input (ngModelChange)="modelChanged1($event)" matInput [matDatepicker]="pickerbd_denngay" 
+						placeholder="Đến ngày" [(ngModel)]="to" [min]="from">
+					<mat-datepicker-toggle matSuffix [for]="pickerbd_denngay"></mat-datepicker-toggle>
+					<mat-datepicker #pickerbd_denngay></mat-datepicker>
+				</mat-form-field>
+			</ng-container>
+			<div style="display: flex; padding: 10px">
+				<button (click)="EditQuy()" style="margin-left: 10px; margin-bottom: 10px;" mat-button [class.mat-raised-button]="true" matTooltip="{{ 'COMMON.UPDATE' | translate }}" color="primary" type="button">
+					<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
+				</button>
+			</div>
+		</div>
+		<div *ngIf="khoiTao">
+			<button (click)="QuickAdd()" mat-button [class.mat-raised-button]="true"  matTooltip="Thêm nhanh" color="primary" type="button">
+				<span class="button-text">Thêm nhanh</span>
+			</button>
+			<button (click)="EditQuy()" mat-button [class.mat-raised-button]="true"  matTooltip="{{ 'COMMON.CREATE' | translate }}" color="primary" type="button">
+				<span class="button-text">{{ 'COMMON.CREATE' | translate }}</span>
+			</button>
+		</div>
+	</ng-container>
+</kt-portlet-header>
+
+<div class="col-xl-12">
+	<div *ngIf="!khoiTao" class="quy-info">
+		<div class="info-item col-xl-6">
+			<div class="bieu-do">
+				<div class="tieu-de">
+					<span>Biểu đồ thể hiện thu chi tồn quỹ</span>
+				</div>
+				<canvas baseChart
+					[datasets]="barChartData"
+					[labels]="barChartLabels"
+					[options]="barChartOptions"
+					[plugins]="barChartPlugins"
+					[legend]="barChartLegend"
+					[chartType]="barChartType"
+					style="padding-top: 10px">
+				</canvas>
+			</div>
+		</div>
+		<div class="info-item col-xl-6" style="padding-left: 0; padding-right: 0;">
+			<div class="chi-tiet">
+				<div class="title">
+					<span>Thông tin chi tiết</span>
+				</div>
+				<div class="list" *ngIf="data_QDO">
+					<span class="info"><b>Tên quỹ: </b>{{data_QDO.QuyDenOn}}</span><br>
+					<span class="info"><b>Số tài khoản: </b>{{data_QDO.SoTaiKhoan}}</span><br>
+					<span class="info"><b>Tên ngân hàng: </b>{{data_QDO.TenNganHang}}</span><br>
+					<span class="info"><b>Mã quan hệ ngân sách: </b>{{data_QDO.MaQHNganSach}}</span><br>
+					<span class="info"><b>Số tiền đầu: </b>{{data_QDO.SoTienDau | mask:'separator':tsSeparator}}</span><br>
+					<span class="info"><b>Tổng thu: </b>
+						<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem()" *ngIf="data_QDO.TongThu > 0">{{data_QDO.TongThu | mask:'separator':tsSeparator}}</a>	
+						<ng-container *ngIf="data_QDO.TongThu <= 0">{{data_QDO.TongThu | mask:'separator':tsSeparator}}</ng-container>
+					</span><br>
+					<span class="info"><b>Tổng chi: </b>
+						<a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(true)" *ngIf="data_QDO.TongChi > 0">{{data_QDO.TongChi | mask:'separator':tsSeparator}}</a>	
+						<ng-container *ngIf="data_QDO.TongChi <= 0">{{data_QDO.TongChi | mask:'separator':tsSeparator}}</ng-container>
+					</span><br>
+					<span class="info"><b>Tổng tiền: </b>{{commonService.f_currency_V2(data_QDO.TonQuy) }}</span>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+
+</div>

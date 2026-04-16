@@ -1,0 +1,88 @@
+<style>
+	:host .dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 2;
+		max-width: 300px;
+	}
+	.mw-100px {
+		min-width: 100px;
+	}
+	.mw-150px {
+		min-width: 150px;
+	}
+	.mw-200px {
+		min-width: 200px;
+	}
+	.mw-250px {
+		min-width: 250px;
+	}
+	.mw-300px {
+		min-width: 300px;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<kt-portlet [options]="{headLarge: true}" >
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">{{_name}}</h3>
+			</div>
+		</ng-container>
+	</kt-portlet-header>
+
+	<div class="kt-portlet__body" style="min-height: 200px;">
+		<div class="mat-table__wrapper" id="print-section-detail">
+
+			<table mat-table class="lmat-elevation-z8" [dataSource]="datatest" >
+				<ng-container matColumnDef="STT">
+					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell"><span translate="COMMON.STT"></span></th>
+					<td mat-cell *matCellDef="let object;let vi = index" class="mat-column-vinCode stt-cell">{{vi + 1}}</td>
+				</ng-container>
+
+				<ng-container matColumnDef="DoiTuong">
+					<th mat-header-cell *matHeaderCellDef >
+						Đối tượng
+					</th>
+					<td mat-cell *matCellDef="let object">{{object.DoiTuong}}</td>
+				</ng-container>
+				<ng-container matColumnDef="SoLuong">
+					<th nowrap mat-header-cell *matHeaderCellDef>
+						Số lượng
+					</th>
+					<td mat-cell *matCellDef="let object">{{object.SoLuong}}</td>
+				</ng-container>
+				<ng-container matColumnDef="ChiPhiYeuCau" *ngIf="_item.loaitkCT == 1">
+					<th nowrap mat-header-cell *matHeaderCellDef>
+						Tiền yêu cầu
+					</th>
+					<td mat-cell *matCellDef="let object">{{object.ChiPhiYeuCau | mask: 'separator':tsSeparator}}</td>
+				</ng-container>
+				<ng-container matColumnDef="SoTienHoTro" *ngIf="_item.loaitkCT == 2">
+					<th nowrap mat-header-cell *matHeaderCellDef>
+						Tiền hỗ trợ
+					</th>
+					<td mat-cell *matCellDef="let object">{{object.SoTienHoTro | mask: 'separator':tsSeparator}}</td>
+				</ng-container>
+				<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+				<tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="row.highlighted = !row.highlighted" [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+			</table>
+
+			<div class="mat-table__message" *ngIf="datatest.length == 0">
+				<span translate="COMMON.NO_RECORD_FOUND"></span>
+			</div>
+
+		</div>
+
+	</div>
+</kt-portlet>

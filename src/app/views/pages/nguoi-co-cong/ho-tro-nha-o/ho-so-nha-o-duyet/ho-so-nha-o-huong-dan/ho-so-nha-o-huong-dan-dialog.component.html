@@ -1,0 +1,32 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)" matTooltip="Lưu và đóng" [disabled]="disabledBtn">
+				<span>Lưu và đóng</span>
+			</button>
+		</div>
+	</div>
+	<div class="kt-portlet__body">
+		<form class="kt-form" [formGroup]="itemForm">
+			<div class="row">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Nội dung" formControlName="NoiDung" required #focusInput />
+						<mat-error> Nội dung bắt buộc nhập </mat-error>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<angular-editor formControlName="MoTa" [config]="CommonService.editorConfig"></angular-editor>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

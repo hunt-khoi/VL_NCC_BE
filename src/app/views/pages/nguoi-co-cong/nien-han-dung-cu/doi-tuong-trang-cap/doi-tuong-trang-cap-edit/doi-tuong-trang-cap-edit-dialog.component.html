@@ -1,0 +1,229 @@
+<style>
+	.example-action-buttons {
+  padding-bottom: 20px;
+}
+
+.example-headers-align .mat-expansion-panel-header-title,
+.example-headers-align .mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.example-headers-align .mat-expansion-panel-header-description {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.example-headers-align .mat-form-field + .mat-form-field {
+  margin-left: 8px;
+  
+   /* justify-content: space-between;
+  align-items: center; */
+}
+
+table, th, td {
+  border:1px solid black;
+}
+
+</style>
+
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+			<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0 && !IsReturn" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+			</button>
+		</div>
+	</div>
+
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<div class="row">
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select (selectionChange)="loadListDungCuChinhHinh()" disableOptionCentering placeholder="Đối tượng dụng cụ" formControlName="Id_DoiTuong" class="require" required>
+							<mat-option>
+								<ngx-mat-select-search  [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+									[(ngModel)]="FilterCtrl_dc" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option value="{{item.id}}" *ngFor="let item of listdoituongdc | async;" matTooltip="{{item.title}}">{{item.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 m--margin-bottom-20-mobile" style="display: flex;">
+					<mat-form-field class="mat-form-field-fluid " style="width: 50%;">
+						<input matInput placeholder="Số Hồ sơ" formControlName="SoHoSo" class="require" required #focusInput />
+						<mat-error> Số hồ sơ bắt buộc nhập </mat-error>
+					</mat-form-field>
+					<mat-form-field class="mat-form-field-fluid "  style="width: 50%;margin-left: 8px;">
+						<input matInput placeholder="Số sổ theo dõi" formControlName="SoTheoDoi" type="text" class="require" required (change)="changeNS(true)">
+						<mat-error> Số sổ theo dõi bắt buộc nhập </mat-error>
+					</mat-form-field>
+				</div>
+			
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Họ và tên người nhận" formControlName="HoTen" class="require" required style="text-transform:capitalize"/>
+						<mat-error> Họ tên bắt buộc nhập </mat-error>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Ngày sinh" formControlName="NgaySinh" type="text" [matDatepicker]="picker" [max]="maxNS" (dateChange)="changeNS()">
+						<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+						<mat-datepicker #picker></mat-datepicker>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-3 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Năm sinh" formControlName="NamSinh" type="text" class="require" required (change)="changeNS(true)">
+					</mat-form-field>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Giới tính" formControlName="GioiTinh" class="require" required>
+							<mat-option value="{{gt.id}}" *ngFor="let gt of listgioitinh;">
+								{{gt.title}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="{{ 'PROVINCE.NAME' | translate }}" formControlName="Province" class="require" (selectionChange)="loadGetListDistrictByProvinces(filterprovinces)" [(value)]="filterprovinces" required [disabled]="true">
+							<mat-option [value]="provinces.id_row" *ngFor="let provinces of listprovinces;">{{provinces.Province}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" formControlName="District" class="require" (selectionChange)="loadGetListWardByDistrict(filterdistrict)" [(value)]="filterdistrict" required [disabled]="Capcocau>=2 || !allowEdit ">
+							<mat-option value="{{district.ID_Row}}" *ngFor="let district of listdistrict;">{{district.District}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="{{ 'WARD.NAME' | translate }}" formControlName="Id_Xa" class="require" [(value)]="filterward" required [disabled]="Capcocau==3 || !allowEdit" (selectionChange)="loadKhomAp()">
+							<mat-option value="{{ward.ID_Row}}" *ngFor="let ward of listward;">{{ward.Ward}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Khóm, ấp" formControlName="Id_KhomAp" class="require" required>
+							<mat-option value="{{ward.id}}" *ngFor="let ward of listKhomAp;">{{ward.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Địa chỉ" formControlName="DiaChi" />
+						<mat-hint>Địa chỉ nhà, tên đường</mat-hint>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-12 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Ghi chú" formControlName="GhiChu"/>
+					</mat-form-field>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Họ tên thân nhân" formControlName="HoTenThanNhan" style="text-transform:capitalize"/>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Quan hệ gia đình" formControlName="Id_QHGiaDinh" [(ngModel)]="quanhe">
+							<mat-option>
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+									[(ngModel)]="FilterCtrl1" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter1()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option [value]="object.id" *ngFor="let object of listquanhevoilietsy | async;">{{object.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+
+			<mat-accordion class="example-headers-align" multi>
+				<mat-expansion-panel>
+					<mat-expansion-panel-header>
+						<mat-panel-title> 
+							<b>Danh sách dụng cụ chỉnh hình trang cấp</b> 
+						</mat-panel-title>
+					</mat-expansion-panel-header>
+				
+					<div class="row" *ngIf="allowEdit">
+						<div class="col-lg-6 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid">
+								<mat-label>Chọn dụng cụ</mat-label>
+								<mat-select formControlName="DungCuChinhHinh">
+									<mat-option *ngFor="let dcch of listDungCuChinhHinh" [value]="dcch.id" >
+										{{ dcch.title }}
+									</mat-option>
+								</mat-select>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-3 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid">
+								<mat-label>Năm cấp</mat-label>
+								<input formControlName="NamCap" matInput type="number" [min]="namhientai">
+								<mat-error nowrap>Năm cấp không thể nhỏ hơn năm hiện tại</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-3 m--margin-bottom-20-mobile">
+							<button style="margin-left: 8px;" mat-flat-button color="primary" 
+								(click)="add_DC()" matTooltip="Thêm dụng cụ vào danh sách">
+								Thêm
+							</button>
+						</div>
+					</div>
+
+					<div class="col-lg-12 m--margin-bottom-20-mobile" style="width: 100%;margin-top: 10px;">
+						<table style="width:100%" class="table-bordered">
+							<tr>
+								<th class="text-center">STT</th>
+								<th class="text-center">Tên dụng cụ chỉnh hình, vật phẩm phụ</th>
+								<th class="text-center">Năm cấp</th>
+								<th class="text-center" *ngIf="allowEdit">Thao tác</th>
+							</tr>
+							<tr *ngFor="let dt of listDoiTuongDC_added; let i = index">
+								<td class="text-center">{{ i + 1 }}</td>
+								<td>{{ dt.title }}</td>
+								<td class="text-center">{{ dt.NamCap }}</td>
+								<td class="text-center" *ngIf="allowEdit">
+									<button type="button" color="warn" mat-icon-button matTooltip="Xóa dụng cụ" (click)="xoaDT(dt)">
+										<mat-icon>delete</mat-icon>
+									</button>
+								</td>
+							</tr>					
+						</table>
+					</div>
+				</mat-expansion-panel>
+			</mat-accordion>
+			
+		</div>
+	</form>
+</div>

@@ -1,0 +1,183 @@
+<style>
+	::ng-deep .no-margin p {
+		margin: 0;
+	}
+</style>
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+			 style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+
+			<button class="show-view-sm float-right" mat-raised-button [matMenuTriggerFor]="chucnang" color="primary">
+				Chức năng
+			</button>
+			<mat-menu #chucnang="matMenu">
+				<button mat-menu-item (click)="displayKeyword()" matTooltip="Hiển thị từ khóa" color="accent" type="button" *ngIf="!isZoomSize">
+					{{ 'BIEUMAU.SHOWKEY' | translate }}
+				</button>
+				<button mat-menu-item (click)="displayKeyword()" matTooltip="Ẩn từ khóa" color="accent" type="button" *ngIf="isZoomSize">
+					{{ 'BIEUMAU.HIDEKEY' | translate }}
+				</button>
+				<ng-container *ngIf="allowEdit">
+					<button mat-menu-item type="button" color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+						<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+					</button>
+					<button mat-menu-item color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+						<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+					</button>
+				</ng-container>
+			</mat-menu>
+
+			<div class="hide-view-sm">
+				<button (click)="displayKeyword()" mat-raised-button matTooltip="Hiển thị từ khóa" color="accent" type="button" *ngIf="!isZoomSize">
+					{{ 'BIEUMAU.SHOWKEY' | translate }}
+				</button>
+				<button (click)="displayKeyword()" mat-raised-button matTooltip="Ẩn từ khóa" color="accent" type="button" *ngIf="isZoomSize">
+					{{ 'BIEUMAU.HIDEKEY' | translate }}
+				</button>
+				<ng-container *ngIf="allowEdit">
+					<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+						<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+					</button>
+					<button mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+						<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+					</button>
+				</ng-container>
+			</div>
+
+		</div>
+	</div>
+
+	<form class="kt-form" [formGroup]="itemForm">
+		<div class="kt-portlet__body">
+			<div class="row">
+				<div class="col-lg-{{isZoomSize?8:12}}">
+					<div class="row">
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="{{ 'BIEUMAU.SO' | translate }}" formControlName="So" class="require" required #focusInput [readonly]="item.Id>0" />
+								<mat-error *ngIf="itemForm.controls['So'].errors">
+									{{ 'BIEUMAU.SO' | translate }} <strong> bắt buộc nhập</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<mat-select matInput placeholder="Nhóm biểu mẫu" formControlName="Loai" class="require" required [disabled]="item.Id>0">
+									<mat-option [value]="opt.id" *ngFor="let opt of lstLoai">{{opt.title}}</mat-option>
+								</mat-select>
+								<mat-error *ngIf="itemForm.controls['Loai'].errors">
+									{{ 'NHOM_BM.NAME' | translate }} <strong> bắt buộc nhập</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<mat-select matInput placeholder="Nhóm quyết định" formControlName="Id_LoaiQuyetDinh" class="require" required>
+									<mat-option [value]="opt.id" *ngFor="let opt of lstLoaiQD">{{opt.title}}</mat-option>
+								</mat-select>
+								<mat-error *ngIf="itemForm.controls['Id_LoaiQuyetDinh'].errors">
+									{{ 'NHOM_QD.NAME' | translate }} <strong> bắt buộc nhập</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="{{ 'BIEUMAU.NAME' | translate }}" formControlName="BieuMau" class="require" required />
+								<mat-error *ngIf="itemForm.controls['BieuMau'].errors">
+									{{ 'BIEUMAU.NAME' | translate }} <strong> bắt buộc nhập</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="{{ 'COMMON.PRIORITY' | translate }}" formControlName="Priority" type="number" />
+								<mat-error *ngIf="itemForm.controls['Priority'].errors">
+									Thứ tự <strong> lớn hơn 0</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-8 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<mat-select matInput placeholder="{{ 'CANCU.NAME' | translate }}" formControlName="Id_CanCu" class="require" required>
+									<mat-option *ngFor="let opt of lstCanCu" [disabled]="opt.disabled" [value]="opt.id">{{opt.title}}</mat-option>
+								</mat-select>
+								<mat-error *ngIf="itemForm.controls['Id_CanCu'].errors">
+									{{ 'CANCU.NAME' | translate }} <strong> bắt buộc nhập</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="{{ 'BIEUMAU.VERSION' | translate }}" formControlName="curVersion" readonly />
+							</mat-form-field>
+						</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile" *ngIf="item.Id>0 && !allowEdit">
+							<button type="button" mat-raised-button color="primary" (click)="download()" [disabled]="disabledBtn" matTooltip="Tải file nội dung">
+								Tải file nội dung
+							</button>
+						</div>
+						<div class="col-lg-2 m--margin-bottom-20-mobile" style="padding-top: 20px;" [hidden]="item.Id==0 || !allowEdit">
+							<mat-checkbox formControlName="IsUp">Cập nhật phiên bản</mat-checkbox>
+						</div>
+						<div class="col-lg-2 m--margin-bottom-20-mobile" [hidden]="!itemForm.controls['IsUp'].value">
+							<mat-form-field class="mat-form-field-fluid ">
+								<input matInput placeholder="Phiên bản mới" formControlName="Version" />
+								<mat-error *ngIf="itemForm.controls['Version'].errors">
+									{{ 'BIEUMAU.VERSION' | translate }} <strong> bắt buộc nhập</strong>
+								</mat-error>
+							</mat-form-field>
+						</div>
+						<div class="col-md-4 kt-margin-bottom-10-mobile" [hidden]="item.Id>0 && !itemForm.controls['IsUp'].value">
+							<dl-image-control formControlName="fileDinhKem" nameButton="Chọn file nội dung" [multiple]="false" [disabled]="!allowEdit" type=".docx">
+							</dl-image-control>
+						</div>
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<mat-checkbox formControlName="isTinh">Cấp tỉnh</mat-checkbox>&nbsp;&nbsp;&nbsp;
+							<mat-checkbox formControlName="isHuyen">Cấp huyện</mat-checkbox>&nbsp;&nbsp;&nbsp;
+							<mat-checkbox formControlName="isXa">Cấp xã</mat-checkbox>
+						</div>
+					</div>
+					<div class="row" hidden>
+						<div class="w-100" [hidden]="!itemForm.controls['IsUp'].value && item.Id>0" *ngIf="arr">
+							<div class="col-lg-12 m--margin-bottom-20-mobile">
+								<mat-label>Nội dung</mat-label>
+							</div>
+							<div class="col-lg-12 m--margin-bottom-20-mobile" *ngFor="let content of arr; let i=index">
+								<!--<angular-editor formControlName="content{{i}}" [config]="commonService.editorConfig"></angular-editor>-->
+								<!--<editor apiKey="test" formControlName="content{{i}}" [init]="commonService.tinyConfig"></editor>-->
+								<editor formControlName="content{{i}}" [init]="commonService.tinyConfig"></editor>
+							</div>
+						</div>
+						<div [hidden]="itemForm.controls['IsUp'].value || item.Id==0" class="col-lg-12 m--margin-bottom-20-mobile overflow-hidden">
+							<b>Xem trước</b>
+							<hr />
+							<span [innerHtml]="strHtml" class="no-margin"></span>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4" [hidden]="!isZoomSize">
+					<div class="row" style=" position: sticky; top: 0;">
+						<div class="col-lg-12 m--margin-bottom-20-mobile text-right">
+							<button (click)="viewKeyword()" mat-raised-button matTooltip="{{ 'BIEUMAU.DSKHOA' | translate }}" color="accent" type="button">
+								{{ 'BIEUMAU.DSKHOA' | translate }}
+							</button>
+						</div>
+
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<kt-key-word-list [IsFull]="false"></kt-key-word-list>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

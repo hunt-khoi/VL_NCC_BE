@@ -1,0 +1,184 @@
+import { Component, OnInit, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { MatDatepicker } from '@angular/material';
+import { BehaviorSubject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+// Services
+import { BaoCaoVanDongService } from '../../bao-cao-van-dong/Services/bao-cao-thang.service'
+import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { Moment } from 'moment';
+import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
+import moment from 'moment';
+
+@Component({
+	selector: 'm-bao-cao-thang',
+	templateUrl: './bao-cao-thang.component.html',
+	changeDetection: ChangeDetectionStrategy.OnPush
+})
+
+export class BaoCaoThangComponent implements OnInit {
+
+	loadingSubject = new BehaviorSubject<boolean>(false);
+	loading$ = this.loadingSubject.asObservable();
+	_name = "";
+	dataThongKe: any = { Tongs: [], data: [] };
+	allowExport = false;
+
+	listTinh: any[] = []
+	listHuyen: any[] = []
+	display: boolean = false;
+	filterprovinces: number = 0;
+	filterDistrict: number = 0;
+	filterWard: number;
+	listXa: any[] = [];
+
+	viewLoading: boolean = false;
+	queryParams: QueryParamsModel;
+	Capcocau: number;
+	ThangBaoCao: any;
+	tsSeparator = "";
+
+	lstCap: any[] = [
+		{ Id: '2', Title: '- Cấp huyện'}, 
+		{ Id: '3', Title: '- Cấp xã'}, 
+	]
+	rowTinh: any 
+	rowHuyen: any
+
+	style_print: any = {
+		td: {
+			'border-right': '1px solid #dee2e6',
+			'border-bottom': '1px solid #dee2e6',
+		},
+		th: {
+			'border-right': '1px solid #dee2e6',
+			'border-bottom': '1px solid #dee2e6',
+		},
+		table: { 'border': '1px solid #dee2e6' }
+	};
+	
+	constructor(public tracuuHoSoService: BaoCaoVanDongService,
+		private commonService: CommonService,
+		private ref: ApplicationRef,
+		private changeDetectorRefs: ChangeDetectorRef,
+		private layoutUtilsService: LayoutUtilsService,
+		private tokenStorage: TokenStorage,
+		private translate: TranslateService) {
+			this._name = this.translate.instant("Báo cáo kế hoạch vận động theo tháng");
+			this.tsSeparator = commonService.thousandSeparator;
+	}
+
+	/** LOAD DATA */
+	ngOnInit() {
+		this.tokenStorage.getUserInfo().subscribe(res => {
+			this.Capcocau = res.Capcocau;
+			this.filterprovinces = res.IdTinh;
+			if (this.Capcocau == 2) {
+				this.filterDistrict = +res.ID_Goc_Cha;
+			}
+			if (res.Capcocau == 3) {
+				this.filterDistrict = +res.ID_Goc_Cha;
+				this.filterWard = +res.ID_Goc;
+				this.listXa = [{
+					Ward: res.DonVi,
+					ID_Row: res.ID_Goc
+				}];
+			}
+		})
+		this.ThangBaoCao = moment();
+	}
+
+	chosenMonthHandler(normalizedMonth: Moment, datepicker: MatDatepicker<Moment>) {
+		this.ThangBaoCao = normalizedMonth;
+		datepicker.close();
+	}
+
+	loadData() {
+		this.queryParams = this.prepareQuery();
+		this.viewLoading = true;
+		this.display = false;
+		this.tracuuHoSoService.baoCaoVanDongThang(this.queryParams).subscribe(res => {
+			this.loadingSubject.next(false);
+			this.viewLoading = false;
+			if (res && res.status == 1) {
+				this.dataThongKe = res.data
+				if (this.dataThongKe.Tongs != undefined) {
+					this.rowTinh = this.dataThongKe.Tongs.TongTinhs
+					this.rowHuyen = this.dataThongKe.Tongs.TongHuyens
+				}
+				this.allowExport = true;
+				this.display = true;
+			}
+			else {
+				this.dataThongKe = []
+				this.allowExport = false;
+				this.layoutUtilsService.showError(res.error.message);
+			}
+			this.changeDetectorRefs.detectChanges(); //ko có data sẽ ko xuất hiện
+		})
+	}
+
+	filterHuyen(): any {
+		const filter: any = {};
+		filter.ProvinceID = this.filterprovinces;
+		return filter
+	}
+
+	getValue(item, id, str, isCurrency = true) {
+		let find = item.ThongKes.find(x => +x.CapQuy == +id);
+		if (find != null) {
+			if (isCurrency)
+				return find[str] == '0' ? '0' : this.commonService.f_currency_V2(find[str]);
+			return find[str];
+		}
+		return '0';
+	}
+
+	replace(value) {
+		return value.toString().replace('.', ',')
+	}
+
+	getValueH(id, str, isCurrency = true) {
+		let find = this.rowHuyen.ThongKes.find(x => +x.CapQuy == +id);
+		if (find != null) {
+			if (isCurrency)
+				return find[str] == '0' ? '0' : this.commonService.f_currency_V2(find[str]);
+			return find[str];
+		}
+		return '0';
+	}
+
+	xuatDanhSach() {
+		this.loadingSubject.next(true);
+		this.tracuuHoSoService.exportBCVanDongThang(this.queryParams).subscribe(res => {
+			this.loadingSubject.next(false);
+			const headers = res.headers;
+			const filename = headers.get('x-filename');
+			const type = headers.get('content-type');
+			const blob = new Blob([res.body], { type });
+			const fileURL = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = fileURL;
+			link.download = filename;
+			link.click();
+		}, err => {
+			this.layoutUtilsService.showError("Xuất thống kê báo cáo thất bại");
+		});
+	}
+
+	prepareQuery(): QueryParamsModel {
+		const queryParams = new QueryParamsModel(
+			this.filterConfiguration(),
+			'', '', 0, 10,
+		);
+
+		return queryParams;
+	}
+
+	filterConfiguration(): any {
+		const filter: any = {};
+		filter.Thang = this.ThangBaoCao.format("MM");
+		filter.Nam = this.ThangBaoCao.format("YYYY");
+		return filter;
+	}
+}

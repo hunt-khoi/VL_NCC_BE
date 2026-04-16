@@ -1,0 +1,85 @@
+<style>
+	tr.example-detail-row {
+		height: 0;
+	}
+
+	tr.example-detail-row.example-expanded-row {
+		height: 48px;
+		display: table-row;
+	}
+
+	tr.example-element-row:not(.example-expanded-row):hover {
+		background: whitesmoke;
+	}
+
+	tr.example-element-row:not(.example-expanded-row):active {
+		background: #efefef;
+	}
+
+	.example-element-detail {
+		overflow: hidden;
+		display: none;
+	}
+
+	.mat-row.error td {
+		color: red;
+	}
+
+	.row-return {
+		background: #ffb881;
+	}
+</style>
+<kt-portlet>
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" >
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title" *ngIf="!IsEnable_Duyet">
+					Nhập niên hạn cần duyệt
+				</h3>
+				<h3 class="kt-portlet__head-title" *ngIf="IsEnable_Duyet">
+					Nhập niên hạn đã duyệt
+				</h3>
+			</div>
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+		<!-- list cần duyệt -->
+		<ng-container *ngIf="!IsEnable_Duyet">
+			<mat-tab-group [selectedIndex]="selectedTab" (selectedIndexChange)="changed_tab($event)">
+				<mat-tab label="Danh sách niên hạn xã" *ngIf="UserInfo.Capcocau==2 && range==1">
+					<ng-template matTabContent>
+						<m-nien-han-xa-duyet-list></m-nien-han-xa-duyet-list>
+					</ng-template>
+				</mat-tab>
+				<mat-tab label="Danh sách niên hạn">
+					<ng-template matTabContent>
+						<m-nien-han-huyen-duyet-list></m-nien-han-huyen-duyet-list>
+					</ng-template>
+				</mat-tab>
+				<mat-tab label="Nhắc nhở niên hạn" *ngIf="UserInfo.Capcocau<3">
+					<ng-template matTabContent>
+						<m-nhac-nho-nien-han [isxa]="UserInfo.Capcocau==2 && range==1"></m-nhac-nho-nien-han>
+					</ng-template>
+				</mat-tab>
+			</mat-tab-group>
+		</ng-container>
+		<!-- list đã duyệt -->
+		<ng-container *ngIf="IsEnable_Duyet">
+			<mat-tab-group [selectedIndex]="selectedTab1" *ngIf="UserInfo.Capcocau==2 && range==1">
+				<mat-tab label="Danh sách niên hạn xã">
+					<ng-template matTabContent>
+						<m-nien-han-xa-duyet-list></m-nien-han-xa-duyet-list>
+					</ng-template>
+				</mat-tab>
+				<mat-tab label="Danh sách niên hạn">
+					<ng-template matTabContent>
+						<m-nien-han-huyen-duyet-list></m-nien-han-huyen-duyet-list>
+					</ng-template>
+				</mat-tab>
+			</mat-tab-group>
+			<ng-container *ngIf="UserInfo.Capcocau!=2 || (UserInfo.Capcocau==2 && range!=1)">
+				<m-nien-han-huyen-duyet-list></m-nien-han-huyen-duyet-list>
+			</ng-container>
+		</ng-container>
+	</kt-portlet-body>
+</kt-portlet>

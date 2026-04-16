@@ -1,0 +1,200 @@
+<style>
+	.dt-overflow {
+		overflow: hidden;
+		line-height: 2rem;
+		max-height: 8rem;
+		-webkit-box-orient: vertical;
+		display: block;
+		display: -webkit-box;
+		overflow: hidden !important;
+		text-overflow: ellipsis;
+		-webkit-line-clamp: 2;
+		max-width: 200px;
+		word-break: break-all;
+	}
+</style>
+<kt-portlet [options]="{headLarge: true}">
+	<div class="kt-portlet__head kt-portlet__head--lg">
+		<div class="kt-portlet__head-label">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="kt-portlet__head-toolbar">
+			<button type="button" mat-raised-button (click)="close()" matTooltip="Quay lại">
+				<span>Quay lại</span>
+			</button>
+		</div>
+	</div>
+	<kt-portlet-body>
+		<h3 *ngIf="!item.IsVisible_Duyet">Bạn không có quyền duyệt hồ sơ này</h3>
+		<div class="duyeths" *ngIf="item.IsVisible_Duyet">
+			<div class="form-group kt-form__group row">
+				<div class="col-md-6 m--margin-bottom-20-mobile">
+					<h3>{{getTitle()}}</h3>
+				</div>
+				<div class="col-md-6 m--margin-bottom-20-mobile {{getWidth() > 767?'text-right':''}} ">
+					<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)"
+						matTooltip="Duyệt" [disabled]="!item.IsEnable_Duyet || disabledBtn">
+						{{ 'COMMON.DUYET' | translate }}
+					</button>&nbsp;
+					<button type="button" mat-raised-button color="warn" (click)="onSubmit(false)" 
+						matTooltip="Không duyệt" [disabled]="!item.IsEnable_Duyet || disabledBtn">
+						{{ 'COMMON.KODUYET' | translate }}
+					</button>
+				</div>
+			</div>
+			<form class="kt-form" [formGroup]="itemForm">
+				<div class="form-group kt-form__group row">
+					<div class="col-lg-12 m--margin-bottom-20-mobile">
+						<mat-form-field class="mat-form-field-fluid ">
+							<input matInput placeholder="Ghi chú" formControlName="note" #focusInput />
+						</mat-form-field>
+					</div>
+					<div class="col-lg-12 m--margin-bottom-20-mobile">
+						<dl-image-control formControlName="FileDinhKem" [multiple]="false" nameButton="Chọn tệp đính kèm" [disabled]="disabledBtn">
+						</dl-image-control>
+					</div>
+					<div class="col-lg-12 m--margin-bottom-20-mobile" *ngIf="item.CurrentChecker">
+						Đang trong quá trình duyệt của: <b>{{item.CurrentChecker}}</b><br />
+						<ng-container *ngIf="item.Deadline">
+							Thời hạn <b *ngIf="item.Deadline.IsTre" style="color:red;">{{item.Deadline.Ngay}}</b> <b *ngIf="!item.Deadline.IsTre">{{item.Deadline.Ngay}}</b>
+						</ng-container>
+					</div>
+				</div>
+			</form>
+
+			<mat-accordion>
+				<mat-expansion-panel [expanded]="true">
+					<mat-expansion-panel-header>
+						<mat-panel-title>
+							<a [routerLink]="['/chi-tiet-ho-so',item.Id]" target="_blank" mat-icon-button matTooltip="Xem đầy đủ thông tin hồ sơ" color="primary" class="text-left">
+								Chi tiết hồ sơ
+							</a>
+						</mat-panel-title>
+					</mat-expansion-panel-header>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Họ tên:</div>
+						<div class="col-lg-10 m--margin-bottom-20-mobile">
+							<b>{{item.HoTen}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Số hồ sơ:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.SoHoSo}}</b>
+						</div>
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Bí danh:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.BiDanh}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Nguyên quán:</div>
+						<div class="col-lg-10 m--margin-bottom-20-mobile">
+							<b>{{item.NguyenQuan}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Địa chỉ:</div>
+						<div class="col-lg-10 m--margin-bottom-20-mobile">
+							<b>{{item.TruQuan}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Đối tượng:</div>
+						<div class="col-lg-10 m--margin-bottom-20-mobile">
+							<b>{{item.DoiTuong}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Loại hồ sơ:</div>
+						<div class="col-lg-10 m--margin-bottom-20-mobile">
+							<b>{{item.LoaiHoSo}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Ngày, năm sinh:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.strNgaySinh}}</b>
+						</div>
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Giới tính:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.strGioiTinh}}</b>
+						</div>
+					</div>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Thân nhân:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.ThanNhan}}</b>
+						</div>
+						<div class="col-lg-2 m--margin-bottom-20-mobile">Quan hệ gia đình:</div>
+						<div class="col-lg-4 m--margin-bottom-20-mobile">
+							<b>{{item.QHGiaDinh}}</b>
+						</div>
+					</div>
+				</mat-expansion-panel>
+
+				<mat-expansion-panel>
+					<mat-expansion-panel-header>
+						<mat-panel-title>Trao đổi trong quá trình giải quyết hồ sơ</mat-panel-title>
+					</mat-expansion-panel-header>
+					<div class="form-group kt-form__group row">
+						<div class="col-lg-12 m--margin-bottom-20-mobile">
+							<kt-comment [Loai]="2" [Id]="item.Id" (inserted)="addComment($event)"></kt-comment>
+						</div>
+					</div>
+				</mat-expansion-panel>
+
+				<mat-expansion-panel>
+					<mat-expansion-panel-header>
+						<mat-panel-title>File đính kèm</mat-panel-title>
+					</mat-expansion-panel-header>
+					<div class="form-group kt-form__group row">
+						<div class="col-md-6">
+							<mat-form-field class="mat-form-field-fluid">
+								<mat-select [(ngModel)]="Cap" placeholder="Cấp đính kèm" (selectionChange)="getFiles()">
+									<mat-option [value]="0">--Tất cả--</mat-option>
+									<mat-option [value]="opt.id" *ngFor="let opt of lstCap">{{opt.title}}</mat-option>
+								</mat-select>
+							</mat-form-field>
+							</div></div>
+					<div class="form-group kt-form__group row">
+						<table class="table table-hover table-bordered" matSort matSortActive="CreatedDate" matSortDirection="desc" (matSortChange)="getFiles($event)">
+							<thead>
+								<tr>
+									<th scope="col">STT</th>
+									<th scope="col">Người gửi</th>
+									<th scope="col">Cấp đính kèm</th>
+									<th scope="col">File đính kèm</th>
+									<th scope="col" mat-sort-header="CreatedDate">Ngày gửi</th>
+									<th scope="col">Mô tả</th>
+									<th scope="col" style=" width: 160px;"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let file of ListFile;let i = index">
+									<td scope="row">{{i+1}}</td>
+									<td>{{file.CreatedBy}}</td>
+									<td>{{file.strCapcocau}}</td>
+									<td>
+										<span class="dt-overflow" title="{{file.Filename}}">{{file.Filename}}</span>
+									</td>
+									<td>{{file.CreatedDate}}</td>
+									<td>{{file.MoTa}}</td>
+									<td>
+										<a href="viewer/file-dinh-kem/0?path={{file.path}}" matTooltip="Xem file đính kèm" target="_blank" mat-button mat-raised-button color="info">
+											Xem
+										</a>
+										&nbsp;
+										<a href="javascript:;" class="url" (click)="Download(file.path)" matTooltip="{{ 'COMMON.DOWNLOAD' | translate }}" mat-button mat-raised-button color="info">
+											Tải
+										</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</mat-expansion-panel>
+			</mat-accordion>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>

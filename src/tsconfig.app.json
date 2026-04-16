@@ -1,0 +1,15 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "../out-tsc/app",
+		"baseUrl": "./",
+		"types": [],
+		"resolveJsonModule": true
+	},
+	"exclude": [
+		"test.ts",
+		"**/*.spec.ts",
+		"src/app/views/pages/nguoi-co-cong/components/canvas-demo",
+		"src/app/views/pages/nguoi-co-cong/quan-tri/no-checker",
+	]
+}

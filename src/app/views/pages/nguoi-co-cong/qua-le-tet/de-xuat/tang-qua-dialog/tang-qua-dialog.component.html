@@ -1,0 +1,62 @@
+<div class="btn-close-container">
+    <button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn"
+        title="Đóng">
+        <mat-icon>clear</mat-icon>
+    </button>
+</div>
+<div class="kt-portlet">
+    <kt-portlet-header [class]="'kt-portlet__head--lg'">
+        <ng-container ktPortletTitle>
+            <div class="kt-form__filtration">
+                <h3 class="kt-portlet__head-title">Nhận quà NCC</h3>
+            </div>
+        </ng-container>
+        <ng-container ktPortletTools>
+            <button class="btn btn-primary" (click)="onSubmit()">Lưu và đóng</button>
+        </ng-container>
+    </kt-portlet-header>
+
+    <div class="kt-form">
+        <div class="kt-portlet__body">
+            <div class="row">
+                <div class="col-md-6 row form-group">
+                    <div class="col-3">Họ tên:</div>
+                    <div class="col-9 font-weight-bold">
+                        {{dataNhanqua.HoTen}}
+                    </div>
+                </div>
+                <div class="col-md-6 row form-group">
+                    <div class="col-3">Số hồ sơ:</div>
+                    <div class="col-9 font-weight-bold">
+                        {{dataNhanqua.SoHoSo}}
+                    </div>
+                </div>
+                <div class="col-md-6 row form-group">
+                    <div class="col-3">Mức quà:</div>
+                    <div class="col-9 font-weight-bold">
+                        {{dataNhanqua.SoTien}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 form-group">
+                    <mat-form-field class="mat-form-field-fluid">
+                        <input matInput autocomplete="off" [(ngModel)]="nguoinhan" placeholder="Người nhận" type="text">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-6 row form-group">
+                    <div class="col-4">Thời gian nhận:</div>
+                    <div class="col-8 font-weight-bold">
+                       {{ThoiGianNhan | date:'dd/MM/yyyy HH:mm'}}
+                    </div>
+                </div>
+                <div class="col-md-6 row form-group">
+                    <div class="col-3">Số phiếu chi:</div>
+                    <div class="col-9 font-weight-bold">
+                       {{sophieuchi}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

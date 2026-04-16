@@ -1,0 +1,110 @@
+<kt-portlet [ngClass]="{ 'kt-portlet--body-progress' : viewLoading }">
+	<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTools>
+			<ng-container *ngIf="thongKe==0">
+				<button (click)="loadData(true)" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport1==true" printTitle={{this._name}}
+						[printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach(true)" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport1==true">Export</button>
+			</ng-container>
+			<ng-container *ngIf="thongKe==1">
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport2==true" printTitle={{this._name}}
+						[printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport2==true">Export</button>
+			</ng-container>
+		</ng-container>
+	</kt-portlet-header>
+	<kt-portlet-body>
+		<form class="kt-form" [formGroup]="itemForm">
+			<!-- Chọn các năm -->
+			<div class="form-group kt-form__group row">
+				<div class="col-m-2 kt-margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Năm" formControlName="Nam" />
+					</mat-form-field>
+				</div>
+				<div class="col-md-3 kt-margin-bottom-10-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Loại thống kê" formControlName="thongKe" (selectionChange)="changeLoai($event)">
+							<mat-option value="0" *ngIf="Capcocau == 1">Thống kê theo tỉnh</mat-option>
+							<mat-option value="1">Thống kê theo huyện</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-3 kt-margin-bottom-10-mobile" [hidden]="true">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select [value]="filterprovinces" (selectionChange)="loadHuyen()" formControlName="Tinh" [disabled]="true">
+							<mat-option [value]="list.id_row" *ngFor="let list of listTinh">{{list.Province}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+				<div class="col-md-3 kt-margin-bottom-10-mobile" *ngIf="thongKe==1">
+					<mat-form-field class="mat-form-field-fluid ">
+						<mat-select placeholder="Chọn huyện thống kê" formControlName="Huyen" [disabled]="Capcocau == 2">
+							<mat-option [value]="list.ID_Row" *ngFor="let list of listHuyen">{{list.District}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+			</div>
+		</form>
+		<div id="print-section" *ngIf="display">
+			<div class="row" *ngIf="thongKe==0">
+				<div class="col-lg-12 kt-margin-bottom-10-mobile">
+					<table class="table-bordered table-sm" style="width:100%;">
+						<tr>
+							<th style="text-align: center;width:30px;">STT</th>
+							<th>Huyện</th>
+							<th style="text-align: right;width:100px;">Chi trả</th>
+						</tr>
+						<ng-container *ngFor="let items of dataThongKe1">
+							<tr>
+								<td colspan="3"><b>{{items.DoiTuong}}</b></td>
+							</tr>
+							<ng-container *ngFor="let dt of items.ThongKe; let i=index">
+								<tr>
+									<td style="text-align: right;">{{i+1}}</td>
+									<td>{{dt.TenHuyen}}</td>
+									<td style="text-align: right;">{{dt.ChiTra}}</td>
+								</tr>
+							</ng-container>
+						</ng-container>
+						<tr *ngIf="dataThongKe1.length==0">
+							<td colspan="3" class="text-center"><b>Không có dữ liệu</b></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="row" *ngIf="thongKe==1">
+				<div class="col-lg-12 kt-margin-bottom-10-mobile">
+					<table class="table-bordered table-sm" style="width:100%;">
+						<tr>
+							<th style="text-align: center;width:30px;">STT</th>
+							<th>Xã</th>
+							<th style="text-align: right;width:100px;">Chi trả</th>
+						</tr>
+						<ng-container *ngFor="let items of dataThongKe2">
+							<tr>
+								<td colspan="3"><b>{{items.DoiTuong}}</b></td>
+							</tr>
+							<ng-container *ngFor="let dt of items.ThongKe; let i=index">
+								<tr>
+									<td style="text-align: right;">{{i+1}}</td>
+									<td>{{dt.TenXa}}</td>
+									<td style="text-align: right;">{{dt.ChiTra}}</td>
+								</tr>
+							</ng-container>
+						</ng-container>
+						<tr *ngIf="dataThongKe2.length==0">
+							<td colspan="3" class="text-center"><b>Không có dữ liệu</b></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</kt-portlet-body>
+</kt-portlet>

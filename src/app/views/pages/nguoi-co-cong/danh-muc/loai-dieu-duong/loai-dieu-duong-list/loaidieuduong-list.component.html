@@ -1,0 +1,124 @@
+<kt-portlet [options]="{headLarge: true}">
+	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
+		<ng-container ktPortletTitle>
+			<div class="kt-form__filtration">
+				<h3 class="kt-portlet__head-title">
+					<span translate="OBJECT.LIST"  [translateParams]="{name:this._name.toLowerCase()}"></span>
+				</h3>
+			</div>
+		</ng-container>
+		<ng-container ktPortletTools>
+			<button (click)="AddWorkplace()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="!loaiDieuDuongService1.ReadOnlyControl" color="accent" type="button">
+				<span translate="COMMON.CREATE"></span>
+			</button>
+			<kt-column-option [gridService]="gridService"></kt-column-option>
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<div class="mat-table__wrapper" cdkDropListGroup [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}">
+			<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" 
+				matSort #sort1="matSort" matSortActive="Priority" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
+				<ng-container matColumnDef="STT">
+					<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%"><span translate="COMMON.STT"></span></th>
+					<td mat-cell *matCellDef="let loaidieuduong;let vi = index" class="mat-column-vinCode" style="flex: 0 0 6%">{{vi + 1}}</td>
+				</ng-container>
+				<ng-container matColumnDef="LoaiDieuDuong">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="LoaiDieuDuong" column_title="Loại điều dưỡng"></kt-column-filter>
+					</th>
+					<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let loaidieuduong">
+						<a href="javascript:;" (click)="Editdienchinhhinh(dienchinhhinh, false)">{{loaidieuduong.LoaiDieuDuong}}</a>
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="MoTa">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" column_name="MoTa" column_title="Mô tả"></kt-column-filter>
+					</th>
+					<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px" *matCellDef="let loaidieuduong">
+						{{loaidieuduong.MoTa}}
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="Locked">
+					<th style="white-space: nowrap;" mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Locked" column_title="Tình trạng"></kt-column-filter>
+					</th>
+					<td mat-cell [ngClass]="{'m--padding-10': true}" style="white-space: nowrap; text-align: left" *matCellDef="let loaidieuduong">
+						<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide {{getItemCssClassByStatus(loaidieuduong.Locked)}}">{{getItemStatusString(loaidieuduong.Locked)}}</span>
+					</td>
+				</ng-container>
+				<ng-container matColumnDef="Priority">
+					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode" mat-sort-header column_name="Priority" style="flex: 0 0 6%">Thứ tự</th>
+					<td mat-cell *matCellDef="let loaidieuduong;let vi = index" class="mat-column-vinCode" style="flex: 0 0 6%">{{loaidieuduong.Priority}}</td>
+				</ng-container>
+				
+				<ng-container matColumnDef="actions">
+					<th mat-header-cell *matHeaderCellDef style="justify-content: center; width:170px">
+						<span translate="COMMON.TACVU"></span>
+					</th>
+					<td mat-cell *matCellDef="let loaidieuduong" class="action-cell" [ngClass]="list_button?'list-button':''">
+						<button type="button" (click)="EditLoaiDieuDuong(loaidieuduong, false)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="info" matTooltip="{{ 'COMMON.DETAIL' | translate }}">
+							<mat-icon>visibility</mat-icon>
+							<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
+						</button>
+						<ng-container *ngIf="!loaiDieuDuongService1.ReadOnlyControl ">
+							<button type="button" (click)="lock(loaidieuduong,false)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary" matTooltip="Mở khóa" *ngIf="loaidieuduong.Locked">
+								<mat-icon>lock_open</mat-icon>
+								<span class="button-text">Mở khóa</span>
+							</button>
+							<button type="button" (click)="lock(loaidieuduong)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" matTooltip="Khóa" *ngIf="!loaidieuduong.Locked">
+								<mat-icon>lock</mat-icon>
+								<span class="button-text">Khóa</span>
+							</button>
+							<button (click)="EditLoaiDieuDuong(loaidieuduong)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="{{ 'COMMON.UPDATE' | translate }}" color="primary" type="button">
+								<mat-icon>create</mat-icon>
+								<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
+							</button>
+							<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" type="button" (click)="DeleteWorkplace(loaidieuduong)" matTooltip="{{ 'COMMON.DELETE' | translate }}">
+								<mat-icon>delete</mat-icon>
+								<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
+							</button>
+						</ng-container>
+					</td>
+				</ng-container>
+
+				<!-- <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+				<tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="row.highlighted = !row.highlighted"
+					[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true"
+					(mouseout)="row.hovered = false"></tr> -->
+				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
+				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
+			</table>
+
+			<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
+		</div>
+
+		<!-- start: BOTTOM -->
+		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
+			<div class="flt-selected" *ngIf="gridService.model.haveFilter">
+				<mat-chip-list>
+					<ng-container *ngFor="let chip of gridService.model.lstChip">
+						<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
+							{{chip.title}}: {{chip.data}}
+							<mat-icon matChipRemove>cancel</mat-icon>
+						</mat-chip>
+						<ng-container *ngIf="chip.type==1">
+							<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
+								{{chip.title}}: {{item.name}}
+								<mat-icon matChipRemove>cancel</mat-icon>
+							</mat-chip>
+						</ng-container>
+					</ng-container>
+					<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
+						Đặt lại
+					</mat-chip>
+				</mat-chip-list>
+			</div>
+			<div class="flt-page">
+				<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+				<mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+			</div>
+		</div>
+		<!-- end: BOTTOM -->
+	</kt-portlet-body>
+</kt-portlet>

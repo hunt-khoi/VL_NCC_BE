@@ -1,0 +1,126 @@
+<form class="kt-form" [formGroup]="itemForm">
+	<div class="form-group kt-form__group row">
+		<div class="col-lg-12 m--margin-bottom-20-mobile">
+			<h5>Nơi quản lý cũ</h5>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Tỉnh" formControlName="tinh_old" (selectionChange)="changeTinhOld($event.value)" [disabled]="!allowEdit || isChuyenDi">
+					<mat-option [value]="lgt.id_row" *ngFor="let lgt of listTinh;">{{lgt.Province}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Huyện" formControlName="huyen_old" (selectionChange)="changeHuyenOld($event.value)" [disabled]="!allowEdit || isChuyenDi">
+					<mat-option [value]="lgt.ID_Row" *ngFor="let lgt of listHuyenOld;">{{lgt.District}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Xã" formControlName="xa_old" (selectionChange)="changeXaOld($event.value)" [disabled]="!allowEdit || isChuyenDi">
+					<mat-option [value]="lgt.ID_Row" *ngFor="let lgt of listXaOld;">{{lgt.Ward}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls.tinh_old.value == filterprovinces">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Khóm ấp" formControlName="khomap_old" [disabled]="!allowEdit || isChuyenDi">
+					<mat-option [value]="lgt.id" *ngFor="let lgt of listKhomApOld;">{{lgt.title}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Địa chỉ, tên đường" formControlName="diaChi_old" [readonly]="!allowEdit || isChuyenDi" />
+			</mat-form-field>
+		</div>
+	</div>
+	<!-- <div class="form-group kt-form__group row" [hidden]="!hideOther">
+		<div class="col-lg-12 m--margin-bottom-20-mobile">
+			<mat-checkbox [(ngModel)]="isChuyenDi" [ngModelOptions]="{standalone: true}">Chuyển đi nơi khác</mat-checkbox>
+		</div>
+	</div> -->
+	<div class="form-group kt-form__group row">
+		<div class="col-lg-12 m--margin-bottom-20-mobile">
+			<!-- <h5>Chuyển {{isChuyenDi? 'đi' : 'đến từ'}} nơi khác:</h5> -->
+			<h5>Nơi quản lý</h5>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Ngày chuyển" formControlName="NgayChuyen" type="text" [matDatepicker]="picker" class="require" required #focusInput>
+				<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+				<mat-datepicker #picker></mat-datepicker>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Hồ sơ chuyển {{isChuyenDi?'đi':'đến'}}" formControlName="IsBanChinh">
+					<mat-option [value]="1">Bản chính</mat-option>
+					<mat-option [value]="0">Bản sao</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Tỉnh" formControlName="tinh" required (selectionChange)="changeTinh($event.value)" [disabled]="!allowEdit || !isChuyenDi">
+					<mat-option [value]="lgt.id_row" *ngFor="let lgt of listTinh;">{{lgt.Province}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Huyện" formControlName="huyen" required (selectionChange)="changeHuyen($event.value)" [disabled]="!allowEdit || !isChuyenDi">
+					<mat-option [value]="lgt.ID_Row" *ngFor="let lgt of listHuyen;">{{lgt.District}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Xã" formControlName="xa" (selectionChange)="changeXa($event.value)" required [disabled]="!allowEdit || !isChuyenDi">
+					<mat-option [value]="lgt.ID_Row" *ngFor="let lgt of listXa;">{{lgt.Ward}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls.tinh.value == filterprovinces">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="Khóm ấp" formControlName="khomap" [disabled]="!allowEdit || !isChuyenDi">
+					<mat-option [value]="lgt.id" *ngFor="let lgt of listKhomAp;">{{lgt.title}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="Địa chỉ, tên đường" formControlName="diaChi" [readonly]="!isChuyenDi"/>
+			</mat-form-field>
+		</div>
+	</div>
+	<div class="form-group kt-form__group row">
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<textarea matInput placeholder="Các chế độ ưu đãi khác đã được giải quyết" formControlName="DaGiaiQuyet" rows="3"></textarea>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<textarea matInput placeholder="Các chế độ chưa được thực hiện" formControlName="ChuaGiaiQuyet" rows="3"></textarea>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<textarea matInput placeholder="Các giấy tờ kèm theo hồ sơ bản chính gồm" formControlName="GiayTo" rows="3"></textarea>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-6 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<textarea matInput placeholder="Các chế độ, chính sách thực hiện như sau" formControlName="ThucHien" rows="3"></textarea>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-12 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<textarea matInput placeholder="Ghi chú" formControlName="GhiChu" rows="3"></textarea>
+			</mat-form-field>
+		</div>
+	</div>
+</form>

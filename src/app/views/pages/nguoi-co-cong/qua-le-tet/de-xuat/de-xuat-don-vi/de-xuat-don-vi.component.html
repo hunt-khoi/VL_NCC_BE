@@ -1,0 +1,45 @@
+<kt-portlet>
+	<div class="row">
+		<div class="col-md-4" *ngIf="CapCoCau!=3">
+			<kt-portlet-header [sticky]="true" [title]="'Đơn vị hành chánh'" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+			</kt-portlet-header>
+			<div class="row" style="padding-left: 20px;">
+				<div class="col-md-12">
+					<mat-form-field style="width: 50px;">
+						<input matInput [(ngModel)]="nam" placeholder="Năm" (change)="changeNam()" />
+					</mat-form-field>
+					<mat-form-field>
+						<mat-select [(ngModel)]="dot">
+							<mat-option [value]="0">Tất cả</mat-option>
+							<mat-option [value]="opt.id" *ngFor="let opt of lstDotTangQua">{{opt.title}}</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<!-- chọn đợt + huyện -->
+					<ng-container *ngIf="!checkAllowExport()">
+						<button mat-button mat-icon-button [matMenuTriggerFor]="menu" color="primary"><mat-icon>print</mat-icon></button>
+						<mat-menu #menu="matMenu">
+							<button mat-menu-item (click)="In()" matTooltip="In đề xuất theo huyện">
+								In đề xuất theo huyện
+							</button>
+							<button mat-menu-item (click)="In(2)" matTooltip="In đề xuất theo huyện">
+								In đề xuất theo huyện (mẫu mới)
+							</button>
+							<button mat-menu-item (click)="In(3)" matTooltip="In đề xuất theo huyện">
+								In đề xuất theo huyện (mẫu mới tổng hợp)
+							</button>
+						</mat-menu>
+						<!--<button mat-button mat-raised-button color="primary" (click)="capNhatSoQD()" matTooltip="Cập nhật số QĐ">Cập nhật số QĐ</button>-->
+						<!--<button mat-button mat-raised-button color="primary" (click)="InQD()" matTooltip="In QĐ">In QĐ</button>-->
+					</ng-container>
+				</div>
+			</div>
+			<m-tree-don-vi *ngIf="dataTreeDonVi ? dataTreeDonVi.length > 0 : false" [showCheck]="false" [classIconLeaf]="'fas fa-torii-gate'" 
+				[classIconRoot]="'fas fa-landmark'" [nameNode]="'text'" [propNameChild]="'children'" [valuePhanQuyen]="dataTreeDonVi" 
+				[textFeildRoof]="'Tất cả'" [idRoleKey]="'IdGroup'" (NodeActiveChange)="treeDonViChanged($event)">
+			</m-tree-don-vi>
+		</div>
+		<div class="{{CapCoCau==3 ? 'col-md-12' : 'col-md-8'}}">
+			<m-de-xuat-list [donvi]="donvi" [nam]="nam" [dot]="dot" [cap]="CapCoCau"></m-de-xuat-list>
+		</div>
+	</div>
+</kt-portlet>

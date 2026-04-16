@@ -1,0 +1,201 @@
+<div class="btn-close-container">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn" title="Đóng">
+		<mat-icon>clear</mat-icon>
+	</button>
+</div>
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+	<div class="kt-portlet__head kt-portlet__head__custom">
+		<div class="col-md-3 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+		</div>
+		<div class="col-md-9 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="item.Id > 0">Export</button>
+			<ng-container *ngIf="allowEdit">
+				<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+					<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+				</button>
+				<button type="button" class="hide-view-sm hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" *ngIf="this.item.Id == 0 && !IsMauTheoPhong" 
+					[disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+					<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+				</button>
+			</ng-container>
+		</div>
+	</div>
+
+	<div class="kt-portlet__body" style="max-height: 85vh;">
+		<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			Không thể lưu, vui lòng nhập đủ thông tin!
+		</kt-alert>
+
+		<form class="kt-form" [formGroup]="itemForm">
+			<div class="form-group kt-form__group row">
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Kế hoạch vận động" formControlName="KeHoach" class="require" required #focusInput  />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-3 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput type="number" placeholder="Năm" class="require" required formControlName="Nam" />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-3 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Thứ tự" formControlName="Priority" class="require" required />
+					</mat-form-field>
+					<mat-error *ngIf="hasFormErrors">
+						<span *ngIf="itemForm.controls.Priority.value === '' || itemForm.controls.Priority.value <= -1 ">
+							Thứ tự
+						</span>
+						<strong *ngIf="itemForm.controls.Priority.value === ''">bắt buộc nhập</strong>
+						<strong *ngIf="itemForm.controls.Priority.value <= -1">bắt buộc không phải là số âm</strong>
+					</mat-error>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Tiền kế hoạch" formControlName="SoTien" 
+							mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<input matInput placeholder="Tổng tiền chi tiết" formControlName="TienCT"
+							mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+					</mat-form-field>
+				</div>
+				<div class="col-lg-8 m--margin-bottom-20-mobile">
+					<mat-form-field class="mat-form-field-fluid ">
+						<textarea rows="1" matInput placeholder="Mô tả" formControlName="MoTa"></textarea>
+					</mat-form-field>
+				</div>
+				<div class="col-lg-4 m--margin-bottom-20-mobile" *ngIf="allowEdit">
+					<button type="button" color="primary" mat-raised-button matTooltip="Thêm đơn vị vận động" 
+						(click)="AddDonViNew()"><span>Thêm đơn vị</span>
+					</button>
+				</div>
+			</div>
+		</form>
+		
+		<div class="form-group kt-form__group row">
+			<div class="col-lg-12 m--margin-bottom-20-mobile">
+				<mat-label style="padding-top: 15px;"><h5>Nội dung chi tiết: </h5></mat-label>
+			</div>
+			<div class="col-lg-12 m--margin-bottom-20-mobile">
+				<table class="table-bordered table-sm" style="width:100%;">
+					<tr>
+						<th class="text-center" style="width:50px">STT</th>
+						<th class="text-center">Đơn vị</th>
+						<th class="text-center">Số tiền</th>
+						<th class="text-center">PT (%) hoàn thành</th>
+						<th class="text-center" *ngIf="allowEdit">Tác vụ</th>
+					</tr>
+					<ng-container *ngFor="let dt of listDetail; let i = index">
+						<tr>
+							<td>{{i + 1}}</td>
+							<td>{{dt.DonVi}}</td>
+							<td>
+								<mat-form-field class="mat-form-field-fluid" style="width:200px">
+									<input type="text" matInput [(ngModel)]="dt.SoTien" [ngModelOptions]="{standalone: true}" 
+										[disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+								</mat-form-field>
+							</td>
+							<td>
+								<div class="row">
+									<div class="col-md-9">
+										<ngb-progressbar height="8px" type="{{getColorProgressBar(dt.PTHoanThanh)}}"
+										[value]="dt.PTHoanThanh" style="width: 100px;"></ngb-progressbar>
+										<b matTooltip="Thực hiện đóng góp" [ngStyle]="{ 'color' : getColor(dt.PTHoanThanh) }" 
+											(click)="AddDongGop(dt)" *ngIf="allowEdit">{{dt.PTHoanThanh}} %</b>
+										<b [ngStyle]="{ 'color' : getColor(dt.PTHoanThanh) }" *ngIf="!allowEdit">{{dt.PTHoanThanh}} %</b>
+									</div>
+								</div>
+							</td>
+							<td *ngIf="allowEdit && item.Id > 0"> 
+								<button mat-icon-button color="primary" type="button" matTooltip="Lưu chi tiết" (click)="updateDonViSelected(dt)">
+									<mat-icon>save</mat-icon>
+								</button>
+								<button mat-icon-button color="warn" *ngIf="dt.TienVanDong == 0" (click)="xoaDonViSelected(dt, i)" type="button" matTooltip="{{ 'COMMON.DELETE' | translate }}">
+									<mat-icon>delete</mat-icon>
+								</button>
+								<button mat-icon-button color="info" type="button" matTooltip="Xuất thư ngỏ" (click)="phatThu(dt)" *ngIf="dt.Id > 0">
+									<mat-icon>email</mat-icon>
+								</button>
+							</td>
+						</tr>
+					</ng-container>
+					<tr *ngIf="listDetail.length == 0 && !allowEdit">
+						<td class="text-center" colspan="3">Không có dữ liệu hiển thị</td> 
+					</tr>
+					<ng-container *ngIf="UserInfo.Capcocau<3">
+						<tr>
+							<th colspan="4">Đơn vị chỉ tiêu &nbsp;&nbsp;
+								<button type="button" *ngIf="item.Id > 0 && listConDetail.length > 0" color="primary" mat-raised-button matTooltip="Nhắc nhở vận động" (click)="nhacNho()">
+									<span>Nhắc nhở</span>
+								</button>
+							</th> 
+							<th class="text-center" *ngIf="allowEdit">
+								<button type="button" color="primary" mat-raised-button matTooltip="Thêm chỉ tiêu đơn vị cấp dưới" 
+									(click)="AddDonViNew(true)">
+									<span>Thêm</span>
+								</button>
+								<ng-container *ngIf="item.Id > 0 && listConDetail.length > 0">
+									&nbsp;&nbsp;
+									<ng-container *ngIf="isAllGiao">
+										<button type="button" color="info" mat-raised-button matTooltip="Giao tất cả chỉ tiêu" (click)="giaoTatCa(1)">
+											<span>Giao</span>
+										</button>&nbsp;&nbsp;
+									</ng-container>
+									<button type="button" *ngIf="isAllHuyGiao" color="warn" mat-raised-button matTooltip="Hủy giao tất cả chỉ tiêu" (click)="giaoTatCa(0)">
+										<span>Hủy giao</span>
+									</button>
+								</ng-container>
+							</th>
+						</tr>
+						<ng-container *ngFor="let dt of listConDetail; let i = index">
+							<tr>
+								<td>{{i + 1}}</td>
+								<td>{{dt.DonVi}}</td>
+								<td>
+									<mat-form-field class="mat-form-field-fluid" style="width:200px">
+										<input type="text" matInput [(ngModel)]="dt.SoTien" [ngModelOptions]="{standalone: true}" 
+											[disabled]="!allowEdit || dt.IsGiao" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+									</mat-form-field>
+								</td>
+								<td>
+									<div class="row">
+										<div class="col-md-9">
+											<ngb-progressbar height="8px" type="{{getColorProgressBar(dt.PTHoanThanh)}}"
+											[value]="dt.PTHoanThanh" style="width: 100px;"></ngb-progressbar>
+											<b [ngStyle]="{ 'color' : getColor(dt.PTHoanThanh) }">{{dt.PTHoanThanh}} %</b>
+										</div>
+									</div>
+								</td>
+								<td *ngIf="allowEdit"> 
+									<ng-container *ngIf="!dt.IsGiao">
+										<button mat-icon-button color="primary" type="button" matTooltip="Lưu chi tiết" (click)="updateDonViSelected(dt, true)" *ngIf="item.Id > 0">
+											<mat-icon>save</mat-icon>
+										</button>
+										<button mat-icon-button color="warn" (click)="xoaDonViSelected(dt, i, true)" type="button" matTooltip="{{ 'COMMON.DELETE' | translate }}">
+											<mat-icon>delete</mat-icon>
+										</button>
+										<button mat-icon-button color="info" (click)="giaoDonVi(dt, 1)" type="button" matTooltip="Giao chỉ tiêu" *ngIf="dt.Id > 0">
+											<mat-icon>forward</mat-icon>
+										</button>
+									</ng-container>
+									<ng-container *ngIf="dt.IsGiao">
+										<button mat-icon-button color="warn" (click)="giaoDonVi(dt, 0)" type="button" matTooltip="Hủy giao chỉ tiêu">
+											<mat-icon>undo</mat-icon>
+										</button>
+									</ng-container>
+								</td>
+							</tr>
+						</ng-container>
+						<tr *ngIf="listConDetail.length == 0 && !allowEdit">
+							<td class="text-center" colspan="4">Không có dữ liệu hiển thị</td> 
+						</tr>
+					</ng-container>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
