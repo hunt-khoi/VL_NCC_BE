@@ -1,10 +1,8 @@
 import { HoSoNCCEditDialogComponent } from './ho-so-ncc-edit/ho-so-ncc-edit-dialog.component';
-import { HoSoNCCListComponent } from './ho-so-ncc-list/ho-so-ncc-list.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
 import { HoSoNCCService } from './Services/ho-so-ncc.service';
-import { HoSoNCCImportComponent } from './ho-so-ncc-import/ho-so-ncc-import.component';
 import { FormDinhChinhComponent } from './ho-so-ncc-edit-page/form-dinh-chinh/form-dinh-chinh.component';
 import { FormCatTCComponent } from './ho-so-ncc-edit-page/form-cat-tc/form-cat-tc.component';
 import { FormMTPComponent } from './ho-so-ncc-edit-page/form-mtp/form-mtp.component';
@@ -44,7 +42,6 @@ import { FormCatTuatTTComponent } from './ho-so-ncc-edit-page/form-cat-tuat-tutr
 		HoSoNCCService,
 	],
 	entryComponents: [
-		HoSoNCCImportComponent,
 		HoSoNCCEditDialogComponent,
 		FormBaseComponent,
 
@@ -82,8 +79,6 @@ import { FormCatTuatTTComponent } from './ho-so-ncc-edit-page/form-cat-tuat-tutr
 		FormTongHopComponent
 	],
 	declarations: [
-		HoSoNCCListComponent,
-		HoSoNCCImportComponent,
 		HoSoNCCEditDialogComponent,
 		FormBaseComponent,
 
@@ -120,10 +115,6 @@ import { FormCatTuatTTComponent } from './ho-so-ncc-edit-page/form-cat-tuat-tutr
 
 		FormTongHopComponent
 	],
-	exports: [
-		HoSoNCCListComponent,
-	]
 })
-
 
 export class HoSoNCCRefModule { }

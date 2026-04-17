@@ -4,11 +4,10 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
 import { HoSoNCCComponent } from './ho-so-ncc.component';
-import { HoSoNCCRefModule } from './ho-so-ncc-ref.module';
 import { HoSoNCCListComponent } from './ho-so-ncc-list/ho-so-ncc-list.component';
+import { HoSoNCCImportComponent } from './ho-so-ncc-import/ho-so-ncc-import.component';
 import { ThanNhanService } from '../than-nhan/Services/than-nhan.service';
 import { QuyetDinhRefModule } from '../quyet-dinh/quyet-dinh-ref.module';
-import { HoSoNCCEditPageComponent } from './ho-so-ncc-edit-page/ho-so-ncc-edit-page.component';
 
 const routes: Routes = [
 	{
@@ -17,13 +16,11 @@ const routes: Routes = [
 		children: [
 			{
 				path: '',
-				// loadChildren: () => import('./ho-so-ncc-list/ho-so-ncc-list.component').then(m => m.HoSoNCCListComponent)
 				component: HoSoNCCListComponent
 			},
 			{
 				path: 'them-ho-so',
-				// loadChildren: () => import('./ho-so-ncc-edit-page/ho-so-ncc-edit-page.component').then(m => m.HoSoNCCEditPageComponent)
-				component: HoSoNCCEditPageComponent
+				loadChildren: () => import('./ho-so-ncc-edit.module').then(m => m.HoSoNCCEditModule)
 			}
 		]
 	}
@@ -33,8 +30,7 @@ const routes: Routes = [
 	imports: [
 		RouterModule.forChild(routes),
 		DPSCommonModule,
-		HoSoNCCRefModule,
-		QuyetDinhRefModule
+		QuyetDinhRefModule,
 	],
 	providers: [
 		HoSoNCCService,
@@ -42,10 +38,12 @@ const routes: Routes = [
 		GiayToService,
 	],
 	entryComponents: [
+		HoSoNCCImportComponent,
 	],
 	declarations: [
 		HoSoNCCComponent,
-		HoSoNCCEditPageComponent
+		HoSoNCCListComponent,
+		HoSoNCCImportComponent,
 	],
 })
 export class HoSoNCCModule { }
