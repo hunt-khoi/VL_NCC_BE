@@ -55,7 +55,7 @@
 					<div class="kt-portlet__body-progress">
 						<mat-spinner [diameter]="20"></mat-spinner>
 					</div>
-					<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+					<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 						Không thể lưu, vui lòng kiểm tra lại thông tin!
 					</kt-alert>
 					<ng-container class="kt-form__filtration">
@@ -109,9 +109,8 @@
 									<input matInput [value]="listKhiDuyetDon.length > 0 ? ' ' : ''" readonly="true" 
 										placeholder="{{ 'QUY_TRINH_DUYET.addnguoinhankhiduyet' | translate }}">
 									<mat-chip-list #chipList>
-										<mat-chip *ngFor="let fruit of listKhiDuyetDon"
-											(removed)="removenguoinhankhiduyet(fruit)">
-											{{fruit.HoTen}} <mat-icon matChipRemove>cancel</mat-icon>
+										<mat-chip *ngFor="let d of listKhiDuyetDon" (removed)="removenguoinhankhiduyet(d)">
+											{{d.HoTen}} <mat-icon matChipRemove>cancel</mat-icon>
 										</mat-chip>
 									</mat-chip-list>
 									<img matSuffix src="{{link_img}}" class="icon" *ngIf="allowEdit" (click)="addnguoinhankhiduyet()"
@@ -126,9 +125,8 @@
 									<input matInput [value]="listKhiKhongDuyetDon.length > 0 ? ' ': ''" readonly="true" 
 										placeholder="{{ 'QUY_TRINH_DUYET.addnguoinhankhikoduyet' | translate }}">
 									<mat-chip-list #chipList>
-										<mat-chip *ngFor="let fruit of listKhiKhongDuyetDon"
-											(removed)="removenguoinhankhikoduyet(fruit)">
-											{{fruit.HoTen}}
+										<mat-chip *ngFor="let d of listKhiKhongDuyetDon" (removed)="removenguoinhankhikoduyet(d)">
+											{{d.HoTen}}
 											<mat-icon matChipRemove>cancel</mat-icon>
 										</mat-chip>
 									</mat-chip-list>
@@ -298,7 +296,6 @@
 								{{item.GhiChu}}
 							</td>
 						</ng-container>
-
 						<ng-container matColumnDef="actions">
 							<th mat-header-cell *matHeaderCellDef style="justify-content: center; width:80px">Tác vụ</th>
 							<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">

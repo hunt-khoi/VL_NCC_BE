@@ -1,26 +1,27 @@
 import { BaseModel } from 'app/core/_base/crud';
 
 export class NhapQuyTrinhDuyetModel extends BaseModel {
-	ID_QuyTrinh: number;
-	Loai: number;
-	TenQuyTrinh: string;
-	MoTa: string;
-	ID_NhanMailKhiDuyetDon: string;
-	ID_NhanMailKhiKhongDuyetDon: string;
-	ID_NhanMailKhiKhongTimThayNguoiDuyetDon: string;
+	ID_QuyTrinh: number = 0;
+	Loai: number | null = null;
+	TenQuyTrinh: string = '';
+	MoTa: string = '';
+	ID_NhanMailKhiDuyetDon: string = '';
+	ID_NhanMailKhiKhongDuyetDon: string = '';
+	ID_NhanMailKhiKhongTimThayNguoiDuyetDon: string = '';
 	data_NhanMailKhiDuyetDon: any[] = [];
 	data_NhanMailKhiKhongDuyetDon: any[] = [];
 	data_NhanMailKhiKhongTimThayNguoiDuyetDon: any[] = [];
-	VisibleQTD: boolean;
-	ProcessMethod: string;
-	ProcessMethodLoai: number;
-	AllowDevChecker: boolean;
-	IdCapquanly: number;
-	IdChucdanh: number;
-	Code: string;
-	StructureID : number;
-	Permission_CodeGroup : string;
-	ID_ChucVu : number;
+	VisibleQTD: boolean = false;
+	ProcessMethod: string = '';
+	ProcessMethodLoai: number = 0;
+	AllowDevChecker: boolean = false;
+	IdCapquanly: number | null = null;
+	IdChucdanh: number | null = null;
+	Code: string = '';
+	StructureID : number | null = null;
+	Permission_CodeGroup : string | null = null;
+	ID_ChucVu : number | null = null;
+
 	clear() {
 		this.ID_QuyTrinh = 0;
 		this.Loai = null;
@@ -42,31 +43,32 @@ export class NhapQuyTrinhDuyetModel extends BaseModel {
 }
 
 export class NhapCapQuanLyDuyetModel extends BaseModel {
-	ID_QuyTrinh: number;
-	TenQuyTrinh: string;
-	ID_CapQuanLy: number;
-	SoNgayXuLy: number;
-	TenCapDuyet: string;
-	ID_CapDuyet: number;
-	StructureID: number;
-	ID_ChucDanh: number;
-	ID_ChucVu: number;
-	Permission_CodeGroup: string;
-	Permission_Code: string;
-	Permission_Name: string;
-	TenChucVu: string;
-	GhiChu: string;
-	ID_NguoiNhanMail: string;
-	ID_CapDuyetLonNhat: number;
-	ViTri: number;
+	ID_QuyTrinh: number = 0;
+	TenQuyTrinh: string = "";
+	ID_CapQuanLy: number = 0;
+	SoNgayXuLy: number = 0;
+	TenCapDuyet: string = "";
+	ID_CapDuyet: number = 0;
+	StructureID: number = 0;
+	ID_ChucDanh: number = 0;
+	ID_ChucVu: number = 0;
+	Permission_CodeGroup: string = "";
+	Permission_Code: string = "";
+	Permission_Name: string = "";
+	TenChucVu: string = "";
+	GhiChu: string = "";
+	ID_NguoiNhanMail: string = "";
+	ID_CapDuyetLonNhat: number = 0;
+	ViTri: number = 0;
 	data_NguoiNhanMail: any[] = [];
-	VisibleCQL: boolean;
-	Processmethod: string;
-	ProcessmethodLoai: number;
-	AllowDevChecker: boolean;
-	ID_Back: number;
-	Icon: string;
-	DuyetSS: boolean;
+	VisibleCQL: boolean = false;
+	Processmethod: string = "";
+	ProcessmethodLoai: number = 0;
+	AllowDevChecker: boolean = false;
+	ID_Back: number = 0;
+	Icon: string = "";
+	DuyetSS: boolean = false;
+
 	clear() {
 		this.ID_QuyTrinh = 0;
 		this.TenQuyTrinh = '';
@@ -94,9 +96,10 @@ export class NhapCapQuanLyDuyetModel extends BaseModel {
 	}
 }
 export class PriorityAddData extends BaseModel {
-	ID_CapQuanLy: number;
-	ViTri: number;
-	ID_Back: number;
+	ID_CapQuanLy: number = 0;
+	ViTri: number = 0;
+	ID_Back: number = 0;
+
 	clear() {
 		this.ID_CapQuanLy = 0;
 		this.ViTri = 0;

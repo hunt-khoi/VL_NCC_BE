@@ -12,7 +12,6 @@ export class NhapQuyTrinhDuyetDataSource extends BaseDataSource {
 	loadList(queryParams: QueryParamsModel) {
 		this.nhapQuyTrinhDuyetService.lastFilter$.next(queryParams);
 		this.loadingSubject.next(true);
-
 		this.nhapQuyTrinhDuyetService.findData(queryParams)
 			.pipe(
 				tap(resultFromServer => {
@@ -32,7 +31,6 @@ export class NhapQuyTrinhDuyetDataSource extends BaseDataSource {
 	loadListCapQuanLy(queryParams: QueryParamsModel) {
 		this.nhapQuyTrinhDuyetService.lastFilter$.next(queryParams);
 		this.loadingSubject.next(true);
-
 		this.nhapQuyTrinhDuyetService.findDataCapQuanLy(queryParams)
 			.pipe(
 				tap(resultFromServer => {
@@ -53,7 +51,6 @@ export class NhapQuyTrinhDuyetDataSource extends BaseDataSource {
 	loadListDieuKien(queryParams: QueryParamsModel) {
 		this.nhapQuyTrinhDuyetService.lastFilter1$.next(queryParams);
 		this.loadingSubject.next(true);
-
 		this.nhapQuyTrinhDuyetService.findDataDieuKien(queryParams)
 			.pipe(
 				tap(resultFromServer => {

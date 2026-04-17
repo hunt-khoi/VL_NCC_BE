@@ -63,9 +63,7 @@
 				</ng-container>
 				<ng-container matColumnDef="Loai">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">Loại phiếu</th>
-					<td mat-cell *matCellDef="let item" class="mat-column-vinCode">
-						{{item.TenLoai}}
-					</td>
+					<td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.TenLoai}}</td>
 				</ng-container>
 				<ng-container matColumnDef="NhanMailKhiDuyetDon">
 					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode">
@@ -108,8 +106,7 @@
 							<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
 						</a>
 						<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" type="button" (click)="deleteItem(item)"
-								*ngIf="!item.IsDefault"
-								matTooltip="{{ 'COMMON.DELETE' | translate }}">
+							*ngIf="!item.IsDefault" matTooltip="{{ 'COMMON.DELETE' | translate }}">
 							<mat-icon>delete</mat-icon>
 							<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
 						</button>
@@ -132,5 +129,4 @@
 		</div>
 		<!-- end::Body -->
 	</kt-portlet-body>
-
 </kt-portlet>

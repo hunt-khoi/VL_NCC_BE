@@ -5,7 +5,6 @@ import { HolidaysListComponent } from './ngay-le-list/ngay-le-list.component';
 import { HolidaysEditDialogComponent } from './ngay-le-edit/ngay-le-edit.dialog.component';
 import { HolidaysComponent } from './ngay-le.component';
 import { HolidaysService } from './Services/ngay-le.service';
-import { HolidaysRefModule } from './ngay-le-ref.module';
 
 const routes: Routes = [
 	{
@@ -32,15 +31,17 @@ const routes: Routes = [
 	imports: [
 		RouterModule.forChild(routes),
 		DPSCommonModule,
-		HolidaysRefModule
 	],
 	providers: [
 		HolidaysService
 	],
 	entryComponents: [
+		HolidaysListComponent
 	],
 	declarations: [
-		HolidaysComponent
+		HolidaysComponent,
+		HolidaysListComponent,
+		HolidaysEditDialogComponent,
 	]
 })
 

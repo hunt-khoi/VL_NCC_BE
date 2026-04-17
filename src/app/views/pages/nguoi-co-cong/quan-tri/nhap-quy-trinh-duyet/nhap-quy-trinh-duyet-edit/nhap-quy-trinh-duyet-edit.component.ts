@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator, MatSort, MatDialog, MatTabChangeEvent } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { BehaviorSubject, merge } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
 import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
 import { NhapCapQuanLyDuyetModel, PriorityAddData, NhapQuyTrinhDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
@@ -29,7 +29,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	listKhiKhongDuyetDon: any[] = [];
 	listKhiKhongThayNguoiDuyetDon: any[] = [];
 	//==========================
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	loadingControl = new BehaviorSubject<boolean>(false);
 	item: NhapQuyTrinhDuyetModel;
 	oldItem: NhapQuyTrinhDuyetModel;
@@ -51,15 +51,15 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	tenqt: string = '';
 	selectedTab: number = 0;
 	//===================Tab cấp quản lý duyệt=========================
-	dataSource: NhapQuyTrinhDuyetDataSource;
+	dataSource: NhapQuyTrinhDuyetDataSource | undefined;
 	displayedColumns = ['#', 'TieuDe', 'SoNgayXuLy', 'ViTri', 'IdBack'/*, 'CapQuanLy'*/, 'NguoiNhanMail', 'GhiChu', 'actions'];
-	@ViewChild('paginator_tab1', { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
+	@ViewChild('paginator_tab1', { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 	// Selection
 	selection = new SelectionModel<NhapCapQuanLyDuyetModel>(true, []);
 	productsResult: NhapCapQuanLyDuyetModel[] = [];
 	//==========================
-	sudungvitri: string;
+	sudungvitri: string = "";
 	showViTri: boolean = true;
 	showBtViTri: boolean = false;
 	listViTri: any[] = [];
@@ -67,7 +67,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	listLoaiPhieu: any[] = []
 	listProcessMethod: any[] = []
 
-	public datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	public datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	ID_Struct: string = '';
 	showChucVu: boolean = false;
 	showQuyen: boolean = false;
@@ -78,9 +78,9 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	id_capduyet: string = '';
 	id_cd: string = '';
 	id_cv: string = '';
-	listCapDuyet: any[];
+	listCapDuyet: any[] = [];
 	allowEdit: boolean = true;
-	list_button: boolean;
+	list_button: boolean = false;
 
 	link_img = 'https://img.icons8.com/color/96/000000/plus.png';
 
@@ -97,8 +97,6 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		private commonService: CommonService,
 		private activatedRoute: ActivatedRoute,
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
-		private routesPage: Router,
 		private itemFB: FormBuilder,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef) { }
@@ -119,30 +117,31 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 				this.allowEdit = res.allowEdit;
 		})
 		//#region cấp ql
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange5
-		**/
-		merge(this.sort.sortChange, this.paginator.page)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-		)
 		this.dataSource = new NhapQuyTrinhDuyetDataSource(this.nhapQuyTrinhDuyetService);
 		this.activatedRoute.params.subscribe(params => {
 			this.idqt = params.id;
-			let queryParams = this.nhapQuyTrinhDuyetService.lastFilter$.getValue();
-			queryParams.filter.ID_QuyTrinh = this.idqt;
-			// First load
-			this.dataSource.loadList(queryParams);
+			if (this.dataSource) {
+				let queryParams = this.nhapQuyTrinhDuyetService.lastFilter$.getValue();
+				queryParams.filter.ID_QuyTrinh = this.idqt;
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.showBtViTri = true;
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -182,7 +181,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 				this.listKhiDuyetDon = this.item.data_NhanMailKhiDuyetDon;
 				this.listKhiKhongDuyetDon = this.item.data_NhanMailKhiKhongDuyetDon;
 				this.listKhiKhongThayNguoiDuyetDon = this.item.data_NhanMailKhiKhongTimThayNguoiDuyetDon;
-				this.initProduct();
+				this.init();
 				this.nhapQuyTrinhDuyetService.GetListApprovalLevel().subscribe(res => {
 					if (res && res.status == 1) {
 						this.listCapDuyet = res.data;
@@ -217,8 +216,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 
 
 	/** ACTIONS */
-
-	initProduct() {
+	init() {
 		this.createForm();
 		this.loadListData();
 		this.loadingSubject.next(false);
@@ -243,7 +241,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	addnguoinhankhiduyet() {
 		let id = "";
 		if (this.listKhiDuyetDon.length > 0) {
-			this.listKhiDuyetDon.map((item, index) => {
+			this.listKhiDuyetDon.map((item) => {
 				id += "," + item.ID_NV;
 			});
 		}
@@ -256,7 +254,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (res && res.done) {
 				if (this.listKhiDuyetDon.length > 0) {
-					res.nhanVienSelected.map((item, index) => {
+					res.nhanVienSelected.map((item: any) => {
 						let ktc = this.listKhiDuyetDon.find(x => x.ID_NV == item.ID_NV);
 						if (!ktc) {
 							let kdd = new ChonNhieuNhanVienListModel;
@@ -284,7 +282,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	addnguoinhankhikoduyet() {
 		let id = "";
 		if (this.listKhiKhongDuyetDon.length > 0) {
-			this.listKhiKhongDuyetDon.map((item, index) => {
+			this.listKhiKhongDuyetDon.map((item) => {
 				id += "," + item.ID_NV;
 			});
 		}
@@ -297,7 +295,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (res && res.done) {
 				if (this.listKhiKhongDuyetDon.length > 0) {
-					res.nhanVienSelected.map((item, index) => {
+					res.nhanVienSelected.map((item: any) => {
 						let ktc = this.listKhiKhongDuyetDon.find(x => x.ID_NV == item.ID_NV);
 						if (!ktc) {
 							let kdd = new ChonNhieuNhanVienListModel;
@@ -326,7 +324,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	addnguoinhankhikothaynguoiduyet() {
 		let id = "";
 		if (this.listKhiKhongThayNguoiDuyetDon.length > 0) {
-			this.listKhiKhongThayNguoiDuyetDon.map((item, index) => {
+			this.listKhiKhongThayNguoiDuyetDon.map((item) => {
 				id += "," + item.ID_NV;
 			});
 		}
@@ -339,7 +337,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (res && res.done) {
 				if (this.listKhiKhongThayNguoiDuyetDon.length > 0) {
-					res.nhanVienSelected.map((item, index) => {
+					res.nhanVienSelected.map((item: any) => {
 						let ktc = this.listKhiKhongThayNguoiDuyetDon.find(x => x.ID_NV == item.ID_NV);
 						if (!ktc) {
 							let kdd = new ChonNhieuNhanVienListModel;
@@ -372,8 +370,10 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		this.showButton = true;
 		this.item.ID_QuyTrinh = row.ID_Row;
 		this.item.TenQuyTrinh = row.TieuDe;
-		this.itemForm.controls['tenQuyTrinh'].setValue(row.TieuDe);
-		this.itemForm.controls['moTa'].setValue(row.MoTa);
+		if (this.itemForm) { 
+			this.itemForm.controls['tenQuyTrinh'].setValue(row.TieuDe);
+			this.itemForm.controls['moTa'].setValue(row.MoTa);
+		}
 		if (row.data_NhanMailKhiDuyetDon.length > 0) {
 			this.listKhiDuyetDon = row.data_NhanMailKhiDuyetDon;
 		}
@@ -399,16 +399,19 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		this.showvitri = true;
 		this.showButton = false;
 		this.item.ID_QuyTrinh = 0;
-		this.itemForm.controls['tenQuyTrinh'].setValue('');
-		this.itemForm.controls['moTa'].setValue('');
 		this.listKhiDuyetDon = [];
 		this.listKhiKhongDuyetDon = [];
 		this.listKhiKhongThayNguoiDuyetDon = [];
+		if (this.itemForm) { 
+			this.itemForm.controls['tenQuyTrinh'].setValue('');
+			this.itemForm.controls['moTa'].setValue('');
+		}
 		this.changeDetectorRefs.detectChanges();
 	}
 	//===Button lưu và tiếp tục============
 	luuvatieptuc(withBack: boolean = false) {
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -426,77 +429,73 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			this.layoutUtilsService.showError("Vui lòng chọn chức vụ để xác định người nhận output khi phiếu được duyệt");
 			return;
 		}
-		let editedProduct = this.prepareProduct();
-		this.CreateQuyTrinhDuyet(editedProduct, withBack);
+		let edited = this.prepare();
+		this.CreateQuyTrinhDuyet(edited, withBack);
 	}
-	prepareProduct(): NhapQuyTrinhDuyetModel {
+	prepare(): NhapQuyTrinhDuyetModel {
 		const controls = this.itemForm.controls;
-		const _product = new NhapQuyTrinhDuyetModel();
-		_product.ID_QuyTrinh = this.item.ID_QuyTrinh;
-		_product.TenQuyTrinh = controls['tenQuyTrinh'].value;
-		_product.ProcessMethod = controls['processMethod'].value;
-		_product.Loai = controls['loai'].value;
-		_product.MoTa = controls['moTa'].value;
+		const _item = new NhapQuyTrinhDuyetModel();
+		_item.ID_QuyTrinh = this.item.ID_QuyTrinh;
+		_item.TenQuyTrinh = controls['tenQuyTrinh'].value;
+		_item.ProcessMethod = controls['processMethod'].value;
+		_item.Loai = controls['loai'].value;
+		_item.MoTa = controls['moTa'].value;
 		if (this.listKhiDuyetDon.length > 0) {
 			let list1 = "";
-			this.listKhiDuyetDon.map((item, index) => {
+			this.listKhiDuyetDon.map((item) => {
 				list1 += item.ID_NV + ',';
 			})
-			_product.ID_NhanMailKhiDuyetDon = list1.substring(0, list1.length - 1);
+			_item.ID_NhanMailKhiDuyetDon = list1.substring(0, list1.length - 1);
 		}
 		if (this.listKhiKhongDuyetDon.length > 0) {
 			let list2 = "";
-			this.listKhiKhongDuyetDon.map((item, index) => {
+			this.listKhiKhongDuyetDon.map((item) => {
 				list2 += item.ID_NV + ',';
 			})
-			_product.ID_NhanMailKhiKhongDuyetDon = list2.substring(0, list2.length - 1);
+			_item.ID_NhanMailKhiKhongDuyetDon = list2.substring(0, list2.length - 1);
 		}
 		if (this.listKhiKhongThayNguoiDuyetDon.length > 0) {
 			let list3 = "";
-			this.listKhiKhongThayNguoiDuyetDon.map((item, index) => {
+			this.listKhiKhongThayNguoiDuyetDon.map((item) => {
 				list3 += item.ID_NV + ',';
 			})
-			_product.ID_NhanMailKhiKhongTimThayNguoiDuyetDon = list3.substring(0, list3.length - 1);
+			_item.ID_NhanMailKhiKhongTimThayNguoiDuyetDon = list3.substring(0, list3.length - 1);
 		}
 		if (this.id_capduyet) {
-			_product.IdCapquanly = +this.id_capduyet;
+			_item.IdCapquanly = +this.id_capduyet;
 			if (this.id_capduyet == '-3') {
-				_product.Code = this.item.Code;
+				_item.Code = this.item.Code;
 			}
 			if (this.id_capduyet == '-2') {
-				_product.IdChucdanh = +this.id_cd;
+				_item.IdChucdanh = +this.id_cd;
 			}
 		}
-		return _product;
+		return _item;
 	}
-	CreateQuyTrinhDuyet(_product: NhapQuyTrinhDuyetModel, withBack: boolean = false) {
+	CreateQuyTrinhDuyet(item: NhapQuyTrinhDuyetModel, withBack: boolean = false) {
 		this.loadingSubject.next(true);
 		this.disabledBtn = true;
-		this.nhapQuyTrinhDuyetService.CreateQuyTrinhDuyet(_product).subscribe(res => {
+		this.nhapQuyTrinhDuyetService.CreateQuyTrinhDuyet(item).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack) {
-					return;
-				} else {
-					this.idqt = res.data.ID_QuyTrinh;
-					this.tenqt = res.data.TenQuyTrinh;
-					this.showTab2 = false;
-					this.selectedTab = 1;
-					this.loadDataList();
-					// if (this.showvitri == true) {
-					// 	// const _refreshUrl = `StaffProfile/Systems/ApprovalProcess/chinh-sua/${idqt}/${tenqt}`;
-					// 	// this.routesPage.navigateByUrl(_refreshUrl);
-					// 	this.loadPopupDanhSach(idqt, tenqt);
-					// }
-					// else {
-					// 	// const _refreshUrl = `StaffProfile/Systems/ApprovalProcess/chinh-sua/${idqt}/${tenqt}`;
-					// 	// this.routesPage.navigateByUrl(_refreshUrl);
-					// 	this.loadPopupDanhSach(idqt, tenqt);
-					// }
-
-				}
+				if (withBack) return;
+				this.idqt = res.data.ID_QuyTrinh;
+				this.tenqt = res.data.TenQuyTrinh;
+				this.showTab2 = false;
+				this.selectedTab = 1;
+				this.loadDataList();
+				// if (this.showvitri == true) {
+				// 	// const _refreshUrl = `StaffProfile/Systems/ApprovalProcess/chinh-sua/${idqt}/${tenqt}`;
+				// 	// this.routesPage.navigateByUrl(_refreshUrl);
+				// 	this.loadPopupDanhSach(idqt, tenqt);
+				// }
+				// else {
+				// 	// const _refreshUrl = `StaffProfile/Systems/ApprovalProcess/chinh-sua/${idqt}/${tenqt}`;
+				// 	// this.routesPage.navigateByUrl(_refreshUrl);
+				// 	this.loadPopupDanhSach(idqt, tenqt);
+				// }
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -512,21 +511,6 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		this.showTab2 = false;
 		this.selectedTab = 1;
 		this.loadDataList();
-		// const _refreshUrl = `StaffProfile/Systems/ApprovalProcess/chinh-sua/${idqt}/${tenqt}`;
-		// this.routesPage.navigateByUrl(_refreshUrl);
-		// this.loadPopupDanhSach(idqt, tenqt);
-	}
-	//============Gọi Popup danh sách=================
-	loadPopupDanhSach(id: string, ten: string) {
-		// const dialogRef = this.dialog.open(NhapCapQuanLyDuyetListComponent, { data: { id, ten, _item: this.data._item }, width: '90%', height: '90%' });
-		// dialogRef.afterClosed().subscribe(res => {
-		// 	if (!res) {
-
-		// 	}
-		// 	else {
-
-		// 	}
-		// });
 	}
 	goBack() {
 		window.history.back();
@@ -564,7 +548,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 				this.listKhiDuyetDon = this.item.data_NhanMailKhiDuyetDon;
 				this.listKhiKhongDuyetDon = this.item.data_NhanMailKhiKhongDuyetDon;
 				this.listKhiKhongThayNguoiDuyetDon = this.item.data_NhanMailKhiKhongTimThayNguoiDuyetDon;
-				this.initProduct();
+				this.init();
 				this.changeDetectorRefs.detectChanges();
 			});
 		}
@@ -580,6 +564,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	//============================Tab cấp quản lý duyệt==============================
 	//------------Load data-------------------------
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -598,9 +583,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	}
 	//===Tiêu đề hiển thị==================================================
 	getComponentTitle() {
-		let result = '';
-
-		result = this.tenqt;
+		let result = this.tenqt;
 		return result;
 	}
 	//============Goi Popup=================
@@ -620,7 +603,6 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 				this.loadDataList();
 			}
 		});
-
 	}
 
 	trolai() {
@@ -641,7 +623,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			this.listKhiDuyetDon = this.item.data_NhanMailKhiDuyetDon;
 			this.listKhiKhongDuyetDon = this.item.data_NhanMailKhiKhongDuyetDon;
 			this.listKhiKhongThayNguoiDuyetDon = this.item.data_NhanMailKhiKhongTimThayNguoiDuyetDon;
-			this.initProduct();
+			this.init();
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
@@ -697,16 +679,15 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			}
 			this.listViTri.push(q);
 		});
-		if (error)
-			return;
+		if (error) return;
 		if (this.listViTri.length > 0) {
 			this.updateViTri(this.listViTri);
 		}
 	}
-	updateViTri(_product: any[]) {
+	updateViTri(item: any[]) {
 		this.loadingSubject.next(true);
 		this.disabledBtn = true;
-		this.nhapQuyTrinhDuyetService.updateViTri(_product).subscribe(res => {
+		this.nhapQuyTrinhDuyetService.updateViTri(item).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
@@ -726,13 +707,10 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		const _description = "Bạn có chắc muốn xóa bước duyệt không";
 		const _waitDesciption = "Dữ liệu đang được xóa";
 		const _deleteMessage = "Xóa bước duyệt thành công";
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
+			if (!res) return;
+			
 			this.nhapQuyTrinhDuyetService.deleteCapQuanLy(row.ID_CapQuanLy, this.idqt, row.TenCapDuyet).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
@@ -753,8 +731,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		}
 	}
 	//===============================================================================
-
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -817,15 +794,14 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		});
 	}
 
-	setListQuyen(val) {
-		if (val) {
-			var find = this.listNhomQuyen.find(x => x.Code == val);
-			if (find)
-				this.listQuyen = find.PqPermission;
-			else
-				this.listQuyen = [];
-			this.changeDetectorRefs.detectChanges();
-		}
+	setListQuyen(val: any) {
+		if (!val) return;
+		var find = this.listNhomQuyen.find(x => x.Code == val);
+		if (find)
+			this.listQuyen = find.PqPermission;
+		else
+			this.listQuyen = [];
+		this.changeDetectorRefs.detectChanges();
 	}
 
 	loadListData() {
@@ -868,10 +844,8 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			case ("-3"): {
 				this.showChucVu = false;
 				this.showQuyen = true;
-
 				if (this.listNhomQuyen == null || this.listNhomQuyen.length == 0)
 					this.loadPermission();
-
 				break;
 			};
 			case ("-2"): {

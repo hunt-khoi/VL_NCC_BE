@@ -21,10 +21,10 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 
 	// Table fields
 	loadingSubject = new BehaviorSubject<boolean>(false);
-	dataSource: NhapQuyTrinhDuyetDataSource;
+	dataSource: NhapQuyTrinhDuyetDataSource | undefined;
 	displayedColumns = ['#', 'TieuDe', 'ViTri', 'CapQuanLy', 'NguoiNhanMail', 'GhiChu', 'actions'];
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
 	// Selection
 	selection = new SelectionModel<NhapCapQuanLyDuyetModel>(true, []);
@@ -33,7 +33,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	//List các danh sách email
 	listNguoiNhanEmail: any[] = [];
 	//==========================
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	loadingControl = new BehaviorSubject<boolean>(false);
 	item: NhapCapQuanLyDuyetModel;
 	oldItem: NhapCapQuanLyDuyetModel;
@@ -62,13 +62,13 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	id_capduyetmax: string = '';
 	listViTri: any[] = [];
 	//==========================
-	idquytrinh: string;
-	tenquytrinh: string;
-	sudungvitri: string;
+	idquytrinh: string = "";
+	tenquytrinh: string = "";
+	sudungvitri: string = "";
 	showViTri: boolean = true;
 	showBtViTri: boolean = false;
 	//==========================
-	public datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	public datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	title: string = '';
 	ID_Struct: string = '';
 	disabledBtn: boolean = false;
@@ -79,8 +79,8 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		{ icon: "description", name: "Xử lý" },
 		{ icon: "check", name: "Duyệt" },
 		{ icon: "near_me", name: "Chốt đơn hàng" },
-		{ icon: "chat", name: "Kết quả thu hồi" }];
-	// Selection
+		{ icon: "chat", name: "Kết quả thu hồi" }
+	];
 	allowEdit: boolean = true;
 
 	/* Keyboard Shortcut Keys */
@@ -95,9 +95,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private nhapQuyTrinhDuyetService: NhapQuyTrinhDuyetService,
 		private commonService: CommonService,
-		private activatedRoute: ActivatedRoute,
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
 		private itemFB: FormBuilder,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef) { }
@@ -112,10 +110,10 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		this.tenquytrinh = this.data.tenqt;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.createForm();
 		this.getTreeValue();
 		this.loadListData();
-
 		if (this.item.ID_CapQuanLy > 0) {
 			this.nhapQuyTrinhDuyetService.get_ChiTietCapQuanLy(this.item.ID_CapQuanLy).subscribe(res => {
 				this.viewLoading = false;
@@ -142,7 +140,10 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			this.oldItem = Object.assign({}, this.item);
 			this.initProduct();
 		}
-		setTimeout(function () { document.getElementById('id').focus(); }, 100);
+		setTimeout(function () { 
+			let id = document.getElementById('id');
+			if (id) id.focus(); 
+		}, 100);
 	}
 
 	getTreeValue() {
@@ -156,7 +157,8 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 				}
 				this.loadListChucVu();
 				this.loadPermission();
-				this.itemForm.controls['drp'].setValue(this.ID_Struct);
+				if (this.itemForm)
+					this.itemForm.controls['drp'].setValue(this.ID_Struct);
 				this.changeDetectorRefs.detectChanges();
 			}
 		});
@@ -200,6 +202,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		this.item = Object.assign({}, this.oldItem);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -207,7 +210,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 
 
 	//============Hàm load chức vụ=================
-	loadListCapBack(IdQuyTrinh, IdCap, ViTri) {
+	loadListCapBack(IdQuyTrinh: number, IdCap: number, ViTri: number) {
 		this.nhapQuyTrinhDuyetService.GetListCapBack(IdQuyTrinh, IdCap, ViTri).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listCapDuyetQT = res.data;
@@ -242,6 +245,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 					this.listChucVu = [];
 					this.layoutUtilsService.showError(res.error.message);
 				}
+				if (!this.itemForm) return;
 				if (this.item.ID_ChucVu == 0) {
 					if (this.id_capduyet == "-2") {
 						if (res.data.length > 0) {
@@ -249,8 +253,9 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 						} else
 							this.itemForm.controls['chucVu'].setValue('');
 					}
-				} else
+				} else {
 					this.itemForm.controls['chucVu'].setValue('' + this.item.ID_ChucVu);
+				}
 				this.changeDetectorRefs.detectChanges();
 			});
 		});
@@ -273,27 +278,28 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		});
 	}
 
-	setListQuyen(val) {
-		if (val) {
-			var find = this.listNhomQuyen.find(x => x.Code == val);
-			if (find)
-				this.listQuyen = find.PqPermission;
-			else
-				this.listQuyen = [];
-			this.changeDetectorRefs.detectChanges();
-		}
+	setListQuyen(val: any) {
+		if (!val) return;
+		var find = this.listNhomQuyen.find(x => x.Code == val);
+		if (find)
+			this.listQuyen = find.PqPermission;
+		else
+			this.listQuyen = [];
+		this.changeDetectorRefs.detectChanges();
 	}
 
 	loadListData() {
 		this.commonService.GetListPosition().subscribe(res => {
 			this.listChucDanhLite = res.data;
+			if (!this.itemForm) return;
 			if (res.data.length > 0) {
 				if (this.item.ID_ChucVu > 0)
 					this.itemForm.controls['chucDanh'].setValue('' + this.item.ID_ChucVu);
 				else
 					this.itemForm.controls['chucDanh'].setValue('' + res.data[0].ID);
-			} else
+			} else {
 				this.itemForm.controls['chucDanh'].setValue('');
+			}
 			this.changeDetectorRefs.detectChanges();
 		});
 		this.nhapQuyTrinhDuyetService.GetListApprovalLevel().subscribe(res => {
@@ -327,12 +333,11 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		this.commonService.GetListJobtitleByStructure(idcd, id_st).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listChucVu = res.data;
-				if (this.listChucVu.length > 0) {
+				if (!this.itemForm) return;
+				if (this.listChucVu.length > 0) 
 					this.itemForm.controls['chucVu'].setValue('' + res.data[0].ID);
-				}
-				else {
+				else 
 					this.itemForm.controls['chucVu'].setValue('');
-				}
 			} else {
 				this.listChucVu = [];
 				this.layoutUtilsService.showError(res.error.message);
@@ -342,6 +347,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	}
 
 	loadChange(val: any) {
+		if (!this.itemForm) return;
 		this.itemForm.controls['chucVu'].setValue(" ");
 		this.itemForm.controls['chucDanh'].setValue(" ");
 		this.itemForm.controls["quyen"].setValue(" ");
@@ -402,14 +408,13 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	//Xử lý chọn cán bộ gửi email==========================================
 	themnguoinhanemail() {
 		const dialogRef = this.dialog.open(ChonNhieuNhanVienListComponent, {
-			data: {
-			},
+			data: { },
 			disableClose: false
 		});
 		dialogRef.afterClosed().subscribe(res => {
 			if (res && res.done) {
 				if (this.listNguoiNhanEmail.length > 0) {
-					res.nhanVienSelected.map((item, index) => {
+					res.nhanVienSelected.map((item: any) => {
 						let ktc = this.listNguoiNhanEmail.find(x => x.ID_NV == item.ID_NV);
 						if (!ktc) {
 							let kdd = new ChonNhieuNhanVienListModel;
@@ -440,13 +445,10 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		const _description = "Bạn có chắc muốn xóa không";
 		const _waitDesciption = "Dữ liệu đang được xóa";
 		const _deleteMessage = "Xóa thành công";
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
+			if (!res) return;
+			
 			this.nhapQuyTrinhDuyetService.deleteCapQuanLy(row.ID_CapQuanLy, this.tenquytrinh, row.TenCapDuyet).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showError(_deleteMessage);
@@ -469,9 +471,11 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			this.showCapQuanLyMax = false;
 			this.showChucVu = false;
 			this.showQuyen = true;
-			this.itemForm.controls['chucVu'].setValue(" ");
-			this.itemForm.controls['nhomQuyen'].setValue(row.Permission_CodeGroup);
-			this.itemForm.controls['quyen'].setValue(row.Permission_Code);
+			if (this.itemForm) {
+				this.itemForm.controls['chucVu'].setValue(" ");
+				this.itemForm.controls['nhomQuyen'].setValue(row.Permission_CodeGroup);
+				this.itemForm.controls['quyen'].setValue(row.Permission_Code);
+			}
 			this.nhapQuyTrinhDuyetService.GetListPermission().subscribe(res => {
 				if (res && res.status == 1) {
 					this.listNhomQuyen = res.data;
@@ -497,7 +501,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 						this.id_cd = '' + row.ID_ChucDanh;
 						this.commonService.GetListJobtitleByStructure(this.id_cd, this.ID_Struct).subscribe(res => {
 							this.listChucVu = res.data;
-							if (res.data.length > 0) {
+							if (this.itemForm && res.data.length > 0) {
 								this.itemForm.controls['chucVu'].setValue('' + row.ID_ChucVu);
 							}
 							this.changeDetectorRefs.detectChanges();
@@ -509,12 +513,14 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 				this.showCapQuanLyMax = true;
 				this.showChucVu = false;
 				this.id_capduyetmax = '' + row.ID_CapDuyetLonNhat;
-				this.itemForm.controls['chucVu'].setValue(" ");
+				if (this.itemForm) 
+					this.itemForm.controls['chucVu'].setValue(" ");
 			}
 			else {
 				this.showCapQuanLyMax = false;
 				this.showChucVu = false;
-				this.itemForm.controls['chucVu'].setValue(" ");
+				if (this.itemForm) 
+					this.itemForm.controls['chucVu'].setValue(" ");
 			}
 		}
 		if (row.data_NguoiNhanMail.length > 0) {
@@ -525,6 +531,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	//===========Button lưu và cập nhật
 	luuvacapnhat(withBack: boolean = false) {
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -533,54 +540,54 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-		let editedProduct = this.prepareProduct();
-		this.CreateCapQuanLy(editedProduct, withBack);
+		let edited = this.prepare();
+		this.CreateCapQuanLy(edited, withBack);
 		return;
 
 	}
-	prepareProduct(): NhapCapQuanLyDuyetModel {
+	prepare(): NhapCapQuanLyDuyetModel {
 		const controls = this.itemForm.controls;
-		const _product = new NhapCapQuanLyDuyetModel();
-		_product.clear();
-		_product.ID_CapQuanLy = this.item.ID_CapQuanLy;
-		_product.ID_QuyTrinh = +this.idquytrinh;
-		_product.SoNgayXuLy = +controls['SoNgayXuLy'].value;
-		_product.TenQuyTrinh = this.tenquytrinh;
-		_product.TenCapDuyet = controls['tenCapDuyet'].value;
-		_product.ID_CapDuyet = +this.id_capduyet;
-		_product.DuyetSS = controls['duyetSS'].value;
+		const _item = new NhapCapQuanLyDuyetModel();
+		_item.clear();
+		_item.ID_CapQuanLy = this.item.ID_CapQuanLy;
+		_item.ID_QuyTrinh = +this.idquytrinh;
+		_item.SoNgayXuLy = +controls['SoNgayXuLy'].value;
+		_item.TenQuyTrinh = this.tenquytrinh;
+		_item.TenCapDuyet = controls['tenCapDuyet'].value;
+		_item.ID_CapDuyet = +this.id_capduyet;
+		_item.DuyetSS = controls['duyetSS'].value;
 		if (this.id_capduyet == "-3") {
-			_product.Permission_Code = controls['quyen'].value;
+			_item.Permission_Code = controls['quyen'].value;
 		}
 		if (this.id_capduyet == "-2") {
-			_product.ID_ChucVu = controls['chucVu'].value;
+			_item.ID_ChucVu = controls['chucVu'].value;
 		}
 		if (this.id_capduyet == "-5") {
-			_product.ID_ChucVu = controls['chucDanh'].value;
+			_item.ID_ChucVu = controls['chucDanh'].value;
 		}
 		if (this.id_capduyet == "-1" || this.id_capduyet == "0") {
-			_product.ID_CapDuyetLonNhat = this.id_capduyetmax ? +this.id_capduyetmax : 0;
+			_item.ID_CapDuyetLonNhat = this.id_capduyetmax ? +this.id_capduyetmax : 0;
 		}
-		_product.GhiChu = controls['ghiChu'].value;
+		_item.GhiChu = controls['ghiChu'].value;
 		if (this.item.ProcessmethodLoai == 1) {
-			_product.Icon = controls['icon'].value;
+			_item.Icon = controls['icon'].value;
 		}
 		if (this.listNguoiNhanEmail.length > 0) {
 			let list1 = "";
-			this.listNguoiNhanEmail.map((item, index) => {
+			this.listNguoiNhanEmail.map((item) => {
 				list1 += item.ID_NV + ',';
 			})
-			_product.ID_NguoiNhanMail = list1.substring(0, list1.length - 1);
+			_item.ID_NguoiNhanMail = list1.substring(0, list1.length - 1);
 		}
 		if (this.item.Processmethod == '2') {
-			_product.ID_Back = controls['id_back'].value;
+			_item.ID_Back = controls['id_back'].value;
 		}
-		return _product;
+		return _item;
 	}
-	CreateCapQuanLy(_product: NhapCapQuanLyDuyetModel, withBack: boolean = false) {
+	CreateCapQuanLy(item: NhapCapQuanLyDuyetModel, withBack: boolean = false) {
 		this.loadingSubject.next(true);
 		this.disabledBtn = true;
-		this.nhapQuyTrinhDuyetService.CreateCapQuanLy(_product).subscribe(res => {
+		this.nhapQuyTrinhDuyetService.CreateCapQuanLy(item).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
@@ -595,32 +602,16 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 					this.layoutUtilsService.showInfo(_messageType);
 				}
 				this.listNguoiNhanEmail = [];
-				if (withBack) {
-					this.dialogRef.close(_product);
-				}
+				if (withBack) 
+					this.dialogRef.close(item);
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
 
-	}
-	/**
-	 * Close alert
-	 *
-	 * @param $event
-	 */
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 	

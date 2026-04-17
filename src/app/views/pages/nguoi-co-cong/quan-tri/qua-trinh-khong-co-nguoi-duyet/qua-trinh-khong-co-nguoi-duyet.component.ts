@@ -10,11 +10,10 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 
 @Injectable()
 export class QuaTrinhKhongCoNguoiDuyetComponent implements OnInit {
-	constructor(
-		private service: QuaTrinhKhongCoNguoiDuyetService
-	) { }
+	constructor(private service: QuaTrinhKhongCoNguoiDuyetService) { }
+
 	ngOnInit() {
-		if (this.service != undefined)
+		if (this.service)
 			this.service.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 	}
 }

@@ -22,7 +22,6 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class EmailHistoryListComponent implements OnInit, OnDestroy {
-
 	// Table fields
 	dataSource: EmailHistoryDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
@@ -265,23 +264,20 @@ export class EmailHistoryListComponent implements OnInit, OnDestroy {
 			this.BatDau_denngay = date[2] + '-' + date[1] + '-' + date[0];
 		}
 		if (value.targetElement.value == '') {
-			if (ind == 1) {
+			if (ind == 1) 
 				this.BatDau_tungay = '';
-			}
-			if (ind == 2) {
+			if (ind == 2) 
 				this.BatDau_denngay = '';
-			}
 		}
 		else {
+			var re = /^(\d{4})(\/|\-)(\d{2})(\/|\-)(\d{2})$/;
 			if (ind == 1) {
-				var re = /^(\d{4})(\/|\-)(\d{2})(\/|\-)(\d{2})$/;
 				if (!this.BatDau_tungay.match(re)) {
 					this.layoutUtilsService.showInfo("Thời gian từ ngày không đúng");
 					return;
 				}
 			}
 			if (ind == 2) {
-				var re = /^(\d{4})(\/|\-)(\d{2})(\/|\-)(\d{2})$/;
 				if (!this.BatDau_denngay.match(re)) {
 					this.layoutUtilsService.showInfo("Thời gian đến ngày không đúng");
 					return;

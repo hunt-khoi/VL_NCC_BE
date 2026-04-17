@@ -1,19 +1,14 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { merge, BehaviorSubject } from 'rxjs';
-//Datasource
-import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
-//Service
-import { SubheaderService } from '../../../../../../core/_base/layout';
 import { LayoutUtilsService, QueryParamsModel, MessageType } from '../../../../../../core/_base/crud';
 import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
 import { NhapQuyTrinhDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
 import { NhapQuyTrinhDuyetEditComponent } from '../nhap-quy-trinh-duyet-edit/nhap-quy-trinh-duyet-edit.component';
+import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
 import { CommonService } from '../../../services/common.service';
 
 @Component({
@@ -28,10 +23,10 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
-	dataSource: NhapQuyTrinhDuyetDataSource;
+	dataSource: NhapQuyTrinhDuyetDataSource | undefined;
 	displayedColumns = ['#', 'TieuDe', 'MoTa', 'Loai', 'NhanMailKhiDuyetDon', 'NhanMailKhiKhongDuyetDon', 'NhanMailKhiKhongTimThayNguoiDuyetDon', 'actions'];
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Selection
 	selection = new SelectionModel<NhapQuyTrinhDuyetModel>(true, []);
 	productsResult: NhapQuyTrinhDuyetModel[] = [];
@@ -41,7 +36,7 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 	listKhiKhongDuyetDon: any[] = [];
 	listKhiKhongThayNguoiDuyetDon: any[] = [];
 	//==========================
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	loadingControl = new BehaviorSubject<boolean>(false);
 	item: NhapQuyTrinhDuyetModel;
 	oldItem: NhapQuyTrinhDuyetModel;
@@ -52,50 +47,39 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 	//==========================
 	showTruyCapNhanh: boolean = true;
 	id_menu: number = 371;
-	list_button: boolean;
+	list_button: boolean = false;
 
 	constructor(
 		public nhapQuyTrinhDuyetService: NhapQuyTrinhDuyetService,
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
-		private routesPage: Router,
-		private subheaderService: SubheaderService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef) { }
 
 	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-
-		let breadcrumbs = [{ title: 'Cấu hình' }, { title: 'Quy trình duyệt', page: '/quy-trinh-duyet' }];
-		this.subheaderService.setBreadcrumbs(breadcrumbs);
 		this.loadingSubject.next(true);
 
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
-
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 		this.dataSource = new NhapQuyTrinhDuyetDataSource(this.nhapQuyTrinhDuyetService);
-
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
 			}
 		});
-
 		this.loadDataList();
 	}
 
@@ -103,19 +87,14 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 
 	//------------Load data-------------------------
 	loadDataList(holdCurrentPage: boolean = true) {
-		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(),
+		if (!this.paginator || !this.sort || !this.dataSource) return;
+		const queryParams = new QueryParamsModel({},
 			this.sort.direction,
 			this.sort.active,
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
 			this.paginator.pageSize
 		);
 		this.dataSource.loadList(queryParams);
-	}
-	/** FILTRATION */
-	filterConfiguration(): any {
-		const filter: any = {};
-		return filter;
 	}
 
 	//====================================================================================
@@ -125,8 +104,6 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 		this.showButton = true;
 		this.item.ID_QuyTrinh = row.ID_Row;
 		this.item.TenQuyTrinh = row.TieuDe;
-		this.itemForm.controls['tenQuyTrinh'].setValue(row.TieuDe);
-		this.itemForm.controls['moTa'].setValue(row.MoTa);
 		if (row.data_NhanMailKhiDuyetDon.length > 0) {
 			this.listKhiDuyetDon = row.data_NhanMailKhiDuyetDon;
 		}
@@ -144,6 +121,10 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 		else {
 			this.listKhiKhongThayNguoiDuyetDon = [];
 		}
+		if (this.itemForm) {
+			this.itemForm.controls['tenQuyTrinh'].setValue(row.TieuDe);
+			this.itemForm.controls['moTa'].setValue(row.MoTa);
+		}
 		this.changeDetectorRefs.detectChanges();
 	}
 	//===Button xóa trên lưới===========
@@ -152,13 +133,10 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 		const _description = "Bạn có chắc muốn xóa không";
 		const _waitDesciption = "Dữ liệu đang được xóa";
 		const _deleteMessage = "Xóa thành công";
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
+			if (!res) return;
+			
 			this.nhapQuyTrinhDuyetService.deleteQuyTrinhDuyet(row.ID_QuyTrinh, row.TenQuyTrinh).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showActionNotification(_deleteMessage, MessageType.Delete, 5000, true, false);
@@ -189,6 +167,5 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 				this.loadDataList();
 			}
 		});
-
 	}
 }

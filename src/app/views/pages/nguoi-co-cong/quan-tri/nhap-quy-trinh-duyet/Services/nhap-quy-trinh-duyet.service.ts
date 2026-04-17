@@ -6,14 +6,15 @@ import { HttpUtilsService } from '../../../../../../../app/core/_base/crud/utils
 import { QueryParamsModel, QueryResultsModel } from '../../../../../../../app/core/_base/crud';
 import { PriorityAddData, NhapQuyTrinhDuyetModel, NhapCapQuanLyDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
 import { map } from 'rxjs/operators';
+
 const API_PRODUCTS_URL = environment.ApiRoot + '/quy-trinh-duyet';
 
 @Injectable()
 export class NhapQuyTrinhDuyetService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'desc', '', 0, 10));
 	lastFilter1$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	VisibleQTD: boolean;
-	VisibleCQL: boolean;
+	VisibleQTD: boolean = false;
+	VisibleCQL: boolean = false;
 
 	constructor(private http: HttpClient,
 		private httpUtils: HttpUtilsService) { }
@@ -29,13 +30,12 @@ export class NhapQuyTrinhDuyetService {
 		});
 	}
 	//====Update quy trình duyệt===
-	CreateQuyTrinhDuyet(item): Observable<any> {
+	CreateQuyTrinhDuyet(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL + '/Update_QuyTrinhDuyet', item, { headers: httpHeaders });
 	}
 
 	get_ChiTietQuyTrinhDuyet(itemId: number): Observable<NhapQuyTrinhDuyetModel> {
-
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(API_PRODUCTS_URL + `/Get_ChiTietQuyTrinhDuyet?ID=${itemId}`, { headers: httpHeaders }).pipe(
 			map(res => {
@@ -70,7 +70,7 @@ export class NhapQuyTrinhDuyetService {
 			params: httpParams
 		});
 	}
-	findAllCapQuanLy(id): Observable<any> {
+	findAllCapQuanLy(id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = API_PRODUCTS_URL + '/Get_DSCapQuanLy?more=true&sortOrder=asc&sortField=ViTri&filter.keys=ID_QuyTrinh&filter.vals=' + id;
 		return this.http.get<QueryResultsModel>(url, {headers: httpHeaders});
@@ -80,11 +80,10 @@ export class NhapQuyTrinhDuyetService {
 		const url = `${API_PRODUCTS_URL}/Delete_CapQuanLy?id=${itemId}&TenQuyTrinh=${ten}&TenCapDuyet=${tencapduyet}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	CreateCapQuanLy(item): Observable<any> {
+	CreateCapQuanLy(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL + '/Update_CapQuanLy', item, { headers: httpHeaders });
 	}
-
 	get_ChiTietCapQuanLy(itemId: number): Observable<NhapCapQuanLyDuyetModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(API_PRODUCTS_URL + `/Get_ChiTietCapQuanLy?ID=${itemId}`, { headers: httpHeaders }).pipe(
@@ -125,7 +124,7 @@ export class NhapQuyTrinhDuyetService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(API_PRODUCTS_URL + '/GetListLoai', { headers: httpHeaders });
 	}
-	GetListCapBack(IdQuyTrinh, IdCap, ViTri): Observable<any> {
+	GetListCapBack(IdQuyTrinh: number, IdCap: number, ViTri: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(API_PRODUCTS_URL + `/GetListCapBack?IdQuyTrinh=${IdQuyTrinh}&IdCap=${IdCap}&ViTri=${ViTri}`, { headers: httpHeaders });
 	}
@@ -149,7 +148,7 @@ export class NhapQuyTrinhDuyetService {
 		const url = `${API_PRODUCTS_URL}/Delete_DieuKien?id=${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	CreateDieuKien(item): Observable<any> {
+	CreateDieuKien(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL + '/Update_DieuKien', item, { headers: httpHeaders });
 	}

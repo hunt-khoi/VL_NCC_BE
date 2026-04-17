@@ -52,4 +52,5 @@ const routes: Routes = [
 		QuaTrinhKhongCoNguoiDuyetEditComponent
 	]
 })
-export class QuaTrinhKhongCoNguoiDuyetModule {}
+
+export class QuaTrinhKhongCoNguoiDuyetModule { }

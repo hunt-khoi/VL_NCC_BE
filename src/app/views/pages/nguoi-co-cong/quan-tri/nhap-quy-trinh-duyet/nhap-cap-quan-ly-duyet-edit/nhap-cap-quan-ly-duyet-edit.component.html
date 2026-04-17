@@ -30,7 +30,7 @@
 			<div class="kt-portlet__body-progress">
 				<mat-spinner [diameter]="20"></mat-spinner>
 			</div>
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 			<div class="form-group kt-form__group row">

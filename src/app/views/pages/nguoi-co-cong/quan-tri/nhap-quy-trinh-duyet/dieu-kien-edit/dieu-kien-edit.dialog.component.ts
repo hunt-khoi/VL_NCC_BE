@@ -2,7 +2,6 @@ import { Component, OnInit, Inject, HostListener, ChangeDetectorRef } from '@ang
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
@@ -14,7 +13,7 @@ import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.servi
 
 export class DieuKienEditDialogComponent implements OnInit {
 	item: any;
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -43,8 +42,7 @@ export class DieuKienEditDialogComponent implements OnInit {
 		private _service: NhapQuyTrinhDuyetService,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService,
-		private danhMucChungService: CommonService,
-		private router: Router,) {
+		private danhMucChungService: CommonService) {
 	}
 
 	/** LOAD DATA */
@@ -52,6 +50,7 @@ export class DieuKienEditDialogComponent implements OnInit {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.danhMucChungService.liteConstLoaiHoSo().subscribe(res => {
 			if (res && res.status === 1) {
 				this.listDT = res.data;
@@ -85,7 +84,7 @@ export class DieuKienEditDialogComponent implements OnInit {
 		if (this.item.Id == 0) {
 			this._service.findAllCapQuanLy(this.item.Id_QuyTrinh).subscribe(res => {
 				if (res && res.status == 1) {
-					this.item.CapQL = res.data.map(x => {
+					this.item.CapQL = res.data.map((x: any) => {
 						return {
 							Id: 0,
 							rowid: x.ID_CapQuanLy,
@@ -120,6 +119,7 @@ export class DieuKienEditDialogComponent implements OnInit {
 
 	/** ACTIONS */
 	prepare(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const item: any = {};
 		item.Id = this.item.Id;
@@ -135,6 +135,7 @@ export class DieuKienEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
@@ -144,26 +145,26 @@ export class DieuKienEditDialogComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-		const updatedegree = this.prepare();
-		if (updatedegree.Id > 0) {
-			this.Update(updatedegree, withBack);
+		const updated= this.prepare();
+		if (updated.Id > 0) {
+			this.Update(updated);
 		} else {
-			this.Create(updatedegree, withBack);
+			this.Create(updated, withBack);
 		}
 	}
 
-	Update(_item: any, withBack: boolean) {
+	Update(item: any) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this._service.CreateDieuKien(_item).subscribe(res => {
+		this._service.CreateDieuKien(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: "Quy trình theo đối tượng" });
 				this.layoutUtilsService.showInfo(_messageType);
 				this.dialogRef.close({
-					_item
+					item
 				});
 			}
 			else {
@@ -172,10 +173,10 @@ export class DieuKienEditDialogComponent implements OnInit {
 		});
 	}
 
-	Create(_item: any, withBack: boolean) {
+	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this._service.CreateDieuKien(_item).subscribe(res => {
+		this._service.CreateDieuKien(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -183,7 +184,7 @@ export class DieuKienEditDialogComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_messageType);
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				}
 				else {
@@ -201,10 +202,6 @@ export class DieuKienEditDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
-
 	close() {
 		this.dialogRef.close();
 	}
@@ -213,6 +210,7 @@ export class DieuKienEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

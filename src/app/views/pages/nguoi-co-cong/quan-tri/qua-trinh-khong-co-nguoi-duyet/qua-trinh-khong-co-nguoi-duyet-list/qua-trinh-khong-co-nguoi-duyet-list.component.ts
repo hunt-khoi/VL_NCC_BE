@@ -4,19 +4,15 @@ import { MatPaginator, MatSort, MatDialog, MatMenuTrigger } from '@angular/mater
 import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge, BehaviorSubject } from 'rxjs';
-//Datasource
-import { QuaTrinhKhongCoNguoiDuyetDataSource } from '../Model/data-sources/qua-trinh-khong-co-nguoi-duyet.datasource';
-//Service
-import { QuaTrinhKhongCoNguoiDuyetService } from '../Services/qua-trinh-khong-co-nguoi-duyet.service';
-import { SubheaderService } from '../../../../../../core/_base/layout';
-import { LayoutUtilsService, QueryParamsModel, MessageType } from '../../../../../../core/_base/crud';
-import { QuaTrinhKhongCoNguoiDuyetEditComponent } from '../qua-trinh-khong-co-nguoi-duyet-edit/qua-trinh-khong-co-nguoi-duyet-edit.component';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table';
 import { SettingProcessComponent } from '../../../components';
 import { CommonService } from '../../../services/common.service';
-import { ActivatedRoute, Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
+import { QuaTrinhKhongCoNguoiDuyetDataSource } from '../Model/data-sources/qua-trinh-khong-co-nguoi-duyet.datasource';
+import { QuaTrinhKhongCoNguoiDuyetService } from '../Services/qua-trinh-khong-co-nguoi-duyet.service';
+import { QuaTrinhKhongCoNguoiDuyetEditComponent } from '../qua-trinh-khong-co-nguoi-duyet-edit/qua-trinh-khong-co-nguoi-duyet-edit.component';
 
 @Component({
 	selector: 'm-qua-trinh-khong-co-nguoi-duyet-list',
@@ -27,35 +23,31 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 	// Table fields
-	dataSource: QuaTrinhKhongCoNguoiDuyetDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
+	dataSource: QuaTrinhKhongCoNguoiDuyetDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
+	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	dataResult: any[] = [];
 	tmpdataResult: any[] = [];
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-	previousIndex: number;
+	previousIndex: number = 0;
 	listLoai: any[] = [];
 	selectedLoai: string = '';
-	gridService: TableService;
+	gridService: TableService | undefined;
 	gridModel: TableModel = new TableModel();
 	trangthaiduyet: boolean = false;
-	list_button: boolean;
+	list_button: boolean = false;
 
 	constructor(
 		public dataService: QuaTrinhKhongCoNguoiDuyetService,
 		public dialog: MatDialog,
-		private subheaderService: SubheaderService,
 		private changeDetect: ChangeDetectorRef,
 		private cookieService: CookieService,
 		private ref: ApplicationRef,
-		private route: Router,
-		private layoutUtilsService: LayoutUtilsService) {
-		let user = JSON.parse(localStorage.getItem("UserInfo"));
-	}
+		private layoutUtilsService: LayoutUtilsService) { }
 
 	/** LOAD DATA */
 	ngOnInit() {
@@ -145,28 +137,25 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.gridModel, this.cookieService);
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
-		// // If the QuaTrinhKhongCoNguoiDuyet changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadList();
-				})
-			)
-			.subscribe();
+		
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadList();
+					})
+				).subscribe();
+		}
 
 		// Init DataSource
 		this.dataSource = new QuaTrinhKhongCoNguoiDuyetDataSource(this.dataService);
-		let queryParams = new QueryParamsModel({});
-
 		this.dataSource.entitySubject.subscribe(res => {
 			this.dataResult = res
 			this.tmpdataResult = []
-			if (this.dataResult != null) {
+			if (this.dataResult && this.paginator) {
 				if (this.dataResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadList(false);
 				}
@@ -177,7 +166,9 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 			}
 		});
 	}
+
 	loadList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -188,7 +179,6 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 			this.gridService.model.filterGroupData
 		);
 		this.dataSource.loadData(queryParams);
-
 	}
 
 	/** FILTRATION */
@@ -196,22 +186,21 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 		const filter: any = {};
 		filter.Loai = this.selectedLoai;
 		filter.trangthai = this.trangthaiduyet ? 2 : 0;
-
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.so_phieu = this.gridService.model.filterText.so_phieu;
 			filter.ten_phieu = this.gridService.model.filterText.ten_phieu;
 			filter.nguoi_tao = this.gridService.model.filterText.nguoi_tao;
 		}
-
 		return filter;
 	}
-	/** ACTIONS */
+
 	/** SELECTION */
 	isAllSelected() {
 		const numSelected = this.selection.selected.length;
 		const numRows = this.dataResult.length;
 		return numSelected === numRows;
 	}
+
 	/** Selects all rows if they are not all selected; otherwise clear selection. */
 	masterToggle() {
 		if (this.isAllSelected()) {
@@ -220,17 +209,17 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 			this.dataResult.forEach(row => this.selection.select(row));
 		}
 	}
+
 	/* UI */
 	edit(QuaTrinhKhongCoNguoiDuyet: any, isThaoluan = false) {
 		var loaiphieu = this.listLoai.find(x => x.id == this.selectedLoai);
 		const dialogRef = this.dialog.open(QuaTrinhKhongCoNguoiDuyetEditComponent, { data: { QuaTrinhKhongCoNguoiDuyet, isThaoluan, loai: this.selectedLoai, urlTo: loaiphieu.urlTo } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			this.loadList();
 		});
 	}
+
 	timeline(QuaTrinhKhongCoNguoiDuyet: any) {
 		const dialogRef = this.dialog.open(SettingProcessComponent, { data: { data: QuaTrinhKhongCoNguoiDuyet, Type: QuaTrinhKhongCoNguoiDuyet.id_loai } });
 		dialogRef.afterClosed().subscribe(res => {
@@ -259,7 +248,6 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 	// 		loai = 0;
 	// 	if (this.selectedLoai == '8')
 	// 		loai = 0;
-
 	// 	let url = `/log/doi-tuong/${loai}/${item.id_phieu}`;
 	// 	window.open(url, "_blank");
 	// }

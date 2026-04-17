@@ -19,8 +19,7 @@
 
 	<form class="kt-form" [formGroup]="QuaTrinhKhongCoNguoiDuyetForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true"
-					(close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 
@@ -59,7 +58,6 @@
 						Đang trong quá trình duyệt của: <b>{{nguoiduyet.Hoten}}</b>
 					</div>
 				</ng-container>
-
 				<div class="col-md-12 form-group kt-margin-bottom-10-mobile" *ngIf="isShowNhacnho 
 					&& ((ListNguoiDuyet.length > 0) || (nguoiduyet.NguoiDuyetDon && userId != nguoiduyet.NguoiDuyetDon))">
 					<button [disabled]="guiduyet" class="btn btn-primary" (click)="GuiDeXuatDuyet()">
@@ -75,5 +73,4 @@
 			</div>
 		</div>
 	</form>
-
 </div>

@@ -2,36 +2,29 @@
 <div class="kt-portlet__head kt-portlet__head--fit">
 	<div class="kt-portlet__head-caption">
 		<div class="kt-portlet__head-title">
-			<h5 class="kt-portlet__head-text">
-				Danh sách quy trình theo loại hồ sơ
-			</h5>
+			<h5 class="kt-portlet__head-text">Danh sách quy trình theo loại hồ sơ</h5>
 		</div>
 	</div>
 </div>
 
 <div class="example-container-hc1 mat-table__wrapper">
-	<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource1" matSort matSortActive="DieuKien" #sort2='matSort' matSortDirection="asc" matSortDisableClear>
+	<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="DieuKien" #sort2='matSort' matSortDirection="asc" matSortDisableClear>
 		<ng-container matColumnDef="#">
 			<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode mat-header-cell-stt stt-cell">#</th>
 			<td mat-cell *matCellDef="let item;let vi = index" class="mat-column-vinCode mat-cell-stt stt-cell">
 				{{vi + 1}}
 			</td>
 		</ng-container>
-
 		<ng-container matColumnDef="DieuKien">
 			<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">Tiêu đề</th>
 			<td mat-cell *matCellDef="let item" class="mat-column-vinCode">
 				<a href="javascript:;" (click)="UpdateDieuKien(item, false)">{{item.DieuKien}}</a>
 			</td>
 		</ng-container>
-
 		<ng-container matColumnDef="DoiTuong">
 			<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">Loại hồ sơ</th>
-			<td mat-cell *matCellDef="let item" class="mat-column-vinCode">
-				{{item.DoiTuong}}
-			</td>
+			<td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.DoiTuong}}</td>
 		</ng-container>
-
 		<ng-container matColumnDef="actions">
 			<th mat-header-cell *matHeaderCellDef style="justify-content: center; width:80px">Tác vụ</th>
 			<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">
@@ -52,16 +45,17 @@
 			</td>
 		</ng-container>
 
-		<tr mat-header-row *matHeaderRowDef="displayedColumns1; sticky: true"></tr>
-		<tr mat-row *matRowDef="let row; columns: displayedColumns1" (click)="row.highlighted = !row.highlighted"
+		<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+		<tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="row.highlighted = !row.highlighted"
 			[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}"
 			(mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
 	</table>
-	<div class="mat-table__message" *ngIf="!dataSource1.hasItems">Không có dữ liệu</div>
+	<div class="mat-table__message" *ngIf="!dataSource.hasItems">Không có dữ liệu</div>
 </div>
 <div class="mat-table__bottom" style="flex-wrap: wrap-reverse;">
 	<div class="col-12 col-sm-8 col-md-8 kt--margin-bottom-10-mobile">
-		<mat-spinner [diameter]="20" *ngIf="dataSource1.loading$ | async"></mat-spinner>
-		<mat-paginator #paginator_tab2 [pageSize]="10" [pageSizeOptions]="[3, 5, 10]" [length]="dataSource1.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+		<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
+		<mat-paginator #paginator_tab2 [pageSize]="10" [pageSizeOptions]="[3, 5, 10]" 
+		[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
 	</div>
 </div>
