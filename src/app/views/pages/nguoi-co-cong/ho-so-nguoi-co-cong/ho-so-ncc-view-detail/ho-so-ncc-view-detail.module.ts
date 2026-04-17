@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
 import { PermissionViewHS } from './Services/permission-hs';
 import { HoSoNCCService } from '../ho-so-ncc/Services/ho-so-ncc.service';
-import { HoSoNCCRefModule } from '../ho-so-ncc/ho-so-ncc-ref.module';
 import { InfoComponent } from './info/info.component';
 import { HoSoNccViewDetailComponent } from './ho-so-ncc-view-detail.component';
 import { DinhchinhthongtinDialogComponent } from './../dinh-chinh-thong-tin/dinhchinhthongtin-dialog/dinhchinhthongtin-dialog.component';
@@ -74,7 +73,6 @@ const routes: Routes = [
 	imports: [
 		RouterModule.forChild(routes),
 		DPSCommonModule,
-		HoSoNCCRefModule,
 		QuyetDinhRefModule,
 	],
 	providers: [
