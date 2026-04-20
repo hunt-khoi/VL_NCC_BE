@@ -10,7 +10,7 @@ const API_URL = environment.ApiRoot + '/giay-to';
 @Injectable()
 export class GiayToService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
+	ReadOnlyControl: boolean = false;
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	// READ
@@ -34,27 +34,24 @@ export class GiayToService {
 		const url = `${API_URL}/${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	// CREATE =>  POST: add a new oduct to the server
-	CreateGiayTo(item): Observable<any> {
+
+	Create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
-	UpdateGiayTo(item: GiayToModel): Observable<any> {
-		// Note: Add headers if needed (tokens/bearer)
+	Update(item: GiayToModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
-	deleteItem(itemId: number): Observable<any> {
+	Delete(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
-	Lock(itemId: number, value: boolean) {
+	Lock(itemId: number, value: boolean): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/Lock?id=${itemId}&Value=${value}`;
 		return this.http.get<any>(url, { headers: httpHeaders });

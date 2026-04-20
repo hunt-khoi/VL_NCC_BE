@@ -17,8 +17,7 @@ import { HuongDanHuongThienDialogComponent } from '../huong-dan-hoan-thien/huong
 export class HoSoNCCDuyetDialogComponent implements OnInit {
 
 	item: any;
-	itemForm: FormGroup;
-	hasFormErrors = false;
+	itemForm: FormGroup | undefined;
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
@@ -26,7 +25,7 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 	isDuyet: boolean = true;//k duyệt thì chỉ hiển thị comment
 	require = '';
 	id = 0;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 	userId = 0;
 	guiduyet = false;
@@ -55,12 +54,12 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 		private CommonService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		public dialog: MatDialog,
 		private translate: TranslateService) {
 			this._NAME = 'Hồ sơ người có công';
 			// load id user
-			this.userId = (JSON.parse(localStorage.getItem('UserInfo'))).Id;
+			const userInfo = localStorage.getItem('UserInfo');
+			this.userId = userInfo ? (JSON.parse(userInfo)).Id : 0;
 			this.isShowNhacnho = this.CommonService.IsShowNhacnhoduyet(this.router.url);
 	}
 
@@ -120,6 +119,7 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 
 	/** ACTIONS */
 	prepareData(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		let Id: number;
@@ -134,33 +134,31 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 	}
 
 	onSubmit(value: boolean) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
-			this.hasFormErrors = true;
 			return;
 		}
-		const _item = this.prepareData();
+
+		const item = this.prepareData();
 		if (value) {
-			const _Message = this.translate.instant('OBJECT.DUYET.MESSAGE', { name: this._NAME });
-			this.Duyet(_item, value, _Message);
+			const message = this.translate.instant('OBJECT.DUYET.MESSAGE', { name: this._NAME });
+			this.Duyet(item, value, message);
 		} else {
-			const _Message = this.translate.instant('OBJECT.KHONGDUYET.MESSAGE', { name: this._NAME });
+			const message = this.translate.instant('OBJECT.KHONGDUYET.MESSAGE', { name: this._NAME });
 			this.CommonService.getIdHuongDan(this.item.Id, 2).subscribe(res1 => {
 				if (res1 && res1.status == 1) {
 					let itemHD = res1.dataExtra;
 					const dialogRef = this.dialog.open(HuongDanHuongThienDialogComponent, { data: { item: { id_quytrinh_lichsu: 0, itemHD } } });
 					dialogRef.afterClosed().subscribe(res => {
-						if (!res) {
-						} else {
-							_item.HuongDan = res._item;
-							this.Duyet(_item, value, _Message);
+						if (res) {
+							item.HuongDan = res._item;
+							this.Duyet(item, value, message);
 						}
 					});
 				} else
@@ -169,12 +167,12 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 		}
 	}
 
-	Duyet(_item: any, value: boolean, _Message: string) {
-		_item.value = value;
+	Duyet(item: any, value: boolean, _Message: string) {
+		item.value = value;
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Duyet(_item).subscribe(res => {
+		this.objectService.Duyet(item).subscribe(res => {
 			this.loadingAfterSubmit = false;
 			this.viewLoading = false;
 			this.disabledBtn = false;
@@ -182,7 +180,7 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_Message);
 				this.dialogRef.close({
-					_item
+					item
 				});
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -202,33 +200,30 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close();
 	}
+
 	traLai() {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
-			this.hasFormErrors = true;
 			return;
 		}
 
-		const _item = this.prepareData();
-		this.objectService.traLai(_item.Id, _item.note).subscribe(res => {
+		const item = this.prepareData();
+		this.objectService.traLai(item.Id, item.note).subscribe(res => {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -240,5 +235,4 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 			}
 		});
 	}
-
 }

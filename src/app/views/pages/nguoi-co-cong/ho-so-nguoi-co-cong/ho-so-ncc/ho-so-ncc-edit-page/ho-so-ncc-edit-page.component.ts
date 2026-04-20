@@ -1,14 +1,11 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Type } from '@angular/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { CommonService } from '../../../services/common.service';
 import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
 import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
-import { FormControl } from '@angular/forms';
-import { FormTongHopComponent } from './form-tong-hop/form-tong-hop.component';
 import { FormDinhChinhComponent } from './form-dinh-chinh/form-dinh-chinh.component';
 import { FormCatTCComponent } from './form-cat-tc/form-cat-tc.component';
 import { FormMTPComponent } from './form-mtp/form-mtp.component';
@@ -50,7 +47,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 	_NAME: string = 'Hồ sơ NCC';
 
 	ChildComponentInstance: any;
-	childComponentType: Type<any>;
+	childComponentType: Type<any> | undefined;
 	childComponentData: any = {};
 	_item: any = {};
 	tenloai: any;
@@ -58,7 +55,6 @@ export class HoSoNCCEditPageComponent implements OnInit {
 	
 	constructor(
 		private objectService: HoSoNCCService,
-		private actRoute: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		public commonService: CommonService,
@@ -96,8 +92,8 @@ export class HoSoNCCEditPageComponent implements OnInit {
 		return tmp_height + 'px';
 	}
 
-	changeTab($event, id_doituong) {
-		this.childComponentType = null;
+	changeTab($event: any, id_doituong: number) {
+		this.childComponentType = undefined;
 		this.changeDetectorRefs.detectChanges();
 		//load form
 		this._item = new HoSoNCCModel();
@@ -106,6 +102,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 		this._item.Id_LoaiHoSo = $event;
 		if (this._item.Id_DoiTuongNCC == 1)
 			this._item.GioiTinh = 2;
+
 		this.childComponentData = {
 			_item: Object.assign({}, this._item)
 		};
@@ -306,7 +303,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	getInstance($event) {
+	getInstance($event: any) {
 		this.ChildComponentInstance = $event;
 	}
 
@@ -320,20 +317,19 @@ export class HoSoNCCEditPageComponent implements OnInit {
 		this.CreateHoSoNCC(EditHoSoNCC, withBack);
 	}
 
-	CreateHoSoNCC(_item: HoSoNCCModel, withBack: boolean) {
+	CreateHoSoNCC(item: HoSoNCCModel, withBack: boolean) {
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.CreateHoSoNCC(_item).subscribe(res => {
+		this.objectService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 				this.layoutUtilsService.showInfo(_messageType);
-				if (withBack == true) {
+				if (withBack) 
 					this.back();
-				} else {
+				else 
 					this.ChildComponentInstance.ngOnInit();
-				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
@@ -353,24 +349,22 @@ export class HoSoNCCEditPageComponent implements OnInit {
 		}
 	}
 
-	isExpand: boolean = false
-	clearAllBut(id) {
-		this.isExpand = true
+	isExpand: boolean = false;
+	clearAllBut(id: number) {
+		this.isExpand = true;
 		let lst1: any[] = [];
-		let idx = this.lstLoai.findIndex(x => x.id == id)
+		let idx = this.lstLoai.findIndex(x => x.id == id);
 		if (idx >= 0) {
-			lst1.push(this.lstLoai[idx])
-			this.lstLoai = lst1
+			lst1.push(this.lstLoai[idx]);
+			this.lstLoai = lst1;
 			this.changeDetectorRefs.detectChanges();
 		}
 	}
 
 	reloadListLoai() {
-		this.isExpand = false
-		this.lstLoai.pop() //remove 1 pt còn lại trong mảng
-		this.lstLoaiTemp.forEach(y => {
-			this.lstLoai.push(y)
-		})
+		this.isExpand = false;
+		this.lstLoai.pop(); //remove 1 pt còn lại trong mảng
+		this.lstLoaiTemp.forEach(y => this.lstLoai.push(y));
 		this.changeDetectorRefs.detectChanges();
 	}
 }

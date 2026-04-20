@@ -1,9 +1,7 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MatTableDataSource, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
 import { LayoutUtilsService } from 'app/core/_base/crud';
 import { HoSoNCCService } from '../Services/ho-so-ncc.service';
 import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
@@ -16,12 +14,12 @@ import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
 export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 
 	// Public properties
-	HoSoNCC: HoSoNCCModel;
-	itemForm: FormGroup;
+	HoSoNCC: HoSoNCCModel = new HoSoNCCModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> | undefined;
 	lstNCC: HoSoNCCModel[] = [];
 	dataSource = new MatTableDataSource(this.lstNCC);
 	viewLoading = false;
@@ -31,7 +29,7 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 	HTMLStr = '';
 	isReview = false;
 	displayedColumns: string[] = ['STT', 'SoHoSo', 'HoTen', 'NgaySinh', 'GioiTinh', 'DoiTuong', 'DiaChi','KhomAp', 'Title', 'DistrictName', 'NguoiThoCungLietSy', 'QuanHeVoiLietSy', 'actions'];
-	private componentSubscriptions: Subscription;
+	private componentSubscriptions: Subscription | undefined;
 
 	constructor(
 		public dialogRef: MatDialogRef<HoSoNCCImportComponent>,
@@ -59,26 +57,25 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 	}
 
 	isControlInvalid(controlName: string): boolean {
+		if (!this.itemForm) return false;
 		const control = this.itemForm.controls[controlName];
 		const result = control.invalid && control.touched;
 		return result;
 	}
 
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
-	numberOnly(event): boolean {
+	numberOnly(event: any): boolean {
 		const charCode = (event.which) ? event.which : event.keyCode;
-		if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+		if (charCode > 31 && (charCode < 48 || charCode > 57)) 
 			return false;
-		}
 		return true;
 	}
+
 	closeDialog() {
 		this.dialogRef.close(this.isChange);
 	}
 
 	loadImport() {
+		if (!this.itemForm) return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -99,6 +96,7 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 	}
 
 	luuImport() {
+		if (!this.itemForm) return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -118,7 +116,6 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 				this.layoutUtilsService.showError(res.error.message);
 		});
 	}
-
 
 	DownloadFileMau() {
 		this.HoSoNCCService.downloadTemplate().subscribe(response => {

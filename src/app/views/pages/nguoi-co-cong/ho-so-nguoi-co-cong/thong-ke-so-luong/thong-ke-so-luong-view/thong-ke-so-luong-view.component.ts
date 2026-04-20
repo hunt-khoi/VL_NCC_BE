@@ -1,14 +1,13 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
-import { Moment } from 'moment';
-// Services
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { ThongKeSoLuongService } from '../Services/thong-ke-so-luong.service';
 import { ChiTietThongKeComponent } from './../chi-tiet-thong-ke/chi-tiet-thong-ke.component';
+import { Moment } from 'moment';
 
 @Component({
 	selector: 'kt-thong-ke-so-luong-view',
@@ -23,19 +22,18 @@ export class ThongKeSoLuongViewComponent implements OnInit {
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	now = new Date();
-	to: Moment;
-	from: Moment;
+	to: Moment | undefined;
+	from: Moment | undefined;
 	loai: string = '0';
 	dataThongKe: any[] = [];
 	filterdistrict: string = "";
 	listdistrict: any[] = [];
-	Capcocau: number;
-	@ViewChild('printme', {static: true}) printme: ElementRef;
+	Capcocau: number = 0;
+	@ViewChild('printme', {static: true}) printme: ElementRef | undefined;
 
 	constructor(public service: ThongKeSoLuongService,
 		private CommonService: CommonService,
 		public dialog: MatDialog,
-		private ref: ApplicationRef,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private tokenStorage: TokenStorage,
@@ -77,8 +75,10 @@ export class ThongKeSoLuongViewComponent implements OnInit {
 	}
 
 	print(){
-		const printme = this.printme.nativeElement as HTMLElement;
-		printme.click();
+		if (this.printme) {
+			const printme = this.printme.nativeElement as HTMLElement;
+			printme.click();
+		}
 	}
 
 	loadDataList() {
@@ -97,6 +97,7 @@ export class ThongKeSoLuongViewComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 		})
 	}
+	
 	export() {
 		let queryParams = this.filterConfiguration();
 		this.service.exportList(queryParams).subscribe(response => {
@@ -113,7 +114,8 @@ export class ThongKeSoLuongViewComponent implements OnInit {
 			this.layoutUtilsService.showError("Xuất thống kê không thành công");
 		});
 	}
-	xem(item, status, IdParent = 0) {
+
+	xem(item: any, status: any, IdParent: number = 0) {
 		var loai = this.loai;
 		const dialogRef = this.dialog.open(ChiTietThongKeComponent, { 
 			width:'90vw',

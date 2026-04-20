@@ -1,16 +1,15 @@
-import { ThanNhanService } from '../../../than-nhan/Services/than-nhan.service';
-import { HoSoNCCService } from '../../Services/ho-so-ncc.service';
-import { HoSoNCCModel } from '../../Model/ho-so-ncc.model';
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, Type, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { CommonService } from '../../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel, TypesUtilsService } from '../../../../../../../core/_base/crud';
-import * as moment from 'moment';
-import { ReplaySubject } from 'rxjs';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../../core/auth/_services/token-storage.service';
+import { CommonService } from '../../../../services/common.service';
+import { ThanNhanService } from './../../../than-nhan/Services/than-nhan.service';
+import { HoSoNCCService } from './../../Services/ho-so-ncc.service';
+import { HoSoNCCModel } from '../../../ho-so-ncc/Model/ho-so-ncc.model';
 import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-form-dinh-chi-ls',
@@ -23,13 +22,12 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 	//#region nhúng mảng form trợ cấp
 	lstTC: any[] = [];
 	childComponentType = TroCapRowEditComponent;
-
-	@ViewChild("libInsertion", { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef
+	@ViewChild("libInsertion", { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef | undefined;
 	//#endregion
 
-	item: HoSoNCCModel;
-	oldItem: HoSoNCCModel;
-	itemForm: FormGroup;
+	item: HoSoNCCModel = new HoSoNCCModel();
+	oldItem: HoSoNCCModel = new HoSoNCCModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -37,19 +35,19 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 	disabledBtn = false;
 	allowEdit: boolean = true;
 
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 	maxNS = moment(new Date()).add(-16, 'year').toDate();
-	IsThanNhan: boolean;
-	Capcocau: number;
-	Id_LoaiHoSo: number;
+	IsThanNhan: boolean = false;
+	Capcocau: number = 0;
+	Id_LoaiHoSo: number = 0;
 	//
 	nhapTC: boolean = true;
 	nhapDC: boolean = true;
 	//di chuyển
 	isChuyenDi: boolean = false;
-
 	selectedTab: number = 0;
+
 	constructor(private componentFactoryResolver: ComponentFactoryResolver,
 		private fb: FormBuilder,
 		public commonService: CommonService,
@@ -57,7 +55,6 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 		private thannhanService: ThanNhanService,
 		public layoutUtilsService: LayoutUtilsService,
 		public changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private tokenStorage: TokenStorage,
 		private translate: TranslateService) {
 		super(commonService, layoutUtilsService, changeDetectorRefs);
@@ -71,22 +68,21 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 		this.Id_LoaiHoSo = this.item.Id_LoaiHoSo;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.loadProvinces();
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 			this.item.ProvinceID = this.filterprovinces;
 			this.loadGetListDistrictByProvinces(this.filterprovinces);
 			this.Capcocau = res.Capcocau;
-			if (res.Capcocau == 2)//cấp huyen
-			{
+			if (res.Capcocau == 2) {//cấp huyện
 				this.filterdistrict = res.ID_Goc_Cha;
 				this.item.DistrictID = +this.filterdistrict			
 				if (this.item.Id == 0) {
 					this.loadGetListWardByDistrict(this.filterdistrict);
 				}
 			}
-			if (res.Capcocau == 3)//cấp xã
-			{
+			if (res.Capcocau == 3) {//cấp xã
 				this.filterdistrict = res.ID_Goc_Cha;
 				this.item.DistrictID = +this.filterdistrict
 				this.item.Id_Xa = res.ID_Goc;
@@ -120,10 +116,10 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 		})
 	}
 
-	getInstanceNew($event, index) {
+	getInstanceNew($event: any, index: number) {
 		this.lstTC[index] = $event;
 	}
-
+	
 	loadListDoiTuongNCC() {
 		this.commonService.liteDoiTuongNCC(false, this.Id_LoaiHoSo).subscribe(res => {
 			this.listdoituongncc.next(res.data);
@@ -138,17 +134,19 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 	}
 
 	isBangTQ: boolean = false;
-	changeLoaiHS(value) {
+	changeLoaiHS(value: any) {
 		let xa = "";
-		if (this.itemForm.controls["Id_Xa"].value) {
-			let fx = this.listward.find(x => x.ID_Row == this.itemForm.controls["Id_Xa"].value);
+		const form = this.itemForm;
+		if (!form) return;
+		if (form.controls["Id_Xa"].value) {
+			let fx = this.listward.find(x => x.ID_Row == form.controls["Id_Xa"].value);
 			if (fx)
 				xa = this.firstLowerCase(fx.Ward);
 		}
 		this.Id_LoaiHoSo = +value;
 		var f = this.listOpt1.find(x => x.id == value);
 		if (f) {
-			this.GiayTos = f.data.GiayTos.map(x => { return { Id_LoaiGiayTo: x.id, GiayTo: x.title, IsRequired: x.IsRequired, NoiCap: xa } });
+			this.GiayTos = f.data.GiayTos.map((x: any) => { return { Id_LoaiGiayTo: x.id, GiayTo: x.title, IsRequired: x.IsRequired, NoiCap: xa } });
 			var k = this.GiayTos.find(x => x.Id_LoaiGiayTo == 9) //bằng tổ quốc ghi công
 			if(k)	this.isBangTQ = true;
 			this.GiayTos = this.GiayTos.filter(x => x.Id_LoaiGiayTo != 9)
@@ -157,11 +155,7 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 	}
 
 	createForm() {
-		let ng;
-		if (this.item.Id > 0)
-			ng = moment(this.item.NgayGui);
-		else
-			ng = new Date();
+		let ng = this.item.Id > 0 ? moment(this.item.NgayGui) : new Date();
 		const temp: any = {
 			NgayGui: [ng, Validators.required],
 			SoHoSo: [this.item.SoHoSo],
@@ -245,10 +239,7 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 			LyDoTamDC: [], //tạm đình chỉ
 			LyDoDinhChi: [] //đình chỉ
 		};
-
 		this.itemForm = this.fb.group(temp);
-
-		// this.focusInput.nativeElement.focus();
 		
 		if (!this.allowEdit) {
 			this.itemForm.disable();
@@ -258,9 +249,10 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 			this.itemForm.controls.QuanHeVoiLietSy.disable();
 		}
 		this.changeDetectorRefs.detectChanges();
-		Object.keys(this.itemForm.controls).forEach(controlName =>
-			this.itemForm.controls[controlName].markAsTouched()
-		);
+		Object.keys(this.itemForm.controls).forEach(controlName => {
+			if (this.itemForm) 
+				this.itemForm.controls[controlName].markAsUntouched();
+		});
 	}
 
 	/** UI */
@@ -273,11 +265,12 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` hồ sơ người có công`;
 		return result;
 	}
+
 	changeNS(isNam = false) {
+		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh.setValue('');
 		}
@@ -289,7 +282,9 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 			}
 		}
 	}
+
 	changeNS1(isNam = false) {
+		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh1.setValue('');
 		}
@@ -301,10 +296,11 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 			}
 		}
 	}
-	changeDC(name) {
+
+	changeDC(name: string) {
+		if (!this.itemForm) return;
 		let _name = name;
-		if (name == 'TruQuan')
-			_name = 'DiaChi';
+		if (name == 'TruQuan') _name = 'DiaChi';
 		let dc = this.itemForm.controls[name].value;
 		if (_name == 'NguyenQuan')
 			this.itemForm.controls["NguyenQuan1"].setValue(dc);
@@ -312,29 +308,27 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 			this.itemForm.controls["TruQuan1"].setValue(dc);
 	}
 
-	onSubmit(withBack: boolean = false, callapi: boolean = false) {
+	onSubmit(callapi: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
-
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
+
 		let EditHoSoNCC: any = this.prepareCustomer(this.itemForm, this.item.Id, this.data.id_ncc);
-		if (EditHoSoNCC == null)
-			return;
+		if (!EditHoSoNCC) return;
 		if (this.nhapTC) {
 			EditHoSoNCC.TroCapModel = [];
 			for (var i = 0; i < this.lstTC.length; i++) {
 				if (this.lstTC[i].cmpRef && !this.lstTC[i].cmpRef.hostView.destroyed) {
 					let EditTroCap = this.lstTC[i].onSubmit();
-					if (EditTroCap == null) {
+					if (!EditTroCap) {
 						this.layoutUtilsService.showError("Vui lòng nhập đầy đủ thông tin trợ cấp");
 						return;
 					}
@@ -344,23 +338,23 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 		}
 		if (!callapi)
 			return EditHoSoNCC;
-		else {
-			this.disabledBtn = true;
-			this.objectService.CreateHoSoNCC(EditHoSoNCC).subscribe(res => {
-				this.disabledBtn = false;
-				this.changeDetectorRefs.detectChanges();
-				if (res && res.status === 1) {
-					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType);
-					this.ngOnInit();
-				} else {
-					this.layoutUtilsService.showError(res.error.message);
-				}
-			});
-		}
+
+		this.disabledBtn = true;
+		this.objectService.Create(EditHoSoNCC).subscribe(res => {
+			this.disabledBtn = false;
+			this.changeDetectorRefs.detectChanges();
+			if (res && res.status === 1) {
+				const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
+				this.layoutUtilsService.showInfo(_messageType);
+				this.ngOnInit();
+			} else {
+				this.layoutUtilsService.showError(res.error.message);
+			}
+		});
 	}
 
 	changeQuanHeLietSy() {
+		if (!this.itemForm) return;
 		if (this.itemForm.controls.NguoiThoCungLietSy) {
 			this.require = '';
 		} else {
@@ -369,9 +363,9 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 	}
 
 	filterKhom = '';
-	fillNguyenTruQuan(cap) {
+	fillNguyenTruQuan(cap : number) {
+		if (!this.itemForm) return;
 		let val = this.findNguyenTruQuan(cap, this.filterKhom);
-
 		this.itemForm.controls["NguyenQuan"].setValue(val);
 		this.itemForm.controls["TruQuan"].setValue(val);
 		this.itemForm.controls["NguyenQuan1"].setValue(val);
@@ -391,24 +385,25 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
+
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
-	addTC($event = null) {
-		if(this.lstTC.length > 0) {
+	addTC() {
+		if (!this.insertionPoint) return;
+		if (this.lstTC.length > 0) {
 			this.lstTC = [];
 			this.insertionPoint.clear()
 		}
-		
 		for(var i=0; i<this.listLoaiTroCap.length; i++) {
 			var item =  this.listLoaiTroCap[i]
 			let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.childComponentType);
-
 			let componentRef = this.insertionPoint.createComponent(componentFactory);
 			let instance = componentRef.instance;
 			instance.cmpRef = componentRef;
@@ -425,23 +420,11 @@ export class FormDinhChiLSComponent extends FormBaseComponent implements OnInit 
 					showNamCat: true,
 				};
 			}
-
 			instance.close$.subscribe(() => {
-				instance.cmpRef.destroy();
+				if (instance.cmpRef)
+					instance.cmpRef.destroy();
 			});
 			this.lstTC.push(instance);
-		}
-	}
-
-	@HostListener('document:keydown', ['$event'])
-	onKeydownHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.keyCode == 13) {
-			this.item = this.data._item;
-			if (this.viewLoading == true) {
-				this.onSubmit(true);
-			} else {
-				this.onSubmit(false);
-			}
 		}
 	}
 }

@@ -7,7 +7,6 @@ import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, ActivatedRoute } from '@angular/router';
-// Services
 import { TableService } from './../../../../partials/table/table.service';
 import { TableModel } from './../../../../partials/table/table.model';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
@@ -15,8 +14,8 @@ import { LayoutUtilsService } from './../../../../../core/_base/crud/utils/layou
 import { ReviewExportComponent } from './../../components/review-export/review-export.component';
 import { HoSoNCCModule } from './../ho-so-ncc/ho-so-ncc.module';
 import { DinhChinhThongTinService } from './Services/dinh-chinh-thong-tin.service';
-import { DinhChinhModel } from './Model/Dinhchinhthongtin.model';
-import { DinhChinhThongTinDataSource } from './Model/data-sources/dinh-chinh-thong-tin.datasource';
+import { DinhChinhModel } from './Model/dinh-chinh.model';
+import { DinhChinhDataSource } from './Model/data-sources/dinh-chinh.datasource';
 import { DinhchinhthongtinDialogComponent } from './dinhchinhthongtin-dialog/dinhchinhthongtin-dialog.component';
 import { QuyetDinhEditDialogComponent } from './../quyet-dinh/quyet-dinh-edit/quyet-dinh-edit-dialog.component';
 import { CookieService } from 'ngx-cookie-service';
@@ -27,27 +26,25 @@ import { HoSoNCCService } from '../ho-so-ncc/Services/ho-so-ncc.service';
 	templateUrl: './dinh-chinh-thong-tin.component.html'
 })
 export class DinhChinhThongTinComponent implements OnInit {
-
 	// Table fields
-	dataSource: DinhChinhThongTinDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: DinhChinhDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
 	// Selection
 	selection = new SelectionModel<HoSoNCCModule>(true, []);
 	productsResult: HoSoNCCModule[] = [];
-	// tslint:disable-next-line:variable-name
+
 	_name = '';
 	objectId = '';
 	_user: any = {};
-	
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
 	ncc: any;
-	list_button: boolean;
+	list_button: boolean = false;
 
 	constructor(
 		private router: Router,
@@ -87,7 +84,6 @@ export class DinhChinhThongTinComponent implements OnInit {
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText.So = '';
 		this.gridModel.filterText.NoiCap = '';
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -156,9 +152,7 @@ export class DinhChinhThongTinComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
@@ -172,40 +166,38 @@ export class DinhChinhThongTinComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumnsDinhchinhNCC';
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumnsDinhchinhNCC'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
-		this.dataSource = new DinhChinhThongTinDataSource(this.dinhchinhService);
+		this.dataSource = new DinhChinhDataSource(this.dinhchinhService);
 		let queryParams = new QueryParamsModel({});
 
 		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.dinhchinhService.lastFilter$.getValue();
-			queryParams.sortField = 'NgayChuyen';
-			queryParams.filter.Id_NCC = this.objectId;
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.dinhchinhService.lastFilter$.getValue();
+				queryParams.sortField = 'NgayChuyen';
+				queryParams.filter.Id_NCC = this.objectId;
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -222,6 +214,7 @@ export class DinhChinhThongTinComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -236,29 +229,25 @@ export class DinhChinhThongTinComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.So = this.gridService.model.filterText.So;
 			filter.NoiCap = this.gridService.model.filterText.NoiCap;
 			filter.Id_NCC = this.objectId;
 		}
-
 		return filter;
 	}
 
 	/** Delete */
-	DeleteWorkplace(_item: any) {
+	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.dinhchinhService.deleteItem(_item.ID_DC).subscribe(res => {
+			if (!res) return;
+			
+			this.dinhchinhService.Delete(item.ID_DC).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -268,19 +257,13 @@ export class DinhChinhThongTinComponent implements OnInit {
 			});
 		});
 	}
-	AddWorkplace() {
-		const objectModel: any = {}
-		this.Editobject(objectModel, true, false, true);
-	}
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
 
-		if (!queryParams.filter) {
-			return;
-		}
+	Add() {
+		const objectModel: any = {}
+		this.Edit(objectModel, true, false, true);
 	}
-	Editobject(_item: any, allowEdit: boolean = true, allowDuyet: boolean = false, checkTN: boolean = false) {
+
+	Edit(_item: any, allowEdit: boolean = true, allowDuyet: boolean = false, checkTN: boolean = false) {
 		_item.Id_NCC = this.objectId;
 		let saveMessageTranslateParam = '';
 		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
@@ -290,42 +273,41 @@ export class DinhChinhThongTinComponent implements OnInit {
 			data: { _item, allowEdit, allowDuyet, checkTN, ncc: this.ncc }
 		});
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
 
 		});
 	}
-	print(_item: any) {
-		this.dinhchinhService.PrintDinhChinh(_item.ID_DC).subscribe(res => {
+
+	print(item: any) {
+		this.dinhchinhService.PrintDinhChinh(item.ID_DC).subscribe(res => {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 				dialogRef.afterClosed().subscribe(res => {
-					if (!res) {
-					} else {
-						this.dinhchinhService.exportDinhChinh(_item.ID_DC, _item.Id_NCC, res.loai).subscribe(response => {
-							const headers = response.headers;
-							const filename = headers.get('x-filename');
-							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
-							const fileURL = URL.createObjectURL(blob);
-							const link = document.createElement('a');
-							link.href = fileURL;
-							link.download = filename;
-							link.click();
-						}, err => {
-							this.layoutUtilsService.showError("Xuất đính chính thất bại")
-						});
-					}
+					if (!res) return;
+					this.dinhchinhService.exportDinhChinh(item.ID_DC, item.Id_NCC, res.loai).subscribe(response => {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename;
+						link.click();
+					}, err => {
+						this.layoutUtilsService.showError("Xuất đính chính thất bại")
+					});
 				});
-			} else
+			} else {
 				this.layoutUtilsService.showError(res.error.message);
+			}
 		})
 	}
 
-	DuyetTin(item, val) {
+	DuyetTin(item: any, val: any) {
 		let saveMessageTranslateParam = '';
 		saveMessageTranslateParam += 'OBJECT.EDIT.UPDATE_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
@@ -357,7 +339,7 @@ export class DinhChinhThongTinComponent implements OnInit {
 		}
 	}
 
-	raQuyetDinh(item) {
+	raQuyetDinh(item: any) {
 		let _item: any = {
 			ObjectType: 2,
 			ObjectId: item.Id,
@@ -365,19 +347,18 @@ export class DinhChinhThongTinComponent implements OnInit {
 		}
 		const dialogRef = this.dialog.open(QuyetDinhEditDialogComponent, { data: { _item, callapi: false } });
 		dialogRef.afterClosed().subscribe(respone => {
-			if (!respone) {
-			} else {
-				this.dinhchinhService.Duyet(respone).subscribe(res => {
-					if (res && res.status == 1) {
-						this.layoutUtilsService.showInfo("Tạo quyết định thành công");
-						this.ngOnInit();
-					} else
-						this.layoutUtilsService.showError(res.error.message);
-				})
-			}
+			if (!respone) return;
+			this.dinhchinhService.Duyet(respone).subscribe(res => {
+				if (res && res.status == 1) {
+					this.layoutUtilsService.showInfo("Tạo quyết định thành công");
+					this.ngOnInit();
+				} else
+					this.layoutUtilsService.showError(res.error.message);
+			})
 		});
 	}
-	Download(item) {
+
+	Download(item: any) {
 		window.open(item, '_blank');
 	}
 }

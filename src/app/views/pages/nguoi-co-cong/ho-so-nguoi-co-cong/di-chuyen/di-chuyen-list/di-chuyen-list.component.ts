@@ -27,30 +27,28 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class DiChuyenListComponent implements OnInit {
-
 	// Table fields
-	dataSource: DiChuyenDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: DiChuyenDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
 	// Selection
 	selection = new SelectionModel<HoSoNCCModule>(true, []);
 	productsResult: HoSoNCCModule[] = [];
-	// tslint:disable-next-line:variable-name
 	_name = '';
 	objectId = '';
 	_user: any = {};
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
 	ncc: any;
-	list_button: boolean;
+	list_button: boolean = false;
 
 	constructor(
 		private router: Router,
 		private route: ActivatedRoute,
 		public objectService: DiChuyenService,
-		private hosoService: HoSoNCCService,
+		private apiService: HoSoNCCService,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
@@ -67,7 +65,7 @@ export class DiChuyenListComponent implements OnInit {
 		var arr = this.router.url.split("/");
 		if (arr.length > 1) {
 			this.objectId = arr[arr.length - 2];
-			this.hosoService.getItem(+this.objectId).subscribe(res => {
+			this.apiService.getItem(+this.objectId).subscribe(res => {
 				if (res && res.status === 1) {
 					this._user = res.data;
 				} else {
@@ -84,7 +82,6 @@ export class DiChuyenListComponent implements OnInit {
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText.So = '';
 		this.gridModel.filterText.NoiCap = '';
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -175,10 +172,7 @@ export class DiChuyenListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
@@ -192,47 +186,42 @@ export class DiChuyenListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumnsDiChuyenNCC';
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumnsDiChuyenNCC'));
+ 
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new DiChuyenDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			queryParams.sortField = 'NgayChuyen';
-			queryParams.sortOrder = 'desc';
-			queryParams.filter.Id_NCC = this.objectId;
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilter$.getValue();
+				queryParams.sortField = 'NgayChuyen';
+				queryParams.sortOrder = 'desc';
+				queryParams.filter.Id_NCC = this.objectId;
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
 			}
 		});
-
 		this.objectService.getNCC(+this.objectId).subscribe(res => {
 			if (res && res.status === 1) {
 				this.ncc = res.data;
@@ -243,6 +232,7 @@ export class DiChuyenListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -257,29 +247,25 @@ export class DiChuyenListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.So = this.gridService.model.filterText.So;
 			filter.NoiCap = this.gridService.model.filterText.NoiCap;
 			filter.Id_NCC = this.objectId;
 		}
-
 		return filter;
 	}
 
 	/** Delete */
-	DeleteWorkplace(_item: any) {
+	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.Delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -290,29 +276,19 @@ export class DiChuyenListComponent implements OnInit {
 		});
 	}
 
-	AddWorkplace() {
+	Add() {
 		const objectModel: any = {}
-		this.Editobject(objectModel);
+		this.Edit(objectModel);
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	Editobject(_item: any, allowEdit: boolean = true) {
+	Edit(_item: any, allowEdit: boolean = true) {
 		_item.Id_NCC = this.objectId;
 		let saveMessageTranslateParam = '';
 		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(DiChuyenEditDialogComponent, { data: { _item, allowEdit, ncc: this.ncc } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
@@ -332,61 +308,55 @@ export class DiChuyenListComponent implements OnInit {
 		}
 	}
 
-	reviewDeNghiDC(item) {
+	reviewDeNghiDC(item: any) {
 		this.objectService.previewDN(item.Id, parseInt(this.objectId)).subscribe(res => {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 				dialogRef.afterClosed().subscribe(res => {
-					if (!res) {
-					} 
-					else {
-						this.objectService.exportDN(item.Id, parseInt(this.objectId)).subscribe(response => {
-							const headers = response.headers;
-							const filename = headers.get('x-filename');
-							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
-							const fileURL = URL.createObjectURL(blob);
-							const link = document.createElement('a');
-							link.href = fileURL;
-							link.download = filename;
-							link.click();
-						}, err => {
-							this.layoutUtilsService.showError("Xuất đề nghị di chuyển thất bại")
-						});
-					}
+					if (!res) return;
+					this.objectService.exportDN(item.Id, parseInt(this.objectId)).subscribe(response => {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename;
+						link.click();
+					}, err => {
+						this.layoutUtilsService.showError("Xuất đề nghị di chuyển thất bại")
+					});
 				});
 			} else
 				this.layoutUtilsService.showError(res.error.message);
 		})
 	}
 
-	reviewPhieuBaoDC(item) {
+	reviewPhieuBaoDC(item: any) {
 		this.objectService.previewQD(item.Id, parseInt(this.objectId)).subscribe(res => {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 				dialogRef.afterClosed().subscribe(res => {
-					if (!res) {
-					} 
-					else {
-						this.objectService.exportQD(item.Id, parseInt(this.objectId)).subscribe(response => {
-							const headers = response.headers;
-							const filename = headers.get('x-filename');
-							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
-							const fileURL = URL.createObjectURL(blob);
-							const link = document.createElement('a');
-							link.href = fileURL;
-							link.download = filename;
-							link.click();
-						});
-					}
+					if (!res) return;
+					this.objectService.exportQD(item.Id, parseInt(this.objectId)).subscribe(response => {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename;
+						link.click();
+					});
 				});
 			} else
 				this.layoutUtilsService.showError(res.error.message);
 		})
 	}
 
-	in(item) {
+	in(item: any) {
 		// this.objectService.downloadQD(item.Id_NCC, item.Id_QuyetDinh).subscribe(res => {
 		// 	if (res && res.status == 1) {
 		// 		const dialogRef = this.dialog.open(ReviewDocxComponent, { data: res.data });
@@ -433,24 +403,22 @@ export class DiChuyenListComponent implements OnInit {
 		})
 	}
 
-	raQuyetDinh(item) {
+	raQuyetDinh(item: any) {
 		let _item: any = {
 			ObjectType: 2,
 			ObjectId: item.Id,
 			Id_NCC: item.Id_NCC
 		}
 		const dialogRef = this.dialog.open(QuyetDinhEditDialogComponent, { data: { _item, callapi: false } });
-		dialogRef.afterClosed().subscribe(respone => {
-			if (!respone) {
-			} else {
-				this.objectService.Duyet(respone).subscribe(res => {
-					if (res && res.status == 1) {
-						this.layoutUtilsService.showInfo("Tạo quyết định thành công");
-						this.ngOnInit();
-					} else
-						this.layoutUtilsService.showError(res.error.message);
-				})
-			}
+		dialogRef.afterClosed().subscribe(res => {
+			if (!res) return;
+			this.objectService.Duyet(res).subscribe(res => {
+				if (res && res.status == 1) {
+					this.layoutUtilsService.showInfo("Tạo quyết định thành công");
+					this.ngOnInit();
+				} else
+					this.layoutUtilsService.showError(res.error.message);
+			});
 		})
 	}
 }

@@ -1,7 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialog, MatPaginator, MatSort } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -13,7 +12,7 @@ import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_ba
 import { CommonService } from '../../../services/common.service';
 import { ThoiHanDataSource } from '../Model/data-sources/thoi-han.datasource';
 import { Moment } from 'moment';
-import * as moment from 'moment';
+import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -24,10 +23,9 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class ThoiHanListComponent implements OnInit {
 	// Table fields
-	dataSource: ThoiHanDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: ThoiHanDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterType = '';
 
@@ -35,9 +33,9 @@ export class ThoiHanListComponent implements OnInit {
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
 	lstStatus: any[] = [];
-	// tslint:disable-next-line:variable-name
+
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict: number = 0;
 	listdistrict: any[] = [];
@@ -47,29 +45,24 @@ export class ThoiHanListComponent implements OnInit {
 	IsTre: string = '-1';
 	lstDoiTuongNCC: any[] = [];
 	Id_DoiTuongNCC: string = '';
-	Capcocau: number;
+	Capcocau: number = 0;
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
 	now = new Date();
-	to: Moment;
-	from: Moment;
-	list_button: boolean;
+	to: Moment | undefined;
+	from: Moment | undefined;
+	list_button: boolean | undefined;
 
 	constructor(public objectService: ThoiHanService,
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
 		private cookieService: CookieService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private ref: ApplicationRef,
 		private commonService: CommonService,
 		private translate: TranslateService,
-		private tokenStorage: TokenStorage,
-		private router: Router) {
-
-		}
+		private tokenStorage: TokenStorage) { }
 
 	/** LOAD DATA */
 	ngOnInit() {
@@ -262,10 +255,7 @@ export class ThoiHanListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
@@ -279,31 +269,27 @@ export class ThoiHanListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_thoihan'
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_thoihan'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new ThoiHanDataSource(this.objectService);
-
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -312,6 +298,7 @@ export class ThoiHanListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -372,10 +359,9 @@ export class ThoiHanListComponent implements OnInit {
 		if (this.Id_DoiTuongNCC)
 			filter.Id_DoiTuongNCC = +this.Id_DoiTuongNCC;
 
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 		}
-
 		return filter;
 	}
 
@@ -386,23 +372,13 @@ export class ThoiHanListComponent implements OnInit {
 		});
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	getStatusString(status) {
+	getStatusString(status: any) {
 		var f = this.lstStatus.find(x => x.id == status);
-		if (!f)
-			return "";
+		if (!f) return "";
 		return f.data.color;
 	}
 
-	in(id, loai, isThannhan = false) {
+	in(id: any, loai: any, isThannhan: boolean = false) {
 		const filter: any = {};
 		filter.loai = loai;
 		filter.isThannhan = isThannhan;
@@ -418,7 +394,9 @@ export class ThoiHanListComponent implements OnInit {
 			link.click();
 		});
 	}
+
 	export() {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
@@ -455,7 +433,7 @@ export class ThoiHanListComponent implements OnInit {
 	}
 
 	print: boolean = false;
-	printTicket(print_template) {
+	printTicket(print_template: any) {
 		this.print = true;
 		this.changeDetectorRefs.detectChanges();
 		let title = this.translate.instant('THONG_KE_NCC.tkthoihan');
@@ -467,6 +445,7 @@ export class ThoiHanListComponent implements OnInit {
 		newstr = '<span class="mat-sort-header-button" aria-label="Change sorting for HoTen">Thời hạn</span>';
 		innerContents = innerContents.replace(substr, newstr);
 		const popupWinindow = window.open();
+		if (!popupWinindow) return;
 		popupWinindow.document.open();
 		popupWinindow.document.write('<html><head><title>'+title+'</title></head><body onload="window.print()">' + innerContents + '</html>');
 		popupWinindow.document.write(`<style>

@@ -1,14 +1,13 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialog, MatPaginator, MatSort } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { CookieService } from 'ngx-cookie-service';
-import { BehaviorSubject, merge, forkJoin } from 'rxjs';
+import { merge, forkJoin } from 'rxjs';
 import { tap, take } from 'rxjs/operators';
 import { Moment } from 'moment';
-import * as moment from 'moment';
-// Services
+import moment from 'moment';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
@@ -29,13 +28,12 @@ import { QuyetDinhEditDialogComponent } from '../../quyet-dinh/quyet-dinh-edit/q
 })
 
 export class HoSoNCCListComponent implements OnInit {
-
 	// Table fields
-	dataSource: HoSoNCCDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: HoSoNCCDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
-	filterStatus: number; //filterStatus=2: filter những hồ sơ đã duyệt
+	filterStatus: number = 0; //filterStatus=2: filter những hồ sơ đã duyệt
 	filterType = '';
 	listchucdanh: any[] = [];
 
@@ -43,28 +41,27 @@ export class HoSoNCCListComponent implements OnInit {
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
 	lstStatus: any[] = [];
-	// tslint:disable-next-line:variable-name
 	_name = '';
 	print: boolean = false;
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict: number = 0;
 	listdistrict: any[] = [];
 	filterward: number = 0;
 	listward: any[] = [];
-	visibleGuiDuyet: boolean;
-	visibleThuHoi: boolean;
-	IsVisible_Duyet: boolean;
-	IsEnable_Duyet: boolean;
+	visibleGuiDuyet: boolean = false;
+	visibleThuHoi: boolean = false;
+	IsVisible_Duyet: boolean = false;
+	IsEnable_Duyet: boolean = false;
 	thaotac: number = 0;
 	Capcocau: number = 0;
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
-	to: Moment;
-	from: Moment;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	to: Moment | undefined;
+	from: Moment | undefined;
 
 	constructor(
 		public objectService: HoSoNCCService,
@@ -76,8 +73,7 @@ export class HoSoNCCListComponent implements OnInit {
 		private commonService: CommonService,
 		private translate: TranslateService,
 		private tokenStorage: TokenStorage,
-		private cookieService: CookieService,
-		private router: Router) {
+		private cookieService: CookieService) {
 			this._name = 'Hồ sơ người có công';
 			this.print = false;
 	}
@@ -130,10 +126,13 @@ export class HoSoNCCListComponent implements OnInit {
 					this.lstStatus = this.lstStatus.filter(x => x.id == +this.filterStatus);
 				else
 					this.lstStatus = this.lstStatus.filter(x => x.id != 2);
-				this.gridService.model.filterGroupDataChecked['Status'] = this.lstStatus.map(x => ({
-					name: x.title, value: x.id, checked: false
-				}));
-				this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
+
+				if (this.gridService) {
+					this.gridService.model.filterGroupDataChecked['Status'] = this.lstStatus.map(x => ({
+						name: x.title, value: x.id, checked: false
+					}));
+					this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
+				}
 			}
 
 			// Step 3: trigger first data load now that Capcocau and filters are ready
@@ -142,12 +141,16 @@ export class HoSoNCCListComponent implements OnInit {
 				queryParams.filter.Status = this.filterStatus;
 			else
 				queryParams.filter.DaDuyet = '0';
+
 			if (this.Capcocau == 1) {
 				queryParams.filter.DateKey = 'NgayGui';
-				queryParams.filter.TuNgay = this.from.format('DD/MM/YYYY');
-				queryParams.filter.DenNgay = this.to.format('DD/MM/YYYY');
+				if (this.from)
+					queryParams.filter.TuNgay = this.from.format('DD/MM/YYYY');
+				if (this.to)
+					queryParams.filter.DenNgay = this.to.format('DD/MM/YYYY');
 			}
-			this.dataSource.loadList(queryParams);
+			if (this.dataSource)
+				this.dataSource.loadList(queryParams);
 		});
 	}
 
@@ -166,7 +169,7 @@ export class HoSoNCCListComponent implements OnInit {
 		const availableColumns = [
 			{ stt: 0,  name: 'select',              displayName: 'Chọn',                    alwaysChecked: false, isShow: true  },
 			{ stt: 1,  name: 'STT',                 displayName: 'STT',                     alwaysChecked: false, isShow: true  },
-			{ stt: 2,  name: 'SoHoSo',              displayName: 'Sổ Hồ Sơ',               alwaysChecked: false, isShow: true  },
+			{ stt: 2,  name: 'SoHoSo',              displayName: 'Sổ Hồ Sơ',               	alwaysChecked: false, isShow: true  },
 			{ stt: 3,  name: 'HoTen',               displayName: 'Họ tên',                  alwaysChecked: false, isShow: true  },
 			{ stt: 4,  name: 'NgaySinh',            displayName: 'Ngày sinh',               alwaysChecked: false, isShow: false },
 			{ stt: 5,  name: 'GioiTinh',            displayName: 'Giới tính',               alwaysChecked: false, isShow: false },
@@ -176,8 +179,8 @@ export class HoSoNCCListComponent implements OnInit {
 			{ stt: 8,  name: 'DistrictName',        displayName: 'Quận/Huyện',              alwaysChecked: false, isShow: false },
 			{ stt: 8,  name: 'DoiTuong',            displayName: 'Đối tượng',               alwaysChecked: false, isShow: true  },
 			{ stt: 9,  name: 'LoaiHoSo',            displayName: 'Loại hồ sơ',              alwaysChecked: false, isShow: true  },
-			{ stt: 10, name: 'NguoiThoCungLietSy',  displayName: 'Người thờ cúng liệt sỹ', alwaysChecked: false, isShow: false },
-			{ stt: 11, name: 'QuanHeVoiLietSy',     displayName: 'Quan hệ với liệt sỹ',    alwaysChecked: false, isShow: false },
+			{ stt: 10, name: 'NguoiThoCungLietSy',  displayName: 'Người thờ cúng liệt sỹ', 	alwaysChecked: false, isShow: false },
+			{ stt: 11, name: 'QuanHeVoiLietSy',     displayName: 'Quan hệ với liệt sỹ',    	alwaysChecked: false, isShow: false },
 			{ stt: 12, name: 'Status',              displayName: 'Tình trạng',              alwaysChecked: false, isShow: true  },
 			{ stt: 13, name: 'SoQuyetDinh',         displayName: 'Quyết định',              alwaysChecked: false, isShow: true  },
 			{ stt: 94, name: 'NgayGui',             displayName: 'Ngày gửi',                alwaysChecked: false, isShow: false },
@@ -208,16 +211,21 @@ export class HoSoNCCListComponent implements OnInit {
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check(name_cookie));
 
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(tap(() => this.loadDataList()))
-			.subscribe();
-
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 		this.dataSource = new HoSoNCCDataSource(this.objectService);
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
-				// Pre-compute statusColor per row to avoid method calls in template
+			if (this.productsResult && this.paginator) {
 				this.productsResult.forEach(item => {
 					const s = this.lstStatus.find(x => x.id == item.Status);
 					item.statusColor = s ? s.data.color : '';
@@ -230,6 +238,7 @@ export class HoSoNCCListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -241,7 +250,6 @@ export class HoSoNCCListComponent implements OnInit {
 		);
 		this.dataSource.loadList(queryParams);
 	}
-
 
 	filterDistrictID(id: any) {
 		this.filterdistrict = id;
@@ -273,15 +281,13 @@ export class HoSoNCCListComponent implements OnInit {
 			if (this.to)
 				filter["DenNgay"] = this.to.format("DD/MM/YYYY");
 		}
-
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DiaChi = this.gridService.model.filterText.DiaChi;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 			filter.LoaiHoSo = this.gridService.model.filterText.LoaiHoSo;
 		}
-
 		return filter;
 	}
 
@@ -293,19 +299,16 @@ export class HoSoNCCListComponent implements OnInit {
 	}
 
 	/** Delete */
-	DeleteWorkplace(_item: HoSoNCCModel) {
+	Delete(item: HoSoNCCModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.Delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -316,50 +319,16 @@ export class HoSoNCCListComponent implements OnInit {
 		});
 	}
 
-	// AddWorkplace() {
-	// 	const objectModel = new HoSoNCCModel();
-	// 	objectModel.clear(); // Set all defaults fields
-	// 	this.Editobject(objectModel);
-	// }
-
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	// Editobject(_item: HoSoNCCModel, allowEdit: boolean = true) {
-	// 	_item.ProvinceID = this.filterprovinces;
-	// 	let saveMessageTranslateParam = '';
-	// 	saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
-	// 	const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
-	// 	const dialogRef = this.dialog.open(HoSoNCCEditDialogComponent, { data: { _item, allowEdit } });//, width: '80%' 
-	// 	dialogRef.afterClosed().subscribe(res => {
-	// 		if (!res) {
-	// 		} else {
-	// 			this.layoutUtilsService.showInfo(_saveMessage);
-	// 			this.loadDataList();
-	// 		}
-
-	// 	});
-	// }
-
-	GuiDuyet(_item: HoSoNCCModel) {
+	GuiDuyet(item: HoSoNCCModel) {
 		const _title = this.translate.instant('OBJECT.GUIDUYET.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.GUIDUYET.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.GUIDUYET.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.GUIDUYET.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
-			this.objectService.GuiDuyet(_item.Id).subscribe(res => {
+			this.objectService.GuiDuyet(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -370,7 +339,7 @@ export class HoSoNCCListComponent implements OnInit {
 		});
 	}
 
-	ThuHoi(_item: HoSoNCCModel) {
+	ThuHoi(item: HoSoNCCModel) {
 		const _title = this.translate.instant('OBJECT.THUHOI.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.THUHOI.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.THUHOI.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
@@ -378,11 +347,9 @@ export class HoSoNCCListComponent implements OnInit {
 
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
-			this.objectService.ThuHoi(_item.Id).subscribe(res => {
+			this.objectService.ThuHoi(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -396,18 +363,17 @@ export class HoSoNCCListComponent implements OnInit {
 	Import() {
 		const dialogRef = this.dialog.open(HoSoNCCImportComponent, { width: '80%' });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			this.loadDataList();
 		});
 	}
 
-	openChiTiet(id) {
+	openChiTiet(id: number) {
 		window.open('/chi-tiet-ho-so/'+id , '_blank')
 	}
 
 	Export() {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'SoQuyetDinh' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
@@ -446,13 +412,14 @@ export class HoSoNCCListComponent implements OnInit {
 		});
 	}
 
-	getStatusString(status) {
+	getStatusString(status: any) {
 		var f = this.lstStatus.find(x => x.id == status);
 		if (!f)
 			return "";
 		return f.data.color;
 	}
-	in(object, loai = 1, isThannhan = false) {
+
+	in(object: any, loai = 1, isThannhan = false) {
 		var id = object.Id;
 		const filter: any = {};
 		filter.loai = loai;
@@ -499,9 +466,9 @@ export class HoSoNCCListComponent implements OnInit {
 			// let path = "viewer/file-dinh-kem/0?path=" + ApiRoot + "dulieu/quyet-dinh/" + filename;
 			// window.open(path, "_blank");
 		},
-			(err) => {
-				this.layoutUtilsService.showError("Vui lòng cập nhật biểu mẫu quyết định tương ứng với loại loại trợ cấp");
-			});
+		(err) => {
+			this.layoutUtilsService.showError("Vui lòng cập nhật biểu mẫu quyết định tương ứng với loại loại trợ cấp");
+		});
 	}
 	
 	guiDuyets(gui = true) {
@@ -510,17 +477,15 @@ export class HoSoNCCListComponent implements OnInit {
 			data = this.selection.selected.filter(x => x.visibleGuiDuyet).map(x => x.Id);
 		else
 			data = this.selection.selected.filter(x => x.visibleThuHoi).map(x => x.Id);
+
 		var title = gui ? 'GUIDUYET' : 'THUHOI';
 		const _title = this.translate.instant('OBJECT.' + title + '.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.' + title + '.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.' + title + '.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.' + title + '.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			if (gui)
 				this.objectService.GuiDuyets(data).subscribe(res => {
 					if (res && res.status === 1) {
@@ -543,7 +508,8 @@ export class HoSoNCCListComponent implements OnInit {
 				});
 		});
 	}
-	raQuyetDinh(item) {
+
+	raQuyetDinh(item: any) {
 		let _item: any = {
 			ObjectType: 0,
 			ObjectId: item.Id,
@@ -551,39 +517,38 @@ export class HoSoNCCListComponent implements OnInit {
 		}
 		const dialogRef = this.dialog.open(QuyetDinhEditDialogComponent, { data: { _item } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo("Tạo quyết định thành công");
 				this.ngOnInit();
 			}
 		});
 	}
-	inQD(item) {
+
+	inQD(item: any) {
 		this.objectService.previewQD(item.Id, item.Id_QuyetDinh).subscribe(res => {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 				dialogRef.afterClosed().subscribe(res => {
-					if (!res) {
-					} else {
-						this.objectService.exportQD(item.Id, item.Id_QuyetDinh, res.loai).subscribe(response => {
-							const headers = response.headers;
-							const filename = headers.get('x-filename');
-							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
-							const fileURL = URL.createObjectURL(blob);
-							const link = document.createElement('a');
-							link.href = fileURL;
-							link.download = filename;
-							link.click();
-						}, err => {
-							this.layoutUtilsService.showError("Xuất quyết định thất bại")
-						});
-					}
+					if (!res) return;
+					this.objectService.exportQD(item.Id, item.Id_QuyetDinh, res.loai).subscribe(response => {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename;
+						link.click();
+					}, err => {
+						this.layoutUtilsService.showError("Xuất quyết định thất bại")
+					});
 				});
 			} else
 				this.layoutUtilsService.showError(res.error.message);
 		})
 	}
+
 	/** SELECTION */
 	isAllSelected() {
 		const numSelected = this.selection.selected.length;
@@ -602,7 +567,6 @@ export class HoSoNCCListComponent implements OnInit {
 		} else {
 			this.productsResult.forEach(row => {
 				if (this.thaotac == 0 || (this.thaotac == 1 && !row.visibleGuiDuyet) || (this.thaotac == 2 && !row.visibleThuHoi)) {
-
 				} else {
 					this.selection.select(row)
 				}
@@ -610,7 +574,7 @@ export class HoSoNCCListComponent implements OnInit {
 		}
 	}
 
-	Download(object) {
+	Download(object: any) {
 		window.open(object.path, '_blank');
 	}
 
@@ -623,28 +587,28 @@ export class HoSoNCCListComponent implements OnInit {
 					if (res && res.status == 1) {
 						const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 						dialogRef.afterClosed().subscribe(res2 => {
-							if (!res2) {
-							} else {
-								this.commonService.exportHuongDan(id_quatrinh_lichsu, 2, res2.loai).subscribe(response => {
-									const headers = response.headers;
-									const filename = headers.get('x-filename');
-									const type = headers.get('content-type');
-									const blob = new Blob([response.body], { type });
-									const fileURL = URL.createObjectURL(blob);
-									const link = document.createElement('a');
-									link.href = fileURL;
-									link.download = filename;
-									link.click();
-								}, err => {
-									this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
-								});
-							}
+							if (!res2) return;
+							this.commonService.exportHuongDan(id_quatrinh_lichsu, 2, res2.loai).subscribe(response => {
+								const headers = response.headers;
+								const filename = headers.get('x-filename');
+								const type = headers.get('content-type');
+								const blob = new Blob([response.body], { type });
+								const fileURL = URL.createObjectURL(blob);
+								const link = document.createElement('a');
+								link.href = fileURL;
+								link.download = filename;
+								link.click();
+							}, err => {
+								this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
+							});
 						});
-					} else
+					} else {
 						this.layoutUtilsService.showError(res.error.message);
+					}
 				})
-			} else
+			} else {
 				this.layoutUtilsService.showError(res1.error.message);
+			}
 		});
 	}
 
@@ -653,22 +617,20 @@ export class HoSoNCCListComponent implements OnInit {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 				dialogRef.afterClosed().subscribe(res2 => {
-					if (!res2) {
-					} else {
-						this.commonService.exportBienNhan(object.Id, res2.loai).subscribe(response => {
-							const headers = response.headers;
-							const filename = headers.get('x-filename');
-							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
-							const fileURL = URL.createObjectURL(blob);
-							const link = document.createElement('a');
-							link.href = fileURL;
-							link.download = filename;
-							link.click();
-						}, err => {
-							this.layoutUtilsService.showError("Xuất biên nhận thất bại")
-						});
-					}
+					if (!res2) return;
+					this.commonService.exportBienNhan(object.Id, res2.loai).subscribe(response => {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename;
+						link.click();
+					}, err => {
+						this.layoutUtilsService.showError("Xuất biên nhận thất bại")
+					});
 				});
 			} else
 				this.layoutUtilsService.showError(res.error.message);
@@ -692,7 +654,6 @@ export class HoSoNCCListComponent implements OnInit {
 			// link.href = fileURL;
 			// link.download = filename;
 			// link.click();
-
 			let ApiRoot = environment.ApiRoot.slice(0, environment.ApiRoot.length - 3);
 			// let path = "viewer/file-dinh-kem/0?path=" + ApiRoot + "dulieu/ds-xuat/" + filename;
 			let path = ApiRoot + "dulieu/ds-xuat/" + filename;
@@ -704,19 +665,20 @@ export class HoSoNCCListComponent implements OnInit {
 	);
 	}
 	
-	printTicket(print_template) {
+	printTicket(print_template: any) {
 		this.print = true;
 		this.changeDetectorRefs.detectChanges();
 		let title = 'Tiếp nhận hồ sơ';
-		let zoom ='';
-		if(this.gridService.IsAllColumnsChecked()){
+		let zoom = '';
+		if (this.gridService && this.gridService.IsAllColumnsChecked()) {
 			zoom = `body {
 				zoom: 60%;
 			}`;
-		}
-		let slCol = this.gridService.IsAllColumnsChecked();
+		}  
+
 		let innerContents = document.getElementById(print_template).innerHTML;
 		const popupWinindow = window.open();
+		if (!popupWinindow) return;
 		popupWinindow.document.open();
 		popupWinindow.document.write('<html><head><title>'+ title +'</title></head><body onload="window.print()">' + innerContents + '</html>');
 		popupWinindow.document.write(`<style>

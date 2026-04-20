@@ -3,7 +3,7 @@ import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../../../../../core/_base/crud';
 
-export class DinhChinhThongTinDataSource extends BaseDataSource {
+export class DinhChinhDataSource extends BaseDataSource {
 	constructor(private objectService: DinhChinhThongTinService) {
 		super();
 	}

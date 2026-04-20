@@ -2,12 +2,10 @@ import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewC
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { GiayToService } from '../Services/giay-to.service';
 import { GiayToModel } from '../Model/giay-to.model';
-import * as moment from 'moment';
-import { Moment } from 'moment';
 
 @Component({
 	selector: 'kt-giay-to-edit',
@@ -16,10 +14,9 @@ import { Moment } from 'moment';
 })
 
 export class GiayToEditDialogComponent implements OnInit {
-
-	item: GiayToModel;
-	oldItem: GiayToModel;
-	itemForm: FormGroup;
+	item: GiayToModel = new GiayToModel();
+	oldItem: GiayToModel = new GiayToModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -28,9 +25,8 @@ export class GiayToEditDialogComponent implements OnInit {
 	allowEdit = false;
 	listLoaiGiayTo: any[] = [];
 	image: any;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
-	_NAME = '';
-	maxNS: Moment;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
+	_NAME: string = '';
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
@@ -45,7 +41,6 @@ export class GiayToEditDialogComponent implements OnInit {
 		}
 	}
 
-
 	constructor(public dialogRef: MatDialogRef<GiayToEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
@@ -53,17 +48,14 @@ export class GiayToEditDialogComponent implements OnInit {
 		private objectService: GiayToService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 			this._NAME = this.translate.instant('GIAYTO.NAME');
 	}
 
 	/** LOAD DATA */
 	ngOnInit() {
-		this.maxNS = moment(new Date());
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
-
 		this.LoadListLoaiGiayTo();
 		this.createForm();
 		if (this.item.Id > 0) {
@@ -94,11 +86,10 @@ export class GiayToEditDialogComponent implements OnInit {
 			FileDinhKem: [this.item.FileDinhKem ? [this.item.FileDinhKem] : null],
 		};
 		this.itemForm = this.fb.group(temp);
-
-		this.focusInput.nativeElement.focus();
-		if (!this.allowEdit) {
+		if (this.focusInput) 
+			this.focusInput.nativeElement.focus();
+		if (!this.allowEdit) 
 			this.itemForm.disable();
-		}
 	}
 
 	/** UI */
@@ -111,13 +102,13 @@ export class GiayToEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE');
 		return result;
 	}
 
 	/** ACTIONS */
-	prepareCustomer(): GiayToModel {
+	prepare(): GiayToModel | null {
+		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
 		const _item = new GiayToModel();
 		_item.Id = this.item.Id;
@@ -136,51 +127,49 @@ export class GiayToEditDialogComponent implements OnInit {
 		if (this.image && this.image.length > 0) {
 			_item.FileDinhKem = this.image[0];
 		} 
-		// else {
-		// 	this.layoutUtilsService.showError("Vui lòng chọn file giấy tờ");
-		// 	return;
-		// }
 		return _item;
 	}
 
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditGiayTo = this.prepareCustomer();
-		if (EditGiayTo.Id > 0) {
-			this.UpdateGiayTo(EditGiayTo, withBack);
-		} else {
-			this.CreateGiayTo(EditGiayTo, withBack);
+		const Edit = this.prepare();
+		if (Edit) {
+			if (Edit.Id > 0)
+				this.Update(Edit, withBack);
+			else
+				this.Create(Edit, withBack);
 		}
 	}
 
-	UpdateGiayTo(_item: GiayToModel, withBack: boolean) {
+	Update(item: GiayToModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.UpdateGiayTo(_item).subscribe(res => {
+		this.objectService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
+				if (withBack) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -188,22 +177,23 @@ export class GiayToEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateGiayTo(_item: GiayToModel, withBack: boolean) {
+	Create(item: GiayToModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		// 	this.viewLoading = true;
+		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.CreateGiayTo(_item).subscribe(res => {
+		this.objectService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -219,37 +209,24 @@ export class GiayToEditDialogComponent implements OnInit {
 		});
 	}
 
-	changeLoaiGT(val){
-		this.listLoaiGiayTo.forEach(x=>{
-			if(x.id==val)
+	changeLoaiGT(val: any){
+		this.listLoaiGiayTo.forEach(x => {
+			if (this.itemForm && x.id == val)
 				this.itemForm.controls.GiayTo.setValue(x.title)
 		})
 	}
 
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		} else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-	}
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
-	}
-	
-	onAlertClose($event) {
-		this.hasFormErrors = false;
 	}
 
 	close() {
 		this.dialogRef.close();
 	}
-
 }

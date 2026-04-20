@@ -40,7 +40,7 @@ export class ThanNhanEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.loadListGioiTInh();
+		this.loadListGioiTinh();
 		this.loadListQuanHeVoiLietSy();
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
@@ -67,7 +67,7 @@ export class ThanNhanEditComponent implements OnInit {
 		}
 	}
 
-	loadListGioiTInh() {
+	loadListGioiTinh() {
 		this.commonService.ListGioiTinh().subscribe(res => {
 			this.listgioitinh = res.data;
 		});

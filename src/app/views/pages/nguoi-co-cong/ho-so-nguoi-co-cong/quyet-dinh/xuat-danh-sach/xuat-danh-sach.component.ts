@@ -1,13 +1,12 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-import { Moment } from 'moment';
-import * as moment from 'moment';
 import { QuyetDinhService } from '../Services/quyet-dinh.service';
 import { ReviewDocxComponent } from '../../../components';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-xuat-danh-sach',
@@ -16,9 +15,7 @@ import { ReviewDocxComponent } from '../../../components';
 })
 
 export class XuatDanhSachComponent implements OnInit {
-
-	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict: number = 0;
 	listdistrict: any[] = [];
@@ -28,14 +25,13 @@ export class XuatDanhSachComponent implements OnInit {
 	listward: any[] = [];
 	lstStatus: any[] = [];
 	lstLoaiDT: any[] = [];
-	Capcocau: number;
-	to: Moment;
-	from: Moment;
-	list_button: boolean;
+	Capcocau: number = 0;
+	to: Moment | undefined;
+	from: Moment | undefined;
+	list_button: boolean = false;
 
 	constructor(public objectService: QuyetDinhService,
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
 		private commonService: CommonService,
 		private detechChange: ChangeDetectorRef,
@@ -49,7 +45,6 @@ export class XuatDanhSachComponent implements OnInit {
 		this.from = moment(new Date(y, 0, 1));
 		this.to = moment(new Date(y, 11, 31));
 		this.list_button = CommonService.list_button();
-
 		this.commonService.liteDoiTuongNCC(false).subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstLoaiDT = res.data;
@@ -57,7 +52,6 @@ export class XuatDanhSachComponent implements OnInit {
 				this.detechChange.detectChanges();
 			}
 		})
-
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 			this.Capcocau = res.Capcocau;
@@ -75,15 +69,14 @@ export class XuatDanhSachComponent implements OnInit {
 				this.filterDistrictID(+res.ID_Goc_Cha)
 			}
 		})
-
 		this.commonService.GetAllProvinces().subscribe(res => {
 			this.listprovinces = res.data;
 		});
 	}
 
 	checkDT(arr: any, id_dt: any) {
-		let idx = arr.findIndex(x=> x.id == id_dt)
-		if(idx > -1) return true
+		let idx = arr.findIndex((x: any) => x.id == id_dt);
+		return idx > -1;
 	}
 
 	loadGetListDistrictByProvinces(idProvince: any) {
@@ -101,12 +94,12 @@ export class XuatDanhSachComponent implements OnInit {
 		})
 	}
 
-	filterConfiguration(loai): any {
+	filterConfiguration(loai: any): any {
 		const filter: any = {};
 		if (this.loaids == 0)
 			this.layoutUtilsService.showError("Hãy chọn loại danh sách xuất");
-		filter.loai = loai //loại xuất
 
+		filter.loai = loai //loại xuất
 		if (this.loaids == 1 || this.loaids == 3) { //ds thờ cúng hoặc truy tặng bà mẹ vnah
 			var i = 0;
 			if (this.filterdistrict > 0) {
@@ -138,88 +131,55 @@ export class XuatDanhSachComponent implements OnInit {
 		return filter;
 	}
 
-	xuatQD(loai) {
-		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(loai),
-		);
-		if (this.loaids == 1) {
-			this.objectService.getDSThoCung(queryParams).subscribe(res => {
-				if (res && res.status == 1) {
-					const dialogRef = this.dialog.open(ReviewDocxComponent, { data: res.data });
-					dialogRef.afterClosed().subscribe(res2 => {
-						if (!res2) {
-						} else {
-							this.objectService.downloadDSThoCung(queryParams).subscribe(response => {
-								const headers = response.headers;
-								const filename = headers.get('x-filename');
-								const type = headers.get('content-type');
-								const blob = new Blob([response.body], { type });
-								const fileURL = URL.createObjectURL(blob);
-								const link = document.createElement('a');
-								link.href = fileURL;
-								link.download = filename;
-								link.click();
-							}, err => {
-								this.layoutUtilsService.showError("Không tìm thấy danh sách thờ cúng");
-							});
-						}
-					});
-				} else
-					this.layoutUtilsService.showError(res.error.message);
-			});
+	xuatQD(loai: any) {
+		const queryParams = new QueryParamsModel(this.filterConfiguration(loai));
+		let getApiData$, downloadApiData$, errorMsg: string;
+		switch (this.loaids) {
+			case 1:
+				getApiData$ = this.objectService.getDSThoCung(queryParams);
+				downloadApiData$ = this.objectService.downloadDSThoCung(queryParams);
+				errorMsg = "Không tìm thấy danh sách thờ cúng";
+				break;
+			case 2:
+				getApiData$ = this.objectService.getDSKham(queryParams);
+				downloadApiData$ = this.objectService.downloadDSKham(queryParams);
+				errorMsg = "Không tìm thấy danh sách khám";
+				break;
+			case 3:
+				getApiData$ = this.objectService.getTruyTangBMVNAH(queryParams);
+				downloadApiData$ = this.objectService.downloadTruyTangBMVNAH(queryParams);
+				errorMsg = "Không tìm thấy danh sách truy tặng BMVNAH";
+				break;
+			default:
+				return; // Thoát nếu loaids không hợp lệ
 		}
-		if (this.loaids == 2) {
-			this.objectService.getDSKham(queryParams).subscribe(res => {
-				if (res && res.status == 1) {
-					const dialogRef = this.dialog.open(ReviewDocxComponent, { data: res.data });
-					dialogRef.afterClosed().subscribe(res2 => {
-						if (!res2) {
-						} else {
-							this.objectService.downloadDSKham(queryParams).subscribe(response => {
-								const headers = response.headers;
-								const filename = headers.get('x-filename');
-								const type = headers.get('content-type');
-								const blob = new Blob([response.body], { type });
-								const fileURL = URL.createObjectURL(blob);
-								const link = document.createElement('a');
-								link.href = fileURL;
-								link.download = filename;
-								link.click();
-							}, err => {
-								this.layoutUtilsService.showError("Không tìm thấy danh sách khám");
-							});
-						}
-					});
-				} else
-					this.layoutUtilsService.showError(res.error.message);
-			});
-		}
-		if (this.loaids == 3) {
-			this.objectService.getTruyTangBMVNAH(queryParams).subscribe(res => {
-				if (res && res.status == 1) {
-					const dialogRef = this.dialog.open(ReviewDocxComponent, { data: res.data });
-					dialogRef.afterClosed().subscribe(res2 => {
-						if (!res2) {
-						} else {
-							this.objectService.downloadTruyTangBMVNAH(queryParams).subscribe(response => {
-								const headers = response.headers;
-								const filename = headers.get('x-filename');
-								const type = headers.get('content-type');
-								const blob = new Blob([response.body], { type });
-								const fileURL = URL.createObjectURL(blob);
-								const link = document.createElement('a');
-								link.href = fileURL;
-								link.download = filename;
-								link.click();
-							}, err => {
-								this.layoutUtilsService.showError("Không tìm thấy danh sách truy tặng BMVNAH");
-							});
-						}
-					});
-				} else
-					this.layoutUtilsService.showError(res.error.message);
-			});
-		}
-			
+		getApiData$.subscribe(res => {
+			if (res && res.status == 1) {
+				const dialogRef = this.dialog.open(ReviewDocxComponent, { data: res.data });
+				dialogRef.afterClosed().subscribe(res2 => {
+					if (!res2) return;
+					downloadApiData$.subscribe(
+						response => this.downloadFile(response),
+						err => this.layoutUtilsService.showError(errorMsg)
+					);
+				});
+			} else {
+				this.layoutUtilsService.showError(res.error.message);
+			}
+		});
+	}
+
+	private downloadFile(response: any) {
+		const headers = response.headers;
+		const filename = headers.get('x-filename');
+		const type = headers.get('content-type');
+		const blob = new Blob([response.body], { type });
+		const fileURL = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = fileURL;
+		link.download = filename;
+		link.click();
+		// Khuyến nghị bổ sung: Giải phóng bộ nhớ sau khi tạo URL
+		URL.revokeObjectURL(fileURL);
 	}
 }

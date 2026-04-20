@@ -24,11 +24,10 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class HoSoNCCDuyetListComponent implements OnInit {
-
 	// Table fields
-	dataSource: HoSoNCCDuyetDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: HoSoNCCDuyetDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
@@ -36,24 +35,23 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
-	// tslint:disable-next-line:variable-name
 	_name = '';
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict = '';
 	listdistrict: any[] = [];
 	filterward = '';
 	listward: any[] = [];
-	visibleGuiDuyet: boolean;
-	visibleThuHoi: boolean;
-	IsVisible_Duyet: boolean;
-	IsEnable_Duyet: boolean=true;
-	Capcocau: number;
+	visibleGuiDuyet: boolean = false;
+	visibleThuHoi: boolean = false;
+	IsVisible_Duyet: boolean = false;
+	IsEnable_Duyet: boolean = true;
+	Capcocau: number = 0;
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
 	selectedTab: number = 0;
 
 	constructor(
@@ -66,8 +64,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 		private ref: ApplicationRef,
 		private commonService: CommonService,
 		private translate: TranslateService,
-		private tokenStorage: TokenStorage,
-		private router: Router) {
+		private tokenStorage: TokenStorage) {
 			this._name = 'Hồ sơ người có công';
 	}
 
@@ -135,7 +132,6 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			value: 'False',
 			checked: false
 		}];
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -309,10 +305,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
 			this.gridModel.availableColumns
@@ -325,40 +318,35 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_hosonccdaduyet'
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_hosonccdaduyet'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new HoSoNCCDuyetDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			//queryParams.filter=new 
-			queryParams.filter.IsEnable_Duyet = this.IsEnable_Duyet;
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilter$.getValue();
+				queryParams.filter.IsEnable_Duyet = this.IsEnable_Duyet;
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -368,6 +356,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 
 	loadDataList(holdCurrentPage: boolean = true) {
 		this.selection.clear();
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -378,6 +367,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 		);
 		this.dataSource.loadList(queryParams);
 	}
+
 	filterDistrictID(id: any) {
 		this.filterdistrict = id;
 		this.filterward = '';
@@ -401,14 +391,13 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 		if (this.filterward) {
 			filter.Id_Xa = +this.filterward;
 		}
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DiaChi = this.gridService.model.filterText.DiaChi;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 			filter.LoaiHoSo = this.gridService.model.filterText.LoaiHoSo;
 		}
-
 		return filter;
 	}
 
@@ -430,6 +419,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 				return 'metal';
 		}
 	}
+
 	loadGetListDistrictByProvinces(idProvince: any) {
 		this.commonService.GetListDistrictByProvinces(idProvince).subscribe(res => {
 			this.listdistrict = res.data;
@@ -437,36 +427,22 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 		});
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	viewCT(id) {
+	viewCT(id: number) {
 		window.open('/chi-tiet-ho-so/'+id, '_blank')
 	}
 
 	Duyet(item: any, isDuyet: boolean = true) {
-		//let saveMessageTranslateParam = '';
-		//saveMessageTranslateParam += 'OBJECT.DUYET.MESSAGE';
-		//const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(HoSoNCCDuyetDialogComponent, { data: { _item, isDuyet } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				//this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
 		});
 	}
 
-
-	duyets(duyet = true) {
+	duyets(duyet: boolean = true) {
 		var data = {
 			ids: this.selection.selected.filter(x => !x.IsEnable_Duyet).map(x => x.Id),
 			value: duyet
@@ -476,12 +452,9 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 		const _description = this.translate.instant('OBJECT.' + tt + '.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.' + tt + '.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.' + tt + '.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
 			this.objectService.Duyets(data).subscribe(res => {
 				if (res && res.status === 1) {
@@ -494,6 +467,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			});
 		});
 	}
+
 	/** SELECTION */
 	isAllSelected() {
 		const numSelected = this.selection.selected.length;
@@ -513,22 +487,21 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 		}
 	}
 
-	Download(object) {
+	Download(object: any) {
 		window.open(object.path, '_blank');
 	}
+
 	timeline(QuaTrinhKhongCoNguoiDuyet: any) {
 		var data = { id_phieu: QuaTrinhKhongCoNguoiDuyet.Id };
 		const dialogRef = this.dialog.open(SettingProcessComponent, { data: { data: data, Type: 2 } });
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
-	changeTab($event) {
+
+	changeTab($event: any) {
 		this.selectedTab = $event;
 		//this.filterConfiguration();
 	}
+
 	inhuongdan(QuaTrinhKhongCoNguoiDuyet: any) {
 		let id_quatrinh_lichsu: number = 0;
 		this.commonService.getIdHuongDan(QuaTrinhKhongCoNguoiDuyet.Id, 2).subscribe(res1 => {
@@ -538,68 +511,68 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 					if (res && res.status == 1) {
 						const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 						dialogRef.afterClosed().subscribe(res2 => {
-							if (!res2) {
-							} else {
-								this.commonService.exportHuongDan(id_quatrinh_lichsu, 2, res2.loai).subscribe(response => {
-									const headers = response.headers;
-									const filename = headers.get('x-filename');
-									const type = headers.get('content-type');
-									const blob = new Blob([response.body], { type });
-									const fileURL = URL.createObjectURL(blob);
-									const link = document.createElement('a');
-									link.href = fileURL;
-									link.download = filename;
-									link.click();
-								}, err => {
-									this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
-								});
-							}
+							if (!res2) return;
+							this.commonService.exportHuongDan(id_quatrinh_lichsu, 2, res2.loai).subscribe(response => {
+								const headers = response.headers;
+								const filename = headers.get('x-filename');
+								const type = headers.get('content-type');
+								const blob = new Blob([response.body], { type });
+								const fileURL = URL.createObjectURL(blob);
+								const link = document.createElement('a');
+								link.href = fileURL;
+								link.download = filename;
+								link.click();
+							}, err => {
+								this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
+							});
 						});
-					} else
+					} else {
 						this.layoutUtilsService.showError(res.error.message);
+					}
 				})
-			} else
+			}  else {
 				this.layoutUtilsService.showError(res1.error.message);
+			}
 		});
 	}
+
 	InBienNhan(object: any) {
 		this.commonService.getBienNhan(object.Id).subscribe(res => {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 				dialogRef.afterClosed().subscribe(res2 => {
-					if (!res2) {
-					} else {
-						this.commonService.exportBienNhan(object.Id, res2.loai).subscribe(response => {
-							const headers = response.headers;
-							const filename = headers.get('x-filename');
-							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
-							const fileURL = URL.createObjectURL(blob);
-							const link = document.createElement('a');
-							link.href = fileURL;
-							link.download = filename;
-							link.click();
-						}, err => {
-							this.layoutUtilsService.showError("Xuất biên nhận thất bại")
-						});
-					}
+					if (!res2) return;
+					this.commonService.exportBienNhan(object.Id, res2.loai).subscribe(response => {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename;
+						link.click();
+					}, err => {
+						this.layoutUtilsService.showError("Xuất biên nhận thất bại")
+					});
 				});
 			} else
 				this.layoutUtilsService.showError(res.error.message);
 		});
 	}
+
 	TraLai(item: any) {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(HoSoNCCDuyetDialogComponent, { data: { _item, isDuyet: true, isReturn: true } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			}
-			else {
+			if (res) {
 				this.loadDataList();
 			}
 		});
 	}
+
 	Export() {
+		if (!this.paginator || !this.sort || !this.gridService) return;
 		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'SoQuyetDinh' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
@@ -608,18 +581,14 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 		});
 
 		let index = cols.indexOf("Id_HinhThuc");
-		if(index != -1){
+		if (index != -1)
 			cols[index] = 'strHinhThuc';
-		};
 		index = cols.indexOf("IsTre_Duyet");
-		if(index != -1){
+		if (index != -1) 
 			cols[index] = 'Deadline_Duyet';
-		};
 		index = cols.indexOf("IsTre");
-		if(index != -1){
+		if (index != -1) 
 			cols[index] = 'Deadline';
-		};
-
 
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -647,23 +616,26 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			this.layoutUtilsService.showError("Xuất danh sách thất bại")
 		});
 	}
+
 	print: boolean = false;
-	printTicket(print_template) {
+	printTicket(print_template: any) {
 		this.print = true;
 		this.changeDetectorRefs.detectChanges();
-		let innerContents = document.getElementById(print_template).innerHTML;
+		const element = document.getElementById(print_template);
+		if (!element) return;
+		let innerContents = element.innerHTML;
 		let str = '<button class="mat-sort-header-button" type="button" aria-label="Change sorting for CreatedDate">Ngày tạo</button>';
 		let str1 = '<span aria-label="Change sorting for CreatedDate">Ngày tạo</span>';
 		innerContents = innerContents.replace(str, str1);
-		let zoom ='';
-		if(this.gridService.IsAllColumnsChecked()){
+		let zoom = '';
+		if (this.gridService && this.gridService.IsAllColumnsChecked()) {
 			zoom = `body {
 				zoom: 60%;
 			}`;
 		}
 		let title = !this.IsEnable_Duyet? 'Hồ sơ người có công cần duyệt' : 'Hồ sơ người có công đã duyệt';
-
 		const popupWinindow = window.open();
+		if (!popupWinindow) return;
 		popupWinindow.document.open();
 		popupWinindow.document.write('<html><head><title>'+title+'</title></head><body onload="window.print()">' + innerContents + '</html>');
 		popupWinindow.document.write(`<style>
@@ -674,25 +646,24 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			.hiden-print {
 				display: none !important;
 			}
-			td{
+			td {
 				border-bottom: 1px solid #dee2e6;
 				padding: 10px;
 				font-size: 10pt;
 			}
-			th{
+			th {
 				padding: 10px;
 				font-size: 12pt;
 			}
-			
 		}
 		</style>
 		`);
 
-			popupWinindow.document.close();
-			// popupWinindow.print();
+		popupWinindow.document.close();
+		// popupWinindow.print();
 		popupWinindow.onafterprint = window.close;
-			// setTimeout(popupWinindow.close, 0);
+		// setTimeout(popupWinindow.close, 0);
 		this.print = false;
 		this.changeDetectorRefs.detectChanges();
-	 }
+	}
 }

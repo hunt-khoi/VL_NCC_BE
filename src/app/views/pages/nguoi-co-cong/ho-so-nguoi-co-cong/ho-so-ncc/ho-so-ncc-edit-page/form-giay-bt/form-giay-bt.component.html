@@ -1,5 +1,5 @@
 <form class="kt-form" [formGroup]="itemForm">
-	<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+	<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 		Không thể lưu, vui lòng kiểm tra lại thông tin!
 	</kt-alert>
 	<mat-tab-group [selectedIndex]="selectedTab" (selectedIndexChange)="selectedTab=$event">
@@ -316,7 +316,7 @@
 			</div>
 			<div class="form-group kt-form__group row">
 				<div class="col-md-12 text-center">
-					<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false, true)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+					<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(true)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
 						<span translate="COMMON.LUU_TIEPTUC"></span>
 					</button>
 				</div>

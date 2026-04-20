@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { ActivatedRoute } from '@angular/router';
 import { HoSoNCCService } from '../ho-so-ncc/Services/ho-so-ncc.service';
+
 @Component({
 	selector: 'kt-ho-so-ncc-view-detail',
 	templateUrl: './ho-so-ncc-view-detail.component.html',
@@ -11,7 +12,8 @@ import { HoSoNCCService } from '../ho-so-ncc/Services/ho-so-ncc.service';
 
 export class HoSoNccViewDetailComponent implements OnInit {
 	_user: any = {};
-	objectId: string;
+	objectId: string = '';
+
 	constructor(
 		private objectService: HoSoNCCService,
 		private actRoute: ActivatedRoute,
@@ -20,9 +22,9 @@ export class HoSoNccViewDetailComponent implements OnInit {
 
 	ngOnInit() {
 		this.actRoute.paramMap.subscribe(params => {
-			this.objectId = params.get('id');
+			this.objectId = params.get('id') || '';
 		});
-		if (this.objectId)
+		if (this.objectId) {
 			this.objectService.getItem(+this.objectId).subscribe(res => {
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -31,12 +33,10 @@ export class HoSoNccViewDetailComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 				}
 			});
+		}
 	}
 
 	back() {
 		history.back();
 	}
-
 }
-
-

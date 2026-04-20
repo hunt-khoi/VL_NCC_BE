@@ -175,7 +175,7 @@ export class DoiTuongTrangCapEditDialogComponent implements OnInit {
 			}
 		})
 
-		this.loadListGioiTInh();
+		this.loadListGioiTinh();
 		this.loadListDoiTuongDC();
 		this.loadListQuanHeGiaDinh();
 
@@ -449,7 +449,7 @@ export class DoiTuongTrangCapEditDialogComponent implements OnInit {
 		});
 	}
 
-	loadListGioiTInh() {
+	loadListGioiTinh() {
 		this.commonService.ListGioiTinh().subscribe(res => {
 			this.listgioitinh = res.data;
 		});

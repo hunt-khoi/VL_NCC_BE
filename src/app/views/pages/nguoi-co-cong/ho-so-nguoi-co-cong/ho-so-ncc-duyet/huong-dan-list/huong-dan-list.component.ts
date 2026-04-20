@@ -17,7 +17,6 @@ import { HuongDanHuongThienDialogComponent } from '../huong-dan-hoan-thien/huong
 import { HoSoNCCDuyetDialogComponent } from '../ho-so-ncc-duyet/ho-so-ncc-duyet-dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
-
 @Component({
 	selector: 'kt-huong-dan-list',
 	templateUrl: './huong-dan-list.component.html',
@@ -27,9 +26,9 @@ import { CookieService } from 'ngx-cookie-service';
 export class HuongDanListComponent implements OnInit {
 
 	// Table fields
-	dataSource: HuongDanDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: HuongDanDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
@@ -37,20 +36,19 @@ export class HuongDanListComponent implements OnInit {
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
-	// tslint:disable-next-line:variable-name
 	_name = '';
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict = '';
 	listdistrict: any[] = [];
 	filterward = '';
 	listward: any[] = [];
-	Capcocau: number;
+	Capcocau: number = 0;
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
 
 	constructor(
 		public objectService: HoSoNCCDuyetService,
@@ -125,7 +123,6 @@ export class HuongDanListComponent implements OnInit {
 			value: 'False',
 			checked: false
 		}];
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -278,10 +275,7 @@ export class HuongDanListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
 			this.gridModel.availableColumns
@@ -297,33 +291,30 @@ export class HuongDanListComponent implements OnInit {
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new HuongDanDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -332,6 +323,7 @@ export class HuongDanListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -365,13 +357,12 @@ export class HuongDanListComponent implements OnInit {
 		if (this.filterward) {
 			filter.Id_Xa = +this.filterward;
 		}
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DiaChi = this.gridService.model.filterText.DiaChi;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 		}
-
 		return filter;
 	}
 
@@ -380,15 +371,6 @@ export class HuongDanListComponent implements OnInit {
 			this.listdistrict = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-	}
-
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
 	}
 
 	/** SELECTION */
@@ -411,68 +393,53 @@ export class HuongDanListComponent implements OnInit {
 	}
 
 	Duyet(item: any, isDuyet: boolean = true) {
-		//let saveMessageTranslateParam = '';
-		//saveMessageTranslateParam += 'OBJECT.DUYET.MESSAGE';
-		//const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(HoSoNCCDuyetDialogComponent, { data: { _item, isDuyet } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				//this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
 		});
 	}
 
-	Download(object) {
+	Download(object: any) {
 		window.open(object.path, '_blank');
 	}
+
 	timeline(QuaTrinhKhongCoNguoiDuyet: any) {
 		var data = { id_phieu: QuaTrinhKhongCoNguoiDuyet.Id };
 		const dialogRef = this.dialog.open(SettingProcessComponent, { data: { data: data, Type: 2 } });
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
 
-	inhuongdan(id_quatrinh_lichsu) {
+	inhuongdan(id_quatrinh_lichsu: number) {
 		this.commonService.getHuongDan(id_quatrinh_lichsu, 5).subscribe(res => {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 				dialogRef.afterClosed().subscribe(res2 => {
-					if (!res2) {
-					} else {
-						this.commonService.exportHuongDan(id_quatrinh_lichsu, 5, res2.loai).subscribe(response => {
-							const headers = response.headers;
-							const filename = headers.get('x-filename');
-							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
-							const fileURL = URL.createObjectURL(blob);
-							const link = document.createElement('a');
-							link.href = fileURL;
-							link.download = filename;
-							link.click();
-						}, err => {
-							this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
-						});
-					}
+					this.commonService.exportHuongDan(id_quatrinh_lichsu, 5, res2.loai).subscribe(response => {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename;
+						link.click();
+					}, err => {
+						this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
+					});
 				});
 			} else
 				this.layoutUtilsService.showError(res.error.message);
 		})
 	}
 
-	capNhat(id_quatrinh_lichsu) {
+	capNhat(id_quatrinh_lichsu: number) {
 		let item = { id_quytrinh_lichsu: id_quatrinh_lichsu };
 		const dialogRef = this.dialog.open(HuongDanHuongThienDialogComponent, { data: {item} });
-		dialogRef.afterClosed().subscribe(res2 => {
-			if (!res2) {
-			} else {
-				this.loadDataList();
-			}
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
 }

@@ -13,7 +13,8 @@
 				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
 				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>
-			<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+			<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" 
+				*ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
 				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
 				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>

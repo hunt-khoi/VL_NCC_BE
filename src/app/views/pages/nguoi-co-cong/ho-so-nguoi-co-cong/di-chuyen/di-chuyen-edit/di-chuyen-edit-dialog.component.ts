@@ -1,9 +1,7 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, Type } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { DiChuyenEditComponent } from '../../../components';
 import { DiChuyenService } from '../Services/di-chuyen.service';
 
@@ -14,21 +12,18 @@ import { DiChuyenService } from '../Services/di-chuyen.service';
 })
 
 export class DiChuyenEditDialogComponent implements OnInit {
-
 	ChildComponentInstance: any;
-	childComponentType: Type<any>;
+	childComponentType: Type<any> | undefined;
 	childComponentData: any = {};
 	item: any;
 	ncc: any = {};
-	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 	isZoomSize = false;
 	allowEdit = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
-	_NAME = '';
-	maxNS: Moment;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
+	_NAME: string = "";
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
@@ -54,7 +49,6 @@ export class DiChuyenEditDialogComponent implements OnInit {
 
 	/** LOAD DATA */
 	ngOnInit() {
-		this.maxNS = moment(new Date());
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
@@ -73,37 +67,38 @@ export class DiChuyenEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE');
 		return result;
 	}
 
 	onSubmit(withBack: boolean = false) {
-		let EditTroCap = this.ChildComponentInstance.onSubmit();
-		if (EditTroCap.Id > 0) {
-			this.UpdateTroCap(EditTroCap, withBack);
-		} else {
-			this.CreateTroCap(EditTroCap, withBack);
+		let Edit = this.ChildComponentInstance.onSubmit();
+		if (Edit) {
+			if (Edit.Id > 0)
+				this.Update(Edit, withBack);
+			else
+				this.Create(Edit, withBack);
 		}
 	}
 
-	UpdateTroCap(_item: any, withBack: boolean) {
+	Update(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Update(_item).subscribe(res => {
+		this.objectService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
+				if (withBack) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -111,22 +106,23 @@ export class DiChuyenEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateTroCap(_item: any, withBack: boolean) {
+	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Create(_item).subscribe(res => {
+		this.objectService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
+				if (withBack) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -136,25 +132,11 @@ export class DiChuyenEditDialogComponent implements OnInit {
 		});
 	}
 
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		} else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-	}
-
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
-
 	close() {
 		this.dialogRef.close();
 	}
 
-	getInstance($event) {
+	getInstance($event: any) {
 		this.ChildComponentInstance = $event;
 	}
 }

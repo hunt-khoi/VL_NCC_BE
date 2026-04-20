@@ -22,5 +22,4 @@ import { ThoiHanListComponent } from './thoi-han-list/thoi-han-list.component';
 	exports: [ThoiHanListComponent]
 })
 
-
 export class ThoiHanRefModule { }

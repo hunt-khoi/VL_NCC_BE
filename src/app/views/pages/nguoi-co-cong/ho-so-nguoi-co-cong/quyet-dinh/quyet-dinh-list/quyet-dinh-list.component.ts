@@ -1,11 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef } from '@angular/core';
 import { MatDialog, MatPaginator, MatSort } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
+import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
-// Services
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
@@ -23,25 +22,24 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class QuyetDinhListComponent implements OnInit {
-
 	// Table fields
-	dataSource: QuyetDinhDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: QuyetDinhDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
 	// Selection
 	selection = new SelectionModel<HoSoNCCModule>(true, []);
 	productsResult: HoSoNCCModule[] = [];
-	// tslint:disable-next-line:variable-name
+
 	_name = '';
 	objectId = '';
 	selected: number = 0;
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
 
 	constructor(public objectService: QuyetDinhService,
 		public dialog: MatDialog,
@@ -57,7 +55,6 @@ export class QuyetDinhListComponent implements OnInit {
 	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-
 		// filter
 		this.gridModel = new TableModel();
 		this.gridModel.clear();
@@ -66,7 +63,6 @@ export class QuyetDinhListComponent implements OnInit {
 		this.gridModel.filterText.SoQuyetDinh = '';
 		this.gridModel.filterText.SoHoSo = '';
 		this.gridModel.filterText.HoTen = '';
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -163,10 +159,7 @@ export class QuyetDinhListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
@@ -180,37 +173,34 @@ export class QuyetDinhListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_qd'
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_qd'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new QuyetDinhDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) { 
+				queryParams = this.objectService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -219,6 +209,7 @@ export class QuyetDinhListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -233,31 +224,30 @@ export class QuyetDinhListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = { ObjectType: this.selected };
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.SoQuyetDinh = this.gridService.model.filterText.SoQuyetDinh;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 		}
 		return filter;
 	}
-	changetab($event) {
+
+	changetab($event: any) {
 		this.selected = $event;
 		this.loadDataList();
 	}
+
 	/** Delete */
-	DeleteWorkplace(_item: any) {
+	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.Delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -267,19 +257,13 @@ export class QuyetDinhListComponent implements OnInit {
 			});
 		});
 	}
-	AddWorkplace() {
-		const objectModel: any = {}
-		this.Editobject(objectModel);
-	}
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
 
-		if (!queryParams.filter) {
-			return;
-		}
+	Add() {
+		const objectModel: any = {}
+		this.Edit(objectModel);
 	}
-	Editobject(_item: any, allowEdit: boolean = true) {
+
+	Edit(_item: any, allowEdit: boolean = true) {
 		let id_ncc = this.objectId;
 		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
@@ -295,6 +279,7 @@ export class QuyetDinhListComponent implements OnInit {
 	}
 
 	exportList() {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
@@ -341,7 +326,7 @@ export class QuyetDinhListComponent implements OnInit {
 		}
 	}
 
-	in(item) {
+	in(item: any) {
 		//this.objectService.previewQD(item.ObjectType, item.Id_NCC, item.Id).subscribe(res => {
 		//	if (res && res.status == 1) {
 		//		const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });

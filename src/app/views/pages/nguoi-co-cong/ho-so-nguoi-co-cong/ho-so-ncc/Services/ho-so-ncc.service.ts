@@ -11,11 +11,11 @@ const API_URL = environment.ApiRoot + '/ncc';
 @Injectable()
 export class HoSoNCCService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
+	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
 	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	data_import: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
@@ -28,8 +28,7 @@ export class HoSoNCCService {
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_URL;
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_URL, {
 			headers: httpHeaders,
 			params: httpParams
 		});
@@ -41,20 +40,17 @@ export class HoSoNCCService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	// CREATE =>  POST: add a new oduct to the server
-	CreateHoSoNCC(item): Observable<any> {
+	Create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
-	UpdateHoSoNCC(item: HoSoNCCModel): Observable<any> {
+	Update(item: HoSoNCCModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
-	deleteItem(itemId: number): Observable<any> {
+	Delete(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
@@ -88,12 +84,10 @@ export class HoSoNCCService {
 		return this.http.post<any>(API_URL + '/import', item, { headers: httpHeaders });
 	}
 
-	GetTemplateByNCC(ncc): Observable<any> {
+	GetTemplateByNCC(IdNCC: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_URL}/get-mau-theo-ncc?Id=${ncc}`;
-		return this.http.get(url, {
-			headers: httpHeaders
-		});
+		const url = `${API_URL}/get-mau-theo-ncc?Id=${IdNCC}`;
+		return this.http.get(url, { headers: httpHeaders });
 	}
 
 	importFile(item: any): Observable<any> {
@@ -121,7 +115,7 @@ export class HoSoNCCService {
 		});
 	}
 
-	previewHS(id, queryParams): Observable<any> {
+	previewHS(id: number, queryParams: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(queryParams);
 		return this.http.get(API_URL + `/get-ho-so?id=${id}`, {
@@ -130,7 +124,7 @@ export class HoSoNCCService {
 		});
 	}
 
-	previewHS1(id, queryParams): Observable<any> {
+	previewHS1(id: number, queryParams: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(queryParams);
 		return this.http.get(API_URL + `/get-ho-so-tu-loai-hs?id=${id}`, {
@@ -139,7 +133,7 @@ export class HoSoNCCService {
 		});
 	}
 
-	exportHS(id, queryParams): Observable<any> {
+	exportHS(id: number, queryParams: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(queryParams);
 		return this.http.get(API_URL + `/export-ho-so?id=${id}`, {
@@ -150,7 +144,7 @@ export class HoSoNCCService {
 		});
 	}
 
-	downloadHS(id, queryParams): Observable<any> {
+	downloadHS(id: number, queryParams: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(queryParams);
 		return this.http.get(API_URL + `/download-ho-so?id=${id}`, {
@@ -161,7 +155,7 @@ export class HoSoNCCService {
 		});
 	}
 
-	exportHS1(id, loai:number=1, queryParams=null): Observable<any> {
+	exportHS1(id: number, loai: number = 1, queryParams: any = null): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(queryParams);
 		return this.http.get(API_URL + `/export-ho-so1?id=${id}&loai=${loai}`, {
@@ -172,17 +166,17 @@ export class HoSoNCCService {
 		});
 	}
 
-	previewQD(ncc, itemId: number): Observable<any> {
+	previewQD(id: number, itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${environment.ApiRoot}/quyet-dinh/get-quyet-dinh?id=${ncc}&qd=${itemId}`;
+		const url = `${environment.ApiRoot}/quyet-dinh/get-quyet-dinh?id=${id}&qd=${itemId}`;
 		return this.http.get(url, {
 			headers: httpHeaders
 		});
 	}
 
-	exportQD(ncc, itemId: number, loai:number=1): Observable<any> {
+	exportQD(id: number, itemId: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${environment.ApiRoot}/quyet-dinh/export-quyet-dinh?id=${ncc}&qd=${itemId}&loai=${loai}`;
+		const url = `${environment.ApiRoot}/quyet-dinh/export-quyet-dinh?id=${id}&qd=${itemId}&loai=${loai}`;
 		return this.http.get(url, {
 			headers: httpHeaders,
 			responseType: 'blob',
@@ -190,9 +184,9 @@ export class HoSoNCCService {
 		});
 	}
 	
-	downAllFiles(ncc: any): Observable<any> {
+	downAllFiles(id: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_URL}/download-all-files?id=${ncc}`;
+		const url = `${API_URL}/download-all-files?id=${id}`;
 		return this.http.get(url, {
 			headers: httpHeaders,
 			responseType: 'blob',

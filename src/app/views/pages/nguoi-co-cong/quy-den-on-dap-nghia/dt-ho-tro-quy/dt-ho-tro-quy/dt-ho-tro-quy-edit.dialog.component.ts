@@ -108,7 +108,7 @@ export class DTHoTroEditDialogComponent implements OnInit {
 			}
 		})
 		this.getlistDoiTuong();
-		this.loadListGioiTInh();
+		this.loadListGioiTinh();
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
@@ -168,13 +168,13 @@ export class DTHoTroEditDialogComponent implements OnInit {
 	}
 
 	loadKhomAp() {
-		this.commonService.GetListKhomApByWard(this.filterward).subscribe(res => {
+		this.commonService.GetListKhomApByWard(+this.filterward).subscribe(res => {
 			this.listKhomAp = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
 	
-	loadListGioiTInh() {
+	loadListGioiTinh() {
 		this.commonService.ListGioiTinh().subscribe(res => {
 			this.listgioitinh = res.data;
 		});

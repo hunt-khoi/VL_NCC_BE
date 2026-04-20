@@ -30,8 +30,7 @@
 							<mat-datepicker-toggle matSuffix [for]="pickerbd_tungay"></mat-datepicker-toggle>
 							<mat-datepicker #pickerbd_tungay></mat-datepicker>
 							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
-							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong>
-							</mat-error>
+							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong></mat-error>
 						</mat-form-field>
 					</div>
 					<div class="col-md-2 kt-margin-bottom-10-mobile">
@@ -40,16 +39,16 @@
 							<mat-datepicker-toggle matSuffix [for]="pickerbd_denngay"></mat-datepicker-toggle>
 							<mat-datepicker #pickerbd_denngay></mat-datepicker>
 							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
-							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong>
-							</mat-error>
+							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong></mat-error>
 						</mat-form-field>
 					</div>
 					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids==1 || loaids==3">
 						<mat-form-field class="mat-form-field-fluid ">
-							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" (selectionChange)="filterDistrictID(filterdistrict)" [disabled]="Capcocau >= 2">
+							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" 
+								(selectionChange)="filterDistrictID(filterdistrict)" [disabled]="Capcocau >= 2">
 								<mat-option [value]="0">Tất cả</mat-option>
-								<mat-option [value]="district.ID_Row" *ngFor="let district of listdistrict;">
-									{{district.District}}
+								<mat-option [value]="d.ID_Row" *ngFor="let d of listdistrict;">
+									{{d.District}}
 								</mat-option>
 							</mat-select>
 						</mat-form-field>
@@ -58,8 +57,8 @@
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="{{ 'WARD.NAME' | translate }}" [(value)]="filterward" [disabled]="Capcocau == 3">
 								<mat-option [value]="0">Tất cả</mat-option>
-								<mat-option [value]="ward.ID_Row" *ngFor="let ward of listward;">
-									{{ward.Ward}}
+								<mat-option [value]="w.ID_Row" *ngFor="let w of listward;">
+									{{w.Ward}}
 								</mat-option>
 							</mat-select>
 						</mat-form-field>
@@ -77,8 +76,6 @@
 				</div>
 			</div>
 		</div>
-		<div class="example-container mat-table__wrapper" id="print-section">
-			
-		</div>
+		<div class="example-container mat-table__wrapper" id="print-section"></div>
 	</div>
 </kt-portlet>

@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, ChangeDetectionStrategy, ViewChild, ElementR
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { Moment } from 'moment';
 import { QuyetDinhService } from '../Services/quyet-dinh.service';
 import { QuyetDinhEditComponent } from '../../../components';
@@ -16,7 +16,7 @@ import { QuyetDinhEditComponent } from '../../../components';
 export class QuyetDinhEditDialogComponent implements OnInit {
 
 	ChildComponentInstance: any;
-	childComponentType: Type<any>;
+	childComponentType: Type<any> | undefined;
 	childComponentData: any = {};
 
 	item: any;
@@ -29,9 +29,9 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 	callapi = true;//update trên form hay k
 	listLoaiQuyetDinh: any[] = [];
 	image: any;
-	ngay1: Moment;
-	ngay2: Moment;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	ngay1: Moment | undefined;
+	ngay2: Moment | undefined;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 	//type: trợ cấp: 1, cắt trợ cấp: 3 
 
@@ -54,7 +54,6 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 		private objectService: QuyetDinhService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 			this._NAME = this.translate.instant('QUYETDINH.NAME');
 	}
@@ -83,7 +82,6 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ' ' + this._NAME.toLowerCase();
 		return result;
 	}
@@ -120,7 +118,8 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -143,7 +142,8 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -162,14 +162,12 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 			this.isZoomSize = false;
 		}
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close();
 	}
 
-	getInstance($event) {
+	getInstance($event: any) {
 		this.ChildComponentInstance = $event;
 	}
 }

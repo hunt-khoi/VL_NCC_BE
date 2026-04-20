@@ -821,7 +821,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	}
 
 	loadChucDanhChange(idcd: any) {
-		let id_st = this.ID_Struct;
+		let id_st = +this.ID_Struct;
 		this.commonService.GetListJobtitleByStructure(idcd, id_st).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listChucVu = res.data;

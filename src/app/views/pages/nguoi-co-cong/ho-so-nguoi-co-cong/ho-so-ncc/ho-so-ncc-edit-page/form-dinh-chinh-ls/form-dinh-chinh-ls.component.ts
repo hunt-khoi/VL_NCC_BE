@@ -1,15 +1,15 @@
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
+import { ReplaySubject } from 'rxjs';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../../core/_base/crud';
+import { TokenStorage } from '../../../../../../../core/auth/_services/token-storage.service';
+import { CommonService } from '../../../../services/common.service';
 import { ThanNhanService } from './../../../than-nhan/Services/than-nhan.service';
 import { HoSoNCCService } from './../../Services/ho-so-ncc.service';
 import { HoSoNCCModel } from '../../../ho-so-ncc/Model/ho-so-ncc.model';
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, Type, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
-import { CommonService } from '../../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel, TypesUtilsService } from '../../../../../../../core/_base/crud';
-import * as moment from 'moment';
-import { ReplaySubject } from 'rxjs';
-import { TokenStorage } from '../../../../../../../core/auth/_services/token-storage.service';
-import {  DCThanNhanRowEditComponent, TroCapRowEditComponent } from '../../../../components';
+import { TroCapRowEditComponent, DCThanNhanRowEditComponent } from '../../../../components';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-form-dinh-chinh-ls',
@@ -26,21 +26,20 @@ export class FormDinhChinhLSComponent implements OnInit {
 	//ChildComponentInstance: any;
 	childComponentType = TroCapRowEditComponent;
 	childComponentType2 = DCThanNhanRowEditComponent; 
-
-	@ViewChild("libInsertion", { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef
-	@ViewChild("libInsertion2", { static: true, read: ViewContainerRef }) insertionPoint2: ViewContainerRef
+	@ViewChild("libInsertion", { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef | undefined;
+	@ViewChild("libInsertion2", { static: true, read: ViewContainerRef }) insertionPoint2: ViewContainerRef | undefined;
 	//#endregion
 
-	item: HoSoNCCModel;
-	oldItem: HoSoNCCModel;
-	itemForm: FormGroup;
+	item: HoSoNCCModel = new HoSoNCCModel();
+	oldItem: HoSoNCCModel = new HoSoNCCModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	isZoomSize: boolean = false;
 	disabledBtn = false;
 	allowEdit: boolean = true;
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict = '';
 	listdistrict: any[] = [];
@@ -65,15 +64,15 @@ export class FormDinhChinhLSComponent implements OnInit {
 	listTonGiao: any[] = [];
 	GiayTos: any[] = [];
 	thannhanName = '';
-	quanhe: number;
+	quanhe: number = 0;
 	require = '';
 	objectThanNhan: any;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 	maxNS = moment(new Date()).add(-16, 'year').toDate();
-	IsThanNhan: boolean;
-	Capcocau: number;
-	Id_LoaiHoSo: number;
+	IsThanNhan: boolean = false;
+	Capcocau: number = 0;
+	Id_LoaiHoSo: number = 0;
 	//
 	nhapTC: boolean = false;
 	//di chuyển
@@ -90,7 +89,6 @@ export class FormDinhChinhLSComponent implements OnInit {
 		private thannhanService: ThanNhanService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private tokenStorage: TokenStorage,
 		private translate: TranslateService) {
 		this._NAME = 'Hồ sơ người có công';
@@ -103,6 +101,7 @@ export class FormDinhChinhLSComponent implements OnInit {
 		this.Id_LoaiHoSo = this.item.Id_LoaiHoSo;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.commonService.GetAllProvinces().subscribe(res => {
 			this.listprovinces = res.data;
 			this.listTinh = res.data;
@@ -113,16 +112,14 @@ export class FormDinhChinhLSComponent implements OnInit {
 			this.item.ProvinceID = this.filterprovinces;
 			this.loadGetListDistrictByProvinces(this.filterprovinces);
 			this.Capcocau = res.Capcocau;
-			if (res.Capcocau == 2)//cấp huyen
-			{
+			if (res.Capcocau == 2) { //cấp huyện
 				this.filterdistrict = res.ID_Goc_Cha;
 				this.item.DistrictID = +this.filterdistrict			
 				if (this.item.Id == 0) {
 					this.loadGetListWardByDistrict(this.filterdistrict);
 				}
 			}
-			if (res.Capcocau == 3)//cấp xã
-			{
+			if (res.Capcocau == 3) { //cấp xã
 				this.filterdistrict = res.ID_Goc_Cha;
 				this.item.DistrictID = +this.filterdistrict
 				this.item.Id_Xa = res.ID_Goc;
@@ -140,11 +137,10 @@ export class FormDinhChinhLSComponent implements OnInit {
 		this.commonService.ListTonGiao().subscribe(res => {
 			this.listTonGiao = res.data;
 		});
-		this.loadListGioiTInh();
-
+		this.loadListGioiTinh();
 		this.loadListDoiTuongNCC();
-
 		this.loadListQuanHeVoiLietSy();
+
 		this.lstTC = [];
 		if (this.nhapTC)
 			this.addTC();
@@ -152,20 +148,16 @@ export class FormDinhChinhLSComponent implements OnInit {
 		this.createForm();
 	}
 
-	getInstance($event) {
-		//this.ChildComponentInstance = $event;
-	}
-	getInstanceNew($event, index) {
+	getInstanceNew($event: any, index: number) {
 		this.lstTC[index] = $event;
 	}
 
-	changeDoiTuongNCC(value) {
+	changeDoiTuongNCC(value: any) {
 		var f = this.listOpt.find(x => x.id == value);
 		if (f) {
 			this.IsThanNhan = f.data.IsThanNhan;
 			this.changeDetectorRefs.detectChanges();
 		}
-
 		for (var i = 0; i < this.lstTC.length; i++) {
 			if (this.lstTC[i].cmpRef && !this.lstTC[i].cmpRef.hostView.destroyed) {
 				this.lstTC[i].LoadListLoaiTroCap(value);
@@ -176,34 +168,34 @@ export class FormDinhChinhLSComponent implements OnInit {
 		//this.listLoaiHS.next(temp);
 		//this.listOpt1 = temp;
 	}
+
 	isBangTQ: boolean = false;
-	changeLoaiHS(value) {
+	changeLoaiHS(value: any) {
 		let xa = "";
-		if (this.itemForm.controls["Id_Xa"].value) {
-			let fx = this.listward.find(x => x.ID_Row == this.itemForm.controls["Id_Xa"].value);
+		const form = this.itemForm;
+		if (!form) return;
+		if (form.controls["Id_Xa"].value) {
+			let fx = this.listward.find(x => x.ID_Row == form.controls["Id_Xa"].value);
 			if (fx)
 				xa = this.firstLowerCase(fx.Ward);
 		}
 		this.Id_LoaiHoSo = +value;
 		var f = this.listOpt1.find(x => x.id == value);
 		if (f) {
-			this.GiayTos = f.data.GiayTos.map(x => { return { Id_LoaiGiayTo: x.id, GiayTo: x.title, IsRequired: x.IsRequired, NoiCap: xa } });
+			this.GiayTos = f.data.GiayTos.map((x: any) => { return { Id_LoaiGiayTo: x.id, GiayTo: x.title, IsRequired: x.IsRequired, NoiCap: xa } });
 			var k = this.GiayTos.find(x => x.Id_LoaiGiayTo == 9) //bằng tổ quốc ghi công
 			if(k)	this.isBangTQ = true;
 			this.GiayTos = this.GiayTos.filter(x => x.Id_LoaiGiayTo != 9)
 			this.changeDetectorRefs.detectChanges(); //lệnh này làm khi chọn xã mới, nơi cấp sẽ tự cập nhật là xã này
 		}
 	}
-	firstLowerCase(string) {
-		return string.charAt(0).toLowerCase() + string.slice(1);
+	
+	firstLowerCase(str: string) {
+		return str.charAt(0).toLowerCase() + str.slice(1);
 	}
 
 	createForm() {
-		let ng;
-		if (this.item.Id > 0)
-			ng = moment(this.item.NgayGui);
-		else
-			ng = new Date();
+		let ng = this.item.Id > 0 ? moment(this.item.NgayGui) : new Date();
 		const temp: any = {
 			NgayGui: [ng, Validators.required],
 			SoHoSo: [this.item.SoHoSo],
@@ -287,10 +279,7 @@ export class FormDinhChinhLSComponent implements OnInit {
 			LyDoDinhChinhTN: [''],
 			NoiDungCanCu: ['']
 		};
-
 		this.itemForm = this.fb.group(temp);
-
-		// this.focusInput.nativeElement.focus();
 
 		if (!this.allowEdit) {
 			this.itemForm.disable();
@@ -300,9 +289,10 @@ export class FormDinhChinhLSComponent implements OnInit {
 			this.itemForm.controls.QuanHeVoiLietSy.disable();
 		}
 		this.changeDetectorRefs.detectChanges();
-		Object.keys(this.itemForm.controls).forEach(controlName =>
-			this.itemForm.controls[controlName].markAsTouched()
-		);
+		Object.keys(this.itemForm.controls).forEach(controlName => {
+			if (this.itemForm) 
+				this.itemForm.controls[controlName].markAsUntouched();
+		});
 	}
 
 	/** UI */
@@ -315,29 +305,32 @@ export class FormDinhChinhLSComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` hồ sơ người có công`;
 		return result;
 	}
+
 	changeNS(isNam = false) {
+		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh.setValue('');
 		}
 		else {
 			let val = this.itemForm.controls.NgaySinh.value;
-			if (val != null) {
+			if (val) {
 				let y = moment(val).get('year');
 				this.itemForm.controls.NamSinh.setValue(y);
 			}
 		}
 	}
+
 	changeNS1(isNam = false) {
+		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh1.setValue('');
 		}
 		else {
 			let val = this.itemForm.controls.NgaySinh1.value;
-			if (val != null) {
+			if (val) {
 				let y = moment(val).get('year');
 				this.itemForm.controls.NamSinh1.setValue(y);
 			}
@@ -345,8 +338,8 @@ export class FormDinhChinhLSComponent implements OnInit {
 	}
 
 	/** ACTIONS */
-	prepareCustomer(): HoSoNCCModel {
-
+	prepareCustomer(): HoSoNCCModel | null {
+		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
 		const _item = new HoSoNCCModel();
 		_item.Id = +this.item.Id;
@@ -434,16 +427,14 @@ export class FormDinhChinhLSComponent implements OnInit {
 		}
 		for (var i = 0; i < this.GiayTos.length; i++) {
             let gt = this.GiayTos[i];
-
-            if(gt.IsRequired) { //giấy tờ là bắt buộc
+            if (gt.IsRequired) { //giấy tờ là bắt buộc
                 if (!gt.So || !gt.NgayCap) {
                     this.layoutUtilsService.showInfo("Giấy tờ '" + gt.GiayTo + "' là bắt buộc nhập");
                     return null;
                 }
                 let copy = Object.assign({}, gt);
-                if(gt.FileDinhKem != null && gt.FileDinhKem.length > 0) { //có chọn thêm file
+                if (gt.FileDinhKem != null && gt.FileDinhKem.length > 0) { //có chọn thêm file
 					copy.FileDinhKem = gt.FileDinhKem[0];
-			
 				}
                 copy.NgayCap = this.commonService.f_convertDate(gt.NgayCap);
                 _item.GiayTos.push(copy);
@@ -453,11 +444,10 @@ export class FormDinhChinhLSComponent implements OnInit {
                     this.layoutUtilsService.showInfo("Vui lòng nhập đầy đủ thông tin của giấy tờ");
                     return null;
                 }
-                if(gt.So && gt.NgayCap) { //đã nhập đủ 2 trường
+                if (gt.So && gt.NgayCap) { //đã nhập đủ 2 trường
                     let copy = Object.assign({}, gt);
-                    if(gt.FileDinhKem != null && gt.FileDinhKem.length > 0) { //có chọn thêm file
+                    if (gt.FileDinhKem != null && gt.FileDinhKem.length > 0) { //có chọn thêm file
                         copy.FileDinhKem = gt.FileDinhKem[0];
-                
                     }
                     copy.NgayCap = this.commonService.f_convertDate(gt.NgayCap);
                     _item.GiayTos.push(copy);
@@ -468,7 +458,8 @@ export class FormDinhChinhLSComponent implements OnInit {
 		//_item.DiChuyenModel = this.prepareDC(controls);
 		return _item;
 	}
-	prepareThanNhan(controls) {
+	
+	prepareThanNhan(controls: any) {
 		let _item: any = {};
 		_item.Id = 0;
 		_item.Id_NCC = 0;
@@ -497,7 +488,8 @@ export class FormDinhChinhLSComponent implements OnInit {
 
 		return _item;
 	}
-	prepareHD(controls) {
+	
+	prepareHD(controls: any) {
 		const _item: any = {};
 		_item.Id = 0;
 		_item.Id_NCC = 0;
@@ -511,7 +503,8 @@ export class FormDinhChinhLSComponent implements OnInit {
 		_item.IsChet = true
 		return _item;
 	}
-	prepareDC(controls): any {
+
+	prepareDC(controls: any) {
 		const _item: any = {};
 		_item.Id = 0;
 		_item.Id_NCC = 0;
@@ -538,7 +531,8 @@ export class FormDinhChinhLSComponent implements OnInit {
 		}
 		return _item;
 	}
-	prepareGT(controls, id) {
+
+	prepareGT(controls: any, id: any) {
 		const _item: any = {};
 		_item.Id = 0;
 		_item.Id_NCC = 0;
@@ -552,7 +546,8 @@ export class FormDinhChinhLSComponent implements OnInit {
 			_item.NgayCap = null;
 		return _item;
 	}
-	prepareDinhChinh(controls) {
+	
+	prepareDinhChinh(controls: any) {
 		const _item: any = {};
 		_item.Id = 0;
 		_item.Id_NCC = 0;
@@ -564,29 +559,27 @@ export class FormDinhChinhLSComponent implements OnInit {
 			_item.ListColumn.push({ ColumnName: 'NamSinh', GiaTriCu: controls.NamSinh.value, GiaTriMoi: controls.NamSinh_new.value, Type: 1, });
 		return _item;
 	}
-	onSubmit(withBack: boolean = false, callapi: boolean = false) {
+
+	onSubmit(callapi: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
-
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
 		let EditHoSoNCC: any = this.prepareCustomer();
-		if (EditHoSoNCC == null)
-			return;
+		if (!EditHoSoNCC) return;
 		if (this.nhapTC) { //xem kĩ gán nhapTC
 			EditHoSoNCC.TroCapModel = [];
 			for (var i = 0; i < this.lstTC.length; i++) {
 				if (this.lstTC[i].cmpRef && !this.lstTC[i].cmpRef.hostView.destroyed) {
 					let EditTroCap = this.lstTC[i].onSubmit();
-					if (EditTroCap == null) {
+					if (!EditTroCap) {
 						this.layoutUtilsService.showError("Vui lòng nhập đầy đủ thông tin trợ cấp");
 						return;
 					}
@@ -598,7 +591,7 @@ export class FormDinhChinhLSComponent implements OnInit {
 		for (var i = 0; i < this.lstDCThanNhan.length; i++) {
 			if (this.lstDCThanNhan[i].cmpRef && !this.lstDCThanNhan[i].cmpRef.hostView.destroyed) {
 				let DCThanNhan = this.lstDCThanNhan[i].onSubmit();
-				if (DCThanNhan == null) {
+				if (!DCThanNhan) {
 					this.layoutUtilsService.showError("Vui lòng nhập đầy đủ thông tin đính chính");
 					return;
 				}
@@ -618,23 +611,23 @@ export class FormDinhChinhLSComponent implements OnInit {
 		}
 		if (!callapi)
 			return EditHoSoNCC;
-		else {
-			this.disabledBtn = true;
-			this.objectService.CreateHoSoNCC(EditHoSoNCC).subscribe(res => {
-				this.disabledBtn = false;
-				this.changeDetectorRefs.detectChanges();
-				if (res && res.status === 1) {
-					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType);
-					this.ngOnInit();
-				} else {
-					this.layoutUtilsService.showError(res.error.message);
-				}
-			});
-		}
+
+		this.disabledBtn = true;
+		this.objectService.Create(EditHoSoNCC).subscribe(res => {
+			this.disabledBtn = false;
+			this.changeDetectorRefs.detectChanges();
+			if (res && res.status === 1) {
+				const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
+				this.layoutUtilsService.showInfo(_messageType);
+				this.ngOnInit();
+			} else {
+				this.layoutUtilsService.showError(res.error.message);
+			}
+		});
 	}
 
 	changeQuanHeLietSy() {
+		if (!this.itemForm) return;
 		if (this.itemForm.controls.NguoiThoCungLietSy) {
 			this.require = '';
 		} else {
@@ -649,13 +642,13 @@ export class FormDinhChinhLSComponent implements OnInit {
 
 	}
 	//#region di chuyển
-	changeTinh(val) {
+	changeTinh(val: any) {
 		this.commonService.GetListDistrictByProvinces(val).subscribe(res => {
 			this.listHuyen = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
-	changeHuyen(val) {
+	changeHuyen(val: any) {
 		this.commonService.GetListWardByDistrict(val).subscribe(res => {
 			this.listXa = res.data;
 			this.changeDetectorRefs.detectChanges();
@@ -684,8 +677,10 @@ export class FormDinhChinhLSComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
+	
 	filterKhom = '';
-	fillNguyenTruQuan(cap) {
+	fillNguyenTruQuan(cap: any) {
+		if (!this.itemForm) return;
 		let val = "";
 		var khom: any, xa: any, huyen: any, tinh:any;
 		switch(cap){
@@ -717,15 +712,13 @@ export class FormDinhChinhLSComponent implements OnInit {
 				break;
 			}
 		}
-
 		this.itemForm.controls["NguyenQuan"].setValue(val);
 		this.itemForm.controls["TruQuan"].setValue(val);
 		this.itemForm.controls["NguyenQuan1"].setValue(val);
 		this.itemForm.controls["TruQuan1"].setValue(val);
 	}
 
-
-	loadListGioiTInh() {
+	loadListGioiTinh() {
 		this.commonService.ListGioiTinh().subscribe(res => {
 			this.listgioitinh = res.data;
 		});
@@ -763,17 +756,20 @@ export class FormDinhChinhLSComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
+
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
-	changeDC(name) {
+
+	changeDC(name: string) {
+		if (!this.itemForm) return;
 		let _name = name;
-		if (name == 'TruQuan')
-			_name = 'DiaChi';
+		if (name == 'TruQuan') _name = 'DiaChi';
 		let dc = this.itemForm.controls[name].value;
 		if (_name == 'NguyenQuan')
 			this.itemForm.controls["NguyenQuan1"].setValue(dc);
@@ -781,9 +777,9 @@ export class FormDinhChinhLSComponent implements OnInit {
 			this.itemForm.controls["TruQuan1"].setValue(dc);
 	}
 
-	addDCTN($event = null) {
+	addDCTN() {
+		if (!this.insertionPoint2) return;
 		let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.childComponentType2);
-
 		let componentRef = this.insertionPoint2.createComponent(componentFactory);
 		let instance = componentRef.instance;
 		instance.cmpRef = componentRef;
@@ -791,21 +787,19 @@ export class FormDinhChinhLSComponent implements OnInit {
 			_item: { Id: 0, Id_DoiTuongNCC: 0, showDel: false, showGhiChu: false, showCuTru: true },
 		};
 		instance.close$.subscribe(() => {
-			instance.cmpRef.destroy();
+			if (instance.cmpRef)
+				instance.cmpRef.destroy();
 		});
 		this.lstDCThanNhan.push(instance);
 	}
 
-	addTC($event = null) {
-		if(this.lstTC.length > 0) {
+	addTC() {
+		if (!this.insertionPoint) return;
+		if (this.lstTC.length > 0) {
 			this.lstTC = [];
 			this.insertionPoint.clear()
 		}
 		let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.childComponentType);
-
-		//let viewContainerRef = this.insertionPoint;
-		//viewContainerRef.clear();
-
 		let componentRef = this.insertionPoint.createComponent(componentFactory);
 		let instance = componentRef.instance;
 		instance.cmpRef = componentRef;
@@ -817,23 +811,11 @@ export class FormDinhChinhLSComponent implements OnInit {
 			hideNuoiDuong: true
 		};
 		instance.close$.subscribe(() => {
-			instance.cmpRef.destroy();
+			if (instance.cmpRef)
+				instance.cmpRef.destroy();
 		});
 		this.lstTC.push(instance);
-		//if ($event != null)
-		//	$event.stopPropagation();//preventDefault
 	}
 
-	@HostListener('document:keydown', ['$event'])
-	onKeydownHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.keyCode == 13) {
-			this.item = this.data._item;
-			if (this.viewLoading == true) {
-				this.onSubmit(true);
-			} else {
-				this.onSubmit(false);
-			}
-		}
-	}
 	tieptuc() { this.selectedTab++; }
 }

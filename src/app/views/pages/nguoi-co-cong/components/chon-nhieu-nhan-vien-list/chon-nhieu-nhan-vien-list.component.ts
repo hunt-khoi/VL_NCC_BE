@@ -157,17 +157,17 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 			this.listDonVi = res.data;
 			this.id_dv = "";
 			this.changeDetectorRefs.detectChanges();
-			this.service.GetListDepartmentbyBranch(this.id_dv).subscribe(res => {
+			this.service.GetListDepartmentbyBranch().subscribe(res => {
 				this.listPhongBan = res.data;
 				this.id_pb = "";
 				this.changeDetectorRefs.detectChanges();
-				this.service.GetListTeamByDepartment(this.id_pb).subscribe(res => {
+				this.service.GetListTeamByDepartment().subscribe(res => {
 					this.listBoPhan = res.data;
 					this.changeDetectorRefs.detectChanges();
 				});
-				this.service.GetListPositionbyDepartment(this.id_pb).subscribe(res => {
+				this.service.GetListPositionbyDepartment().subscribe(res => {
 					this.listChucDanh = res.data;
-					this.service.GetListJobtitleByPosition(this.id_cd, this.id_pb).subscribe(res => {
+					this.service.GetListJobtitleByPosition().subscribe(res => {
 						this.listChucVu = res.data;
 						this.changeDetectorRefs.detectChanges();
 					});
@@ -176,21 +176,21 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 		});
 	}
 
-	loadDonViChange(iddonvi: any) {
-		this.service.GetListDepartmentbyBranch(iddonvi).subscribe(res => {
+	loadDonViChange() {
+		this.service.GetListDepartmentbyBranch().subscribe(res => {
 			this.listPhongBan = res.data;
 			if (this.listPhongBan.length > 0) {
 				this.id_pb = '';
 				this.changeDetectorRefs.detectChanges();
-				this.service.GetListTeamByDepartment(this.id_pb).subscribe(res => {
+				this.service.GetListTeamByDepartment().subscribe(res => {
 					this.listBoPhan = res.data;
 					this.changeDetectorRefs.detectChanges();
 				});
-				this.service.GetListPositionbyDepartment(this.id_pb).subscribe(res => {
+				this.service.GetListPositionbyDepartment().subscribe(res => {
 					this.listChucDanh = res.data;
 					if (this.listChucDanh.length > 0) {
 						this.id_cd = '';
-						this.service.GetListJobtitleByPosition(this.id_cd, this.id_pb).subscribe(res => {
+						this.service.GetListJobtitleByPosition().subscribe(res => {
 							this.listChucVu = res.data;
 							this.changeDetectorRefs.detectChanges();
 						});
@@ -209,17 +209,17 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 		});
 	}
 
-	loadPhongBanChange(idpb: any) {
-		this.service.GetListTeamByDepartment(idpb).subscribe(res => {
+	loadPhongBanChange() {
+		this.service.GetListTeamByDepartment().subscribe(res => {
 			this.listBoPhan = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
 
-		this.service.GetListPositionbyDepartment(idpb).subscribe(res => {
+		this.service.GetListPositionbyDepartment().subscribe(res => {
 			this.listChucDanh = res.data;
 			if (this.listChucDanh.length > 0) {
 				this.id_cd = '';
-				this.service.GetListJobtitleByPosition(this.id_cd, this.id_pb).subscribe(res => {
+				this.service.GetListJobtitleByPosition().subscribe(res => {
 					this.listChucVu = res.data;
 					this.changeDetectorRefs.detectChanges();
 				});

@@ -59,7 +59,8 @@
 			</div>
 		</div>
 
-		<div id="print-section" class="example-container mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'auto':'auto', 'display': dataSource.hasItems? 'flex':'unset'}">
+		<div id="print-section" class="example-container mat-table__wrapper" 
+			[ngStyle]="{'overflow-x': gridService.model.haveFilter?'auto':'auto', 'display': dataSource.hasItems? 'flex':'unset'}">
 			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="SoHoSo" 
 				matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
 				<ng-container matColumnDef="STT">
@@ -70,9 +71,7 @@
 					<th nowrap mat-header-cell *matHeaderCellDef>
 						<kt-column-filter enable_sort="true" [gridService]="gridService" column_name="SoHoSo" column_title="Số hồ sơ"></kt-column-filter>
 					</th>
-					<td mat-cell *matCellDef="let object">
-						{{object.SoHoSo}}
-					</td>
+					<td mat-cell *matCellDef="let object">{{object.SoHoSo}}</td>
 				</ng-container>
 				<ng-container matColumnDef="HoTen">
 					<th nowrap mat-header-cell *matHeaderCellDef>
@@ -165,7 +164,6 @@
 					<th mat-header-cell *matHeaderCellDef style="justify-content: center">Ngày tạo</th>
 					<td mat-cell *matCellDef="let object" style="justify-content: center">{{object.CreatedDate }}</td>
 				</ng-container>
-
 				<ng-container matColumnDef="UpdatedBy">
 					<th nowrap mat-header-cell *matHeaderCellDef style="justify-content: center">Người sửa</th>
 					<td mat-cell *matCellDef="let item" style="justify-content: center">{{item.UpdatedBy}}</td>
@@ -181,13 +179,15 @@
 					</th>
 					<td mat-cell *matCellDef="let object" style="white-space: nowrap;" class="action-cell" [ngClass]="list_button?'list-button':''">
 						<ng-container *ngIf="!object.IsGiam">
-							<a href="javascript:;" (click)="viewCT(object.Id)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="Xem chi tiết" color="info">
+							<a href="javascript:;" (click)="viewCT(object.Id)" mat-button [class.mat-raised-button]="list_button" 
+								[class.mat-icon-button]="!list_button" matTooltip="Xem chi tiết" color="info">
 								<mat-icon>remove_red_eye</mat-icon>
 								<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 							</a>
 							<ng-container *ngFor="let item of lstLoaiHoSo; let i=index">
 								<ng-container *ngIf="item.id == object.Id_LoaiHoSo">
-									<button mat-button color="info" [matMenuTriggerFor]="menu2" [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="Xem trước quyết định">
+									<button mat-button color="info" [matMenuTriggerFor]="menu2" [class.mat-raised-button]="list_button" 
+										[class.mat-icon-button]="!list_button" matTooltip="Xem trước quyết định">
 										<mat-icon>print</mat-icon>
 										<span class="button-text">In quyết định</span>
 									</button>
@@ -202,7 +202,8 @@
 							</ng-container>
 							<ng-container *ngFor="let item of lstLoaiHoSo; let i=index">
 								<ng-container *ngIf="item.id == object.Id_LoaiHoSo">
-									<button mat-button color="primary" [matMenuTriggerFor]="menu2" [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="Tải xuống quyết định">
+									<button mat-button color="primary" [matMenuTriggerFor]="menu2" [class.mat-raised-button]="list_button" 
+										[class.mat-icon-button]="!list_button" matTooltip="Tải xuống quyết định">
 										<mat-icon>print</mat-icon>
 										<span class="button-text">Xuất file word</span>
 									</button>
@@ -220,13 +221,13 @@
 				</ng-container>
 
 				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
-				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" 
+				[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
 			</table>
 
 			<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
 		</div>
 
-		<!-- start: BOTTOM -->
 		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 			<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
 				<mat-chip-list>
@@ -236,7 +237,7 @@
 							<mat-icon matChipRemove>cancel</mat-icon>
 						</mat-chip>
 						<ng-container *ngIf="chip.type==1">
-							<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
+							<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key); gridService.showClearAllButton()">
 								{{chip.title}}: {{item.name}}
 								<mat-icon matChipRemove>cancel</mat-icon>
 							</mat-chip>
@@ -252,6 +253,6 @@
 				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
 			</div>
 		</div>
-		<!-- end: BOTTOM -->
+
 	</div>
 </kt-portlet>

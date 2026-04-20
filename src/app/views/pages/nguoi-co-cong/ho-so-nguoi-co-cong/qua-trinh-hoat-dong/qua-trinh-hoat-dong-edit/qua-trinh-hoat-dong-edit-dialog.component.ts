@@ -2,11 +2,11 @@ import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewC
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { QuaTrinhHoatDongService } from '../Services/qua-trinh-hoat-dong.service';
 import { QuaTrinhHoatDongEditComponent } from '../../../components';
+import moment from 'moment';
+import { Moment } from 'moment';
 
 @Component({
 	selector: 'kt-qua-trinh-hoat-dong-edit-dialog',
@@ -17,7 +17,7 @@ import { QuaTrinhHoatDongEditComponent } from '../../../components';
 export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 
 	ChildComponentInstance: any;
-	childComponentType: Type<any>;
+	childComponentType: Type<any> | any;
 	childComponentData: any = {};
 	item: any;
 	hasFormErrors = false;
@@ -26,12 +26,12 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 	disabledBtn = false;
 	isZoomSize = false;
 	allowEdit = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
-	maxNS: Moment;
+	maxNS: Moment | undefined;
 	default: number = 0;
-	ngay1: Moment;
-	ngay2: Moment;
+	ngay1: Moment | undefined;
+	ngay2: Moment | undefined;
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
@@ -53,7 +53,6 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 		private objectService: QuaTrinhHoatDongService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 			this._NAME = this.translate.instant('QT_HOATDONG.NAME');
 	}
@@ -80,42 +79,39 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE');
 		return result;
 	}
 
 	onSubmit(withBack: boolean = false) {
-		let EditTroCap = this.ChildComponentInstance.onSubmit();
-		if (EditTroCap == undefined) {
-			this.changeDetectorRefs.detectChanges();
-		}
-		else {
-			if (EditTroCap.Id > 0) {
-				this.UpdateHoatDong(EditTroCap, withBack);
+		let Edit = this.ChildComponentInstance.onSubmit();
+		if (Edit) {
+			if (Edit.Id > 0) {
+				this.Update(Edit, withBack);
 			} else {
-				this.CreateHoatDong(EditTroCap, withBack);
+				this.Create(Edit, withBack);
 			}
 		}
 	}
 
-	UpdateHoatDong(_item: any, withBack: boolean) {
+	Update(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Update(_item).subscribe(res => {
+		this.objectService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -123,22 +119,23 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateHoatDong(_item: any, withBack: boolean) {
+	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Create(_item).subscribe(res => {
+		this.objectService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -147,22 +144,12 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 			}
 		});
 	}
-
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		} else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-	}
 	
 	close() {
 		this.dialogRef.close();
 	}
 
-	getInstance($event) {
+	getInstance($event: any) {
 		this.ChildComponentInstance = $event;
 	}
 }

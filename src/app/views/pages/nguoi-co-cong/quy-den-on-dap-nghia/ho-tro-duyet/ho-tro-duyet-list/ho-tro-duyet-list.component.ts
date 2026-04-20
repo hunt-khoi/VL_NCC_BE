@@ -88,7 +88,7 @@ export class HoTroDuyetListComponent implements OnInit {
 			if (res.Capcocau == 2) {
 				this.Capcocau = res.Capcocau;
 				this.filterdistrict = '' + res.ID_Goc_Cha;
-				this.commonService.GetListWardByDistrict(this.filterdistrict).subscribe(res => {
+				this.commonService.GetListWardByDistrict(+this.filterdistrict).subscribe(res => {
 					if (res && res.status == 1)
 						this.listward = res.data;
 				})

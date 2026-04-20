@@ -18,9 +18,8 @@
 <kt-portlet [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
 	<kt-portlet-header [sticky]="true" [title]="'Thống kê số lượng hồ sơ'" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
 		<ng-container ktPortletTools>
-			<button class="d-none" printTitle="Thống kê số lượng hồ sơ" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'}, 
-				th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint #printme></button> 
-
+			<button class="d-none" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'}, th : {'border-bottom': '1px solid #dee2e6'}}" 
+				printTitle="Thống kê số lượng hồ sơ" printSectionId="print-section" ngxPrint #printme></button> 
 			<button class="show-view-sm" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
 				{{ 'COMMON.CHUCNANG' | translate }}
 			</button>

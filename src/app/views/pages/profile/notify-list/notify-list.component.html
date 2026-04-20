@@ -147,12 +147,9 @@
 			</div>
 		</div>
 
-		<!-- start: BOTTOM -->
 		<div class="mat-table__bottom" style="margin-top: 1px;">
 			<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
 			<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
 		</div>
-		<!-- end: BOTTOM -->
 	</div>
-	<!-- end::Body -->
 </kt-portlet>

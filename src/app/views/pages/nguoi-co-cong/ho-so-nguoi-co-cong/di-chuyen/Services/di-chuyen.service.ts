@@ -10,10 +10,9 @@ const API_QD = environment.ApiRoot + '/quyet-dinh';
 @Injectable()
 export class DiChuyenService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
+	ReadOnlyControl: boolean = false;
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	// READ
 	getAllItems(): Observable<any[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any[]>(API_URL + '?more=true', { headers: httpHeaders });
@@ -22,8 +21,7 @@ export class DiChuyenService {
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_URL;
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_URL, {
 			headers: httpHeaders,
 			params: httpParams
 		});
@@ -40,32 +38,29 @@ export class DiChuyenService {
 		const url = `${environment.ApiRoot}/ncc/${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	// CREATE =>  POST: add a new oduct to the server
-	Create(item): Observable<any> {
+
+	Create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
 	Update(item: any): Observable<any> {
-		// Note: Add headers if needed (tokens/bearer)
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
-	deleteItem(itemId: number): Observable<any> {
+	Delete(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
-	Duyet(item): Observable<any> {
+	Duyet(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL + '/duyet', item, { headers: httpHeaders });
 	}
 
-	previewDN(iddc, idncc: number): Observable<any> {
+	previewDN(iddc: number, idncc: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/get-don-de-nghi?iddc=${iddc}&idncc=${idncc}`;
 		return this.http.get(url, {
@@ -73,7 +68,7 @@ export class DiChuyenService {
 		});
 	}
 
-	exportDN(iddc, idncc: number): Observable<any> {
+	exportDN(iddc: number, idncc: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/export-don-de-nghi?iddc=${iddc}&idncc=${idncc}`;
 		return this.http.get(url, {
@@ -84,7 +79,7 @@ export class DiChuyenService {
 	}
 
 	//#region Quyết định
-	previewQD(ncc, itemId: number): Observable<any> {
+	previewQD(ncc: number, itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_QD}/get-phieu-bao?id=${ncc}&qd=${itemId}`;
 		return this.http.get(url, {
@@ -92,7 +87,7 @@ export class DiChuyenService {
 		});
 	}
 
-	exportQD(ncc, itemId: number, loai: number = 1): Observable<any> {
+	exportQD(ncc: number, itemId: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_QD}/export-phieu-bao?id=${ncc}&qd=${itemId}&loai=${loai}`;
 		return this.http.get(url, {
@@ -101,7 +96,7 @@ export class DiChuyenService {
 		});
 	}
 
-	downloadQD(ncc, itemId: number, loai: number = 1): Observable<any> {
+	downloadQD(ncc: number, itemId: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_QD}/download-quyet-dinh-dc?id=${ncc}&qd=${itemId}&loai=${loai}`;
 		return this.http.get(url, {
@@ -110,7 +105,7 @@ export class DiChuyenService {
 		});
 	}
 
-	getQDDC(ncc, itemId: number, loai: number = 1): Observable<any> {
+	getQDDC(ncc: number, itemId: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_QD}/download-quyet-dinh-dc?id=${ncc}&qd=${itemId}&loai=${loai}`;
 		return this.http.get(url, {
@@ -118,5 +113,4 @@ export class DiChuyenService {
 		});
 	}
 	//#endregion
-
 }

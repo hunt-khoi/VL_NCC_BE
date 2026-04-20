@@ -16,7 +16,7 @@
 	</div>
 	<div class="kt-portlet__body">
 		<form class="kt-form" [formGroup]="itemForm">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 			<div class="row">
@@ -328,7 +328,7 @@
 						</h4>
 					</div>
 					<div class="col-lg-12 m--margin-bottom-20-mobile">
-						<button mat-button mat-raised-button color="primary" (click)="addTC($event)" matTooltip="Thêm trợ cấp">Thêm trợ cấp</button>
+						<button mat-button mat-raised-button color="primary" (click)="addTC()" matTooltip="Thêm trợ cấp">Thêm trợ cấp</button>
 					</div>
 				</div>
 				<mat-hint style="color:red;">Nhập 'Ngày cắt trợ cấp' để <b>CẮT</b> trợ cấp</mat-hint>
@@ -349,8 +349,7 @@
 						<th class="text-center" style="width: 100px;">Tháng thu hồi</th>
 						<th class="text-center" style="width: 80px;	"></th>
 					</tr>
-					<ng-template #libInsertion>
-					</ng-template>
+					<ng-template #libInsertion></ng-template>
 				</table>
 			</div>
 			<!--<lib-dynamic-component [childComponentType]="childComponentType" [data]="childComponentData" (getInstance)="getInstance($event)"></lib-dynamic-component>-->
@@ -375,9 +374,7 @@
 			<!--</mat-expansion-panel>
 			<mat-expansion-panel [hidden]="!nhapDC">
 				<mat-expansion-panel-header>
-					<mat-panel-title>
-						Di chuyển
-					</mat-panel-title>
+					<mat-panel-title>Di chuyển</mat-panel-title>
 				</mat-expansion-panel-header>-->
 			<div [hidden]="!nhapDC">
 				<div class="row">

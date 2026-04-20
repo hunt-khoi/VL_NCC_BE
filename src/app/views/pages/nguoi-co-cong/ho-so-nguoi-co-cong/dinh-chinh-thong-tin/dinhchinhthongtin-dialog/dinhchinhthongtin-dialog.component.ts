@@ -2,17 +2,15 @@ import { Component, OnInit, ViewChild, ElementRef, Inject, ChangeDetectorRef, Ho
 import { MatDatepicker, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ReplaySubject } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import * as moment from 'moment';
-// Services
-import { TypesUtilsService } from './../../../../../../core/_base/crud/utils/types-utils.service';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
 import { GiayToModel } from './../../giay-to/Model/giay-to.model';
-import { ListInfoChangelModel } from '../Model/Dinhchinhthongtin.model';
-import { DinhChinhModel, FileUploadModel } from './../Model/Dinhchinhthongtin.model';
+import { ListInfoChangelModel } from '../Model/dinh-chinh.model';
+import { DinhChinhModel, FileUploadModel } from '../Model/dinh-chinh.model';
 import { DinhChinhThongTinService } from './../Services/dinh-chinh-thong-tin.service';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-dinhchinhthongtin-dialog',
@@ -20,10 +18,9 @@ import { DinhChinhThongTinService } from './../Services/dinh-chinh-thong-tin.ser
 })
 
 export class DinhchinhthongtinDialogComponent implements OnInit {
-
 	item: any;
 	ncc: any = {};
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -31,8 +28,8 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 	isZoomSize = false;
 	allowEdit = false;
 	allowDuyet = false;
-	@ViewChild(MatDatepicker, { static: true }) picker;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild(MatDatepicker, { static: true }) picker: any;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	year = new FormControl(moment());
 	_NAME = '';
 	maxNS: any;
@@ -40,7 +37,7 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 	listField: any;
 	listdoituongncc: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 	listOpt: any = [];
-	ID_NCC;
+	ID_NCC: any;
 	FilterCtrl: string = '';
 	_maxyear: any;
 	AttachFileComment: any[] = [];
@@ -50,21 +47,17 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 	listLoaiGiayTo: any[] = [];
 	tenFile: string = '';
 	daduyet = false;
-	GhiChu: string;
-	isThanNhan: boolean;
+	GhiChu: string = "";
+	isThanNhan: boolean = false;
 	checkTN = false;
-	@ViewChild('fileUpload', { static: true }) fileUpload;
+	@ViewChild('fileUpload', { static: true }) fileUpload: any;
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
 		if (event.altKey && event.keyCode == 13) { //phím Enter
-			this.onSubmit(true);
-		}
-		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
-			this.onSubmit(false);
+			this.onSubmit();
 		}
 	}
 
@@ -75,7 +68,6 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		private objectService: DinhChinhThongTinService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private router: Router,
 		private translate: TranslateService) {
 		this._NAME = this.translate.instant('DINHCHINH.NAME');
@@ -114,27 +106,22 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 			this.LoadListData();
 		else 
 			this.AddColum();
-
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	TypeOfColumn(type) {
+	TypeOfColumn(type: any) {
 		var result = 'text';
 		if (type) {
 			if (type == 1)
 				return 'text';
-			if (type == 2) {
+			if (type == 2) 
 				return 'date';
-			}
-			if (type == 3) {
+			if (type == 3) 
 				return 'dropdown'
-			}
-			if (type == 4) {
+			if (type == 4) 
 				return 'year'
-			}
 		}
 		return result;
-
 	}
 
 	AddRow_formGiayTo() {
@@ -162,15 +149,11 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		if (lastitem.GiayTo && lastitem.Id_LoaiGiayTo && lastitem.NgayCap && lastitem.NoiCap && lastitem.So) {
 			return false;
 		}
-		else {
-			return true;
-		}
+		return true;
 	}
 
 	filter() {
-		if (!this.listOpt) {
-			return;
-		}
+		if (!this.listOpt) return;
 		let search = this.FilterCtrl;
 		if (!search) {
 			this.listdoituongncc.next(this.listOpt.slice());
@@ -179,8 +162,7 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 			search = search.toLowerCase();
 		}
 		this.listdoituongncc.next(
-			this.listOpt.filter(ts =>
-				ts.title.toLowerCase().indexOf(search) > -1)
+			this.listOpt.filter((ts: any) => ts.title.toLowerCase().indexOf(search) > -1)
 		);
 		this.changeDetectorRefs.detectChanges();
 	}
@@ -195,11 +177,11 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		}
 	}
 
-	DeleteCol(index) {
+	DeleteCol(index: number) {
 		this.ListColumn.splice(index, 1);
 	}
 
-	DeleteRowTable(index) {
+	DeleteRowTable(index: number) {
 		this.formGiayTo.splice(index, 1);
 	}
 
@@ -219,21 +201,16 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 			else {
 				dataList = this.formGiayTo;
 			}
-			if (dataList.length > 0) {
-				for (let i = 0; i < dataList.length; i++) {
-					if (dataList[i].GiayTo && dataList[i].Id_LoaiGiayTo && dataList[i].NgayCap && dataList[i].NoiCap && dataList[i].So) {
-					} else {
-						this.layoutUtilsService.showError('Nhập đủ thông tin giấy tờ trước khi gửi')
-						return null;
-					}
-					if (i == (dataList.length - 1)) {
-						return dataList;
-					}
-				}
-			}
-			else {
+			if (dataList.length <= 0) {
 				this.layoutUtilsService.showError('Phải có thông tin giấy tờ trước khi gửi')
 				return null;
+			}
+			for (let i = 0; i < dataList.length; i++) {
+				const item = dataList[i];
+				if (!item.GiayTo || !item.Id_LoaiGiayTo || !item.NgayCap || !item.NoiCap || !item.So) {
+					this.layoutUtilsService.showError('Nhập đủ thông tin giấy tờ trước khi gửi');
+					return null;
+				}
 			}
 		}
 		return dataList;
@@ -241,7 +218,7 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 
 	checkShow(index: number) {
 		try {
-			let r = this.listField.filter((item, vi) => {
+			let r = this.listField.filter((item: any) => {
 				let t1 = this.ListColumn.findIndex(x => x.ColumnName === item.ID_Row);
 				return t1 !== -1 ? t1 == index : t1 == -1;
 			});
@@ -251,20 +228,7 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		}
 	}
 
-	changeField(value) {
-		var dataList = [];
-		if (this.formGiayTo.length > 0) {
-
-			if ((this.ListColumn[this.ListColumn.length - 1].ColumnName == '') && (this.ListColumn[this.ListColumn.length - 1].GiaTriMoi == '')) {
-				dataList = this.ListColumn.slice(0, this.ListColumn.length - 1)
-			}
-			else {
-				dataList = this.ListColumn.slice(0, this.ListColumn.length)
-			}
-		}
-	}
-
-	SetupType(value, index) {
+	SetupType(value: any, index: number) {
 		this.ListColumn[index].Type = (+value.Type);
 		this.ListColumn[index].GiaTriMoi = '';
 		if (this.ListColumn[index].Type == 4) {
@@ -274,8 +238,7 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 
 	/** UI */
 	getTitle(): string {
-		if (this.allowDuyet)
-			return 'Duyệt đính chính';
+		if (this.allowDuyet) return 'Duyệt đính chính';
 		let result = this.translate.instant('COMMON.CREATE');
 		if (!this.allowEdit) {
 			result = 'Xem chi tiết';
@@ -284,22 +247,22 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		if (!this.item || !this.item.ID_DC) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE');
 		return result;
 	}
 
 	selectFile() {
-		// this.item.controls['ErrorMessage'].setValue('');
-		let el: HTMLElement = this.fileUpload.nativeElement as HTMLElement;
-		el["type"] = "text";
-		el["type"] = "file";
+		let el: HTMLInputElement = this.fileUpload.nativeElement as HTMLInputElement;
+		el.type = "text";
+		el.type = "file";
 		el.click();
 	}
 
 	checkDataIsValid(): boolean {
-		let p = document.getElementById("fileUploadExcel");
-		return this.itemForm.controls['fileDinhKems'] && this.item.controls['fileDinhKems'].valid && (p ? (p["type"] == 'file' ? p["files"]["length"] > 0 : false) : false);
+		if (!this.itemForm) return false;
+		let p = document.getElementById("fileUploadExcel") as HTMLInputElement;
+		return this.itemForm.controls['fileDinhKems'] && this.item.controls['fileDinhKems'].valid && 
+		(p ? (p.type == 'file' ? p.files && p.files.length > 0 : false) : false);
 	}
 
 	FileSelected(evt: any, index: number) {
@@ -314,7 +277,7 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 			// }
 			let reader = new FileReader();
 			reader.readAsDataURL(evt.target.files[0]);
-			let base64Str;
+			let base64Str: any;
 			reader.onload = function () {
 				base64Str = reader.result as String;
 				var metaIdx = base64Str.indexOf(';base64,');
@@ -341,7 +304,7 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		}
 	}
 
-	onSubmit(withBack: boolean = false) {
+	onSubmit() {
 		if (this.ListColumn.length == 0) {
 			this.layoutUtilsService.showError('Thông tin thay đổi là bắt buộc')
 			return;
@@ -357,12 +320,12 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 			for (let i = 0; i < dataList.length; i++) {
 				if (dataList[i].ColumnName == '' || dataList[i].GiaTriMoi == '') {
 					this.layoutUtilsService.showError('Nhập đủ dữ liệu trước khi gửi');
-					return
+					return;
 				}
 				if (i == (dataList.length - 1)) {
 					//nếu type = year converse from moment => year
 					for (var index = 0; index < dataList.length; index++) {
-						if (dataList[index].Type == 'year') {
+						if (dataList[index].Type == 4) {
 							dataList[index].GiaTriMoi = dataList[index].GiaTriMoi.year();
 						}
 					}
@@ -375,16 +338,15 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 					data.GiayTo = this.ViewData()
 					if (this.item.ID_DC > 0) {
 						data.Id = this.item.ID_DC;
-						this.UpdateData(data, true);
+						this.Update(data, true);
 					} else {
 						this.Create(data, true);
 					}
 				}
 			}
 			dataList.forEach(res => {
-				if (res.ColumnName == '' || res.GiaTriMoi == '') {
+				if (res.ColumnName == '' || res.GiaTriMoi == '') 
 					return;
-				}
 			})
 		}
 		else {
@@ -393,14 +355,17 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		}
 	}
 
-	kbytes: number;
-	calculateImageSize(base64String) {
+	kbytes: number = 0;
+	calculateImageSize(base64String: any) {
 		let padding;
 		let inBytes;
 		let base64StringLength;
-		if (base64String.endsWith('==')) { padding = 2; }
-		else if (base64String.endsWith('=')) { padding = 1; }
-		else { padding = 0; }
+		if (base64String.endsWith('=='))  
+			padding = 2; 
+		else if (base64String.endsWith('=')) 
+			padding = 1; 
+		else 
+			padding = 0; 
 		base64StringLength = base64String.length;
 		inBytes = (base64StringLength / 4) * 3 - padding;
 		this.kbytes = inBytes / 1000;
@@ -422,33 +387,33 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		});
 	}
 
-	DuyetTin(item) {
+	DuyetTin(item: any) {
 		var data = new DinhChinhModel();
 		data.clear();
 		data.ID_NCC = this.ID_NCC;
 		data.Id = this.item.ID_DC;
 		data.IsDuyet = item;
 		this.objectService.Approved(data).subscribe(res => {
-			this.dialogRef.close({
-			});
+			this.dialogRef.close();
 		})
 	}
 
-	Create(_item: any, withBack: boolean) {
+	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.objectService.Create(_item).subscribe(res => {
+		this.objectService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -458,21 +423,22 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		});
 	}
 
-	UpdateData(_item: any, withBack: boolean) {
+	Update(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.objectService.Create(_item).subscribe(res => {
+		this.objectService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -482,49 +448,35 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 		});
 	}
 
-	chosenYearHandler(normalizedYear: any, datepicker: MatDatepicker<any>, index) {
+	chosenYearHandler(normalizedYear: any, datepicker: MatDatepicker<any>, index: number) {
 		const ctrlValue = moment(new Date());
 		ctrlValue.year(normalizedYear.year());
 		this.ListColumn[index].GiaTriMoi = (ctrlValue);
 		datepicker.close();
 	}
 
-	GetYear(value) {
+	GetYear(value: any) {
 		var year;
 		var x = this.ListColumn.findIndex(x => x.ColumnName == value);
-		if (x) {
+		if (x) 
 			year = this.ListColumn[x].GiaTriMoi == '' ? new Date().getFullYear() : this.ListColumn[x].GiaTriMoi;
-		}
 		return new Date('01/01/' + year)
-	}
-
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		} else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
 	}
 	
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
-	}
-
-	onAlertClose($event) {
-		this.hasFormErrors = false;
 	}
 
 	close() {
 		this.dialogRef.close();
 	}
 
-	DownloadFile(link) {
+	DownloadFile(link: any) {
 		window.open(link);
 	}
 }

@@ -1,12 +1,9 @@
-// Angular
 import { MatPaginator, MatSort, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Component, OnInit, ViewChild, ApplicationRef, Inject, ChangeDetectorRef } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
 import { CommonService } from './../../../services/common.service';
 import { TableService } from './../../../../../partials/table/table.service';
 import { TableModel } from './../../../../../partials/table/table.model';
@@ -22,11 +19,10 @@ import { CookieService } from 'ngx-cookie-service';
 	templateUrl: './chi-tiet-thong-ke.component.html',
 })
 export class ChiTietThongKeComponent implements OnInit {
-
 	// Table fields
-	dataSource: ChiTietThongKeDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: ChiTietThongKeDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
@@ -35,12 +31,12 @@ export class ChiTietThongKeComponent implements OnInit {
 	// Selection
 	selection = new SelectionModel<HoSoNCCModule>(true, []);
 	productsResult: HoSoNCCModule[] = [];
-	// tslint:disable-next-line:variable-name
+
 	_name = '';
 	objectId = '';
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
 	ncc: any;
 	disabledBtn: boolean = false;
 	_item: any;
@@ -49,7 +45,6 @@ export class ChiTietThongKeComponent implements OnInit {
 		public dialogRef: MatDialogRef<ChiTietThongKeComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		public objectService: ThongKeSoLuongService,
-		private router: Router,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
@@ -62,7 +57,6 @@ export class ChiTietThongKeComponent implements OnInit {
 
 	/** LOAD DATA */
 	ngOnInit() {
-
 		this._item = this.data;
 		// filter
 		this.gridModel = new TableModel();
@@ -74,7 +68,6 @@ export class ChiTietThongKeComponent implements OnInit {
 		this.gridModel.filterText.DiaChi = '';
 		this.gridModel.filterText.DoiTuong = '';
 		this.gridModel.filterText.LoaiHoSo = '';
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -220,10 +213,7 @@ export class ChiTietThongKeComponent implements OnInit {
 				isShow: false,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
@@ -240,28 +230,25 @@ export class ChiTietThongKeComponent implements OnInit {
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_tkct'));
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.gridService.result) // bỏ this.paginator.page
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new ChiTietThongKeDataSource(this.objectService);
-		//this.dataSource.loadList(this.filterConfiguration());
 		this.loadDataList();
-
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			// if (this.productsResult != null) {
+			// if (this.productsResult && this.paginator) {
 			// 	if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 			// 		this.loadDataList();
 			// 	}
@@ -275,6 +262,7 @@ export class ChiTietThongKeComponent implements OnInit {
 	}
 
 	loadDataList() {
+		if (!this.sort || !this.dataSource) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -289,19 +277,18 @@ export class ChiTietThongKeComponent implements OnInit {
 		filter.Status = this._item.status;
 		filter.Id = this._item.item.id;
 		filter.IdParent = this._item.IdParent;
-
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DiaChi = this.gridService.model.filterText.DiaChi;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 			filter.LoaiHoSo = this.gridService.model.filterText.LoaiHoSo;
 		}
-
 		return filter;
 	}
 
 	ExportExcel() {
+		if (!this.paginator || !this.sort || !this.gridService) return;
 		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
@@ -351,19 +338,19 @@ export class ChiTietThongKeComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	click(objectId) {
+	click(objectId: number) {
 		this.close();
 		window.open('/chi-tiet-ho-so/' + objectId, '_blank')
 		//this.router.navigateByUrl('/chi-tiet-ho-so/' + objectId);
 	}
+
 	print: boolean = false;
-	printTicket(print_template) {
+	printTicket(print_template: string) {
 		this.print = true;
 		this.changeDetector.detectChanges();
-
 		let innerContents = document.getElementById(print_template).innerHTML;
-		
 		const popupWinindow = window.open();
+		if (!popupWinindow) return;
 		popupWinindow.document.open();
 		popupWinindow.document.write('<html><head><title>' + this._name + '</title></head><body onload="window.print()">' + innerContents + '</html>');
 		popupWinindow.document.write(`<style>

@@ -1,14 +1,13 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { Sort } from '@angular/material/sort';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel, TypesUtilsService } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
 import { HoSoNCCDuyetService } from '../Services/ho-so-ncc-duyet.service';
 import { HuongDanHuongThienDialogComponent } from '../huong-dan-hoan-thien/huong-dan-hoan-thien-dialog.component';
-import { Sort } from '@angular/material/sort';
 
 @Component({
 	selector: 'kt-ho-so-ncc-duyet-page',
@@ -19,17 +18,15 @@ import { Sort } from '@angular/material/sort';
 export class HoSoNCCDuyetPageComponent implements OnInit {
 	item: any = {};
 	ListFile: any = [];
-	itemForm: FormGroup;
-	hasFormErrors = false;
+	itemForm: FormGroup | undefined;
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
 	isZoomSize: boolean = false;
 	require = '';
 	id = 0;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
-	maxNS = moment(new Date()).add(-16, 'year').toDate();
 	Cap: number = 0;
 	lstCap: any = [];
 
@@ -40,7 +37,6 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 		private commonService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private route: Router,
 		private actRoute: ActivatedRoute,
 		private translate: TranslateService) {
@@ -50,7 +46,8 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 	/** LOAD DATA */
 	ngOnInit() {
 		this.actRoute.paramMap.subscribe(params => {
-			this.id = +params.get('id');
+			const idParam = params.get('id');
+			this.id = idParam ? +idParam : 0;
 			this.getFiles();
 		});
 		this.item.Id = this.id;
@@ -79,7 +76,6 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 			note: [''],
 			FileDinhKem: [''],
 		};
-
 		this.itemForm = this.fb.group(temp);
 	}
 
@@ -91,6 +87,7 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 
 	/** ACTIONS */
 	prepareData(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		let Id: number;
@@ -105,47 +102,45 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 	}
 
 	onSubmit(value: boolean) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
-			this.hasFormErrors = true;
 			return;
 		}
-		const _item = this.prepareData();
+		const item = this.prepareData();
 		if (value) {
-			const _Message = this.translate.instant('OBJECT.DUYET.MESSAGE', { name: this._NAME });
-			this.Duyet(_item, value, _Message);
-		} else {
-			const _Message = this.translate.instant('OBJECT.KHONGDUYET.MESSAGE', { name: this._NAME });
+			const message = this.translate.instant('OBJECT.DUYET.MESSAGE', { name: this._NAME });
+			this.Duyet(item, value, message);
+		} 
+		else {
+			const message = this.translate.instant('OBJECT.KHONGDUYET.MESSAGE', { name: this._NAME });
 			const dialogRef = this.dialog.open(HuongDanHuongThienDialogComponent, { data: { item: { id_quytrinh_lichsu: 0 } } });
 			dialogRef.afterClosed().subscribe(res => {
-				if (!res) {
-				} else {
-					_item.HuongDan = res._item;
-					this.Duyet(_item, value, _Message);
+				if (res) {
+					item.HuongDan = res._item;
+					this.Duyet(item, value, message);
 				}
 			});
 		}
 	}
-
-	Duyet(_item: any, value: boolean, _Message: string) {
-		_item.value = value;
+	
+	Duyet(item: any, value: boolean, message: string) {
+		item.value = value;
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Duyet(_item).subscribe(res => {
+		this.objectService.Duyet(item).subscribe(res => {
 			this.loadingAfterSubmit = false;
 			this.viewLoading = false;
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.layoutUtilsService.showInfo(_Message);
+				this.layoutUtilsService.showInfo(message);
 				this.item.Id = 0; //load lại comment
 				this.changeDetectorRefs.detectChanges();
 				// this.ngOnInit();
@@ -156,11 +151,11 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 		});
 	}
 
-	Download(src) {
+	Download(src: string) {
 		window.open(src, '_blank');
 	}
 
-	getFiles(sort: Sort = null) {
+	getFiles(sort: Sort | null = null) {
 		let sortOrder = 'desc';
 		if (sort && (!sort.active || sort.direction === '')) {
 			sortOrder = sort.direction;
@@ -181,16 +176,13 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
-		//this.route.navigateByUrl('/duyet-ho-so');
 		window.history.back();
 	}
 
@@ -198,7 +190,7 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 		return window.innerWidth;
 	}
 
-	addComment($event) {
+	addComment($event: any) {
 		if ($event.Attachment && $event.Attachment.length > 0) {
 			this.getFiles();
 		}

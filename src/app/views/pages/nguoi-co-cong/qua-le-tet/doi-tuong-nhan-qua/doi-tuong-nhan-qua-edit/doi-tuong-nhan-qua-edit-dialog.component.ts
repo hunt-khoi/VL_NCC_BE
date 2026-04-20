@@ -125,7 +125,7 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 			}
 		})
 
-		this.loadListGioiTInh();
+		this.loadListGioiTinh();
 		this.loadListDoiTuongNCC();
 		this.loadListQuanHeVoiLietSy();
 
@@ -373,7 +373,7 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 		});
 	}
 
-	loadListGioiTInh() {
+	loadListGioiTinh() {
 		this.commonService.ListGioiTinh().subscribe(res => {
 			this.listgioitinh = res.data;
 		});

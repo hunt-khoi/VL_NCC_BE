@@ -142,7 +142,6 @@
 					<th mat-header-cell *matHeaderCellDef style="justify-content: center">Ngày tạo</th>
 					<td mat-cell *matCellDef="let object" style="justify-content: center">{{object.CreatedDate }}</td>
 				</ng-container>
-
 				<ng-container matColumnDef="UpdatedBy">
 					<th mat-header-cell *matHeaderCellDef style="justify-content: center">Người cập nhật</th>
 					<td mat-cell class="mw-150px" *matCellDef="let item" style="justify-content: center">{{item.UpdatedBy}}</td>
@@ -158,7 +157,6 @@
 
 			<!-- <div class="mat-table__message" *ngIf="productsResult.length==0"><span translate="COMMON.NO_RECORD_FOUND"></span></div> -->
 
-			<!-- start: BOTTOM -->
 			<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 				<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
 					<mat-chip-list>
@@ -179,13 +177,7 @@
 						</mat-chip>
 					</mat-chip-list>
 				</div>
-				<!-- <div class="flt-page" style="width: 50%;">
-					<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-					<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
-				</div> -->
 			</div>
-			<!-- end: BOTTOM -->
 		</div>
-
 	</div>
 </kt-portlet>

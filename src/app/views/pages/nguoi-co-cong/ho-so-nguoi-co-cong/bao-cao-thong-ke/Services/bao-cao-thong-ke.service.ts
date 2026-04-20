@@ -9,11 +9,8 @@ const API_URL = environment.ApiRoot + '/ncc';
 @Injectable()
 export class BaoCaoThongKeService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
@@ -25,6 +22,7 @@ export class BaoCaoThongKeService {
 			params: httpParams
 		});
 	}
+
 	exportList(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);

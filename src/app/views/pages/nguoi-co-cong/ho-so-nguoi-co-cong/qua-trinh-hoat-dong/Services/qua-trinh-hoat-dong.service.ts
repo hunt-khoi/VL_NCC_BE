@@ -9,10 +9,10 @@ const API_URL = environment.ApiRoot + '/qua-trinh-hoat-dong';
 @Injectable()
 export class QuaTrinhHoatDongService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
+	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	// READ
 	getAllItems(): Observable<any[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any[]>(API_URL + '?more=true', { headers: httpHeaders });
@@ -34,21 +34,17 @@ export class QuaTrinhHoatDongService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	
-	// CREATE =>  POST: add a new oduct to the server
-	Create(item): Observable<any> {
+	Create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
 	Update(item: any): Observable<any> {
-		// Note: Add headers if needed (tokens/bearer)
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
-	deleteItem(itemId: number): Observable<any> {
+	Delete(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });

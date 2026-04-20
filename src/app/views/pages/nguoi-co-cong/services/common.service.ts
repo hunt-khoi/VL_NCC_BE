@@ -13,24 +13,17 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
 @Injectable()
 export class CommonService {
 
-	constructor(private layoutUtilsService: LayoutUtilsService,
-		private http: HttpClient,
-		private httpUtils: HttpUtilsService,
-		private fb: FormBuilder,
-		private tokenStorage: TokenStorage,
-		private idle: Idle,
-		private auth: AuthService,) { }
-	Form: FormGroup;
+	Form: FormGroup | undefined;
 	fixedPoint: number = 0;
 	thousandSeparator: string = '.';
 	decimalSeperator: string = ',';
 
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
 	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	ReadOnlyControl: boolean;
+	data_import: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	ReadOnlyControl: boolean = false;
 
 	//#region ckeditor
 	ckeditor: any = {
@@ -150,6 +143,14 @@ export class CommonService {
 	};
 	//#endregion
 
+	constructor(private layoutUtilsService: LayoutUtilsService,
+		private http: HttpClient,
+		private httpUtils: HttpUtilsService,
+		private fb: FormBuilder,
+		private tokenStorage: TokenStorage,
+		private idle: Idle,
+		private auth: AuthService) { }
+
 	getLockString(locked: boolean = true): string {
 		return locked ? "Khóa" : "Hoạt động";
 	}
@@ -162,6 +163,7 @@ export class CommonService {
 		var temp = localStorage.getItem('DROP_BUTTON');
 		return temp == "1";
 	};
+
 	ValidateChangeNumberEvent(columnName: string, item: any, event: any) {
 		var count = 0;
 		for (let i = 0; i < event.target.value.length; i++) {
@@ -183,6 +185,7 @@ export class CommonService {
 		}
 		return true;
 	}
+
 	/**
 	 * Phonenumber: type= 'phone'
 	 * Domain: type= 'domain'
@@ -226,15 +229,15 @@ export class CommonService {
 		let nbr = Number((value + '').replace(/,/g, ""));
 		return (nbr + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1" + this.thousandSeparator);
 	}
-	stringToInt(value) {
+
+	stringToInt(value: any) {
 		return parseInt(value.replaceAll(this.thousandSeparator, ''));
 	}
 
-	numberOnly(event): boolean {
+	numberOnly(event: any): boolean {
 		const charCode = (event.which) ? event.which : event.keyCode;
-		if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+		if (charCode > 31 && (charCode < 48 || charCode > 57)) 
 			return false;
-		}
 		return true;
 	}
 
@@ -246,8 +249,7 @@ export class CommonService {
 	}
 
 	f_convertDate(v: any) {
-		if (!v)
-			return null;
+		if (!v) new Date();
 		let a = v === "" ? new Date() : new Date(v);
 		return a.getFullYear() + "-" + ("0" + (a.getMonth() + 1)).slice(-2) + "-" + ("0" + (a.getDate())).slice(-2) + "T00:00:00.0000000";
 	}
@@ -261,25 +263,27 @@ export class CommonService {
 		return new Date(formatConvert);
 	}
 
-	
-	romanize(num) {
+	romanize(num: any) {
 		if (isNaN(num))
 			return NaN;
-		var digits = String(+num).split(""),
-			key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+		var digits = String(+num).split("");
+		if (!digits)
+			return NaN;
+
+		var key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
 				"","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
-				"","I","II","III","IV","V","VI","VII","VIII","IX"],
-			roman = "",
-			i = 3;
+				"","I","II","III","IV","V","VI","VII","VIII","IX"];
+		var roman = "";
+
+		var i = 3;
 		while (i--)
-			roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+			roman = (key[+(digits.pop() || 0) + (i * 10)] || "") + roman;
 		return Array(+digits.join("") + 1).join("M") + roman;
 	}
 
 	get_colorByName(ten: string){
 		let result;
-		switch (ten)
-		{
+		switch (ten) {
 			case "A":
 				return result = "rgb(51 152 219)";
 			case "Ă":
@@ -346,9 +350,9 @@ export class CommonService {
 			- nhược điểm: đưa thông báo lỗi load ảnh liên tục nếu link ảnh lỗi
 			- ưu điểm: nó chạy được :D 
 	*/
-	checkImage(url, callback, timeout) {
+	checkImage(url: any, callback: any, timeout: any) {
 		timeout = timeout || 10000;
-		var timedOut = false, timer;
+		var timedOut = false, timer: any;
 		var img = new Image();
 		img.onerror = img.onabort = function() {
 			if (!timedOut) {
@@ -368,13 +372,11 @@ export class CommonService {
 			callback(url, "timeout");
 		}, timeout); 
 	}
-	record(url, result) {
-		if(result == 'error'){
-			return false;
-		} else {
-			return true;
-		}
 
+	record(result: any) {
+		if (result == 'error')
+			return false;
+		return true;
 	}  
 
 	//#region form helper
@@ -388,11 +390,9 @@ export class CommonService {
 	 * @param validationType: string => Equals to valitors name
 	 */
 	isControlHasError(controlName: string, validationType: string): boolean {
+		if (!this.Form) return false;
 		const control = this.Form.controls[controlName];
-		if (!control) {
-			return false;
-		}
-
+		if (!control) return false;
 		const result = control.hasError(validationType) && (control.dirty || control.touched);
 		return result;
 	}
@@ -513,7 +513,7 @@ export class CommonService {
 		const url = environment.ApiRoot + `/lite/doi-tuong-ncc-lite?Locked=${locked}&Id_LoaiHoSo=${Id_LoaiHoSo}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	private _liteDoiTuongNCC_LoaiHS$: Observable<any>;
+	private _liteDoiTuongNCC_LoaiHS$: Observable<any> | null = null;
 	liteDoiTuongNCC_LoaiHS(locked: boolean = false, tendt: string = ''): Observable<any> {
 		// Cache the full list (no filter) so subsequent navigations are instant
 		if (tendt === '' && !locked && this._liteDoiTuongNCC_LoaiHS$) {
@@ -709,13 +709,13 @@ export class CommonService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	ListChucVu(Id): Observable<any> {
+	ListChucVu(Id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/DM_ChucVu?Iddonvi=' + Id;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	TreeChucVu(dv, locked: boolean = false): Observable<any> {
+	TreeChucVu(dv: any, locked: boolean = false): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + `/lite/tree-chuc-vu?Donvi=${dv}&Locked=${locked}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
@@ -780,38 +780,43 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + `/lite/tree-quyen?IdGroup=${itemId}`, { headers: httpHeaders });
 	}
-
-	CheckRole(IDRole): any {
-		var roles = JSON.parse(localStorage.getItem('userRoles'));
-		return roles.filter(x => x == IDRole);
+	CheckRole(IDRole: number): any {
+		const rolesData = localStorage.getItem('userRoles');
+		const roles = rolesData ? JSON.parse(rolesData) : [];
+		return roles.filter((x: number) => x == IDRole);
 	}
 	//#endregion
 
 	//#region danh mục DM_DanhMuc
-	GetAllProvinces() {
+	GetAllProvinces(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/GetListProvinces';
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	GetListDistrictByProvinces(idTinh) {
+	GetListDistrictByProvinces(idTinh: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/GetListDistrictByProvinces?id_provinces=' + idTinh;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	GetListWardByDistrict(id_district) {
+	GetListWardByDistrict(id_district: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/GetListWardByDistrict?id_district=' + id_district;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	GetListKhomApByWard(id_ward) {
+	GetListKhomApByWard(id_ward: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/GetListKhomApByWard?id_ward=' + id_ward;
+		return this.http.get<any>(url, { headers: httpHeaders });
+	}
+	GetListWardByProvince(idTinh: any): Observable<any> { //sau sáp nhập
+		const httpHeaders = this.httpUtils.getHTTPHeaders();
+		const url = environment.ApiRoot + '/lite/GetListWardByProvince?id_provinces=' + idTinh;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	//#endregion
 
 	//#region Vai trò
-	ListVaiTroByDonVi(Id): Observable<any> {
+	ListVaiTroByDonVi(Id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/vai-tro?IdDonVi=' + Id;
 		return this.http.get<any>(url, { headers: httpHeaders });
@@ -829,12 +834,12 @@ export class CommonService {
 	//#endregion
 
 	//#region hồ sơ
-	DanhMucHoSo(Id, iddv: number = 0, locked: boolean = false, idrequired: number = 0): Observable<any> {
+	DanhMucHoSo(Id: number, iddv: number = 0, locked: boolean = false, idrequired: number = 0): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + `/lite/DM_HoSo_Lite?Parent=${Id}&iddv=${iddv}&Locked=${locked}&IdRequired=${idrequired}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	TreeHoSo(DonVi: number = 0, locked: boolean = false): Observable<any> {
+	TreeHoSo(DonVi: number = 0): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + `/lite/Lite_HoSoTree?DonVi=${DonVi}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
@@ -858,12 +863,12 @@ export class CommonService {
 		}
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	TreeDonViByParent(Id): Observable<any> {
+	TreeDonViByParent(Id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/DM_PhongBan_Tree?Id=' + Id;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	TreeDonViCC(Id, locked: boolean = false): Observable<any> {
+	TreeDonViCC(Id: number, locked: boolean = false): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + `/lite/DM_PhongBan_Tree_CC?Id=${Id}&Locked=${locked}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
@@ -886,7 +891,7 @@ export class CommonService {
 		const url = environment.ApiRoot + `/user/GetThongBaoPage?more=false&record=${pagesize}&page=${pageindex}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	ReadNotify(Id): Observable<any> {
+	ReadNotify(Id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/user/ReadNotify?Id=' + Id;
 		return this.http.get<any>(url, { headers: httpHeaders });
@@ -896,14 +901,12 @@ export class CommonService {
 		const url = environment.ApiRoot + '/user/GetInfoUser';
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-
-	UpdateInfoUser(Item): Observable<any> {
+	UpdateInfoUser(Item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/user/UpdateInfoUser';
 		return this.http.post<any>(url, Item, { headers: httpHeaders });
 	}
-
-	changePassword(data): Observable<any> {
+	ChangePassword(data: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/user/change-password';
 		return this.http.post<any>(url, data, { headers: httpHeaders });
@@ -921,23 +924,12 @@ export class CommonService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	//#region DuLam get dropdown  danh-sach-nguoi-lite
+	//#region get dropdown danh-sach-nguoi-lite
 	//drop người dùng theo đơn vị
 	getDSNguoiDungLite(useVaiTro: boolean = true, idDV: number = 0): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + `/lite/danh-sach-nguoi-lite?useVaiTro=${useVaiTro}&idDV=${idDV}`;
 		return this.http.post<any>(url, null, { headers: httpHeaders });
-	}
-	//nhom lam viec lite
-	DMNhomLamViec(): Observable<any> {
-		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = environment.ApiRoot + '/lite/dm-nhom-lam-viec-lite?loai=1';
-		return this.http.get<any>(url, { headers: httpHeaders });
-	}
-	DMNhomLamViecLienThong(): Observable<any> {
-		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = environment.ApiRoot + '/lite/dm-nhom-lam-viec-lite?loai=2';
-		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	//drop  đơn vị (auto complete)
 	getDSDonViLite(): Observable<any> {
@@ -949,7 +941,7 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + `/lite/tree-nguoi-dung-don-vi?Id=${itemId}&useVaiTro=${useVaiTro}`, { headers: httpHeaders });
 	}
-	getDonViTheoParent(Id: any): Observable<any> {
+	getDonViTheoParent(Id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + `/lite/Lite_DanhSachDonVi_Prent?Id=${Id}`, { headers: httpHeaders });
 	}
@@ -963,31 +955,28 @@ export class CommonService {
 	}
 	//#endregion
 
-	Delete_FileDinhKem(id): Observable<any> {
+	Delete_FileDinhKem(id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/delete-dinhkem?id=' + id;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
 	TimesOutExpire() {
-		if (localStorage.getItem('TIME_LOGOUT') != undefined && +localStorage.getItem('TIME_LOGOUT') != 0) {
+		const timeLogout = localStorage.getItem('TIME_LOGOUT');
+		if (timeLogout != null && +timeLogout != 0) {
 			// khi user không hđ trong ('TIME_LOGOUT'/1000)s (không di chuyển chuột, nhấn bất kỳ phím hoặc nút nào,...),
 			// cảnh báo sẽ được hiển thị khi hết khoảng tg này
-			this.idle.setIdle(+localStorage.getItem('TIME_LOGOUT') / 1000);
-
+			this.idle.setIdle(+timeLogout / 1000);
 			// chờ thêm 1s người dùng vẫn ko hđ sẽ logout
 			this.idle.setTimeout(1);
-
 			// sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
 			this.idle.setInterrupts(DEFAULT_INTERRUPTSOURCES);
-
 			this.idle.onTimeout.subscribe(() => {
 				//this.idleState = 'Timed out!';
-				this.layoutUtilsService.showInfo('Bạn đã không thao tác trong ' + (+localStorage.getItem('TIME_LOGOUT') / 1000 / 60) + ' phút, phần mềm sẽ đăng xuất');
+				this.layoutUtilsService.showInfo('Bạn đã không thao tác trong ' + (+timeLogout / 1000 / 60) + ' phút, phần mềm sẽ đăng xuất');
 				this.auth.logout(true);
 				//this.timedOut = true;
 			});
-
 			this.idle.watch();
 			//this.timedOut = false;
 		}
@@ -1069,11 +1058,11 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + `/lite/GetListPosition`, { headers: httpHeaders });
 	}
-	GetListPositionbyStructure(id): Observable<QueryResultsModel> {
+	GetListPositionbyStructure(id: any): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + `/lite/GetListPositionbyStructure?structureid=${id}`, { headers: httpHeaders });
 	}
-	GetListJobtitleByStructure(cd, id): Observable<QueryResultsModel> {
+	GetListJobtitleByStructure(cd: any, id: any): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + `/lite/GetListJobtitleByStructure?id_cv=${cd}&&structureid=${id}`, { headers: httpHeaders });
 	}
@@ -1081,11 +1070,11 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/DM_PhongBan_Tree', { headers: httpHeaders });
 	}
-	GetListPositionbyStructure_All(id): Observable<QueryResultsModel> {
+	GetListPositionbyStructure_All(): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListPositionbyStructure_All', { headers: httpHeaders });
 	}
-	GetListJobtitleByStructure_All(cd, id): Observable<QueryResultsModel> {
+	GetListJobtitleByStructure_All(): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListJobtitleByStructure_All', { headers: httpHeaders });
 	}
@@ -1093,27 +1082,27 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListBranchbyCustomerID', { headers: httpHeaders });
 	}
-	GetListDepartmentbyBranch(id): Observable<QueryResultsModel> {
+	GetListDepartmentbyBranch(): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListDepartmentbyBranch', { headers: httpHeaders });
 	}
-	GetListTeamByDepartment(id): Observable<QueryResultsModel> {
+	GetListTeamByDepartment(): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListTeamByDepartment', { headers: httpHeaders });
 	}
-	GetListPositionbyDepartment(id): Observable<QueryResultsModel> {
+	GetListPositionbyDepartment(): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListPositionbyDepartment', { headers: httpHeaders });
 	}
-	GetListJobtitleByPosition(cd, id): Observable<QueryResultsModel> {
+	GetListJobtitleByPosition(): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListJobtitleByPosition', { headers: httpHeaders });
 	}
-	GetListNhomChucDanhTheoChucDanh(id_cv): Observable<QueryResultsModel> {
+	GetListNhomChucDanhTheoChucDanh(id_cv: any): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListNhomChucDanhTheoChucDanh?id_cv=' + id_cv, { headers: httpHeaders });
 	}
-	GetListOnlyNhomChucDanh(id_nhomcd): Observable<QueryResultsModel> {
+	GetListOnlyNhomChucDanh(id_nhomcd: any): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/lite/GetListOnlyNhomChucDanh?id_nhomcd=' + id_nhomcd, { headers: httpHeaders });
 	}
@@ -1131,46 +1120,42 @@ export class CommonService {
 	}
 
 	// Cho phép gửi đề xuất duyệt
-	IsShowNhacnhoduyet(chuoi) {
+	IsShowNhacnhoduyet(chuoi: string): boolean {
 		var newArr = chuoi.split('/');
 		var chophepduyet = newArr.find(x => x == 'theo-doi-quy-trinh')
-		if (chophepduyet) {
-			return true;
-		}
-		return false;
+		return !!chophepduyet;
 	}
-	CheckersByStep(loai, id_phieu, id_quatrinh): Observable<QueryResultsModel> {
+	CheckersByStep(loai: number, id_phieu: number, id_quatrinh: number): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<QueryResultsModel>(environment.ApiRoot + `/quy-trinh-duyet/CheckersByStep?Loai=${loai}&Id=${id_phieu}&Id_QuaTrinh=${id_quatrinh}`, { headers: httpHeaders });
 	}
 
 	//#region hướng dẫn hoàn thiện 
-	getDetailHuongDan(id): Observable<any> {
+	getDetailHuongDan(id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get(environment.ApiRoot + `/hd-hoan-thien/get-detail-huong-dan?id_quatrinh_lichsu=${id}`, {
 			headers: httpHeaders,
 		});
 	}
-	updateHuongDan(data): Observable<any> {
+	updateHuongDan(data: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post(environment.ApiRoot + `/hd-hoan-thien/update-huong-dan`, data, {
 			headers: httpHeaders,
 		});
 	}
-
-	getIdHuongDan(id, loaiphieu): Observable<any> {
+	getIdHuongDan(id: number, loaiphieu: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get(environment.ApiRoot + `/hd-hoan-thien/get-id-huong-dan?id=${id}&loaiphieu=${loaiphieu}`, {
 			headers: httpHeaders,
 		});
 	}
-	getHuongDan(id, loaiphieu): Observable<any> {
+	getHuongDan(id: number, loaiphieu: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get(environment.ApiRoot + `/hd-hoan-thien/get-huong-dan?id_quatrinh_lichsu=${id}&loaiphieu=${loaiphieu}`, {
 			headers: httpHeaders,
 		});
 	}
-	exportHuongDan(id, loaiphieu, loai: number = 1): Observable<any> {
+	exportHuongDan(id: number, loaiphieu: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get(environment.ApiRoot + `/hd-hoan-thien/export-huong-dan?id_quatrinh_lichsu=${id}&loaiphieu=${loaiphieu}&loai=${loai}`, {
 			headers: httpHeaders,
@@ -1181,13 +1166,13 @@ export class CommonService {
 	//#endregion
 
 	//#region biên nhận
-	getBienNhan(id): Observable<any> {
+	getBienNhan(id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get(environment.ApiRoot + `/ncc/get-bien-nhan?id=${id}`, {
 			headers: httpHeaders,
 		});
 	}
-	exportBienNhan(id, loai: number = 1): Observable<any> {
+	exportBienNhan(id: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get(environment.ApiRoot + `/ncc/export-bien-nhan?id=${id}&loai=${loai}`, {
 			headers: httpHeaders,

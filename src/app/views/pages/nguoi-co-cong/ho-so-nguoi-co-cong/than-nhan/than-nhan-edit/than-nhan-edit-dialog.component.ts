@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, ChangeDetectionStrategy, ChangeDetectorRef, 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ThanNhanService } from './../Services/than-nhan.service';
 import { ThanNhanModel } from '../../than-nhan/Model/than-nhan.model';
 import { ThanNhanEditComponent } from '../../../components/than-nhan-edit/than-nhan-edit.component';
@@ -14,12 +14,11 @@ import { ThanNhanEditComponent } from '../../../components/than-nhan-edit/than-n
 })
 
 export class ThanNhanEditDialogComponent implements OnInit {
-
 	ChildComponentInstance: any;
-	childComponentType: Type<any>;
+	childComponentType: Type<any> | undefined;
 	childComponentData: any = {};
-	item: ThanNhanModel;
-	oldItem: ThanNhanModel;
+	item: ThanNhanModel = new ThanNhanModel();
+	oldItem: ThanNhanModel = new ThanNhanModel();
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -41,7 +40,6 @@ export class ThanNhanEditDialogComponent implements OnInit {
 		}
 	}
 
-
 	constructor(
 		public dialogRef: MatDialogRef<ThanNhanEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
@@ -49,7 +47,6 @@ export class ThanNhanEditDialogComponent implements OnInit {
 		private objectService: ThanNhanService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 			this._NAME = this.translate.instant('THANNHAN.NAME');
 	}
@@ -58,7 +55,6 @@ export class ThanNhanEditDialogComponent implements OnInit {
 	ngOnInit() {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
-
 		this.childComponentType = ThanNhanEditComponent;
 		this.childComponentData = Object.assign({}, this.data);
 		this.childComponentData.objectService = this.objectService;
@@ -75,42 +71,37 @@ export class ThanNhanEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE');
 		return result;
 	}
 
 	/** ACTIONS */
 	onSubmit(withBack: boolean = false) {
-		let EditTroCap = this.ChildComponentInstance.onSubmit();
-		if (EditTroCap == undefined) {
-			this.changeDetectorRefs.detectChanges();
-		}
-		else {
-			if (EditTroCap.Id > 0) {
-				this.UpdateThanNhan(EditTroCap, withBack);
-			} else {
-				this.CreateThanNhan(EditTroCap, withBack);
-			}
+		let Edit = this.ChildComponentInstance.onSubmit();
+		if (Edit) {
+			if (Edit.Id > 0)
+				this.Update(Edit, withBack);
+			else
+				this.Create(Edit, withBack);
 		}
 	}
 
-	UpdateThanNhan(_item: ThanNhanModel, withBack: boolean) {
+	Update(item: ThanNhanModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.UpdateThanNhan(_item).subscribe(res => {
+		this.objectService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
+					this.layoutUtilsService.showInfo(_messageType);
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -118,21 +109,21 @@ export class ThanNhanEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateThanNhan(_item: ThanNhanModel, withBack: boolean) {
+	Create(item: ThanNhanModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		// 	this.viewLoading = true;
+		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.CreateThanNhan(_item).subscribe(res => {
+		this.objectService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
+					this.layoutUtilsService.showInfo(_messageType);
 					this.ngOnInit();
 				}
 			} else {
@@ -142,15 +133,11 @@ export class ThanNhanEditDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
-
 	close() {
 		this.dialogRef.close();
 	}
 
-	getInstance($event) {
+	getInstance($event: any) {
 		this.ChildComponentInstance = $event;
 	}
 }

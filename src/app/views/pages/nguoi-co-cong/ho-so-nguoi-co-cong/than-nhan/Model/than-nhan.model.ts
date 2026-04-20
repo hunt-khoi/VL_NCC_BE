@@ -1,19 +1,19 @@
 import { BaseModel } from './../../../../../../core/_base/crud/models/_base.model';
 
 export class ThanNhanModel extends BaseModel {
-	Id: number;
-	Id_NCC: number;
-	HoTen: string;
-	Id_QHGiaDinh: number;
-	NgaySinh: string;
-	GioiTinh: number;
-	IsChet: boolean;
-	NgayChet: string;
-	SoKhaiTu: string;
-	DiaChi: string;
-	NguyenQuan: string;
-	SDT: string;
-	Email: string;
+	Id: number = 0;
+	Id_NCC: number = 0;
+	HoTen: string = "";
+	Id_QHGiaDinh: number | null = null;
+	NgaySinh: string = "";
+	GioiTinh: number | null = null;
+	IsChet: boolean = false;
+	NgayChet: string | null = null;
+	SoKhaiTu: string = "";
+	DiaChi: string = "";
+	NguyenQuan: string = "";
+	SDT: string = "";
+	Email: string = "";
 
 	clear() {
 		this.Id = 0;

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { LayoutUtilsService } from 'app/core/_base/crud';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ReplaySubject } from 'rxjs';
 import { CommonService } from '../../../services/common.service';
 import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
@@ -14,7 +14,6 @@ import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
 export class FormBaseComponent {
 
 	lstTC: any[] = [];
-
     FilterCtrl: string = '';
 	listOpt: any[] = [];
 	listdoituongncc: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
@@ -23,7 +22,7 @@ export class FormBaseComponent {
 	listOpt1: any[] = [];
 	listLoaiHS: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict = '';
 	listdistrict: any[] = [];
@@ -39,39 +38,36 @@ export class FormBaseComponent {
 	listTonGiao: any[] = [];
 	GiayTos: any[] = [];
 	thannhanName = '';
-	quanhe: number;
+	quanhe: number = 0;
 	thannhanName2 = '';
-	quanhe2: number;
+	quanhe2: number = 0;
 	require = '';
 	objectThanNhan: any;
-
-	IsThanNhan: boolean;
-	Capcocau: number;
+	IsThanNhan: boolean = false;
+	Capcocau: number = 0;
 
 	//di chuyển
 	listTinh: any[] = [];
 	listHuyen: any[] = [];
 	listXa: any[] = [];
 	isChuyenDi: boolean = false;
-
 	selectedTab: number = 0;
 
 	constructor(public commonService: CommonService,
 		public layoutUtilsService: LayoutUtilsService,
 		public changeDetectorRefs: ChangeDetectorRef) { }
     
-	getInstanceNew($event, index) {
+	getInstanceNew($event: any, index: number) {
 		this.lstTC[index] = $event;
 	}
 
-	firstLowerCase(string) {
-		return string.charAt(0).toLowerCase() + string.slice(1);
+	firstLowerCase(str: string) {
+		return str.charAt(0).toLowerCase() + str.slice(1);
 	}
 
-	prepareCustomer(itemForm: any, id: number, id_ncc: number): HoSoNCCModel {
+	prepareCustomer(itemForm: any, id: number, id_ncc: number): HoSoNCCModel | null {
         const controls = itemForm.controls;
 		const item = new HoSoNCCModel();
-
 		item.Id = +id;
 		item.NgayGui = moment(controls.NgayGui.value).format("YYYY-MM-DDTHH:mm:ss.0000000");
 		item.HoTen = controls.HoTen.value;
@@ -237,13 +233,13 @@ export class FormBaseComponent {
 		return item;
 	}
 
-    checkForm(itemForm, name: string) {
+    checkForm(itemForm: any, name: string) {
         if (itemForm.contains(name))
             return itemForm.controls[name].value ? true : false;
         return false;
     }
 
-	prepareThanNhan(controls, id_ncc=0) {
+	prepareThanNhan(controls: any, id_ncc: number = 0) {
 		let item: any = {};
 		item.HoTen = controls.NguoiThoCungLietSy.value;
 		item.DiaChi = controls.TruQuan1.value;
@@ -266,38 +262,36 @@ export class FormBaseComponent {
 			item.NgaySinh = '01/01/0001';
 		}
 		item.NamSinh = +controls.NamSinh1.value;
-
 		return item;
 	}
 
-	prepareThanNhanDM(controls, id_ncc=0) {
-		let _item: any = {};
-		_item.HoTen = controls.HoTenTN.value;
-		_item.DiaChi = controls.TruQuan2.value;
-		_item.SoHoSo = controls.SoHoSo2.value;
-		_item.NguyenQuan = controls.NguyenQuan2.value;
-		_item.GioiTinh = controls.GioiTinh2.value;
-		_item.Id_QHGiaDinh = controls.QuanHeVoiLietSy2.value;
-		_item.IsChet = controls.IsChet2.value == true;
-		if (_item.IsChet) {
-			_item.NgayChet = this.commonService.f_convertDate(controls.NgayChet2.value);
-			_item.SoKhaiTu = controls.SoKhaiTu2.value;
-			_item.NgayKhaiTu = this.commonService.f_convertDate(controls.NgayKhaiTu2.value);
-			_item.NoiKhaiTu = controls.NoiKhaiTu2.value;
+	prepareThanNhanDM(controls: any, id_ncc: number = 0) {
+		let item: any = {};
+		item.HoTen = controls.HoTenTN.value;
+		item.DiaChi = controls.TruQuan2.value;
+		item.SoHoSo = controls.SoHoSo2.value;
+		item.NguyenQuan = controls.NguyenQuan2.value;
+		item.GioiTinh = controls.GioiTinh2.value;
+		item.Id_QHGiaDinh = controls.QuanHeVoiLietSy2.value;
+		item.IsChet = controls.IsChet2.value == true;
+		if (item.IsChet) {
+			item.NgayChet = this.commonService.f_convertDate(controls.NgayChet2.value);
+			item.SoKhaiTu = controls.SoKhaiTu2.value;
+			item.NgayKhaiTu = this.commonService.f_convertDate(controls.NgayKhaiTu2.value);
+			item.NoiKhaiTu = controls.NoiKhaiTu2.value;
 		}
-		_item.Id_NCC = id_ncc;
+		item.Id_NCC = id_ncc;
 
 		if (controls.NgaySinh2.value !== '') {
-			_item.NgaySinh = this.commonService.f_convertDate(controls.NgaySinh2.value);
+			item.NgaySinh = this.commonService.f_convertDate(controls.NgaySinh2.value);
 		} else {
-			_item.NgaySinh = '01/01/0001';
+			item.NgaySinh = '01/01/0001';
 		}
-		_item.NamSinh = +controls.NamSinh2.value;
-
-		return _item;
+		item.NamSinh = +controls.NamSinh2.value;
+		return item;
 	}
 
-	prepareHD(controls) {
+	prepareHD(controls: any) {
 		const item: any = {};
 		if (controls.NgayChet.value)
 			item.TuNgay = this.commonService.f_convertDate(controls.NgayChet.value); //ko bị trừ ngày khi save db
@@ -310,7 +304,7 @@ export class FormBaseComponent {
 		return item;
 	}
 
-	prepareDC(controls): any {
+	prepareDC(controls: any): any {
 		const item: any = {};
 		item.Id_Tinh = controls.tinhdc.value;
 		item.Id_Huyen = controls.huyendc.value;
@@ -325,7 +319,7 @@ export class FormBaseComponent {
 		return item;
 	}
 
-	prepareGT(controls, id) {
+	prepareGT(controls: any, id: number) {
 		const item: any = {};
 		item.Id_LoaiGiayTo = id;
 		item.So = controls["So" + id].value;
@@ -338,7 +332,7 @@ export class FormBaseComponent {
 		return item;
 	}
 
-	prepareDinhChinh(controls) {
+	prepareDinhChinh(controls: any) {
 		const item: any = {};
 		item.GhiChu = controls.GhiChu_new.value;
 		item.ListColumn = [];
@@ -370,13 +364,13 @@ export class FormBaseComponent {
 	}
 
 	//#region di chuyển
-	changeTinh(val) {
+	changeTinh(val: any) {
 		this.commonService.GetListDistrictByProvinces(val).subscribe(res => {
 			this.listHuyen = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
-	changeHuyen(val) {
+	changeHuyen(val: any) {
 		this.commonService.GetListWardByDistrict(val).subscribe(res => {
 			this.listXa = res.data;
 			this.changeDetectorRefs.detectChanges();
@@ -440,7 +434,7 @@ export class FormBaseComponent {
 
 	}
 
-	findNguyenTruQuan(cap, filterKhom): string {
+	findNguyenTruQuan(cap: any, filterKhom: any): string {
 		let val = "";
 		var khom: any, xa: any, huyen: any, tinh: any;
 		khom = this.listKhomAp.find(x => x.id == +filterKhom) //title

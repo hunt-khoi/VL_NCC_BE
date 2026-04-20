@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialog, MatPaginator, MatSort } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, merge } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
@@ -24,18 +24,17 @@ export class XuatQuyetDinhComponent implements OnInit {
 	lstLoai: any[] = [];//nhóm quyết định
 	lstLoaiHoSo: any[] = [];
 	lstLoaiHoSo2: any[] = [];
-	list_button: boolean;
+	list_button: boolean = false;
 
 	// Table fields
-	dataSource: QuyetDinhDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: QuyetDinhDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict: number = 0;
 	listdistrict: any[] = [];
@@ -44,9 +43,9 @@ export class XuatQuyetDinhComponent implements OnInit {
 	lstStatus: any[] = [];
 	lstcc: any[] = [];
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	Capcocau: number;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	Capcocau: number = 0;
 	filterCC: number = 0;
 
 	constructor(public objectService: QuyetDinhService,
@@ -109,11 +108,11 @@ export class XuatQuyetDinhComponent implements OnInit {
 		this.gridModel.filterText.SoHoSo = '';
 		this.gridModel.filterText.DoiTuong = '';
 		this.gridModel.filterText.LoaiHoSo = '';
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 		this.commonService.getStatusNCC().subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstStatus = res.data;
+				if (!this.gridService) return;
 				this.gridService.model.filterGroupDataChecked['Status'] = this.lstStatus.map(x => {
 					return {
 						name: x.title,
@@ -268,10 +267,7 @@ export class XuatQuyetDinhComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
@@ -285,39 +281,35 @@ export class XuatQuyetDinhComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_xqd'
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_xqd'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new QuyetDinhDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams.sortField = 'NgayGui';
-			queryParams.sortOrder = 'desc';
-			// First load
-			this.dataSource.loadListNCC(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams.sortField = 'NgayGui';
+				queryParams.sortOrder = 'desc';
+				this.dataSource.loadListNCC(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -326,8 +318,8 @@ export class XuatQuyetDinhComponent implements OnInit {
 	}
 
 	checkDT(arr: any, id_dt: any) {
-		let idx = arr.findIndex(x=> x.id==id_dt)
-		if(idx>-1) return true
+		let idx = arr.findIndex((x: any) => x.id==id_dt);
+		return idx > -1;
 	}
 
 	loadGetListDistrictByProvinces(idProvince: any) {
@@ -352,6 +344,7 @@ export class XuatQuyetDinhComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -364,7 +357,7 @@ export class XuatQuyetDinhComponent implements OnInit {
 		this.dataSource.loadListNCC(queryParams);
 	}
 
-	viewCT(id) {
+	viewCT(id: number) {
 		window.open('/chi-tiet-ho-so/'+id, '_blank')
 	}
 
@@ -376,32 +369,28 @@ export class XuatQuyetDinhComponent implements OnInit {
 		if (this.filterward) {
 			filter.Id_Xa = +this.filterward;
 		}
-
-		if (this.gridService.model.filterText) {
-
+		if (this.gridService &&  this.gridService.model.filterText) {
 			filter.DiaChi = this.gridService.model.filterText.DiaChi;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 			filter.LoaiHoSo = this.gridService.model.filterText.LoaiHoSo;
 		}
-
 		return filter;
 	}
 
-	chon($event) {
+	chon($event: any) {
 		this.selection.clear();
 		$event.stopPropagation();
 	}
 
-	getStatusString(status) {
+	getStatusString(status: any) {
 		var f = this.lstStatus.find(x => x.id == status);
-		if (!f)
-			return "";
+		if (!f) return "";
 		return f.data.color;
 	}
 
-	in(IdTemplate, id_ncc = 0, ispdf: boolean = true) {
+	in(IdTemplate = 0, id_ncc = 0, ispdf: boolean = true) {
 		if (id_ncc == 0) {
 			if (this.selection.selected.length > 0)
 				id_ncc = this.selection.selected[0].Id;

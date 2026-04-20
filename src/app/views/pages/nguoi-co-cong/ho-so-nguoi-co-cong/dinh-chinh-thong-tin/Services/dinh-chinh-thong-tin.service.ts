@@ -10,11 +10,11 @@ const API_URL = environment.ApiRoot + '/dinh-chinh';
 
 @Injectable()
 export class DinhChinhThongTinService {
-  lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
+  	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
+	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	// READ
 	GetListField(): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<QueryResultsModel>(API_URL+'/GetListField', { headers: httpHeaders });
@@ -46,34 +46,36 @@ export class DinhChinhThongTinService {
 		const url = `${environment.ApiRoot}/ncc/${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	// CREATE =>  POST: add a new oduct to the server
-	Create(item): Observable<any> {
+
+	Create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
-	Approved(item): Observable<any> {
+	Approved(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL+'/Approved', item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
-	deleteItem(itemId: number): Observable<any> {
+	Delete(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
-	Duyet(item): Observable<any> {
+
+	Duyet(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL+'/duyet', item, { headers: httpHeaders });
 	}
-	PrintDinhChinh(iddc): Observable<any> {
+
+	PrintDinhChinh(iddc: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/get-dinh-chinh?id=${iddc}`;
 		return this.http.get(url, {
 			headers: httpHeaders
 		});
 	}
-	exportDinhChinh(iddc, idncc: number, loai:number=1): Observable<any> {
+
+	exportDinhChinh(iddc: number, idncc: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/export-don-dinh-chinh?iddc=${iddc}&idncc=${idncc}&loai=${loai}`;
 		return this.http.get(url, {

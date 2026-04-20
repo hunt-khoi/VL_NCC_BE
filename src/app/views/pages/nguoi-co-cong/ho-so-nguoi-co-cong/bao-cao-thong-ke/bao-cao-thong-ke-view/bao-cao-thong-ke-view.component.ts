@@ -6,9 +6,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Moment } from 'moment';
-import * as moment from 'moment';
-// Services
 import { CommonService } from '../../../services/common.service';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { TableService } from '../../../../../partials/table/table.service';
@@ -16,6 +13,8 @@ import { TableModel } from '../../../../../partials/table/table.model';
 import { BaoCaoThongKeDataSource } from '../Model/data-sources/bao-cao-thong-ke.datasource';
 import { BaoCaoThongKeService } from '../Services/bao-cao-thong-ke.service';
 import { CookieService } from 'ngx-cookie-service';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-bao-cao-thong-ke-view',
@@ -24,11 +23,10 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class BaoCaoThongKeViewComponent implements OnInit {
-
 	// Table fields
-	dataSource: BaoCaoThongKeDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: BaoCaoThongKeDataSource| undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
@@ -36,22 +34,22 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict = '';
 	listdistrict: any[] = [];
 	filterward = '';
 	listward: any[] = [];
-	Capcocau: number;
+	Capcocau: number = 0;
 
 	// khởi tạo grildModel
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
 	DateKey: string = 'SentDate';
 	now = new Date();
-	to: Moment;
-	from: Moment;
-	list_button: boolean;
+	to: Moment | undefined;
+	from: Moment | undefined;
+	list_button: boolean = false;
 
 	constructor(
 		public objectService: BaoCaoThongKeService,
@@ -130,7 +128,6 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 			value: 'False',
 			checked: false
 		}];
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -276,10 +273,7 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
 			this.gridModel.availableColumns
@@ -292,35 +286,30 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_hosotk'
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_hosotk'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new BaoCaoThongKeDataSource(this.objectService);
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
+		this.route.queryParams.subscribe(_ => {
 			this.loadDataList(false);
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -329,6 +318,7 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -368,14 +358,13 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 		if (this.filterward) {
 			filter.Id_Xa = +this.filterward;
 		}
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DiaChi = this.gridService.model.filterText.DiaChi;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 			filter.LoaiHoSo = this.gridService.model.filterText.LoaiHoSo;
 		}
-
 		return filter;
 	}
 
@@ -384,15 +373,6 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 			this.listdistrict = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-	}
-
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
 	}
 
 	/** SELECTION */
@@ -415,6 +395,7 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 	}
 
 	export() {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
@@ -455,13 +436,15 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 			this.layoutUtilsService.showError("Xuất thống kê báo cáo thất bại")
 		});
 	}
+
 	print: boolean = false;
-	printTicket(print_template) {
+	printTicket(print_template: any) {
 		this.print = true;
 		this.changeDetectorRefs.detectChanges();
 		let title = 'Thống kê hồ sơ người có công đã duyệt';
 		let innerContents = document.getElementById(print_template).innerHTML;
 		const popupWinindow = window.open();
+		if (!popupWinindow) return;
 		popupWinindow.document.open();
 		popupWinindow.document.write('<html><head><title>'+title+'</title></head><body onload="window.print()">' + innerContents + '</html>');
 		popupWinindow.document.write(`<style>

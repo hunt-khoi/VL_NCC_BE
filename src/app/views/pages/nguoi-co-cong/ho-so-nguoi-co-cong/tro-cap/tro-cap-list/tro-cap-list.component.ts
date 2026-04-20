@@ -3,9 +3,8 @@ import { MatDialog, MatPaginator, MatSort } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
+import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
-// Services
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
@@ -25,29 +24,27 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class TroCapListComponent implements OnInit {
-
 	// Table fields
-	dataSource: TroCapDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: TroCapDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
 	// Selection
 	selection = new SelectionModel<HoSoNCCModule>(true, []);
 	productsResult: HoSoNCCModule[] = [];
-	// tslint:disable-next-line:variable-name
+
 	_name = '';
 	objectId = '';
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
 	_user: any = {};
-	list_button: boolean;
+	list_button: boolean = false;
 
 	constructor(
 		private router: Router,
-		private actRoute: ActivatedRoute,
 		public objectService: TroCapService,
 		private hosoService: HoSoNCCService,
 		public dialog: MatDialog,
@@ -84,7 +81,6 @@ export class TroCapListComponent implements OnInit {
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText.So = '';
 		this.gridModel.filterText.NoiCap = '';
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -210,10 +206,7 @@ export class TroCapListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
@@ -227,40 +220,36 @@ export class TroCapListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumnsTroCapNCC';
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumnsTroCapNCC'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new TroCapDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			queryParams.sortField = 'TuNgay';
-			queryParams.filter.Id_NCC = this.objectId;
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilter$.getValue();
+				queryParams.sortField = 'TuNgay';
+				queryParams.filter.Id_NCC = this.objectId;
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -269,6 +258,7 @@ export class TroCapListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -283,29 +273,25 @@ export class TroCapListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.So = this.gridService.model.filterText.So;
 			filter.NoiCap = this.gridService.model.filterText.NoiCap;
 			filter.Id_NCC = this.objectId;
 		}
-
 		return filter;
 	}
 
 	/** Delete */
-	DeleteWorkplace(_item: any) {
+	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.Delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -315,19 +301,13 @@ export class TroCapListComponent implements OnInit {
 			});
 		});
 	}
-	AddWorkplace() {
-		const objectModel: any = {}
-		this.Editobject(objectModel);
-	}
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
 
-		if (!queryParams.filter) {
-			return;
-		}
+	Add() {
+		const objectModel: any = {}
+		this.Edit(objectModel);
 	}
-	Editobject(_item: any, allowEdit: boolean = true, IsCat: boolean = false, allowEditCat:boolean=false) {
+
+	Edit(_item: any, allowEdit: boolean = true, IsCat: boolean = false, allowEditCat:boolean=false) {
 		//let showCat = false;
 		//if (!allowEdit)//xem chi tiết thì hiển thị thông tin cắt
 		//{
@@ -340,11 +320,7 @@ export class TroCapListComponent implements OnInit {
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(TroCapEditDialogComponent, { data: { _item, allowEdit, IsCat, allowEditCat} });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
-				this.loadDataList();
-			}
-
+			this.loadDataList();
 		});
 	}
 
@@ -360,7 +336,8 @@ export class TroCapListComponent implements OnInit {
 			return tmp_height + 'px';
 		}
 	}
-	in(item) {
+
+	in(item: any) {
 		//this.objectService.previewQD(item.Id_NCC, item.Id_QuyetDinh).subscribe(res => {
 		//	if (res && res.status == 1) {
 		//		const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
@@ -402,7 +379,8 @@ export class TroCapListComponent implements OnInit {
 			this.layoutUtilsService.showError("Xuất quyết định trợ cấp thất bại");
 		});
 	}
-	raQuyetDinh(item, iscat = false) {
+
+	raQuyetDinh(item: any, iscat = false) {
 		let _item: any = {
 			ObjectType: iscat ? 3 : 1,
 			ObjectId: item.Id,
@@ -410,8 +388,7 @@ export class TroCapListComponent implements OnInit {
 		}
 		const dialogRef = this.dialog.open(QuyetDinhEditDialogComponent, { data: { _item } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo("Tạo quyết định thành công");
 				this.ngOnInit();
 			}

@@ -118,7 +118,7 @@ export class PersonalInformationComponent implements OnInit {
 					f.setAttribute("src", "data:image/png;base64," + base64Str);
 
 			};
-			setTimeout(res => {
+			setTimeout(_ => {
 				if (ind == 1) {
 					this.avatar.strBase64 = base64Str;
 					this.avatar.filename = filename;
@@ -135,7 +135,6 @@ export class PersonalInformationComponent implements OnInit {
 
 	selectFile(ind: any) {
 		let f = document.getElementById("imgInpdd" + ind);
-		if (f)
-			f.click();
+		if (f) f.click();
 	}
 }

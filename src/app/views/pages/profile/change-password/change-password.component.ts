@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { LayoutUtilsService } from '../../../../core/_base/crud';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
@@ -51,18 +51,8 @@ export class ChangePasswordComponent implements OnInit {
 	createForm() {
 		this.Form = this.fb.group({
 			curPassword: ['', [Validators.required]],
-			password: ['', Validators.compose([
-				Validators.required,
-				Validators.minLength(3),
-				Validators.maxLength(100)
-			])
-			],
-			confirmPassword: ['', Validators.compose([
-				Validators.required,
-				Validators.minLength(3),
-				Validators.maxLength(100)
-			])
-			],
+			password: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
+			confirmPassword: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
 		}, {
 			validator: ConfirmPasswordValidator.MatchPassword
 		});
@@ -87,7 +77,7 @@ export class ChangePasswordComponent implements OnInit {
 		data.OldPassword = controls.curPassword.value;
 		data.NewPassword = controls.password.value;
 		data.RePassword = controls.confirmPassword.value;
-		this.commonService.changePassword(data).subscribe(res => {
+		this.commonService.ChangePassword(data).subscribe(res => {
 			if (res && res.status == 1) {
 				this.auth.logout(true);
 			} else {

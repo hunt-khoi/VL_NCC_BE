@@ -10,7 +10,8 @@ const API_NCC = environment.ApiRoot + '/ncc';
 @Injectable()
 export class QuyetDinhService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'desc', 'NgayGui', 0, 10));
-	ReadOnlyControl: boolean;
+	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	// READ
@@ -44,26 +45,24 @@ export class QuyetDinhService {
 		const url = `${API_URL}/${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	// CREATE =>  POST: add a new oduct to the server
-	Create(item): Observable<any> {
+
+	Create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
 	Update(item: any): Observable<any> {
-		// Note: Add headers if needed (tokens/bearer)
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
-	deleteItem(itemId: number): Observable<any> {
+	Delete(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
-	previewQD(mau, ncc, itemId: number): Observable<any> {
+
+	previewQD(mau: number, ncc: any, itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		let url = '';
 		if (mau == 0)
@@ -78,7 +77,8 @@ export class QuyetDinhService {
 			headers: httpHeaders
 		});
 	}
-	exportQD(mau, ncc, itemId: number, loai: number = 1): Observable<any> {
+
+	exportQD(mau: number, ncc: any, itemId: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		let url = '';
 		if (mau == 0)
@@ -95,7 +95,8 @@ export class QuyetDinhService {
 			observe: 'response'
 		});
 	}
-	downloadQD(mau, ncc, itemId: number, loai: number = 1): Observable<any> {
+
+	downloadQD(mau: number, ncc: any, itemId: number, loai: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		let url = '';
 		if (mau == 0)
@@ -112,14 +113,16 @@ export class QuyetDinhService {
 			observe: 'response'
 		});
 	}
-	previewByTemplate(mau, ncc): Observable<any> {
+
+	previewByTemplate(mau: number, ncc: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		let url = `${API_URL}/get-by-template?id_template=${mau}&ncc=${ncc}`;
 		return this.http.get(url, {
 			headers: httpHeaders
 		});
 	}
-	exportByTemplate(mau, ncc, loai: number = 1): Observable<any> { //cũ
+
+	exportByTemplate(mau: number, ncc: any, loai: number = 1): Observable<any> { //cũ
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		let url = `${API_URL}/export-by-template?id_template=${mau}&ncc=${ncc}&loai=${loai}`;
 		return this.http.get(url, {
@@ -128,7 +131,8 @@ export class QuyetDinhService {
 			observe: 'response'
 		});
 	}
-	downloadByTemplate(mau, ncc, ispdf: boolean = true): Observable<any> {
+
+	downloadByTemplate(mau: number, ncc: any, ispdf: boolean = true): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		let url = `${API_URL}/download-by-template?id_template=${mau}&ncc=${ncc}&ispdf=${ispdf}`;
 		return this.http.get(url, {
@@ -150,6 +154,7 @@ export class QuyetDinhService {
 			observe: 'response'
 		})
 	}
+
 	getDSThoCung(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
@@ -171,6 +176,7 @@ export class QuyetDinhService {
 			observe: 'response'
 		})
 	}
+
 	getDSKham(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
@@ -192,6 +198,7 @@ export class QuyetDinhService {
 			observe: 'response'
 		})
 	}
+
 	getTruyTangBMVNAH(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);

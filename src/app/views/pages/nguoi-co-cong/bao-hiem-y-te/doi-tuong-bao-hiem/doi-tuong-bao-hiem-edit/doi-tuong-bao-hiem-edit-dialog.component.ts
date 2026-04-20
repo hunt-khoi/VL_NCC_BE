@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ReplaySubject } from 'rxjs';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { CommonService } from '../../../services/common.service';
@@ -26,7 +26,7 @@ export class DoiTuongBaoHiemEditDialogComponent implements OnInit {
 	isZoomSize: boolean = false;
 	disabledBtn = false;
 	allowEdit = false;
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict = '';
 	listdistrict: any[] = [];
@@ -47,7 +47,7 @@ export class DoiTuongBaoHiemEditDialogComponent implements OnInit {
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
 	_NAME = '';
 	maxNS = moment(new Date()).add(-16, 'year').toDate();
-	Capcocau: number;
+	Capcocau: number = 0;
 	change: boolean = false;
 	IsReturn: boolean = false;
 
@@ -382,7 +382,7 @@ export class DoiTuongBaoHiemEditDialogComponent implements OnInit {
 	}
 
 	loadKhomAp() {
-		this.commonService.GetListKhomApByWard(this.filterward).subscribe(res => {
+		this.commonService.GetListKhomApByWard(+this.filterward).subscribe(res => {
 			this.listKhomAp = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});

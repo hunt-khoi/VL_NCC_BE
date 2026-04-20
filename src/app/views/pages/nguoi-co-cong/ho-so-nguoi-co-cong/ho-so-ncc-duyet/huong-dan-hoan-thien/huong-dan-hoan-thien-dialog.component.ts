@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, ChangeDetectionStrategy, ViewChild, ElementR
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { HoSoNCCDuyetService } from '../Services/ho-so-ncc-duyet.service';
 
@@ -14,14 +14,13 @@ import { HoSoNCCDuyetService } from '../Services/ho-so-ncc-duyet.service';
 
 export class HuongDanHuongThienDialogComponent implements OnInit {
 	item: any;
-
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
 	isZoomSize: boolean = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 
 	constructor(
@@ -32,7 +31,6 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 		public CommonService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 	}
 
@@ -62,7 +60,8 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 		};
 
 		this.itemForm = this.fb.group(temp);
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		this.changeDetectorRefs.detectChanges();
 	}
 
@@ -76,6 +75,7 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 
 	/** ACTIONS */
 	prepareData(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = { id_quytrinh_lichsu: this.item.id_quytrinh_lichsu };
 		_item.NoiDung = controls.NoiDung.value;
@@ -83,8 +83,8 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 		return _item;
 	}
 
-	onSubmit(value: boolean) {
-
+	onSubmit() {
+		if (!this.itemForm) return;
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
@@ -93,7 +93,6 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -115,9 +114,6 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 		}
 	}
 
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
 	close() {
 		this.dialogRef.close();
 	}

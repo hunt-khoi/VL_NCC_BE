@@ -10,11 +10,12 @@ const API_URL = environment.ApiRoot + '/ncc';
 export class HoSoNCCDuyetService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'desc', 'CreatedDate', 0, 10));
 	lastFilterHD$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'desc', 'ngay_tao', 0, 10));
-	ReadOnlyControl: boolean;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
+	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
 	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	data_import: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
@@ -26,32 +27,37 @@ export class HoSoNCCDuyetService {
 			params: httpParams
 		});
 	}
-	detail(id): Observable<any> {
+
+	detail(id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = API_URL;
 		return this.http.get<any>(url + "/" + id, { headers: httpHeaders });
 	}
-	traLai(id, note) {
+
+	traLai(id: number, note: string): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/tra-lai?id=${id}&note=${note}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	Duyet(data) {
+
+	Duyet(data: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/duyet`;
 		return this.http.post<any>(url, data, { headers: httpHeaders });
 	}
-	Duyets(data: any) {
+
+	Duyets(data: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/duyets`;
 		return this.http.post<any>(url, data, { headers: httpHeaders });
 	}
 
-	DeXuatDuyet(data: any) {
+	DeXuatDuyet(data: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/dexuatduyet`;
 		return this.http.post<any>(url, data, { headers: httpHeaders });
 	}
+
 	getFiles(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
@@ -60,7 +66,6 @@ export class HoSoNCCDuyetService {
 			params: httpParams
 		});
 	}
-
 
 	//#region hướng dẫn
 	findDataHD(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
@@ -71,17 +76,13 @@ export class HoSoNCCDuyetService {
 			params: httpParams
 		});
 	}
-	getDetailHuongDan(id): Observable<any> {
+	getDetailHuongDan(id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get(API_URL + `/get-detail-huong-dan?id_quatrinh_lichsu=${id}`, {
-			headers: httpHeaders,
-		});
+		return this.http.get(API_URL + `/get-detail-huong-dan?id_quatrinh_lichsu=${id}`, { headers: httpHeaders });
 	}
-	updateHuongDan(data): Observable<any> {
+	updateHuongDan(data: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post(API_URL + `/update-huong-dan`, data, {
-			headers: httpHeaders,
-		});
+		return this.http.post(API_URL + `/update-huong-dan`, data, { headers: httpHeaders });
 	}
 	exportListHS_DaDuyet(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();

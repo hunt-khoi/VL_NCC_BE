@@ -3,8 +3,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel, TypesUtilsService } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import moment from 'moment';
 import { ReplaySubject } from 'rxjs';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { ThanNhanService } from './../../than-nhan/Services/than-nhan.service';
@@ -22,8 +22,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	//#region nhúng mảng form trợ cấp
 	lstTC: any[] = [];
 	childComponentType = TroCapRowEditComponent;
-
-	@ViewChild("libInsertion", { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef
+	@ViewChild("libInsertion", { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef | undefined;
 	//#endregion
 	//#region nhúng form hoạt động
 	ChildComponentInstance1: any;
@@ -39,14 +38,14 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	childComponentType2 = DiChuyenEditComponent;
 	childComponentData2 = {
 		_item: { Id: 0 },
-		ncc: null,
+		ncc: {},
 		hideOther: true,
 		allowEdit: true
 	};
 	//#endregion
 	//#region thân nhân
 	ChildComponentInstance3: any;
-	childComponentType3: Type<any>;
+	childComponentType3: Type<any> | undefined;
 	childComponentData3: any = {
 		_item: { Id: 0 },
 		hideOther: true,
@@ -54,16 +53,16 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	};
 	//#endregion
 
-	item: HoSoNCCModel;
-	oldItem: HoSoNCCModel;
-	itemForm: FormGroup;
+	item: HoSoNCCModel = new HoSoNCCModel();
+	oldItem: HoSoNCCModel = new HoSoNCCModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	isZoomSize: boolean = false;
 	disabledBtn = false;
 	allowEdit = false;
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict = '';
 	listdistrict: any[] = [];
@@ -88,15 +87,15 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	listTonGiao: any[] = [];
 	GiayTos: any[] = [];
 	thannhanName = '';
-	quanhe: number;
+	quanhe: number = 0;
 	require = '';
 	objectThanNhan: any;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 	maxNS = moment(new Date()).add(-16, 'year').toDate();
-	IsThanNhan: boolean;
-	Capcocau: number;
-	Id_LoaiHoSo: number;
+	IsThanNhan: boolean = false;
+	Capcocau: number = 0;
+	Id_LoaiHoSo: number = 0;
 	//
 	NhomDoiTuong: number = 1;
 	nhapTC: boolean = true;
@@ -112,7 +111,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		private thannhanService: ThanNhanService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private tokenStorage: TokenStorage,
 		private translate: TranslateService) {
 		this._NAME = 'Hồ sơ người có công';
@@ -134,8 +132,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 			this.item.ProvinceID = this.filterprovinces;
 			this.loadGetListDistrictByProvinces(this.filterprovinces);
 			this.Capcocau = res.Capcocau;
-			if (res.Capcocau == 3)//cấp xã
-			{
+			if (res.Capcocau == 3) {
 				this.filterdistrict = res.ID_Goc_Cha;
 				this.item.DistrictID = +this.filterdistrict
 				this.item.Id_Xa = res.ID_Goc;
@@ -153,12 +150,10 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		this.commonService.ListTonGiao().subscribe(res => {
 			this.listTonGiao = res.data;
 		});
-		this.loadListGioiTInh();
 
+		this.loadListGioiTinh();
 		this.loadListDoiTuongNCC();
-
-		this.loadListQuanHeVoiLietSy();
-
+		this.loadListQuanHeVoiLietSy()
 		this.loadListThanNhan();
 
 		this.createForm();
@@ -185,23 +180,20 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 			this.addTC();
 	}
 
-	getInstance($event) {
-		//this.ChildComponentInstance = $event;
-	}
-	getInstanceNew($event, index) {
+	getInstanceNew($event: any, index: number) {
 		this.lstTC[index] = $event;
 	}
-	getInstance1($event) {
+	getInstance1($event: any) {
 		this.ChildComponentInstance1 = $event;
 	}
-	getInstance2($event) {
+	getInstance2($event: any) {
 		this.ChildComponentInstance2 = $event;
 	}
-
-	getInstance3($event) {
+	getInstance3($event: any) {
 		this.ChildComponentInstance3 = $event;
 	}
-	onChangeNhomDoiTuong(value) {
+
+	onChangeNhomDoiTuong(value: any) {
 		this.nhapDC = value == 1;
 		this.nhapTC = value == 2 || value == 3 || value == 4;
 		for (var i = 0; i < this.lstTC.length; i++) {
@@ -219,44 +211,39 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 			this.lstTC[i].changeDetectorRefs.detectChanges();
 		}
 	}
-	changeDoiTuongNCC(value) {
+	changeDoiTuongNCC(value: any) {
 		var f = this.listOpt.find(x => x.id == value);
 		if (f) {
 			this.IsThanNhan = f.data.IsThanNhan;
 			this.changeDetectorRefs.detectChanges();
 		}
-
 		for (var i = 0; i < this.lstTC.length; i++) {
 			if (this.lstTC[i].cmpRef && !this.lstTC[i].cmpRef.hostView.destroyed) {
 				this.lstTC[i].LoadListLoaiTroCap(value);
 			}
 		}
 		//lọc loại hồ sơ theo đối tượng ncc
-		let temp = this.listAllLoaiHS.filter(x => x.data.Id_DoiTuongNCC == value);
+		let temp = this.listAllLoaiHS.filter((x: any) => x.data.Id_DoiTuongNCC == value);
 		this.listLoaiHS.next(temp);
 		this.listOpt1 = temp;
 	}
-	changeLoaiHS(value) {
+	changeLoaiHS(value: any) {
 		let xa = "";
-		if (this.itemForm.controls["Id_Xa"].value) {
-			let fx = this.listward.find(x => x.ID_Row == this.itemForm.controls["Id_Xa"].value);
-			if (fx)
-				xa = fx.Ward;
+		if (this.itemForm && this.itemForm.controls["Id_Xa"].value) {
+			let idxa = this.itemForm.controls["Id_Xa"].value
+			let fx = this.listward.find(x => x.ID_Row == idxa);
+			if (fx) xa = fx.Ward;
 		}
 		this.Id_LoaiHoSo = +value;
 		var f = this.listOpt1.find(x => x.id == value);
 		if (f) {
-			this.GiayTos = f.data.GiayTos.map(x => { return { Id_LoaiGiayTo: x.id, GiayTo: x.title, IsRequired: x.IsRequired, NoiCap: xa } });
+			this.GiayTos = f.data.GiayTos.map((x: any) => { return { Id_LoaiGiayTo: x.id, GiayTo: x.title, IsRequired: x.IsRequired, NoiCap: xa } });
 			this.changeDetectorRefs.detectChanges();
 		}
 	}
 
 	createForm() {
-		let ng;
-		if (this.item.Id > 0)
-			ng = moment(this.item.NgayGui);
-		else
-			ng = new Date();
+		let ng = this.item.Id > 0 ? moment(this.item.NgayGui) : new Date();
 		const temp: any = {
 			NgayGui: [ng, Validators.required],
 			SoHoSo: [this.item.SoHoSo],
@@ -313,11 +300,11 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		//this.itemForm.controls.NguoiThoCungLietSy.markAsTouched();
 		//this.itemForm.controls.QuanHeVoiLietSy.markAsTouched();
 
-		this.focusInput.nativeElement.focus();
-
-		if (!this.allowEdit) {
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
+		if (!this.allowEdit) 
 			this.itemForm.disable();
-		}
+		
 		if (this.item.Id > 0) {
 			this.itemForm.controls.NguoiThoCungLietSy.disable();
 			this.itemForm.controls.QuanHeVoiLietSy.disable();
@@ -335,11 +322,12 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` hồ sơ người có công`;
 		return result;
 	}
+
 	changeNS(isNam = false) {
+		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh.setValue('');
 		}
@@ -352,6 +340,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		}
 	}
 	changeNS1(isNam = false) {
+		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh1.setValue('');
 		}
@@ -365,8 +354,8 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	}
 
 	/** ACTIONS */
-	prepareCustomer(): HoSoNCCModel {
-
+	prepareCustomer(): HoSoNCCModel | null {
+		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
 		const _item = new HoSoNCCModel();
 		_item.Id = +this.item.Id;
@@ -434,7 +423,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		_item.GiayTos = [];
 		for (var i = 0; i < this.GiayTos.length; i++) {
 			let gt = this.GiayTos[i];
-
 			if (gt.FileDinhKem != null && gt.FileDinhKem.length > 0) {
 				if (!gt.So || !gt.NgayCap || !gt.NoiCap) {
 					this.layoutUtilsService.showInfo("Vui lòng nhập đầy đủ thông tin của giấy tờ");
@@ -457,13 +445,13 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -474,8 +462,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		//	return;
 		//}
 		let EditHoSoNCC: any = this.prepareCustomer();
-		if (EditHoSoNCC == null)
-			return;
+		if (!EditHoSoNCC) return;
 		//tt thân nhân
 		if (this.ChildComponentInstance3.itemForm.controls['HoTen'].value) {
 			let EditThanNhan = this.ChildComponentInstance3.onSubmit();
@@ -496,7 +483,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 			for (var i = 0; i < this.lstTC.length; i++) {
 				if (this.lstTC[i].cmpRef && !this.lstTC[i].cmpRef.hostView.destroyed) {
 					let EditTroCap = this.lstTC[i].onSubmit();
-					if (EditTroCap == null) {
+					if (!EditTroCap) {
 						this.layoutUtilsService.showError("Vui lòng nhập đầy đủ thông tin trợ cấp");
 						return;
 					}
@@ -516,16 +503,14 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		if (this.nhapDC) {
 			//tt di chuyển
 			let EditTroCap = this.ChildComponentInstance2.onSubmit();
-			if (!EditTroCap.isChuyenDi)//từ nơi khác chuyển đến
-			{
+			if (!EditTroCap.isChuyenDi) {//từ nơi khác chuyển đến
 				EditTroCap.IsDuyet = true;
 				EditTroCap.Id_Xa_Old = EditTroCap.Id_Xa;
 				EditTroCap.Id_Tinh = +controls["Province"].value;
 				EditTroCap.Id_Huyen = +controls["District"].value;
 				EditTroCap.Id_Xa = EditHoSoNCC.Id_Xa;
-
 			}
-			if (EditTroCap == null) {
+			if (!EditTroCap) {
 				this.layoutUtilsService.showError("Vui lòng nhập đầy đủ thông tin di chuyển");
 				return;
 			}
@@ -537,34 +522,37 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 			this.CreateHoSoNCC(EditHoSoNCC, withBack);
 		}
 	}
-	UpdateHoSoNCC(_item: HoSoNCCModel, withBack: boolean) {
+
+	UpdateHoSoNCC(item: HoSoNCCModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.UpdateHoSoNCC(_item).subscribe(res => {
+		this.objectService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
 					this.dialogRef.close({
-						_item
+						item
 					});
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
+
 	CreateHoSoNCC(_item: HoSoNCCModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.CreateHoSoNCC(_item).subscribe(res => {
+		this.objectService.Create(_item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -574,8 +562,9 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 					});
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 					this.lstTC = [];
 					this.addTC();
@@ -591,6 +580,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	}
 
 	changeQuanHeLietSy() {
+		if (!this.itemForm) return;
 		if (this.itemForm.controls.NguoiThoCungLietSy) {
 			this.require = '';
 		} else {
@@ -602,7 +592,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		this.objectThanNhan = this.listthannhan.find(x => x.Id == id);
 		this.thannhanName = this.objectThanNhan.HoTen;
 		this.quanhe = this.listquanhevoilietsy.find(x => this.objectThanNhan.Id_QHGiaDinh == x.title).id;
-
 	}
 
 	loadGetListDistrictByProvinces(idProvince: any) {
@@ -618,6 +607,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
+
 	loadKhomAp() {
 		this.commonService.GetListKhomApByWard(this.filterward).subscribe(res => {
 			this.listKhomAp = res.data;
@@ -625,7 +615,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		});
 	}
 
-	loadListGioiTInh() {
+	loadListGioiTinh() {
 		this.commonService.ListGioiTinh().subscribe(res => {
 			this.listgioitinh = res.data;
 		});
@@ -645,8 +635,8 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		this.commonService.liteQHGiaDinhNCC().subscribe(res => {
 			this.listquanhevoilietsy = res.data;
 		});
-
 	}
+
 	// lay danh sach than nhan
 	loadListThanNhan() {
 		const queryParams = new QueryParamsModel({});
@@ -660,30 +650,33 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
+
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
+
 	close() {
 		this.dialogRef.close();
 	}
-	changeDC(name) {
+
+	changeDC(name: string) {
 		let _name = name;
-		if (name == 'TruQuan')
-			_name = 'DiaChi';
+		if (name == 'TruQuan') _name = 'DiaChi';
+		if (!this.itemForm) return;
 		let dc = this.itemForm.controls[name].value;
 		this.ChildComponentInstance3.itemForm.controls[_name].setValue(dc);
 	}
 
-	addTC($event = null) {
+	addTC() {
+		if (!this.insertionPoint) return;
 		let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.childComponentType);
-
 		//let viewContainerRef = this.insertionPoint;
 		//viewContainerRef.clear();
-
 		let componentRef = this.insertionPoint.createComponent(componentFactory);
 		let instance = componentRef.instance;
 		instance.cmpRef = componentRef;
@@ -694,7 +687,8 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 			showCat:true
 		};
 		instance.close$.subscribe(() => {
-			instance.cmpRef.destroy();
+			if (instance.cmpRef)
+				instance.cmpRef.destroy();
 		});
 		this.lstTC.push(instance);
 		//if ($event != null)
@@ -710,16 +704,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 			} else {
 				this.onSubmit(false);
 			}
-		}
-	}
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('90%', 'auto');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('70%', 'auto');
-			this.isZoomSize = false;
 		}
 	}
 }

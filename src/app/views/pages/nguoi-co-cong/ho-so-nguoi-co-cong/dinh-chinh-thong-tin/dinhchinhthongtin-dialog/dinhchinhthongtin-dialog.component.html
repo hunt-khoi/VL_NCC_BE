@@ -4,8 +4,7 @@
 		<mat-icon>clear</mat-icon>
 	</button>
 </div>
-<div class="kt-portlet"
-	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
 	<div class="kt-portlet__head kt-portlet__head__custom">
 		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
 			 style="margin-top: 20px;">
@@ -48,7 +47,7 @@
 						</button>
 					</div>
 				</div>
-				<div class="row" *ngFor="let lstCol of ListColumn;let i = index">
+				<div class="row" *ngFor="let lstCol of ListColumn; let i = index">
 					<div class="col-lg-6 m--margin-bottom-20-mobile">
 						<mat-form-field class="mat-form-field-fluid">
 							<mat-select [disabled]="!allowEdit" placeholder="{{'DINHCHINH.thongtin' | translate }}" required
@@ -94,8 +93,7 @@
 					</div>
 					<div class="col-lg-5 m--margin-20-mobile" *ngIf=" (TypeOfColumn(lstCol.Type)=='year')">
 						<mat-form-field class="w-100" appearance="fill">
-							<input matInput [(ngModel)]="ListColumn[i].GiaTriMoi" [matDatepicker]="dp"
-								   [max]="_maxyear" readonly />
+							<input matInput [(ngModel)]="ListColumn[i].GiaTriMoi" [matDatepicker]="dp" [max]="_maxyear" readonly />
 							<mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
 							<mat-datepicker #dp startView="multi-year" (yearSelected)="chosenYearHandler($event, dp,i)">
 							</mat-datepicker>
@@ -118,25 +116,24 @@
 				<div class="row" *ngFor="let lstCol of ListColumn;let i = index">
 					<div class="col-lg-3 m--margin-bottom-20-mobile">
 						<mat-form-field class="mat-form-field-fluid">
-							<mat-select [disabled]="!allowEdit" placeholder="{{'DINHCHINH.thongtin' | translate }}" required
-								[(ngModel)]="ListColumn[i].ColumnName">
+							<mat-select [disabled]="!allowEdit" [(ngModel)]="ListColumn[i].ColumnName"
+								placeholder="{{'DINHCHINH.thongtin' | translate }}" required>
 								<mat-option [value]="lst.ID_Row" (click)="SetupType(lst,i)"
-									*ngFor="let lst of checkShow(i);">{{lst.Title}}</mat-option>
+									*ngFor="let lst of checkShow(i);">{{lst.Title}}
+								</mat-option>
 							</mat-select>
 						</mat-form-field>
 					</div>
 					<div class="col-lg-3 m--margin-bottom-20-mobile">
 						<mat-form-field class="mat-form-field-fluid">
-							<input matInput [disabled]="!allowEdit"
-								type={{TypeOfColumn(lstCol.Type)}} placeholder="{{'DINHCHINH.giatricu' | translate }}" required
-								[(ngModel)]="ListColumn[i].GiaTriCu" />
+							<input matInput [disabled]="!allowEdit" [(ngModel)]="ListColumn[i].GiaTriCu"
+								type={{TypeOfColumn(lstCol.Type)}} placeholder="{{'DINHCHINH.giatricu' | translate }}" required />
 						</mat-form-field>
 					</div>
 					<div class="col-lg-3 m--margin-bottom-20-mobile">
 						<mat-form-field class="mat-form-field-fluid">
-							<input matInput [disabled]="!allowEdit"
-								type={{TypeOfColumn(lstCol.Type)}} placeholder="{{'DINHCHINH.giatrimoi' | translate }}" required
-								[(ngModel)]="ListColumn[i].GiaTriMoi" />
+							<input matInput [disabled]="!allowEdit" [(ngModel)]="ListColumn[i].GiaTriMoi"
+								type={{TypeOfColumn(lstCol.Type)}} placeholder="{{'DINHCHINH.giatrimoi' | translate }}" required />
 						</mat-form-field>
 					</div>
 					<div class="col-lg-1 text-right text-danger" style="padding-top: 20px;">
@@ -230,3 +227,4 @@
 			</div>
 		</div>
 	</div>
+</div>

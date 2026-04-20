@@ -1,15 +1,15 @@
 import { BaseModel } from "../../../../../../core/_base/crud";
 
 export class GiayToModel extends BaseModel {
-	Id: number;
-	Id_NCC: number;
-	Id_LoaiGiayTo: number;
-	So: string;
-	GiayTo: string;
-	NoiCap: string;
-	NgayCap: string;
+	Id: number = 0;
+	Id_NCC: number = 0;
+	Id_LoaiGiayTo: number | null = null;
+	So: string = "";
+	GiayTo: string = "";
+	NoiCap: string = "";
+	NgayCap: string = "";
 	FileDinhKem: any;
-	src: string;
+	src: string = "";
 
 	clear() {
 		this.Id = 0;

@@ -23,8 +23,7 @@ export class PermissionViewHS implements CanActivate, CanActivateChild, CanLoad 
 		var id = state.url.split("/")[2];
 		let re = await this.hs.isViewChiTiet(id).toPromise()
 			.then(res => {
-				if (res && res.data)
-				{
+				if (res && res.data) {
 					this.snackBar.dismiss();
 					return true;
 				}
@@ -36,11 +35,9 @@ export class PermissionViewHS implements CanActivate, CanActivateChild, CanLoad 
 				return false;
 			});
 
-		if (!re) 
-		{
+		if (!re) {
 			this.router.navigate(['/tiep-nhan-ho-so']);
 		}
-					
 		return re;
 	}
 }

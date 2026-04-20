@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
@@ -10,14 +9,10 @@ const API_URL = environment.ApiRoot + '/tk-ncc';
 @Injectable()
 export class ThoiHanService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	// READ
 	getAllItems(): Observable<any[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any[]>(API_URL + '/list-thoi-han?more=true', { headers: httpHeaders });
@@ -33,7 +28,7 @@ export class ThoiHanService {
 		});
 	}
 
-	exportHS(id,queryParams): Observable<any> {
+	exportHS(id: number, queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(queryParams);
 		return this.http.get(environment.ApiRoot + `/ncc/export-ho-so?id=${id}`, {
@@ -43,6 +38,7 @@ export class ThoiHanService {
 			observe: 'response'
 		});
 	}
+
 	exportList(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
