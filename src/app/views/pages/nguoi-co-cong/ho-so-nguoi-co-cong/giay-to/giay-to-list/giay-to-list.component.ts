@@ -33,7 +33,7 @@ export class GiayToListComponent implements OnInit {
 	// Selection
 	selection = new SelectionModel<HoSoNCCModule>(true, []);
 	productsResult: HoSoNCCModule[] = [];
-	// tslint:disable-next-line:variable-name
+
 	_name = '';
 	objectId = '';
 	// khoi tao grildModel

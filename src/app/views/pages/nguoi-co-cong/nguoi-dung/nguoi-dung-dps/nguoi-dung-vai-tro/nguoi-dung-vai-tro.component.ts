@@ -1,8 +1,6 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject } from '@angular/core';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { NguoiDungDPSService } from '../Services/nguoi-dung-dps.service';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
@@ -19,19 +17,15 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 	// Public properties
 	disabledBtn: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> | undefined;
 	viewLoading: boolean = false;
 	isChange: boolean = false;
-
-	fixedPoint = 0;
-
 	isZoomSize: boolean = false;
 	rR = {};
 	User: any;
-	ListVaiTro: any[];
-	private componentSubscriptions: Subscription;
+	ListVaiTro: any[] = [];
+	private componentSubscriptions: Subscription | undefined;
 	displayedColumns: string[] = ['STT'/*, 'DonVi'*/, 'VaiTro',/* 'NguoiKy', 'XuLyViec', 'LanhDao', 'NhanVanBan',*/ 'actions'];
-
 	newrow: any = {
 		IdRow: 0,
 		UserID: 0,
@@ -68,6 +62,7 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		}
 	}
+
 	loadVaiTro() {
 		this.viewLoading = true;
 		this.service.getVaiTro(this.User.UserID).subscribe(res => {
@@ -100,6 +95,7 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 		let message = `Cập nhật vai trò người dùng thành công`;
 		if (item.IdRow == 0)
 			message = `Thêm vai trò người dùng thành công`;
+
 		this.service.updateVaiTro(item).subscribe(res => {
 			if (res.status == 1) {
 				this.layoutUtilsService.showInfo(message);
@@ -115,19 +111,16 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 
 
 	/** Delete */
-	delete(_item: any) {
+	delete(item: any) {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn xóa vai trò người dùng không?';
 		const _waitDesciption: string = 'Vai trò người dùng đang được xóa...';
 		const _deleteMessage = `Xóa vai trò người dùng thành công`;
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			this.disabledBtn = true;
-			this.service.deleteVaiTro(_item.IdRow).subscribe(res => {
+			this.service.deleteVaiTro(item.IdRow).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 					this.loadVaiTro();
@@ -140,10 +133,11 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 			});
 		});
 	}
-	lock(_item: any, islock = true) {
+
+	lock(item: any, islock = true) {
 		this.disabledBtn = true;
 		let _message = (islock ? "Khóa" : "Mở khóa") + " vai trò người dùng thành công";
-		this.service.lockVaiTro(_item.IdRow, islock).subscribe(res => {
+		this.service.lockVaiTro(item.IdRow, islock).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_message);
 				this.loadVaiTro();
@@ -155,12 +149,11 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
-	chonDV(element) {
+
+	chonDV(element: any) {
 		const dialogRef = this.dialog.open(ChonDonViComponent, { data: {} });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			if (element.DonVi != res.id) {
 				element.DonVi = res.id;
 				element.TenDonVi = res.title;
@@ -170,12 +163,11 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
-	chonVT(element) {
+	
+	chonVT(element: any) {
 		const dialogRef = this.dialog.open(ChonVaiTroComponent, { data: { DonVi: element.DonVi } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			element.IdGroup = res.IdGroup;
 			element.GroupName = res.GroupName;
 			element.DonVi = res.IdDonVi;
@@ -183,18 +175,8 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
+
 	closeDialog() {
 		this.dialogRef.close(this.isChange);
-	}
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-
 	}
 }

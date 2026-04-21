@@ -5,14 +5,10 @@ import { MatPaginator, MatSort, MatDialog, MatMenuTrigger } from '@angular/mater
 import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge, BehaviorSubject } from 'rxjs';
-//Datasource
 import { NhomNguoiDungDPSDataSource } from '../Model/data-sources/nhom-nguoi-dung-dps.datasource';
-//Service
 import { NhomNguoiDungDPSService } from '../Services/nhom-nguoi-dung-dps.service';
-import { SubheaderService } from 'app/core/_base/layout';
 import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
 import { NhomNguoiDungDPSEditComponent } from '../nhom-nguoi-dung-dps-edit/nhom-nguoi-dung-dps-edit.component';
-//Model
 import { NhomNguoiDungDPSModel } from '../Model/nhom-nguoi-dung-dps.model';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { CommonService } from '../../../services/common.service';
@@ -30,11 +26,10 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 	// Table fields
-	dataSource: NhomNguoiDungDPSDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
+	dataSource: NhomNguoiDungDPSDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
+	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
 	// Selection
 	selection = new SelectionModel<NhomNguoiDungDPSModel>(true, []);
@@ -44,23 +39,21 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
-	previousIndex: number;
-	fixedPoint = 0;
+	previousIndex: number = 0;
 	name = "Vai trò";
 	rR = {};
 	DonVi: number = 0;
-	datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
+	datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	gridService: TableService | undefined;
+	girdModel: TableModel | undefined;
 	disabledBtn: boolean = false;
-	list_button: boolean;
+	list_button: boolean = false;
 
 	constructor(
-		private nhomnguoidungdpssService: NhomNguoiDungDPSService,
+		private apiService: NhomNguoiDungDPSService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private cookieService: CookieService,
-		private subheaderService: SubheaderService,
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
 		private tokenStorage: TokenStorage,
@@ -73,6 +66,7 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 			this.rR = t;
 		});
 		//#region ***Filter***
+		this.girdModel = new TableModel();
 		this.girdModel.haveFilter = true;
 		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
 		this.girdModel.filterText['GroupName'] = "";
@@ -92,7 +86,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 			}
 		]
 		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
-
 		this.commonService.TreeDonVi().subscribe(res => {
 			if (res && res.status == 1) {
 				this.datatree.next(res.data);
@@ -218,41 +211,37 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_vaitro'
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_vaitro'));
 		//#endregion
 
-		// // If the NhomNguoiDungDPS changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadNhomNguoiDungDPSsList(true);
-				})
-			).subscribe();
-		// // Set title to page breadCrumbs
-		this.subheaderService.setTitle('');
 		// Init DataSource
-		this.dataSource = new NhomNguoiDungDPSDataSource(this.nhomnguoidungdpssService);
+		this.dataSource = new NhomNguoiDungDPSDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-		// // Read from URL itemId, for restore previous state
 		this.route.queryParams.subscribe(() => {
-			queryParams = this.nhomnguoidungdpssService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadNhomNguoiDungDPSs(queryParams);
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadNhomNguoiDungDPSs(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
-			this.nhomnguoidungdpssResult = res
-			this.tmpnhomnguoidungdpssResult = []
-			if (this.nhomnguoidungdpssResult != null) {
+			this.nhomnguoidungdpssResult = res;
+			this.tmpnhomnguoidungdpssResult = [];
+			if (this.nhomnguoidungdpssResult && this.paginator) {
 				if (this.nhomnguoidungdpssResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadNhomNguoiDungDPSsList(true);
+					this.loadDataList(true);
 				} else {
 					for (let i = 0; i < this.nhomnguoidungdpssResult.length; i++) {
 						let tmpElement = new NhomNguoiDungDPSModel();
@@ -265,15 +254,17 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
-		this.gridService.Clear();
+		if (this.gridService)
+			this.gridService.Clear();
 	}
 
-	GetValueNode(item) {
+	GetValueNode(item: any) {
 		this.DonVi = item.id;
-		this.loadNhomNguoiDungDPSsList(true);
+		this.loadDataList(true);
 	}
 
-	loadNhomNguoiDungDPSsList(holdCurrentPage: boolean = false) {
+	loadDataList(holdCurrentPage: boolean = false) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -282,7 +273,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
 			this.paginator.pageSize,
 			this.gridService.model.filterGroupData
-
 		);
 		this.dataSource.loadNhomNguoiDungDPSs(queryParams);
 	}
@@ -292,7 +282,7 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 		const filter: any = {};
 		if (this.DonVi > 0)
 			filter.DonVi = this.DonVi;
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.GroupName = this.gridService.model.filterText['GroupName'];
 			filter.GhiChu = this.gridService.model.filterText['GhiChu'];
 			filter.Ma = this.gridService.model.filterText['Ma'];
@@ -302,39 +292,37 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 
 	/** ACTIONS */
 	/** Delete */
-	deleteNhomNguoiDungDPS(_item: NhomNguoiDungDPSModel) {
+	delete(item: NhomNguoiDungDPSModel) {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn xóa vai trò?';
 		const _waitDesciption: string = 'Vai trò đang được xóa...';
 		const _deleteMessage = `Xóa vai trò thành công`;
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.nhomnguoidungdpssService.deleteNhomNguoiDungDPS(_item.IdGroup).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.delete(item.IdGroup).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
 				else {
 					this.layoutUtilsService.showError(res.error.message);
 				}
-				this.loadNhomNguoiDungDPSsList(true);
+				this.loadDataList(true);
 			});
 		});
 	}
 
-	lock(_item: NhomNguoiDungDPSModel, islock = true) {
+	lock(item: NhomNguoiDungDPSModel, islock = true) {
 		let _message = (islock ? "Khóa" : "Mở khóa") + " vai trò thành công";
-		this.nhomnguoidungdpssService.lock(_item.IdGroup, islock).subscribe(res => {
+		this.apiService.lock(item.IdGroup, islock).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_message);
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
-			this.loadNhomNguoiDungDPSsList(true);
+			this.loadDataList(true);
 		});
 	}
 
@@ -354,33 +342,28 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	addNhomNguoiDungDPS() {
+	add() {
 		const newNhomNguoiDungDPS = new NhomNguoiDungDPSModel();
 		newNhomNguoiDungDPS.clear(); // Set all defaults fields
-		this.editNhomNguoiDungDPS(newNhomNguoiDungDPS);
+		this.edit(newNhomNguoiDungDPS);
 	}
 
-	editNhomNguoiDungDPS(NhomNguoiDungDPS: NhomNguoiDungDPSModel, allowEdit: boolean = true) {
+	edit(NhomNguoiDungDPS: NhomNguoiDungDPSModel, allowEdit: boolean = true) {
 		const dialogRef = this.dialog.open(NhomNguoiDungDPSEditComponent, { data: { NhomNguoiDungDPS: NhomNguoiDungDPS, allowEdit: allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.loadNhomNguoiDungDPSsList(true);
+			if (!res) return;
+			this.loadDataList(true);
 		});
 	}
 
 	phanquyen(NhomNguoiDungDPS: NhomNguoiDungDPSModel) {
 		const dialogRef = this.dialog.open(PhanQuyenComponent, { data: { NhomNguoiDungDPS } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.loadNhomNguoiDungDPSsList(true);
+			if (!res) return;
+			this.loadDataList(true);
 		});
 	}
+
 	/* UI */
 	getItemStatusString(status: boolean = false): string {
 		switch (status) {

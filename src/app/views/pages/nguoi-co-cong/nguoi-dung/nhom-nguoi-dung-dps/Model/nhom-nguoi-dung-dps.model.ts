@@ -1,15 +1,15 @@
 import { BaseModel } from 'app/core/_base/crud';
 
 export class NhomNguoiDungDPSModel extends BaseModel {
-	IdGroup: number
-	GroupName: string
-	Ma: string
-	DisplayOrder: number
-	Locked: boolean
-	GhiChu: string
-	DonVi: number
-	ChucVu: number
-	IsDefault: boolean
+	IdGroup: number = 0;
+	GroupName: string = '';
+	Ma: string = '';
+	DisplayOrder: number = 1;
+	Locked: boolean = false;
+	GhiChu: string = '';
+	DonVi: number = 0;
+	ChucVu: number = 0;
+	IsDefault: boolean = false;
 
 	clear() {
 		this.IdGroup = 0;
@@ -33,6 +33,5 @@ export class NhomNguoiDungDPSModel extends BaseModel {
 		this.DonVi = item.DonVi;
 		this.ChucVu = item.ChucVu;
 		this.IsDefault = item.IsDefault;
-
 	}
 }

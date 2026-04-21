@@ -1,17 +1,14 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { NguoiDungDPSService } from '../Services/nguoi-dung-dps.service';
-//Models
 import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
-import moment from 'moment';
 import { ConfirmPasswordValidator } from '../../../../auth/register/confirm-password.validator';
 import { CommonService } from '../../../services/common.service';
 import { ChonNhieuDonViComponent } from '../../../components/chon-nhieu-don-vi/chon-nhieu-don-vi.component';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-nguoi-dung-dps-reset-password',
@@ -21,25 +18,24 @@ import { ChonNhieuDonViComponent } from '../../../components/chon-nhieu-don-vi/c
 
 export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 	// Public properties
-	NguoiDungDPS: NguoiDungDPSModel;
-	itemForm: FormGroup;
+	NguoiDungDPS: NguoiDungDPSModel = new NguoiDungDPSModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> | undefined;
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 
-	fixedPoint = 0;
 	isZoomSize: boolean = false;
 	listIdGroup: any[] = [];
 	listNV: any[] = [];
 	selectIdGroup: string = '0';
-	private componentSubscriptions: Subscription;
+	private componentSubscriptions: Subscription | undefined;
 
-	datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lstChucVu: any[];
-	lstLoaiChungThu: any[];
-	lstGioiTinh: any[];
+	datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	lstChucVu: any[] = [];
+	lstLoaiChungThu: any[] = [];
+	lstGioiTinh: any[] = [];
 	maxNS = moment(new Date()).add(-16, 'year').toDate();
 
 	selectable: boolean = true;
@@ -55,35 +51,31 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
-			this.onSubmit(true);
+			this.onSubmit();
 		}
 	}
 
 	constructor(
 		public dialogRef: MatDialogRef<NguoiDungDPSResetPasswordComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private NguoiDungDPSFB: FormBuilder,
+		private itemFB: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private nguoidungdpssService: NguoiDungDPSService,
+		private apiService: NguoiDungDPSService,
 		private commonService: CommonService) { }
 
-	/**
-	 * On init
-	 */
 	async ngOnInit() {
 		this.viewLoading = true;
 		this.NguoiDungDPS = this.data.NguoiDungDPS;
 		this.allowEdit = this.data.allowEdit;
 		this.GetConfig();
 		this.createForm();
-		// this.ListIdGroup();
 		if (this.data.NguoiDungDPS) {
 			this.NguoiDungDPS = this.data.NguoiDungDPS;
 		}
 		if (this.data.NguoiDungDPS && this.data.NguoiDungDPS.UserID > 0) {
-			this.nguoidungdpssService.getNguoiDungDPSById(this.data.NguoiDungDPS.UserID).subscribe(res => {
+			this.apiService.getNguoiDungDPSById(this.data.NguoiDungDPS.UserID).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.NguoiDungDPS = res.data;
@@ -100,7 +92,8 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		}
 	}
-	GetValueNode(item) {
+
+	GetValueNode(item: any) {
 		this.commonService.ListChucVu(item.id).subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstChucVu = res.data;
@@ -134,7 +127,7 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 			temp.password = ['', Validators.required];
 		}
 		temp.confirmPassword = ['', Validators.required];
-		this.itemForm = this.NguoiDungDPSFB.group(temp, {
+		this.itemForm = this.itemFB.group(temp, {
 			validator: ConfirmPasswordValidator.MatchPassword
 		});
 		if (!this.allowEdit)
@@ -145,72 +138,43 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 		return `Đặt lại mật khẩu người dùng - ${this.NguoiDungDPS.UserName} `;
 	}
 
-	isControlInvalid(controlName: string): boolean {
-		const control = this.itemForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
-	}
-
-	onSubmit(type: boolean) {
+	onSubmit() {
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/** check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			let invalid = <FormControl[]>Object.keys(this.itemForm.controls).map(key => this.itemForm.controls[key]).filter(ctl => ctl.invalid);
+			let invalid = <FormControl[]>Object.keys(controls).map(key => controls[key]).filter(ctl => ctl.invalid);
 			let invalidElem: any = invalid[0];
 			invalidElem.nativeElement.focus();
 			this.hasFormErrors = true;
 			return;
 		}
-
-		// tslint:disable-next-line:prefer-const
-		let editedNguoiDungDPS = this.prepareNguoiDungDPSs();
-		this.updateNguoiDungDPS(editedNguoiDungDPS)
+		let edited = this.prepare();
+		this.reset(edited)
 	}
 
 
-	prepareNguoiDungDPSs(): any {
-	
+	prepare(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		const _NguoiDungDPS: any = {};
-
-		_NguoiDungDPS.NewPassword = controls['password'].value;
-		_NguoiDungDPS.RePassword = controls['confirmPassword'].value;
-		if (_NguoiDungDPS.NewPassword != _NguoiDungDPS.RePassword) {
+		const _item: any = {};
+		_item.NewPassword = controls['password'].value;
+		_item.RePassword = controls['confirmPassword'].value;
+		if (_item.NewPassword != _item.RePassword) {
 			this.layoutUtilsService.showError("Xác nhận mật khẩu không đúng");
 			return null;
 		}
-
-		//gán lại giá trị id 
 		if (this.NguoiDungDPS.UserID) {
-			_NguoiDungDPS.Id = this.NguoiDungDPS.UserID;
+			_item.Id = this.NguoiDungDPS.UserID;
 		}
-
-		return _NguoiDungDPS;
+		return _item;
 	}
 
-	addNguoiDungDPS(_NguoiDungDPS: NguoiDungDPSModel, withBack: boolean = false) {
-		this.nguoidungdpssService.createNguoiDungDPS(_NguoiDungDPS).subscribe(res => {
-			if (res.status == 1) {
-				this.isChange = true;
-				const message = `Thêm mới người dùng thành công`;
-				this.layoutUtilsService.showInfo(message);
-				this.itemForm.reset();
-				if (withBack)
-					this.dialogRef.close(this.isChange);
-			}
-			else {
-				this.layoutUtilsService.showError(res.error.message);
-			}
-		});
-	}
-
-	updateNguoiDungDPS(_NguoiDungDPS: any, withBack: boolean = false) {
-
-		this.nguoidungdpssService.ResetPassNguoiDungDPS(_NguoiDungDPS).subscribe(res => {
+	reset(item: any) {
+		this.apiService.ResetPassNguoiDungDPS(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Đặt lại mật khẩu người dùng thành công`;
@@ -263,7 +227,7 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 		})
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -271,41 +235,23 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 		this.dialogRef.close(this.isChange);
 	}
 
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-	}
-
-	remove(fruit: any, loai): void {
+	remove(item: any, loai: number): void {
 		if (loai == 1) {
-			const index = this.NguoiDungDPS.DonViQuanTam.indexOf(fruit);
-
-			if (index >= 0) {
+			const index = this.NguoiDungDPS.DonViQuanTam.indexOf(item);
+			if (index >= 0) 
 				this.NguoiDungDPS.DonViQuanTam.splice(index, 1);
-			}
 		} else {
-
-			const index = this.NguoiDungDPS.DonViLayHanXuLy.indexOf(fruit);
-
-			if (index >= 0) {
+			const index = this.NguoiDungDPS.DonViLayHanXuLy.indexOf(item);
+			if (index >= 0) 
 				this.NguoiDungDPS.DonViLayHanXuLy.splice(index, 1);
-			}
 		}
 		this.changeDetectorRefs.detectChanges();
 	}
 	
-	dv(loai) {
+	dv(loai: number) {
 		const dialogRef = this.dialog.open(ChonNhieuDonViComponent, { data: { selected: loai == 1 ? this.NguoiDungDPS.DonViQuanTam : this.NguoiDungDPS.DonViLayHanXuLy } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			if (loai == 1)
 				this.NguoiDungDPS.DonViQuanTam = res;
 			else
@@ -313,7 +259,8 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
-	removeall(loai) {
+
+	removeall(loai: number) {
 		if (loai == 1)
 			this.NguoiDungDPS.DonViQuanTam = [];
 		else
@@ -333,17 +280,17 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 			// }
 			let reader = new FileReader();
 			reader.readAsDataURL(evt.target.files[0]);
-			let base64Str;
+			let base64Str: any;
 			reader.onload = function () {
 				base64Str = reader.result as String;
 				var metaIdx = base64Str.indexOf(';base64,');
 				base64Str = base64Str.substr(metaIdx + 8); // Cắt meta data khỏi chuỗi base64
 				//item.Image = "";
 				let f = document.getElementById("imgIcondd" + ind);
-				f.setAttribute("src", "data:image/png;base64," + base64Str);
-
+				if (f)
+					f.setAttribute("src", "data:image/png;base64," + base64Str);
 			};
-			setTimeout(res => {
+			setTimeout(_ => {
 				if (ind == 1) {
 					this.avatar.strBase64 = base64Str;
 					this.avatar.filename = filename;
@@ -358,10 +305,13 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	selectFile(ind) {
+	selectFile(ind: any) {
 		let f = document.getElementById("imgInpdd" + ind);
-		f["type"] = "text";
-		f["type"] = "file";
-		f.click();
+		if (f) {
+			const inputElement = f as HTMLInputElement;
+			inputElement.type = "text";
+			inputElement.type = "file";
+			inputElement.click();
+		}
 	}
 }

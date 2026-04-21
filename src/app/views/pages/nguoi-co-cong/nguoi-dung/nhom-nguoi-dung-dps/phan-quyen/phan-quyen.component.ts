@@ -10,7 +10,7 @@ import { CommonService } from '../../../services/common.service';
 
 export class TodoItemNode {
 	children?: TodoItemNode[];
-	item: string;
+	item: string = "";
 	selected?: boolean;
 	value?: any;
 }
@@ -25,42 +25,15 @@ export class PhanQuyenComponent implements OnInit {
 	// Public properties
 	hasFormErrors: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> | undefined;
 	viewLoading: boolean = false;
 	isZoomSize: boolean = false;
-	NhomNguoiDungDPS: NhomNguoiDungDPSModel;
-	treeControl: NestedTreeControl<TodoItemNode>;
-	dataSource: ArrayDataSource<TodoItemNode>;
+	NhomNguoiDungDPS: NhomNguoiDungDPSModel = new NhomNguoiDungDPSModel();
+	treeControl: NestedTreeControl<TodoItemNode> | undefined;
+	dataSource: ArrayDataSource<TodoItemNode> | undefined;
 
 	hasChild = (_: number, node: TodoItemNode) => !!node.children && node.children.length > 0;
-
-	TREE_DATA: TodoItemNode[] = [
-		//{
-		//	item: 'Fruit',
-		//	children: [
-		//		{ item: 'Apple', selected: true },
-		//		{ item: 'Banana' },
-		//		{ item: 'Fruit loops' },
-		//	]
-		//}, {
-		//	item: 'Vegetables',
-		//	children: [
-		//		{
-		//			item: 'Green',
-		//			children: [
-		//				{ item: 'Broccoli', selected: true },
-		//				{ item: 'Brussels sprouts' },
-		//			]
-		//		}, {
-		//			item: 'Orange',
-		//			children: [
-		//				{ item: 'Pumpkins', selected: true },
-		//				{ item: 'Carrots', selected: true },
-		//			]
-		//		},
-		//	]
-		//},
-	];
+	TREE_DATA: TodoItemNode[] = [];
 	/** The selection for checklist */
 	checklistSelection = new SelectionModel<TodoItemNode>(true /* multiple */);
 	selected: number[] = [];
@@ -72,7 +45,7 @@ export class PhanQuyenComponent implements OnInit {
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private nhomnguoidungdpssService: NhomNguoiDungDPSService,
+		private apiService: NhomNguoiDungDPSService,
 		private commonService: CommonService) { }
 
 	async ngOnInit() {
@@ -92,9 +65,10 @@ export class PhanQuyenComponent implements OnInit {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 		});
-
 	}
-	bindSelection(parent: TodoItemNode, nodes: TodoItemNode[]) {
+
+	bindSelection(parent: TodoItemNode | null, nodes: TodoItemNode[] = []) {
+		if (!nodes || !this.treeControl) return;
 		for (var i = 0; i < nodes.length; i++) {
 			if (nodes[i].selected) {
 				this.todoLeafItemSelectionToggle(nodes[i]);
@@ -113,7 +87,7 @@ export class PhanQuyenComponent implements OnInit {
 		return `Phân quyền`;
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -123,7 +97,7 @@ export class PhanQuyenComponent implements OnInit {
 			Quyens: this.selected
 		};
 		this.disabledBtn = true;
-		this.nhomnguoidungdpssService.updateQuyen(data).subscribe(res => {
+		this.apiService.updateQuyen(data).subscribe(res => {
 			this.disabledBtn = false;
 			if (res && res.status == 1) {
 				this.layoutUtilsService.showInfo("Cập nhật quyền cho vai trò thành công");
@@ -138,22 +112,9 @@ export class PhanQuyenComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-
-	}
-	SelectItemTree(node) {
-	}
-
 	/** Whether all the descendants of the node are selected. */
 	descendantsAllSelected(node: TodoItemNode): boolean {
+		if (!this.treeControl) return false;
 		const descendants = this.treeControl.getDescendants(node);
 		const descAllSelected = descendants.every(child =>
 			this.checklistSelection.isSelected(child)
@@ -163,6 +124,7 @@ export class PhanQuyenComponent implements OnInit {
 
 	/** Whether part of the descendants are selected */
 	descendantsPartiallySelected(node: TodoItemNode): boolean {
+		if (!this.treeControl) return false;
 		const descendants = this.treeControl.getDescendants(node);
 		const result = descendants.some(child => this.checklistSelection.isSelected(child));
 		return result && !this.descendantsAllSelected(node);
@@ -171,6 +133,7 @@ export class PhanQuyenComponent implements OnInit {
 	/** Toggle the to-do item selection. Select/deselect all the descendants node */
 	todoItemSelectionToggle(node: TodoItemNode): void {
 		this.checklistSelection.toggle(node);
+		if (!this.treeControl) return;
 		const descendants = this.treeControl.getDescendants(node);
 		this.checklistSelection.isSelected(node)
 			? this.checklistSelection.select(...descendants)
@@ -201,6 +164,7 @@ export class PhanQuyenComponent implements OnInit {
 
 	/** Check root node checked state and change it accordingly */
 	checkRootNodeSelection(node: TodoItemNode): void {
+		if (!this.treeControl) return;
 		const nodeSelected = this.checklistSelection.isSelected(node);
 		const descendants = this.treeControl.getDescendants(node);
 		const descAllSelected = descendants.every(child =>
@@ -218,22 +182,22 @@ export class PhanQuyenComponent implements OnInit {
 		return this.getParent(node, arr);
 	}
 
-	getParent(node: TodoItemNode, nodes: TodoItemNode[]) {
-		if (nodes) {
-			for (var i = 0; i < nodes.length; i++) {
-				if (nodes[i].children) {
-					var index = nodes[i].children.indexOf(node);
-					if (index >= 0) {
-						return nodes[i];
-					}
-					var result = this.getParent(node, nodes[i].children);
-					if (result)
-						return result;
+	getParent(node: TodoItemNode, nodes: TodoItemNode[] = []): any {
+		if (!nodes) return null;
+		for (var i = 0; i < nodes.length; i++) {
+			var currentData = nodes[i].children;
+			if (currentData) {
+				var index = currentData.indexOf(node);
+				if (index >= 0) {
+					return nodes[i];
 				}
+				var result = this.getParent(node, currentData);
+				if (result)
+					return result;
 			}
 		}
-		return null;
 	}
+
 	selectedChange(node: TodoItemNode) {
 		if (node.value) {
 			var i = this.selected.indexOf(node.value);

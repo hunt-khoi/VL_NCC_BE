@@ -10,13 +10,10 @@ import { QueryParamsModel } from 'app/core/_base/crud';
 @Injectable()
 export class NhomNguoiDungDPSComponent implements OnInit {
 
-  constructor(
-		private nhomNguoiDungDPSService : NhomNguoiDungDPSService
-	) {}
+  constructor(private apiService : NhomNguoiDungDPSService) { }
 
   ngOnInit() {
-    if (this.nhomNguoiDungDPSService != undefined)
-			this.nhomNguoiDungDPSService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'DisplayOrder', 0, 10));
+    if (this.apiService)
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'DisplayOrder', 0, 10));
   }
-
 }

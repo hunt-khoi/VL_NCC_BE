@@ -15,18 +15,14 @@
 		td:last-child {
 			display: none;
 		}
-		/* @page {
-			orientation: landscape !important;
-		} */
 	}
 	@media print { @page { size: A4 landscape; } }
 </style>
 <kt-portlet>
-	<kt-portlet-header [sticky]="true" id="inheader" [title]="'Danh sách người dùng'" [class]="'kt-portlet__head--lg'"
-		[viewLoading$]="dataSource.loading$">
-
+	<kt-portlet-header [sticky]="true" id="inheader" [title]="'Danh sách người dùng'" 
+		[class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
 		<ng-container ktPortletTools>
-			<button class="show-view-sm" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+			<button class="show-view-sm" mat-raised-button [matMenuTriggerFor]="chucnang" color="primary" >
 				Chức năng
 			</button>
 			<mat-menu #chucnang="matMenu">
@@ -195,13 +191,13 @@
 						Thao tác
 					</th>
 					<td mat-cell *matCellDef="let nguoidungdps" class="hiden-print action-cell" [ngClass]="list_button?'list-button':''">
-						<button type="button" (click)="editNguoiDungDPS(nguoidungdps,false)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
+						<button type="button" (click)="edit(nguoidungdps,false)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
 								color="info" matTooltip="{{ 'COMMON.DETAIL' | translate }}">
 							<mat-icon>visibility</mat-icon>
 							<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 						</button>
 						<ng-container *ngIf="rR.r10">
-							<button type="button" (click)="editNguoiDungDPS(nguoidungdps)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
+							<button type="button" (click)="edit(nguoidungdps)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
 									color="primary" matTooltip="{{ 'COMMON.UPDATE' | translate }}">
 								<mat-icon>create</mat-icon>
 								<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
@@ -220,7 +216,7 @@
 							</button>
 							<!--User đang đăng nhập không được tự khóa, xóa tài khoản-->
 							<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" type="button"
-									(click)="deleteNguoiDungDPS(nguoidungdps)" matTooltip="{{ 'COMMON.DELETE' | translate }}"
+									(click)="delete(nguoidungdps)" matTooltip="{{ 'COMMON.DELETE' | translate }}"
 									[disabled]="curUser.id==nguoidungdps.UserID">
 								<mat-icon>delete</mat-icon>
 								<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
@@ -231,8 +227,8 @@
 								<span class="button-text">Khác</span>
 							</button>
 							<mat-menu #menu="matMenu">
-								<button mat-menu-item (click)="vaitro(nguoidungdps,false)" *ngIf="rR.r24">Vai trò</button>
-								<button mat-menu-item (click)="ResetPassNguoiDungDPS(nguoidungdps)" *ngIf="rR.r11">Đặt lại mật khẩu</button>
+								<button mat-menu-item (click)="vaitro(nguoidungdps, false)" *ngIf="rR.r24">Vai trò</button>
+								<button mat-menu-item (click)="resetPass(nguoidungdps)" *ngIf="rR.r11">Đặt lại mật khẩu</button>
 								<button mat-menu-item (click)="giahan(nguoidungdps)" *ngIf="rR.r11">Gia hạn mật khẩu</button>
 							</mat-menu>
 						</ng-container>
@@ -244,7 +240,6 @@
 			<div class="mat-table__message" *ngIf="!dataSource.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
 		</div>
 
-		<!-- start: BOTTOM -->
 		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 			<div class="flt-selected" *ngIf="gridService.model.haveFilter">
 				<mat-chip-list>
@@ -273,7 +268,5 @@
 					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
 			</div>
 		</div>
-		<!-- end: BOTTOM -->
 	</kt-portlet-body>
-
 </kt-portlet>

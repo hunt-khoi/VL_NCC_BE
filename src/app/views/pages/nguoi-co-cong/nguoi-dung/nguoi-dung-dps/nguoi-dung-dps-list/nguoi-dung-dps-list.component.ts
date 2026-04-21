@@ -33,15 +33,12 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
-	haveFilter: boolean = false;
-
 	// Table fields
-	dataSource: NguoiDungDPSDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
-	@ViewChild('printPage', { static: true }) printPage: ElementRef;
+	dataSource: NguoiDungDPSDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
+	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
+	@ViewChild('printPage', { static: true }) printPage: ElementRef | undefined;
 	// Filter fields
 	listIdGroup: any[] = [];
 
@@ -50,25 +47,20 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 	nguoidungdpssResult: NguoiDungDPSModel[] = [];
 	tmpnguoidungdpssResult: NguoiDungDPSModel[] = [];
 
+	haveFilter: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-
 	name = 'Người dùng';
 	rR = {};
 	curUser: any = {};
 	DonVi: number = 0;
-	datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	VaiTro: number = 0;
 	lstVaiTro: any[] = [];
 	ChuaCoVaiTro: boolean = false;
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
-	list_button: boolean;
-	// exportAsConfig: ExportAsConfig = {
-	// 	type: 'xlsx', // the type you want to download
-	// 	elementIdOrContent: 'printpdf', // the id of html/table element
-	// 	download:true
-	// }
+	gridService: TableService | undefined;
+	girdModel: TableModel | undefined;
+	list_button: boolean = false;
 
 	constructor(
 		private nguoidungdpssService: NguoiDungDPSService,
@@ -79,9 +71,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		private ref: ApplicationRef,
 		private tokenStorage: TokenStorage,
 		private commonService: CommonService,
-		private translate: TranslateService,
-		// private exportAsService: ExportAsService	
-	) { }
+		private translate: TranslateService) { }
 
 	/** LOAD DATA */
 	ngOnInit() {
@@ -92,7 +82,9 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.curUser = res;
 		})
+
 		//#region ***Filter***
+		this.girdModel = new TableModel();
 		this.girdModel.haveFilter = true;
 		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
 		this.girdModel.filterText['FullName'] = "";
@@ -104,7 +96,6 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		this.girdModel.disableButtonFilter['Active'] = true;
 		this.girdModel.disableButtonFilter['NhanLichDonVi'] = true;
 		this.girdModel.disableButtonFilter['ChucVu'] = true;
-
 		let optionsTinhTrang = [
 			{
 				name: 'Khóa',
@@ -115,7 +106,6 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 				value: '1',
 			}
 		];
-
 		this.girdModel.filterGroupDataChecked['Active'] = optionsTinhTrang.map(x => {
 			return {
 				name: x.name,
@@ -136,20 +126,6 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 			}
 		]
 		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
-		//this.commonService.getListNhomNguoiDung().subscribe(res => {
-		//	if (res && res.status === 1) {
-		//		this.listIdGroup = res.data;
-		//	};
-		//	this.gridService.filterGroupDataChecked['IdGroup'] = this.listIdGroup.map(x => {
-		//		return {
-		//			id: x.IdGroup,
-		//			name: x.GroupName,
-		//			value: x.IdGroup,
-		//			checked: false
-		//		}
-		//	});
-		//	this.gridService.filterGroupDataCheckedFake = Object.assign({}, this.gridService.filterGroupDataChecked);
-		//});
 		//#endregion ***Filter***
 
 		//#region ***Drag Drop***
@@ -277,7 +253,6 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		this.girdModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.girdModel.selectedColumns = new SelectionModel<any>(true, this.girdModel.availableColumns);
 
-		
 		this.gridService = new TableService(
 			this.layoutUtilsService,
 			this.ref,
@@ -285,51 +260,39 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_nguoidung'
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_nguoidung'));
 		//#endregion
 
 		this.loadData();
-		this.commonService.TreeDonVi().subscribe(res => {
-			if (res && res.status == 1) {
-				this.datatree.next(res.data);
-			}
-			else {
-				this.datatree.next([]);
-				this.layoutUtilsService.showError(res.error.message);
-			}
-		});
-		// // If the NguoiDungDPS changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		- when a filter event occurs => this.gridService.result
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadNguoiDungDPSsList(true);
-				})
-			)
-			.subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
+
 		// Init DataSource
 		this.dataSource = new NguoiDungDPSDataSource(this.nguoidungdpssService);
 		let queryParams = new QueryParamsModel({});
-		// // Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.nguoidungdpssService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadNguoiDungDPSs(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.nguoidungdpssService.lastFilter$.getValue();
+				this.dataSource.loadNguoiDungDPSs(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
-			this.nguoidungdpssResult = res
-			this.tmpnguoidungdpssResult = []
-			if (this.nguoidungdpssResult != null) {
+			this.nguoidungdpssResult = res;
+			this.tmpnguoidungdpssResult = [];
+			if (this.nguoidungdpssResult  && this.paginator) {
 				if (this.nguoidungdpssResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadNguoiDungDPSsList();
+					this.loadDataList();
 				} else {
 					for (let i = 0; i < this.nguoidungdpssResult.length; i++) {
 						let tmpElement = new NguoiDungDPSModel();
@@ -342,10 +305,20 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
-		this.gridService.Clear();
+		if (this.gridService)
+			this.gridService.Clear();
 	}
 
 	loadData() {
+		this.commonService.TreeDonVi().subscribe(res => {
+			if (res && res.status == 1) {
+				this.datatree.next(res.data);
+			}
+			else {
+				this.datatree.next([]);
+				this.layoutUtilsService.showError(res.error.message);
+			}
+		});
 		this.commonService.ListVaiTroByDonVi(this.DonVi).subscribe(res => {
 			if (res && res.status == 1)
 				this.lstVaiTro = res.data;
@@ -354,10 +327,10 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
-
 		this.commonService.ListChucVu(this.DonVi).subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
-				this.gridService.model.filterGroupDataChecked['ChucVu'] = res.data.map(x => {
+				this.gridService.model.filterGroupDataChecked['ChucVu'] = res.data.map((x: any) => {
 					return {
 						id: x.id,
 						name: x.title,
@@ -365,25 +338,28 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 						checked: false
 					}
 				});
-			} else
+			} else {
 				this.gridService.model.filterGroupDataChecked['ChucVu'] = [];
+			}
 			this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
 		})
 	}
 
 	LoadPagePrint() {
-		// this.girdModel.availableColumns[this.girdModel.availableColumns.length -1].isShow = false;
+		if (!this.printPage) return;
 		const printPage = this.printPage.nativeElement as HTMLElement;
 		printPage.click()
 	}
 
-	GetValueNode(item) {
+	GetValueNode(item: any) {
 		this.DonVi = item.id;
 		this.VaiTro = 0;
 		this.loadData();
-		this.loadNguoiDungDPSsList(true);
+		this.loadDataList(true);
 	}
-	loadNguoiDungDPSsList(holdCurrentPage: boolean = false) {
+
+	loadDataList(holdCurrentPage: boolean = false) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -404,7 +380,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 			filter.Donvi = this.DonVi;
 		if (this.VaiTro > 0)
 			filter.VaiTro = this.VaiTro;
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.FullName = this.gridService.model.filterText['FullName'];
 			filter.UserName = this.gridService.model.filterText['UserName'];
 			filter.Email = this.gridService.model.filterText['Email'];
@@ -414,40 +390,40 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		}
 		return filter;
 	}
+
 	/** ACTIONS */
 	/** Delete */
-	deleteNguoiDungDPS(_item: NguoiDungDPSModel) {
+	delete(item: NguoiDungDPSModel) {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn xóa người dùng?';
 		const _waitDesciption: string = 'Người dùng đang được xóa...';
 		const _deleteMessage = `Xóa người dùng thành công`;
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.nguoidungdpssService.deleteNguoiDungDPS(_item.UserID).subscribe(res => {
+			if (!res) return;
+
+			this.nguoidungdpssService.deleteNguoiDungDPS(item.UserID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
 				else {
 					this.layoutUtilsService.showError(res.error.message);
 				}
-				this.loadNguoiDungDPSsList(true);
+				this.loadDataList(true);
 			});
 		});
 	}
-	lock(_item: any, islock = true) {
+
+	lock(item: any, islock = true) {
 		let _message = (islock ? "Khóa" : "Mở khóa") + " người dùng thành công";
-		this.nguoidungdpssService.lock(_item.UserID, islock).subscribe(res => {
+		this.nguoidungdpssService.lock(item.UserID, islock).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_message);
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
-			this.loadNguoiDungDPSsList(true);
+			this.loadDataList(true);
 		});
 	}
 
@@ -467,72 +443,55 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	/**
-	 * Show add NguoiDungDPS dialog
-	 */
 	addNguoiDungDPS() {
 		const newNguoiDungDPS = new NguoiDungDPSModel();
 		newNguoiDungDPS.clear(); // Set all defaults fields
-		this.editNguoiDungDPS(newNguoiDungDPS);
+		this.edit(newNguoiDungDPS);
 	}
-	/**
-	 * Show Edit NguoiDungDPS dialog and save after success close result
-	 * @param NguoiDungDPS: NguoiDungDPSModel
-	 */
-	editNguoiDungDPS(NguoiDungDPS: NguoiDungDPSModel, allowEdit: boolean = true) {
+
+	edit(NguoiDungDPS: NguoiDungDPSModel, allowEdit: boolean = true) {
 		const dialogRef = this.dialog.open(NguoiDungDPSEditComponent, { data: { NguoiDungDPS: NguoiDungDPS, allowEdit: allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			if (NguoiDungDPS.Id)
-				this.loadNguoiDungDPSsList();
+				this.loadDataList();
 			else
-				this.loadNguoiDungDPSsList(true);
+				this.loadDataList(true);
 		});
 	}
 
-	ResetPassNguoiDungDPS(NguoiDungDPS: NguoiDungDPSModel, allowEdit: boolean = true) {
+	resetPass(NguoiDungDPS: NguoiDungDPSModel, allowEdit: boolean = true) {
 		const dialogRef = this.dialog.open(NguoiDungDPSResetPasswordComponent, { data: { NguoiDungDPS: NguoiDungDPS, allowEdit: allowEdit }, width: '650px' });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			if (NguoiDungDPS.Id)
-				this.loadNguoiDungDPSsList();
+				this.loadDataList();
 			else
-				this.loadNguoiDungDPSsList(true);
+				this.loadDataList(true);
 		});
 	}
 
 	vaitro(_item: NguoiDungDPSModel) {
 		const dialogRef = this.dialog.open(NguoiDungVaiTroComponent, { data: { _item }/*, width: '80%'*/ });
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
 
-	giahan(_item: NguoiDungDPSModel) {
+	giahan(item: NguoiDungDPSModel) {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn gia hạn mật khẩu cho người dùng?';
 		const _waitDesciption: string = 'Người dùng đang được gia hạn...';
 		const _deleteMessage = `Gian hạn mật người cho dùng thành công`;
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.nguoidungdpssService.GiaHan(_item.UserID).subscribe(res => {
+			if (!res) return;
+			this.nguoidungdpssService.GiaHan(item.UserID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
 				else {
 					this.layoutUtilsService.showError(res.error.message);
 				}
-				this.loadNguoiDungDPSsList(true);
+				this.loadDataList(true);
 			});
 		});
 	}
@@ -557,15 +516,15 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		}
 		return '';
 	}
+
 	import() {
 		const dialogRef = this.dialog.open(NguoiDungDPSImportComponent);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.loadNguoiDungDPSsList();
+			if (!res) return;
+			this.loadDataList();
 		});
 	}
+
 	ExportFile() {
 		this.nguoidungdpssService.ExportFile().subscribe(response => {
 			const headers = response.headers;
@@ -625,5 +584,4 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		// 	}
 		// }, 10000);
 	}
-
 }

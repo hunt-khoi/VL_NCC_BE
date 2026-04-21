@@ -1,35 +1,35 @@
 import { BaseModel } from 'app/core/_base/crud';
 
 export class NguoiDungDPSModel extends BaseModel {
-	UserID: number
-	Id: string
-	UserName: string
-	Password: string
-	RePassword: string
-	FullName: string
-	Email: string
-	PhoneNumber: string
-	Status: number
-	IdGroup: number
-	Cap: number
-	IDUserQL: number
-	ViettelStudy: string;
-	SimCA: string;
-	LoaiChungThu: number;
-	SerialToken: string;
-	IdDonVi: number;
-	IdChucVu: number;
-	GioiTinh: number;
-	MaNV: string;
-	NhanLichDonVi: boolean;
-	CMTND: string;
-	NgaySinh: string;
-	DonViQuanTam: any[];
-	DonViLayHanXuLy: any[];
-	lstDoiTuongNCC: any[];
-	avatar:any;
-	Avata:any;
-	Sign:any;
+	UserID: number = 0;
+	Id: string = "";
+	UserName: string = "";
+	Password: string = "";
+	RePassword: string = "";
+	FullName: string = "";
+	Email: string = "";
+	PhoneNumber: string = "";
+	Status: number = 1;
+	IdGroup: number = 0;
+	Cap: number = 0;
+	IDUserQL: number = 0;
+	ViettelStudy: string = "";
+	SimCA: string = "";
+	LoaiChungThu: number = 0;
+	SerialToken: string = "";
+	IdDonVi: number = 0;
+	IdChucVu: number = 0;
+	GioiTinh: number = 0;
+	MaNV: string = "";
+	NhanLichDonVi: boolean = false;
+	CMTND: string = "";
+	NgaySinh: string = "";
+	DonViQuanTam: any[] = [];
+	DonViLayHanXuLy: any[] = [];
+	lstDoiTuongNCC: any[] = [];
+	avatar: any = {};
+	Avata: any = {};
+	Sign: any = {};
 
 	clear() {
 		this.UserID = 0;

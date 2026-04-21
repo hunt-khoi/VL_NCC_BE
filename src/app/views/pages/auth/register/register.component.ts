@@ -79,7 +79,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
 	submit() {
 		if (!this.registerForm) return;
 		const controls = this.registerForm.controls;
-		// check form
 		if (this.registerForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()

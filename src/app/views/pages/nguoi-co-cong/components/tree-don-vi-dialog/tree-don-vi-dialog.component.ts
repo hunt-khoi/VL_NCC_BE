@@ -11,7 +11,7 @@ import { DM_DonViService } from '../../danh-muc/dm-don-vi/Services/dm-don-vi.ser
 	
 export class TreeDonViDialogComponent implements OnInit, OnDestroy {
 	// Public properties
-	DM_YKienForm: FormGroup | undefined;
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	disabledBtn:boolean=false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
@@ -74,13 +74,6 @@ export class TreeDonViDialogComponent implements OnInit, OnDestroy {
 		if (this.componentSubscriptions) {
 			this.componentSubscriptions.unsubscribe();
 		}
-	}
-	
-	isControlInvalid(controlName: string): boolean {
-		if (!this.DM_YKienForm) return false;
-		const control = this.DM_YKienForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
 	}
 
 	numberOnly(event: any): boolean {

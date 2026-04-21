@@ -8,9 +8,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatInputModule } from '@angular/material';
 // Translate
 import { TranslateModule } from '@ngx-translate/core';
-// NGRX
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
 // CRUD
 import { InterceptService } from '../../../core/_base/crud/';
 // Module components

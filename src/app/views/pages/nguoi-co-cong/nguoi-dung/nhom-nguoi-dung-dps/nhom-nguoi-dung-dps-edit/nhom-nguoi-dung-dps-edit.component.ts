@@ -1,9 +1,7 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { NhomNguoiDungDPSService } from '../Services/nhom-nguoi-dung-dps.service';
 import { NhomNguoiDungDPSModel } from '../Model/nhom-nguoi-dung-dps.model';
@@ -16,21 +14,19 @@ import { CommonService } from '../../../services/common.service';
 })
 
 export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
-
 	// Public properties
-	NhomNguoiDungDPS: NhomNguoiDungDPSModel;
-	itemForm: FormGroup;
+	NhomNguoiDungDPS: NhomNguoiDungDPSModel = new NhomNguoiDungDPSModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> | undefined;
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 
-	fixedPoint = 0;
 	isZoomSize: boolean = false;
-	private componentSubscriptions: Subscription;
-	datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lstChucVu: any[];
+	private componentSubscriptions: Subscription | undefined;
+	datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	lstChucVu: any[] = [];
 	allowEdit: boolean = true;
 	disabledBtn: boolean = false;
 
@@ -64,7 +60,7 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		this.getTree();
 		this.createForm();
 		if (this.data.NhomNguoiDungDPS && this.data.NhomNguoiDungDPS.IdGroup > 0) {
-			this.nhomnguoidungdpssService.getNhomNguoiDungDPSById(this.data.NhomNguoiDungDPS.IdGroup).subscribe(res => {
+			this.nhomnguoidungdpssService.getById(this.data.NhomNguoiDungDPS.IdGroup).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.NhomNguoiDungDPS = res.data;
@@ -83,7 +79,7 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	loadChucVuByDonVi(Donvi) {
+	loadChucVuByDonVi(Donvi: any) {
 		this.commonService.ListChucVu(Donvi).subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstChucVu = res.data;
@@ -96,14 +92,12 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		})
 	}
 	getTree() {
-		let Locked = false;
-		if (this.NhomNguoiDungDPS.IdGroup > 0)
-			Locked = true;
+		let Locked = this.NhomNguoiDungDPS.IdGroup > 0;
 		this.commonService.TreeDonVi(0, 0, Locked).subscribe(res => {
 			// this.commonService.TreeDonVi().subscribe(res => {
 			if (res && res.status == 1) {
 				this.datatree.next(res.data);
-				if (this.NhomNguoiDungDPS.IdGroup == 0 && res.data.length > 0) 
+				if (this.itemForm && this.NhomNguoiDungDPS.IdGroup == 0 && res.data.length > 0) 
 					this.itemForm.controls["donVi"].setValue(res.data[0]["id"]);
 			}
 			else {
@@ -113,7 +107,8 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		})
 	}
-	GetValueNode(item) {
+
+	GetValueNode(item: any) {
 		this.loadChucVuByDonVi(item.id);
 	}
 
@@ -122,7 +117,6 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			this.componentSubscriptions.unsubscribe();
 		}
 	}
-
 
 	createForm() {
 		this.itemForm = this.NhomNguoiDungDPSFB.group({
@@ -148,66 +142,58 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	getTitle(): string {
 		if (!this.allowEdit)
 			return 'Chi tiết vai trò';
-		if (this.NhomNguoiDungDPS.IdGroup == 0) {
+		if (this.NhomNguoiDungDPS.IdGroup == 0) 
 			return 'Thêm mới vai trò';
-		}
 		return `Chỉnh sửa vai trò - ${this.NhomNguoiDungDPS.GroupName} `;
-	}
-
-	isControlInvalid(controlName: string): boolean {
-		const control = this.itemForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
 	}
 
 	onSubmit(type: boolean) {
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/** check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			let invalid = <FormControl[]>Object.keys(this.itemForm.controls).map(key => this.itemForm.controls[key]).filter(ctl => ctl.invalid);
+			let invalid = <FormControl[]>Object.keys(controls).map(key => controls[key]).filter(ctl => ctl.invalid);
 			let invalidElem: any = invalid[0];
 			invalidElem.nativeElement.focus();
 			this.hasFormErrors = true;
 			return;
 		}
 
-		// tslint:disable-next-line:prefer-const
-		let editedNhomNguoiDungDPS = this.prepareNhomNguoiDungDPSs();
-
-		if (this.NhomNguoiDungDPS.IdGroup > 0) {
-			this.updateNhomNguoiDungDPS(editedNhomNguoiDungDPS)
-			return;
+		let edited = this.prepare();
+		if (edited) {
+			if (this.NhomNguoiDungDPS.IdGroup > 0) {
+				this.update(edited)
+				return;
+			}
+			this.add(edited, type);
 		}
-
-		this.addNhomNguoiDungDPS(editedNhomNguoiDungDPS, type);
 	}
 
-	prepareNhomNguoiDungDPSs(): NhomNguoiDungDPSModel {
+	prepare(): NhomNguoiDungDPSModel | null {
+		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
-		const _NhomNguoiDungDPS = new NhomNguoiDungDPSModel();
-		_NhomNguoiDungDPS.clear();
-		_NhomNguoiDungDPS.GroupName = controls['groupName'].value;
-		_NhomNguoiDungDPS.Ma = controls['ma'].value;
-		_NhomNguoiDungDPS.DisplayOrder = controls['displayOrder'].value;
-		_NhomNguoiDungDPS.Locked = controls['locked'].value;
-		_NhomNguoiDungDPS.GhiChu = controls['ghiChu'].value;
-		_NhomNguoiDungDPS.DonVi = controls['donVi'].value;
-		_NhomNguoiDungDPS.ChucVu = controls['chucVu'].value;
-		_NhomNguoiDungDPS.IsDefault = controls['isDefault'].value;
+		const _item = new NhomNguoiDungDPSModel();
+		_item.clear();
+		_item.GroupName = controls['groupName'].value;
+		_item.Ma = controls['ma'].value;
+		_item.DisplayOrder = controls['displayOrder'].value;
+		_item.Locked = controls['locked'].value;
+		_item.GhiChu = controls['ghiChu'].value;
+		_item.DonVi = controls['donVi'].value;
+		_item.ChucVu = controls['chucVu'].value;
+		_item.IsDefault = controls['isDefault'].value;
 		//gán lại giá trị id 
 		if (this.NhomNguoiDungDPS.IdGroup > 0) {
-			_NhomNguoiDungDPS.IdGroup = this.NhomNguoiDungDPS.IdGroup;
+			_item.IdGroup = this.NhomNguoiDungDPS.IdGroup;
 		}
-
-		return _NhomNguoiDungDPS;
+		return _item;
 	}
 
-	addNhomNguoiDungDPS(_NhomNguoiDungDPS: NhomNguoiDungDPSModel, withBack: boolean = false) {
-		this.nhomnguoidungdpssService.createNhomNguoiDungDPS(_NhomNguoiDungDPS).subscribe(res => {
+	add(item: NhomNguoiDungDPSModel, withBack: boolean = false) {
+		this.nhomnguoidungdpssService.create(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Thêm mới vai trò thành công`;
@@ -223,8 +209,8 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	updateNhomNguoiDungDPS(_NhomNguoiDungDPS: NhomNguoiDungDPSModel, withBack: boolean = false) {
-		this.nhomnguoidungdpssService.updateNhomNguoiDungDPS(_NhomNguoiDungDPS).subscribe(res => {
+	update(item: NhomNguoiDungDPSModel) {
+		this.nhomnguoidungdpssService.update(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Cập nhật vai trò thành công`;
@@ -237,22 +223,11 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
 	closeDialog() {
 		this.dialogRef.close(this.isChange);
-	}
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-
 	}
 }

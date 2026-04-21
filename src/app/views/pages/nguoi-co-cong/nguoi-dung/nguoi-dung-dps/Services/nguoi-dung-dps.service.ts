@@ -12,11 +12,12 @@ const API_ROOT_URL1 = environment.ApiRoot + '/vai-tro-nguoi-dung';
 @Injectable()
 export class NguoiDungDPSService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
 	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	ReadOnlyControl: boolean;
+	data_import: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient,
 		private httpUtils: HttpUtilsService) { }
 

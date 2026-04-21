@@ -1,17 +1,15 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
 import { NguoiDungDPSService } from '../Services/nguoi-dung-dps.service';
 import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
-import * as moment from 'moment';
 import { ConfirmPasswordValidator } from '../../../../auth/register/confirm-password.validator';
 import { CommonService } from '../../../services/common.service';
 import { ChonNhieuDonViComponent } from '../../../components/chon-nhieu-don-vi/chon-nhieu-don-vi.component';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ChonNhieuDoiTuongListComponent } from '../../../components';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-nguoi-dung-dps-edit',
@@ -21,25 +19,24 @@ import { ChonNhieuDoiTuongListComponent } from '../../../components';
 
 export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	// Public properties
-	NguoiDungDPS: NguoiDungDPSModel;
-	itemForm: FormGroup;
+	NguoiDungDPS: NguoiDungDPSModel = new NguoiDungDPSModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> | undefined;
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 
-	fixedPoint = 0;
 	isZoomSize: boolean = false;
 	listIdGroup: any[] = [];
 	listNV: any[] = [];
 	selectIdGroup: string = '0';
-	private componentSubscriptions: Subscription;
+	private componentSubscriptions: Subscription | undefined;
 
-	datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lstChucVu: any[];
-	lstLoaiChungThu: any[];
-	lstGioiTinh: any[];
+	datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	lstChucVu: any[] = [];
+	lstLoaiChungThu: any[] = [];
+	lstGioiTinh: any[] = [];
 	maxNS = moment(new Date()).add(-16, 'year').toDate();
 
 	selectable: boolean = true;
@@ -49,7 +46,7 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	avatar: any = { strBase64: '', filename: '' };
 	sign: any = { strBase64: '', filename: '' };
 	disabledBtn: boolean = false;
-	Capcocau: number;
+	Capcocau: number = 0;
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
@@ -67,11 +64,11 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	constructor(
 		public dialogRef: MatDialogRef<NguoiDungDPSEditComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private NguoiDungDPSFB: FormBuilder,
+		private itemFB: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private nguoidungdpssService: NguoiDungDPSService,
+		private apiService: NguoiDungDPSService,
 		private commonService: CommonService) { }
 
 	async ngOnInit() {
@@ -86,11 +83,11 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			this.NguoiDungDPS = this.data.NguoiDungDPS;
 		}
 		if (this.data.NguoiDungDPS && this.data.NguoiDungDPS.UserID > 0) {
-			this.nguoidungdpssService.getNguoiDungDPSById(this.data.NguoiDungDPS.UserID).subscribe(res => {
+			this.apiService.getNguoiDungDPSById(this.data.NguoiDungDPS.UserID).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.NguoiDungDPS = res.data;
-					this.GetValueNode({ id: res.data.IdDonVi,Capcocau:res.data.Capcocau });
+					this.GetValueNode({ id: res.data.IdDonVi, Capcocau: res.data.Capcocau });
 					this.createForm();
 				}
 				else {
@@ -103,7 +100,8 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		}
 	}
-	GetValueNode(item) {
+
+	GetValueNode(item: any) {
 		this.Capcocau = +item.Capcocau;
 		this.commonService.ListChucVu(item.id).subscribe(res => {
 			if (res && res.status == 1) {
@@ -144,11 +142,11 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		if (!this.NguoiDungDPS.UserID) {
 			temp.password = ['', Validators.required];
 			temp.confirmPassword = ['', Validators.required];
-			this.itemForm = this.NguoiDungDPSFB.group(temp, {
+			this.itemForm = this.itemFB.group(temp, {
 				validator: ConfirmPasswordValidator.MatchPassword
 			});
 		} else {
-			this.itemForm = this.NguoiDungDPSFB.group(temp);
+			this.itemForm = this.itemFB.group(temp);
 		}
 		if (!this.allowEdit)
 			this.itemForm.disable();
@@ -156,13 +154,12 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	}
 
 	reset() {
+		if (!this.itemForm) return;
 		this.NguoiDungDPS.clear();
 		this.createForm();
 		this.itemForm.controls['donVi'].setValue(null);
 	}
-	/**
-	 * Returns page title
-	 */
+
 	getTitle(): string {
 		if (!this.allowEdit)
 			return 'Chi tiết người dùng';
@@ -172,92 +169,78 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		return `Chỉnh sửa người dùng - ${this.NguoiDungDPS.UserName} `;
 	}
 
-	isControlInvalid(controlName: string): boolean {
-		const control = this.itemForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
-	}
-
 	onSubmit(type: boolean) {
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/** check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			let invalid = <FormControl[]>Object.keys(this.itemForm.controls).map(key => this.itemForm.controls[key]).filter(ctl => ctl.invalid);
+			let invalid = <FormControl[]>Object.keys(controls).map(key => controls[key]).filter(ctl => ctl.invalid);
 			let invalidElem: any = invalid[0];
 			invalidElem.nativeElement.focus();
 			this.hasFormErrors = true;
 			return;
 		}
 
-		// tslint:disable-next-line:prefer-const
-		let editedNguoiDungDPS = this.prepareNguoiDungDPSs();
-		if (editedNguoiDungDPS != null) {
+		let edited = this.prepare();
+		if (edited) {
 			if (this.NguoiDungDPS.UserID) {
-				this.updateNguoiDungDPS(editedNguoiDungDPS)
+				this.update(edited)
 				return;
 			}
-			this.addNguoiDungDPS(editedNguoiDungDPS, type);
+			this.add(edited, type);
 		}
 	}
 
-	/**
-	 * Returns object for saving
-	 */
-	prepareNguoiDungDPSs(): NguoiDungDPSModel {
+	prepare(): NguoiDungDPSModel | null {
+		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
-		const _NguoiDungDPS = new NguoiDungDPSModel();
-		_NguoiDungDPS.clear();
-		_NguoiDungDPS.FullName = controls['fullname'].value;
-		_NguoiDungDPS.UserName = controls['userName'].value;
-		_NguoiDungDPS.ViettelStudy = controls['viettelStudy'].value;
-		_NguoiDungDPS.Email = controls['email'].value;
-		_NguoiDungDPS.PhoneNumber = controls['phoneNumber'].value;
-		_NguoiDungDPS.SimCA = controls['simCA'].value;
-		_NguoiDungDPS.LoaiChungThu = controls['loaiChungThu'].value;
-		_NguoiDungDPS.SerialToken = controls['serialToken'].value;
-		_NguoiDungDPS.IdDonVi = controls['donVi'].value;
-		_NguoiDungDPS.IdChucVu = controls['chucVu'].value;
-		_NguoiDungDPS.MaNV = controls['maNV'].value;
-		_NguoiDungDPS.GioiTinh = controls['gioiTinh'].value;
-		_NguoiDungDPS.NhanLichDonVi = controls['nhanLichDonVi'].value;
-		_NguoiDungDPS.CMTND = controls['cmtnd'].value;
+		const _item = new NguoiDungDPSModel();
+		_item.clear();
+		_item.FullName = controls['fullname'].value;
+		_item.UserName = controls['userName'].value;
+		_item.ViettelStudy = controls['viettelStudy'].value;
+		_item.Email = controls['email'].value;
+		_item.PhoneNumber = controls['phoneNumber'].value;
+		_item.SimCA = controls['simCA'].value;
+		_item.LoaiChungThu = controls['loaiChungThu'].value;
+		_item.SerialToken = controls['serialToken'].value;
+		_item.IdDonVi = controls['donVi'].value;
+		_item.IdChucVu = controls['chucVu'].value;
+		_item.MaNV = controls['maNV'].value;
+		_item.GioiTinh = controls['gioiTinh'].value;
+		_item.NhanLichDonVi = controls['nhanLichDonVi'].value;
+		_item.CMTND = controls['cmtnd'].value;
 		if (controls['ngaySinh'].value)
-			_NguoiDungDPS.NgaySinh = this.commonService.f_convertDate(controls['ngaySinh'].value);
-		_NguoiDungDPS.DonViQuanTam = this.NguoiDungDPS.DonViQuanTam;
-		_NguoiDungDPS.DonViLayHanXuLy = this.NguoiDungDPS.DonViLayHanXuLy;
-		_NguoiDungDPS.avatar = this.avatar;
-		_NguoiDungDPS.Sign = this.sign;
+			_item.NgaySinh = this.commonService.f_convertDate(controls['ngaySinh'].value);
+		_item.DonViQuanTam = this.NguoiDungDPS.DonViQuanTam;
+		_item.DonViLayHanXuLy = this.NguoiDungDPS.DonViLayHanXuLy;
+		_item.avatar = this.avatar;
+		_item.Sign = this.sign;
 		if (!this.NguoiDungDPS.UserID) {
-			_NguoiDungDPS.Password = controls['password'].value;
-			_NguoiDungDPS.RePassword = controls['confirmPassword'].value;
-			if (_NguoiDungDPS.Password != _NguoiDungDPS.RePassword) {
+			_item.Password = controls['password'].value;
+			_item.RePassword = controls['confirmPassword'].value;
+			if (_item.Password != _item.RePassword) {
 				this.layoutUtilsService.showError("Xác nhận mật khẩu không đúng");
 				return null;
 			}
 		}
 		//gán lại giá trị id 
 		if (this.NguoiDungDPS.UserID) {
-			_NguoiDungDPS.UserID = this.NguoiDungDPS.UserID;
+			_item.UserID = this.NguoiDungDPS.UserID;
 		}
 		if (this.Capcocau == 1)
-			_NguoiDungDPS.lstDoiTuongNCC = this.NguoiDungDPS.lstDoiTuongNCC;
+			_item.lstDoiTuongNCC = this.NguoiDungDPS.lstDoiTuongNCC;
 		else
-			_NguoiDungDPS.lstDoiTuongNCC = [];
-
-		return _NguoiDungDPS;
+			_item.lstDoiTuongNCC = [];
+		return _item;
 	}
-	/**
-	 * Add item
-	 *
-	 * @param _NguoiDungDPS: NguoiDungDPSModel
-	 * @param withBack: boolean
-	 */
-	addNguoiDungDPS(_NguoiDungDPS: NguoiDungDPSModel, withBack: boolean = false) {
-		this.nguoidungdpssService.createNguoiDungDPS(_NguoiDungDPS).subscribe(res => {
+
+	add(item: NguoiDungDPSModel, withBack: boolean = false) {
+		this.apiService.createNguoiDungDPS(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Thêm mới người dùng thành công`;
@@ -273,15 +256,8 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	/**
-	 * Update item
-	 *
-	 * @param _NguoiDungDPS: NguoiDungDPSsModel
-	 * @param withBack: boolean
-	 */
-	updateNguoiDungDPS(_NguoiDungDPS: NguoiDungDPSModel, withBack: boolean = false) {
-
-		this.nguoidungdpssService.updateNguoiDungDPS(_NguoiDungDPS).subscribe(res => {
+	update(item: NguoiDungDPSModel) {
+		this.apiService.updateNguoiDungDPS(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Cập nhật người dùng thành công`;
@@ -295,9 +271,7 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	}
 
 	getTree() {
-		let Locked = false;
-		if (this.NguoiDungDPS.UserID > 0)
-			Locked = true;
+		let Locked = this.NguoiDungDPS.UserID > 0;
 		this.commonService.TreeDonVi(0, 0, Locked).subscribe(res => {
 			if (res && res.status == 1) {
 				this.datatree.next(res.data);
@@ -308,6 +282,7 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			}
 		})
 	}
+
 	ListIdGroup() {
 		this.commonService.getListNhomNguoiDung().subscribe(res => {
 			this.loadingSubject.next(false);
@@ -317,7 +292,6 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 				this.changeDetectorRefs.detectChanges();
 			};
 		});
-
 		this.commonService.ListLoaiChungThu().subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstLoaiChungThu = res.data;
@@ -339,87 +313,57 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		})
 	}
-	/**
-	 * Close alert
-	 *
-	 * @param $event
-	 */
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
-
 
 	closeDialog() {
 		this.dialogRef.close(this.isChange);
 	}
 
 
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-
-	}
 	//loai=0: đối tượng NCC
-	remove(fruit: any, loai = 0): void {
+	remove(item: any, loai = 0): void {
 		if (loai == 0) {
-			const index = this.NguoiDungDPS.lstDoiTuongNCC.indexOf(fruit);
-
-			if (index >= 0) {
+			const index = this.NguoiDungDPS.lstDoiTuongNCC.indexOf(item);
+			if (index >= 0) 
 				this.NguoiDungDPS.lstDoiTuongNCC.splice(index, 1);
-			}
 		}
 		if (loai == 1) {
-			const index = this.NguoiDungDPS.DonViQuanTam.indexOf(fruit);
-
-			if (index >= 0) {
+			const index = this.NguoiDungDPS.DonViQuanTam.indexOf(item);
+			if (index >= 0) 
 				this.NguoiDungDPS.DonViQuanTam.splice(index, 1);
-			}
 		} else {
-
-			const index = this.NguoiDungDPS.DonViLayHanXuLy.indexOf(fruit);
-
-			if (index >= 0) {
+			const index = this.NguoiDungDPS.DonViLayHanXuLy.indexOf(item);
+			if (index >= 0) 
 				this.NguoiDungDPS.DonViLayHanXuLy.splice(index, 1);
-			}
 		}
 		this.changeDetectorRefs.detectChanges();
 	}
+
 	dv(loai = 0) {
 		if (loai == 0) {
 			const dialogRef = this.dialog.open(ChonNhieuDoiTuongListComponent, {
 				data: {
 					selected: this.NguoiDungDPS.lstDoiTuongNCC.map(x => {
-						return {
-							Id: x.id,
-							DoiTuong: x.title
-						}
-					}) } });
+						return { Id: x.id, DoiTuong: x.title }
+					}) 
+				} 
+			});
 			dialogRef.afterClosed().subscribe(res => {
-				if (!res) {
-					return;
-				}
+				if (!res) return;
 				if (res.done) {
-					this.NguoiDungDPS.lstDoiTuongNCC = res.nhanVienSelected.map(x => {
-						return {
-							id: x.Id,
-							title: x.DoiTuong
-						}
+					this.NguoiDungDPS.lstDoiTuongNCC = res.nhanVienSelected.map((x: any) => {
+						return { id: x.Id, title: x.DoiTuong }
 					});
 					this.changeDetectorRefs.detectChanges();
 				}
 			});
 		} else {
-			const dialogRef = this.dialog.open(ChonNhieuDonViComponent, { data: { selected: loai == 1 ? this.NguoiDungDPS.DonViQuanTam : this.NguoiDungDPS.DonViLayHanXuLy } });
+			const dialogRef = this.dialog.open(ChonNhieuDonViComponent, { 
+				data: { 
+					selected: loai == 1 ? this.NguoiDungDPS.DonViQuanTam : this.NguoiDungDPS.DonViLayHanXuLy 
+				} 
+			});
 			dialogRef.afterClosed().subscribe(res => {
-				if (!res) {
-					return;
-				}
+				if (!res) return;
 				if (loai == 1)
 					this.NguoiDungDPS.DonViQuanTam = res;
 				else
@@ -428,6 +372,7 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			});
 		}
 	}
+
 	removeall(loai = 0) {
 		if (loai == 0) {
 			this.NguoiDungDPS.lstDoiTuongNCC = [];
@@ -451,17 +396,18 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			// }
 			let reader = new FileReader();
 			reader.readAsDataURL(evt.target.files[0]);
-			let base64Str;
+			let base64Str: any;
 			reader.onload = function () {
 				base64Str = reader.result as String;
 				var metaIdx = base64Str.indexOf(';base64,');
 				base64Str = base64Str.substr(metaIdx + 8); // Cắt meta data khỏi chuỗi base64
 				//item.Image = "";
 				let f = document.getElementById("imgIcondd" + ind);
-				f.setAttribute("src", "data:image/png;base64," + base64Str);
+				if (f)
+					f.setAttribute("src", "data:image/png;base64," + base64Str);
 
 			};
-			setTimeout(res => {
+			setTimeout(_ => {
 				if (ind == 1) {
 					this.avatar.strBase64 = base64Str;
 					this.avatar.filename = filename;
@@ -476,10 +422,13 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	selectFile(ind) {
+	selectFile(ind: any) {
 		let f = document.getElementById("imgInpdd" + ind);
-		f["type"] = "text";
-		f["type"] = "file";
-		f.click();
+		if (f) {
+			const inputElement = f as HTMLInputElement;
+			inputElement.type = "text";
+			inputElement.type = "file";
+			inputElement.click();
+		}
 	}
 }

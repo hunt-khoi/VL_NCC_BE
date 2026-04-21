@@ -61,10 +61,6 @@ export class TreeDonViComponent implements OnInit {
 		})
 	}
 
-	onSumbit() {
-
-	}
-
 	//======================== Lưu quyền ==================================
 	onLuuPhanQuyenCay() {
 		let data: any = {};
@@ -77,7 +73,7 @@ export class TreeDonViComponent implements OnInit {
 
 	layQuyenDuocChon(lstSrc: any, lst: any[]) {
 		let quyen: any = {};
-		if( lstSrc.text=="Tất cả" && lstSrc.anCss.checked && lstSrc.anCss.parentChk ==""){
+		if ( lstSrc.text=="Tất cả" && lstSrc.anCss.checked && lstSrc.anCss.parentChk =="") {
 			return [];
 		}
 		if (lstSrc[this.propNameCss].checked && lstSrc.anCss.parentChk =="") {
@@ -106,8 +102,8 @@ export class TreeDonViComponent implements OnInit {
 		};
 
 		//gán thuốc tính anCss cho node
-		if (itemSrc[this.propNameCss]) { }
-		else itemSrc[this.propNameCss] = Object.assign({}, anCss);
+		if (!itemSrc[this.propNameCss])
+			itemSrc[this.propNameCss] = Object.assign({}, anCss);
 
 		//duyệt các node
 		if (itemSrc[this.propNameChild]) {
@@ -144,7 +140,7 @@ export class TreeDonViComponent implements OnInit {
 		txtKey = item[this.nameNode]; //gán text node để lát serach ra node này
 		if (obj && obj[this.propNameChild] == undefined) { //duyệt node cuối cùng của cấp
 			this.findParentOfLastNode(this.lst_DonVi[0], item[this.nameNode]);
-			if (this.g_ParentOfLastNode != {}) {
+			if (Object.keys(this.g_ParentOfLastNode).length > 0) {
 				obj = this.g_ParentOfLastNode;
 				txtKey = obj[this.nameNode];
 				this.g_ParentOfLastNode = {};
@@ -159,24 +155,22 @@ export class TreeDonViComponent implements OnInit {
 	}
 
 	//tìm vị trí node được checked changed
-	findItemCheck(itemSrc: any, itemKey: any) {
+	findItemCheck(itemSrc: any, itemKey: any): any {
 		let r = undefined;
 		if (itemSrc[this.propNameChild]) {
 			for (var i = 0; i < itemSrc[this.propNameChild].length; i++) {
 				let item = itemSrc[this.propNameChild][i];
 				if (item[this.nameNode] == itemKey[this.nameNode]) {
 					item[this.propNameCss].checked = itemKey[this.propNameCss].checked;
-
 					if (item[this.propNameCss].checked && item[this.propNameChild]) item[this.propNameCss].parentChk = '';//set checkbox có dấu check về default
 					this.g_NodeSlected = Object.assign({}, item);
 					r = item;
 					break;
 				}
-				else
-					if (item[this.propNameChild]) {
-						this.lstNodeSelected.push(item);
-						r = this.findItemCheck(item, itemKey);
-					}
+				else if (item[this.propNameChild]) {
+					this.lstNodeSelected.push(item);
+					r = this.findItemCheck(item, itemKey);
+				}
 			}
 			return r;
 		}
@@ -185,15 +179,12 @@ export class TreeDonViComponent implements OnInit {
 
 	//check all child của node này
 	checkAllChild(itemA: any) {
-		if (itemA[this.propNameChild]) {
-			itemA[this.propNameChild].map((item: any) => {
-				item[this.propNameCss].checked = itemA[this.propNameCss].checked;
-				if (!item[this.propNameCss].checked) item[this.propNameCss].parentChk = '';//set checkbox mark default
-
-				if (item[this.propNameChild])
-					this.checkAllChild(item);
-			});
-		}
+		if (!itemA[this.propNameChild]) return;
+		itemA[this.propNameChild].map((item: any) => {
+			item[this.propNameCss].checked = itemA[this.propNameCss].checked;
+			if (!item[this.propNameCss].checked) item[this.propNameCss].parentChk = ''; //set checkbox mark default
+			if (item[this.propNameChild]) this.checkAllChild(item);
+		});
 	}
 
 	//check all parent của node này
@@ -216,20 +207,17 @@ export class TreeDonViComponent implements OnInit {
 		};
 
 		//gán thuốc tính anCss cho node
-		if (objParent[this.propNameCss]) { }
-		else objParent[this.propNameCss] = Object.assign({}, anCss);
+		if (!objParent[this.propNameCss])
+			objParent[this.propNameCss] = Object.assign({}, anCss);
 
 		if (objParent) {
-			if (objParent[this.propNameCss]) { }
-			else { }
-
 			objParent[this.propNameCss].checked = itemA[this.propNameCss].checked ? true : (this.countCheck(objParent) ? (this.countCheckNbr(objParent) == 0 ? false : true) : false);
 			objParent[this.propNameCss].parentChk = objParent[this.propNameCss].checked ? (this.countCheck(objParent) ? 'chk-sty' : '') : '';
 			if (objParent[this.nameNode] == [this.textFeildRoof]) {
 				this.masterNode[this.propNameCss].checked = objParent[this.propNameCss].checked;
 				this.masterNode[this.propNameCss].parentChk = objParent[this.propNameCss].checked ? (this.countCheck(objParent) ? 'chk-sty' : '') : '';
 				return;
-			}//node cuối cùng
+			} //node cuối cùng
 			else
 				this.checkAllParent(objParent, objParent[this.nameNode]);
 
@@ -237,7 +225,7 @@ export class TreeDonViComponent implements OnInit {
 	}
 
 	//tìm parent của parent
-	findParentRecursion(obj1: any, key: any) {
+	findParentRecursion(obj1: any, key: any): any {
 		let r = undefined;
 		if (obj1) {
 			if (obj1[this.propNameChild]) {
@@ -264,10 +252,8 @@ export class TreeDonViComponent implements OnInit {
 			for (var i = 0; i < itemA[this.propNameChild].length; i++) {
 				if (itemA[this.propNameChild][i][this.propNameCss]) { }
 				else { }
-
-				if (itemA[this.propNameChild][i][this.propNameCss] && itemA[this.propNameChild][i][this.propNameCss].checked) {
+				if (itemA[this.propNameChild][i][this.propNameCss] && itemA[this.propNameChild][i][this.propNameCss].checked) 
 					dem++;
-				}
 			}
 			r = dem < itemA[this.propNameChild].length; //true -> toàn bộ con ko check hết
 		}
@@ -292,34 +278,31 @@ export class TreeDonViComponent implements OnInit {
 
 	//mở hoặc đóng node này
 	collapseNode(itemA: any) {
-		if (itemA[this.propNameCss]) {
-			if (itemA[this.propNameCss].checked) {//mở node này ra
-				itemA[this.propNameCss].state = -1;//-1 mở node này
-				itemA[this.propNameCss].collapse = true;//mở các node con
-			}
-			if (itemA[this.propNameChild])
-				for (var i = 0; i < itemA[this.propNameChild].length; i++)
-					this.collapseNode(itemA[this.propNameChild][i]);
+		if (!itemA[this.propNameCss]) return;
+		if (itemA[this.propNameCss].checked) { //mở node này ra
+			itemA[this.propNameCss].state = -1; //-1 mở node này
+			itemA[this.propNameCss].collapse = true; //mở các node con
+		}
+		if (itemA[this.propNameChild]) {
+			for (var i = 0; i < itemA[this.propNameChild].length; i++)
+				this.collapseNode(itemA[this.propNameChild][i]);
 		}
 	}
 
 	// ============================================================= FOR LAST NODE - IT HAS NO CHILDER ====================================
-
 	//tìm parent trước 1 cấp của node cuối cùng của cấp
 	findParentOfLastNode(obj1: any, key: any) {
-		if (obj1) {
-			if (obj1[this.propNameChild]) {
-				for (var i = 0; i < obj1[this.propNameChild].length; i++) {
-					if (obj1[this.propNameChild][i][this.nameNode] == key) {
-						this.g_ParentOfLastNode = Object.assign({}, obj1);
-						break;
-					}
-					else
-						this.findParentOfLastNode(obj1[this.propNameChild][i], key);
+		if (!obj1) return;
+		if (obj1[this.propNameChild]) {
+			for (var i = 0; i < obj1[this.propNameChild].length; i++) {
+				if (obj1[this.propNameChild][i][this.nameNode] == key) {
+					this.g_ParentOfLastNode = Object.assign({}, obj1);
+					break;
 				}
+				else
+					this.findParentOfLastNode(obj1[this.propNameChild][i], key);
 			}
 		}
-
 	}
 
 	//check xem có check hết tất cả các check box con không
@@ -328,9 +311,8 @@ export class TreeDonViComponent implements OnInit {
 		let dem = 0;
 		if (itemA[this.propNameChild]) {
 			for (var i = 0; i < itemA[this.propNameChild].length; i++) {
-				if (itemA[this.propNameChild][i][this.propNameCss] && itemA[this.propNameChild][i][this.propNameCss].checked) {
+				if (itemA[this.propNameChild][i][this.propNameCss] && itemA[this.propNameChild][i][this.propNameCss].checked) 
 					dem++;
-				}
 			}
 			r = dem < itemA[this.propNameChild].length; //true -> toàn bộ con ko check hết
 		}
@@ -351,7 +333,6 @@ export class TreeDonViComponent implements OnInit {
 		return r;
 	}
 	//================================================================================================================================
-
 	//================================================================================================================================
 	// =================================================== END BUILD TREE VIEW ========================================================
 }

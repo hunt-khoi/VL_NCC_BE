@@ -50,8 +50,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 				//Validators.email,
 				Validators.minLength(3),
 				Validators.maxLength(320) 
-			])
-			]
+			])]
 		});
 	}
 
@@ -74,7 +73,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 		if (objectPath.get(controls, 'password.errors.required')) {
 			this.error_txt.password = this.translate.instant('AUTH.VALIDATION.REQUIRED', { name: this.translate.instant('AUTH.INPUT.PASSWORD') });
 		}
-
 		if (objectPath.get(controls, 'password.errors.minlength.requiredLength')) {
 			this.error_txt.password = this.translate.instant('AUTH.VALIDATION.MIN_LENGTH_FIELD', { name: this.translate.instant('AUTH.INPUT.PASSWORD') })+ " 3 ký tự";
 		}

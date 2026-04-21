@@ -1,9 +1,7 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { NguoiDungDPSService } from '../Services/nguoi-dung-dps.service';
 import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
@@ -15,36 +13,32 @@ import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
 })
 
 export class NguoiDungDPSImportComponent implements OnInit, OnDestroy {
-	
 	// Public properties
-	@ViewChild('fileUpload', { static: true }) fileUpload;
-	NguoiDungDPS: NguoiDungDPSModel;
-	itemForm: FormGroup;
+	@ViewChild('fileUpload', { static: true }) fileUpload: any;
+	NguoiDungDPS: NguoiDungDPSModel = new NguoiDungDPSModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
-
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
-
+	loading$: Observable<boolean> | undefined;
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 	_soLanImport: number = 0;
 	_dataImport: any[] = [];
 	HTMLStr:string='';
-	isZoomSize: boolean = false;
 	disabledBtn: boolean = false;
-	private componentSubscriptions: Subscription;
+	private componentSubscriptions: Subscription | undefined;
 
 	constructor(
 		public dialogRef: MatDialogRef<NguoiDungDPSImportComponent>,
-		private NguoiDungDPSFB: FormBuilder,
+		private itemFB: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private NguoiDungDPSsService: NguoiDungDPSService) {}
+		private apiService: NguoiDungDPSService) {}
 
 	ngOnInit() {
 		this.viewLoading = false;
-		this.NguoiDungDPSsService.data_import.subscribe(res => {
+		this.apiService.data_import.subscribe(res => {
 			this._dataImport = [...res];
 		});
 		this.createForm();
@@ -54,71 +48,75 @@ export class NguoiDungDPSImportComponent implements OnInit, OnDestroy {
 		if (this.componentSubscriptions) {
 			this.componentSubscriptions.unsubscribe();
 		}
-		this.NguoiDungDPSsService.data_import.next([]);
+		this.apiService.data_import.next([]);
 	}
 
 	createForm() {
-		this.itemForm = this.NguoiDungDPSFB.group({
+		this.itemForm = this.itemFB.group({
 			FileDuLieu: [''],
 			ErrorMessage: [''],
 		});
 	}
 
-	isControlInvalid(controlName: string): boolean {
-		const control = this.itemForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
-	}
-
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
-	numberOnly(event): boolean {
+	numberOnly(event: any): boolean {
 		const charCode = (event.which) ? event.which : event.keyCode;
 		if (charCode > 31 && (charCode < 48 || charCode > 57)) {
 			return false;
 		}
 		return true;
 	}
+
 	closeDialog() {
 		this.dialogRef.close(this.isChange); 
 	}
+
 	selectFile() {
+		if (!this.itemForm) return;
 		this.itemForm.controls['ErrorMessage'].setValue('');
-		let el: HTMLElement = this.fileUpload.nativeElement as HTMLElement;
-		el["type"] = "text";
-		el["type"] = "file";
+		let el: HTMLInputElement = this.fileUpload.nativeElement as HTMLInputElement;
+		el.type = "text";
+		el.type = "file";
 		el.click();
 	}
+
 	FileSelected(evt: any) {
+		if (!this.itemForm) return;
 		if (evt.target.files && evt.target.files.length) {//Nếu có file
 			let file = evt.target.files[0]; // Ví dụ chỉ lấy file đầu tiên
 			let fileName = file.name;
-
 			var res = fileName.match(/.xls$|.xlsx$/g);
-			if (res) {
-				if (!res["includes"]('.xlsx') && !res["includes"]('.xls')) {
-					this.layoutUtilsService.showError('File không hợp lệ.');
-					return;
-				}
-				else {
-					this.itemForm.controls['FileDuLieu'].patchValue(fileName); // Set value cho control dùng để validate (trường hợp base64)
-					this.DocDuLieu();
-				}
-			}
-			else {
+			if (!res) {
 				this.layoutUtilsService.showError('File không hợp lệ');
 				return;
 			}
+			if (!res["includes"]('.xlsx') && !res["includes"]('.xls')) {
+				this.layoutUtilsService.showError('File không hợp lệ.');
+				return;
+			}
+			else {
+				this.itemForm.controls['FileDuLieu'].patchValue(fileName); // Set value cho control dùng để validate (trường hợp base64)
+				this.DocDuLieu();
+			}
 		}
-		else {//Không có file
+		else { //Không có file
 			this.itemForm.controls['FileDuLieu'].patchValue('');
 		}
 	}
 
 	checkDataIsValid(): boolean {
-		let p = document.getElementById("fileUploadExcel");
-		return this.itemForm.controls['FileDuLieu'] && this.itemForm.controls['FileDuLieu'].valid && (p ? (p["type"] == 'file' ? p["files"]["length"] > 0 : false) : false);
+		if (!this.itemForm) return false;
+		// Kiểm tra Form Control 'FileDuLieu' có tồn tại và hợp lệ không
+		const fileControl = this.itemForm.controls['FileDuLieu'];
+		const isControlValid = fileControl && fileControl.valid;
+		// Kiểm tra thẻ input HTML xem đã có file được chọn chưa
+		const fileInput = document.getElementById("fileUploadExcel") as HTMLInputElement;
+		let hasSelectedFile = false;
+		if (fileInput && fileInput.type === 'file') {
+			if (fileInput.files && fileInput.files.length > 0) {
+				hasSelectedFile = true;
+			}
+		}
+		return isControlValid && hasSelectedFile;
 	}
 
 	DocDuLieu() {
@@ -128,15 +126,16 @@ export class NguoiDungDPSImportComponent implements OnInit, OnDestroy {
 	}
 
 	Importfile() {
+		if (!this.itemForm) return;
 		let el: any = this.fileUpload.nativeElement;
-		var service = this.NguoiDungDPSsService;
+		var service = this.apiService;
 		var useBase64: boolean = true;
 		for (var idx = 0; idx < el.files.length; idx++) {
 			if (useBase64) {
 				var fileName = el.files[idx].name;
 				let reader = new FileReader();
-				var a=this.itemForm.controls['FileDuLieu'];
-				var b=this.itemForm.controls['ErrorMessage'];
+				var a = this.itemForm.controls['FileDuLieu'];
+				var b = this.itemForm.controls['ErrorMessage'];
 				reader.readAsDataURL(el.files[idx]);
 				reader.onload = function () {
 					let base64Str = reader.result as String;
@@ -154,7 +153,6 @@ export class NguoiDungDPSImportComponent implements OnInit, OnDestroy {
 						else {
 							// service.lastFilterDSExcel$.next([]);
 							// service.lastFilterInfoExcel$.next(undefined);
-
 							a.setValue('');
 							b.setValue(res.error.message);
 							return;
@@ -168,33 +166,33 @@ export class NguoiDungDPSImportComponent implements OnInit, OnDestroy {
 			}
 		}
 	}
+
 	luuImport() {
-		if (this._dataImport.length > 0) {
-			this.NguoiDungDPSsService.importFile(this._dataImport).subscribe(res => {
-				if (res && res.status == 1) {
-					this.isChange = true;
-					this.itemForm.controls['FileDuLieu'].setValue('');
-					this.itemForm.controls['ErrorMessage'].setValue('');
-					this._dataImport = [];
-					this.layoutUtilsService.showInfo('Import thành công!');
-					this.dialogRef.close(this.isChange);
-				}
-				else {
-					this.itemForm.controls['FileDuLieu'].setValue('');
-					this.itemForm.controls['ErrorMessage'].setValue('');
-					this._dataImport = [];
-					this.layoutUtilsService.showError('Import thất bại, vui lòng kiểm tra lại file excel!');
-				}
-			});
-		}
-		else {
+		if (this._dataImport.length <= 0) {
 			this.layoutUtilsService.showError('Không có dữ liệu để import hoặc dữ liệu sai, vui lòng kiểm tra lại!');
 			return;
 		}
+		this.apiService.importFile(this._dataImport).subscribe(res => {
+			if (!this.itemForm) return;
+			if (res && res.status == 1) {
+				this.isChange = true;
+				this.itemForm.controls['FileDuLieu'].setValue('');
+				this.itemForm.controls['ErrorMessage'].setValue('');
+				this._dataImport = [];
+				this.layoutUtilsService.showInfo('Import thành công!');
+				this.dialogRef.close(this.isChange);
+			}
+			else {
+				this.itemForm.controls['FileDuLieu'].setValue('');
+				this.itemForm.controls['ErrorMessage'].setValue('');
+				this._dataImport = [];
+				this.layoutUtilsService.showError('Import thất bại, vui lòng kiểm tra lại file excel!');
+			}
+		});
 	}
 
 	ImportFileMau() {
-		this.NguoiDungDPSsService.downloadTemplate().subscribe(response => {
+		this.apiService.downloadTemplate().subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

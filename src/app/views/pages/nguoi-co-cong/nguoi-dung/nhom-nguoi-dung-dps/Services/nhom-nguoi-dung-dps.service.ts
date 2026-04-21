@@ -11,11 +11,8 @@ const API_ROOT_URL = environment.ApiRoot + '/nhom-nguoi-dung';
 @Injectable()
 export class NhomNguoiDungDPSService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	ReadOnlyControl: boolean;
+	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient,
 		private httpUtils: HttpUtilsService) { }
 
@@ -23,35 +20,41 @@ export class NhomNguoiDungDPSService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
 		return this.http.get<any>(API_ROOT_URL + '/list', { headers: httpHeaders, params: httpParams });
-
 	}
-	getNhomNguoiDungDPSById(itemId: any): Observable<any> {
+
+	getById(itemId: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(API_ROOT_URL + `/detail?id=${itemId}`, { headers: httpHeaders });
 	}
-	deleteNhomNguoiDungDPS(itemId: any): Observable<any> {
+
+	delete(itemId: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_ROOT_URL}/delete?id=${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
+
 	lock(itemId: any, islock: boolean): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_ROOT_URL}/lock?id=${itemId}&islock=${islock}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	createNhomNguoiDungDPS(item: any): Observable<any> {
+
+	create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<NhomNguoiDungDPSModel>(API_ROOT_URL + '/create', item, { headers: httpHeaders });
 	}
-	updateNhomNguoiDungDPS(item: any): Observable<any> {
+
+	update(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<NhomNguoiDungDPSModel>(API_ROOT_URL + '/update', item, { headers: httpHeaders });
 	}
-	uploadFileNhomNguoiDungDPS(data: any): Observable<any> {
+
+	uploadFile(data: any): Observable<any> {
 		const url = API_ROOT_URL + '';
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(url, data, { headers: httpHeaders });
 	}
+
 	updateQuyen(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<NhomNguoiDungDPSModel>(API_ROOT_URL + '/update-quyen', item, { headers: httpHeaders });

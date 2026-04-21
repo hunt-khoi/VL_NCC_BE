@@ -11,13 +11,10 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 @Injectable()
 export class NguoiDungDPSComponent implements OnInit {
 
-  constructor(
-		private nguoiDungDPSService : NguoiDungDPSService
-	) {}
+  constructor(private apiService : NguoiDungDPSService) { }
 
   ngOnInit() {
-    if (this.nguoiDungDPSService != undefined)
-		this.nguoiDungDPSService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'FullName', 0, 10));
+    if (this.apiService)
+		  this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'FullName', 0, 10));
   }
-
 }

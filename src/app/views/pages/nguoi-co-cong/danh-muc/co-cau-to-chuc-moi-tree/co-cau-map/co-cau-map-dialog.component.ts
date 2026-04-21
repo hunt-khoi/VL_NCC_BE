@@ -1,16 +1,15 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { cocautochucMoiTreeService } from '../Services/co-cau-to-chuc-moi-tree.service';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
 
 export class TodoItemNode {
 	children?: TodoItemNode[];
-	item: string;
+	item: string = "";
 	selected?: boolean;
 	value?: any;
 	data?: any;
@@ -32,53 +31,21 @@ export class CoCauMapDialogComponent implements OnInit {
 	_NAME = '';
 	lstNhomLoaiDoiTuongNCC: any[] = [];
 	lstConstLoaiHoSo: any[] = [];
-	treeControl: NestedTreeControl<TodoItemNode>;
-	dataSource: ArrayDataSource<TodoItemNode>;
+	treeControl: NestedTreeControl<TodoItemNode> | undefined;
+	dataSource: ArrayDataSource<TodoItemNode> | undefined;
 
 	hasChild = (_: number, node: TodoItemNode) => !!node.children && node.children.length > 0;
-
-	TREE_DATA: TodoItemNode[] = [
-		//{
-		//	item: 'Fruit',
-		//	value: 1,
-		//	children: [
-		//		{ item: 'Apple', value: 11, selected: true },
-		//		{ item: 'Banana', value: 12 },
-		//		{ item: 'Fruit loops', value: 13 },
-		//	]
-		//}, {
-		//	item: 'Vegetables',
-		//	value: 2,
-		//	children: [
-		//		{
-		//			item: 'Green',
-		//			value: 21,
-		//			children: [
-		//				{ item: 'Broccoli', value: 211, selected: true },
-		//				{ item: 'Brussels sprouts', value: 212 },
-		//			]
-		//		}, {
-		//			item: 'Orange',
-		//			value: 22,
-		//			children: [
-		//				{ item: 'Pumpkins', value: 211, selected: true },
-		//				{ item: 'Carrots', value: 212, selected: true },
-		//			]
-		//		},
-		//	]
-		//},
-	];
+	TREE_DATA: TodoItemNode[] = [];
 	/** The selection for checklist */
 	checklistSelection = new SelectionModel<TodoItemNode>(true /* multiple */);
+	selected: number[] = [];
 
 	constructor(
 		public dialogRef: MatDialogRef<CoCauMapDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private fb: FormBuilder,
 		private danhMucService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private service: cocautochucMoiTreeService,
 		private translate: TranslateService) {
 	}
@@ -108,7 +75,9 @@ export class CoCauMapDialogComponent implements OnInit {
 		});
 
 	}
-	bindSelection(parent: TodoItemNode, nodes: TodoItemNode[]) {
+
+	bindSelection(parent: TodoItemNode | null, nodes: TodoItemNode[] = []) {
+		if (!nodes || !this.treeControl) return;
 		for (var i = 0; i < nodes.length; i++) {
 			if (nodes[i].selected) {
 				this.todoLeafItemSelectionToggle(nodes[i]);
@@ -122,8 +91,10 @@ export class CoCauMapDialogComponent implements OnInit {
 			}
 		}
 	}
+
 	/** Whether all the descendants of the node are selected. */
 	descendantsAllSelected(node: TodoItemNode): boolean {
+		if (!this.treeControl) return false;
 		const descendants = this.treeControl.getDescendants(node);
 		const descAllSelected = descendants.every(child =>
 			this.checklistSelection.isSelected(child)
@@ -133,6 +104,7 @@ export class CoCauMapDialogComponent implements OnInit {
 
 	/** Whether part of the descendants are selected */
 	descendantsPartiallySelected(node: TodoItemNode): boolean {
+		if (!this.treeControl) return false;
 		const descendants = this.treeControl.getDescendants(node);
 		const result = descendants.some(child => this.checklistSelection.isSelected(child));
 		return result && !this.descendantsAllSelected(node);
@@ -141,6 +113,7 @@ export class CoCauMapDialogComponent implements OnInit {
 	/** Toggle the to-do item selection. Select/deselect all the descendants node */
 	todoItemSelectionToggle(node: TodoItemNode): void {
 		this.checklistSelection.toggle(node);
+		if (!this.treeControl) return;
 		const descendants = this.treeControl.getDescendants(node);
 		this.checklistSelection.isSelected(node)
 			? this.checklistSelection.select(...descendants)
@@ -171,6 +144,7 @@ export class CoCauMapDialogComponent implements OnInit {
 
 	/** Check root node checked state and change it accordingly */
 	checkRootNodeSelection(node: TodoItemNode): void {
+		if (!this.treeControl) return;
 		const nodeSelected = this.checklistSelection.isSelected(node);
 		const descendants = this.treeControl.getDescendants(node);
 		const descAllSelected = descendants.every(child =>
@@ -188,26 +162,34 @@ export class CoCauMapDialogComponent implements OnInit {
 		return this.getParent(node, arr);
 	}
 
-	getParent(node: TodoItemNode, nodes: TodoItemNode[]) {
-		if (nodes) {
-			for (var i = 0; i < nodes.length; i++) {
-				if (nodes[i].children) {
-					var index = nodes[i].children.indexOf(node);
-					if (index >= 0) {
-						return nodes[i];
-					}
-					var result = this.getParent(node, nodes[i].children);
-					if (result)
-						return result;
+	getParent(node: TodoItemNode, nodes: TodoItemNode[] = []): any {
+		if (!nodes) return null;
+		for (var i = 0; i < nodes.length; i++) {
+			var currentData = nodes[i].children;
+			if (currentData) {
+				var index = currentData.indexOf(node);
+				if (index >= 0) {
+					return nodes[i];
 				}
+				var result = this.getParent(node, currentData);
+				if (result)
+					return result;
 			}
 		}
-		return null;
 	}
 
 	selectedChange(node: TodoItemNode) {
-	}
-	checkedChange($event, node: TodoItemNode) {
+		if (node.value) {
+			var i = this.selected.indexOf(node.value);
+			if (this.checklistSelection.isSelected(node)) {
+				if (i < 0)
+					this.selected.push(node.value);
+			}
+			else {
+				if (i >= 0)
+					this.selected.splice(i, 1);
+			}
+		}
 	}
 	
 	/** UI */
@@ -219,20 +201,22 @@ export class CoCauMapDialogComponent implements OnInit {
 	prepareCustomer(): any {
 		let indetermine: any[] = [];
 		this.TREE_DATA.forEach(t => {
-			if (this.descendantsPartiallySelected(t)) {
+			if (this.descendantsPartiallySelected(t)) 
 				indetermine.push(t.data);
-			}
-			t.children.forEach(h => {
-				if (this.descendantsPartiallySelected(h)) {
-					indetermine.push(h.data);
-				}
-			})
+
+			if (t.children)
+				t.children.forEach(h => {
+					if (this.descendantsPartiallySelected(h)) {
+						indetermine.push(h.data);
+					}
+				})
 		})
 		let re = this.checklistSelection.selected.map(x => x.data);
 		re = re.concat(indetermine);
 		return re;
 	}
-	onSubmit(withBack: boolean = false) {
+
+	onSubmit() {
 		const data = this.prepareCustomer();
 		this.service.map(data).subscribe(res => {
 			if (res && res.status == 1) {
@@ -242,9 +226,7 @@ export class CoCauMapDialogComponent implements OnInit {
 			}
 		})
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close();
 	}
