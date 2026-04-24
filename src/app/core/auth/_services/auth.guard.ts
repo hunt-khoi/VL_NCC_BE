@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { select, Store } from '@ngrx/store';
-import { AppState } from '../../../core/reducers/';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../reducers';
+import { TokenStorage } from './token-storage.service';
 import * as jwt_decode from 'jwt-decode';
-import { TokenStorage } from '../_services/token-storage.service';
 import { environment } from '../../../../environments/environment';
 
 @Injectable()
@@ -30,15 +30,13 @@ export class AuthGuard implements CanActivate {
 	}
 
 	getToken(): string {
-		return localStorage.getItem(environment.authTokenKey);
+		return localStorage.getItem(environment.authTokenKey) || '';
 	}
 
-	getTokenExpirationDate(token: string): Date {
-		// token = atob(token);
+	getTokenExpirationDate(token: string): Date | null {
 		const decoded = jwt_decode(token);
-
-		if (decoded.exp === undefined) return null;
-
+		if (decoded.exp === undefined) 
+			return null;
 		const date = new Date(0);
 		date.setUTCSeconds(decoded.exp);
 		return date;
@@ -47,20 +45,8 @@ export class AuthGuard implements CanActivate {
 	isTokenExpired(token?: string): boolean {
 		if (!token) token = this.getToken();
 		if (!token) return false;
-
 		const date = this.getTokenExpirationDate(token);
-		if (date === undefined) return false;
+		if (!date) return false;
 		return (date.valueOf() > new Date().valueOf());
 	}
-	//canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean>  {
-	//       return this.store
-	//           .pipe(
-	//               select(isLoggedIn),
-	//               tap(loggedIn => {
-	//                   if (!loggedIn) {
-	//                       this.router.navigateByUrl('/auth/login');
-	//                   }
-	//               })
-	//           );
-	//   }
 }

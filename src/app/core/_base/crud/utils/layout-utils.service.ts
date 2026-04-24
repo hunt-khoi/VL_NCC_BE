@@ -1,11 +1,8 @@
-// Angular
 import { Injectable } from '@angular/core';
 import { MatSnackBar, MatDialog } from '@angular/material';
-// Partials for CRUD
-import { ActionNotificationComponent,
-	DeleteEntityDialogComponent,
-	FetchEntityDialogComponent,
-	UpdateStatusDialogComponent
+import { 
+	ActionNotificationComponent,
+	DeleteEntityDialogComponent
 } from '../../../../views/partials/content/crud';
 
 export enum MessageType {
@@ -17,14 +14,8 @@ export enum MessageType {
 
 @Injectable()
 export class LayoutUtilsService {
-	/**
-	 * Service constructor
-	 *
-	 * @param snackBar: MatSnackBar
-	 * @param dialog: MatDialog
-	 */
-	constructor(private snackBar: MatSnackBar,
-		           private dialog: MatDialog) { }
+
+	constructor(private snackBar: MatSnackBar, private dialog: MatDialog) { }
 
 	/**
 	 * Showing (Mat-Snackbar) Notification
@@ -68,9 +59,7 @@ export class LayoutUtilsService {
 	 *
 	 * @param message: string
 	 */
-	showInfo(
-		_message: string,
-	) {
+	showInfo(_message: string) {
 		let _type: MessageType = MessageType.Read;
 		let _duration: number = 3000;
 		let _showCloseButton: boolean = true;
@@ -98,9 +87,7 @@ export class LayoutUtilsService {
 	 *
 	 * @param message: string
 	 */
-	showError(
-		_message: string,
-	) {
+	showError(_message: string) {
 		let _type: MessageType = MessageType.Read;
 		let _duration: number = 0;
 		let _showCloseButton: boolean = true;
@@ -132,45 +119,21 @@ export class LayoutUtilsService {
 	 * @param description: stirng
 	 * @param waitDesciption: string
 	 */
-	deleteElement(title: string = '', description: string = '', waitDesciption: string = '', NameButton:string='Đồng ý', CancelButton:string="Không") {
+	deleteElement(title: string = '', description: string = '', waitDesciption: string = '', 
+		NameButton: string = "Đồng ý", CancelButton: string = "Không") {
 		return this.dialog.open(DeleteEntityDialogComponent, {
 			data: { title, description, waitDesciption, NameButton, CancelButton },
 			width: '440px'
 		});
 	}
 
-	/**
-	 * Showing Fetching Window(Mat-Dialog)
-	 *
-	 * @param _data: any
-	 */
-	fetchElements(_data) {
-		return this.dialog.open(FetchEntityDialogComponent, {
-			data: _data,
-			width: '400px'
-		});
-	}
-
-	/**
-	 * Showing Update Status for Entites Window
-	 *
-	 * @param title: string
-	 * @param statuses: string[]
-	 * @param messages: string[]
-	 */
-	updateStatusForEntities(title, statuses, messages) {
-		return this.dialog.open(UpdateStatusDialogComponent, {
-			data: { title, statuses, messages },
-			width: '480px'
-		});
-	}
-	menuSelectColumns_On_Off(type: 0 | 1 = 0) {
+	menuSelectColumns_On_Off() {
 		let v, p, _className, _style;
 		v = document.querySelector("body[m-root]");
 		p = document.querySelector("m-pages");
 		if (v && p) {
 			_className = "no-overflow";
-			_style = v.attributes["style"].nodeValue;
+			_style = v.getAttribute("style") || "";
 			_style = _style.replace(/--scrollwidth.*\;/g, "");
 			if (v.classList.contains(_className)) {
 				//q.setAttribute("style", "--scrollwidth:0px");
@@ -178,7 +141,7 @@ export class LayoutUtilsService {
 				v.classList.remove(_className);
 			}
 			else {
-				_style = "--scrollwidth:" + (window.innerWidth - v["offsetWidth"]) + "px;" + _style
+				_style = "--scrollwidth:" + (window.innerWidth - (v as HTMLElement).offsetWidth) + "px;" + _style
 				v.classList.add(_className);
 			}
 			v.setAttribute("style", _style);

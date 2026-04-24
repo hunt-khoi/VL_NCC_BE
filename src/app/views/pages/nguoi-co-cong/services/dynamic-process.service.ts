@@ -10,8 +10,8 @@ const API_ROOT_URL = environment.ApiRoot + '/step';
 export class DynamicProcessService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 	ReadOnlyControl: boolean = false;
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) { }
+
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	detail(id: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();

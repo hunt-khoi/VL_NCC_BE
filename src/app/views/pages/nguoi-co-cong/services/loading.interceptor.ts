@@ -14,8 +14,7 @@ import { LoadingService, LoadingOverlayRef } from './loading.service';
 
 @Injectable()
 export class LoadingInterceptor implements HttpInterceptor {
-	constructor(private loadingService: LoadingService) {
-	}
+	constructor(private loadingService: LoadingService) { }
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 		let loadingRef: LoadingOverlayRef;
@@ -30,9 +29,8 @@ export class LoadingInterceptor implements HttpInterceptor {
 				loadingRef.close();
 			}
 		}).catch(error => {
-			if (loadingRef) {
+			if (loadingRef) 
 				loadingRef.close();
-			}
 			return Observable.throw(error);
 		});
 	}

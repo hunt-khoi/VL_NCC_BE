@@ -3,7 +3,6 @@ import { TranslateService } from '@ngx-translate/core';
 
 export interface Locale {
 	lang: string;
-	// tslint:disable-next-line:ban-types
 	data: Object;
 }
 
@@ -13,11 +12,6 @@ export interface Locale {
 export class TranslationService {
 	private langIds: any = [];
 
-	/**
-	 * Service Constructor
-	 *
-	 * @param translate: TranslateService
-	 */
 	constructor(private translate: TranslateService) {
 		// add new langIds to the list
 		this.translate.addLangs(['vi']);
@@ -36,7 +30,6 @@ export class TranslationService {
 			// use setTranslation() with the third argument set to true
 			// to append translations instead of replacing them
 			this.translate.setTranslation(locale.lang, locale.data, true);
-
 			this.langIds.push(locale.lang);
 		});
 		// add new languages to the list

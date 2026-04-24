@@ -62,7 +62,7 @@ import { MY_FORMATS_EDIT } from './datepicker';
 import { DropdownTreeModule, DatetimePickerModule, ImageControlModule, DynamicComponentModule } from 'dps-lib';//,
 
 //Share
-import { ActionNotificationComponent, DeleteEntityDialogComponent, FetchEntityDialogComponent, UpdateStatusDialogComponent, AlertComponent } from '../../partials/content/crud';
+import { ActionNotificationComponent, DeleteEntityDialogComponent, AlertComponent } from '../../partials/content/crud';
 import { CommonService } from './services/common.service';
 import { CustomMatPaginatorIntl } from './custom-mat-pagination-int';
 import { MatTreeModule } from '@angular/material/tree';
@@ -71,7 +71,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { NgxPrintModule } from 'ngx-print';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 import { TableService } from '../../partials/table/table.service';
-import { ColumnFilterComponent, ColumnOptionComponent } from '../../partials/table';
+import { ColumnFilterComponent, ColumnOptionComponent, ChipFilterComponent } from '../../partials/table';
 import {
 	ChonDonViComponent,
 	ChonNhieuDonViComponent,
@@ -218,6 +218,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 	declarations: [
 		ColumnFilterComponent,
 		ColumnOptionComponent,
+		ChipFilterComponent,
 		ChonDonViComponent,
 		ChonNhieuDonViComponent,
 		ChonVaiTroComponent,
@@ -253,11 +254,10 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 	entryComponents: [
 		ActionNotificationComponent,
 		DeleteEntityDialogComponent,
-		UpdateStatusDialogComponent,
-		FetchEntityDialogComponent,
 		AlertComponent,
 		ColumnFilterComponent,
 		ColumnOptionComponent,
+		ChipFilterComponent,
 		ChonDonViComponent,
 		ChonNhieuDonViComponent,
 		ChonVaiTroComponent,
@@ -341,11 +341,10 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
 		ActionNotificationComponent,
 		DeleteEntityDialogComponent,
-		UpdateStatusDialogComponent,
-		FetchEntityDialogComponent,
 		AlertComponent,
 		ColumnFilterComponent,
 		ColumnOptionComponent,
+		ChipFilterComponent,
 		ChonDonViComponent,
 		ChonNhieuDonViComponent,
 		ChonVaiTroComponent,

@@ -10,9 +10,6 @@ export class MenuConfigService {
 	onConfigUpdated$: Subject<any>;
 	private menuConfig: any;
 
-	/**
-	 * Service Constructor
-	 */
 	constructor(private http: HttpClient) {
 		// register on config changed event and set default config
 		this.onConfigUpdated$ = new Subject();

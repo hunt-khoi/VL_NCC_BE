@@ -14,12 +14,8 @@ export class TimeElapsedPipe implements PipeTransform, OnDestroy {
 	 */
 	constructor(
 		private changeDetectorRef: ChangeDetectorRef,
-		private ngZone: NgZone
-	) { }
+		private ngZone: NgZone) { }
 
-	/**
-	 * On destroy
-	 */
 	ngOnDestroy(): void {
 		this.removeTimer();
 	}

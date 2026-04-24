@@ -14,23 +14,12 @@ export interface HeaderOptions {
 export class HeaderDirective implements AfterViewInit {
 	@Input() options: HeaderOptions = {};
 
-	/**
-	 * Directive Constructor
-	 * @param el: ElementRef
-	 */
 	constructor(private el: ElementRef) { }
 
-	/**
-	 * After view init
-	 */
 	ngAfterViewInit(): void {
 		this.setupOptions();
-		// const header = new KTHeader(this.el.nativeElement, this.options);
 	}
 
-	/**
-	 * Setup options to header
-	 */
 	private setupOptions() {
 		this.options = {
 			classic: {

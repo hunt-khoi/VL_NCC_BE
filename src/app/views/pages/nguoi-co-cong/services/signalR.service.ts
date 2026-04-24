@@ -18,7 +18,7 @@ export class SignalRService {
 	
 	constructor(
 		private tokenStorage: TokenStorage) {
-		this.notifyReceived = new EventEmitter <ThongBaoModel[]>();
+		this.notifyReceived = new EventEmitter<ThongBaoModel[]>();
 		this.connectToken();
 		connection.onclose(() => {
 			setTimeout(r => {
@@ -44,18 +44,6 @@ export class SignalRService {
 		connection.on("recieveMessaged", (data: any) => {
 			this.notifyReceived.emit(data);
 		});
-	}
-
-	ReceiveThongBao() {
-		var _token = '';
-		var _userID = -1;
-		this.tokenStorage.getAccessToken().subscribe(t => { _token = t; });
-		this.tokenStorage.getUserInfo().subscribe(user => {
-			_userID = user.id;
-		})
-		let infoTokenCon = { "Token": _token, "UserID": _userID, "Value": this.message };
-		connection.send("getListNotify", JSON.stringify(infoTokenCon))
-			.then(() => this.message = "");
 	}
 
 	reconnectToken(): void {
@@ -84,10 +72,22 @@ export class SignalRService {
 		let infoTokenCon = { "Token": _token, "UserID": _userID };
 		connection.invoke("onDisconnectToken", JSON.stringify(infoTokenCon));
 	}
+
+	ReceiveThongBao() {
+		var _token = '';
+		var _userID = -1;
+		this.tokenStorage.getAccessToken().subscribe(t => { _token = t; });
+		this.tokenStorage.getUserInfo().subscribe(user => {
+			_userID = user.id;
+		})
+		let infoTokenCon = { "Token": _token, "UserID": _userID, "Value": this.message };
+		connection.send("getListNotify", JSON.stringify(infoTokenCon))
+			.then(() => this.message = "");
+	}
+
 	keyup(e: any) {
-		if (e.keyCode === 13) {
+		if (e.keyCode === 13) 
 			this.send();
-		}
 	}
 	send() {
 		var _token = '';

@@ -1,6 +1,6 @@
 import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
-import { Chart } from 'chart.js/dist/Chart.min.js';
 import { LayoutConfigService } from '../../layout/services/layout-config.service';
+import { Chart } from 'chart.js/dist/Chart.min.js';
 
 export interface SparklineChartOptions {
 	// array of numbers
@@ -18,39 +18,18 @@ export interface SparklineChartOptions {
 	exportAs: 'ktSparklineChart'
 })
 export class SparklineChartDirective implements AfterViewInit {
-	// Public properties
 	@Input() options: SparklineChartOptions | undefined;
-	// Private properties
 	private chart: Chart;
 
-	/**
-	 * Directive Constructor
-	 *
-	 * @param el: ElementRef
-	 * @param layoutConfigService: LayoutConfigService
-	 */
 	constructor(private el: ElementRef, private layoutConfigService: LayoutConfigService) { }
 
-	/**
-	 * After view init
-	 */
 	ngAfterViewInit(): void {
 		if (this.options)
 			this.initChart(this.el.nativeElement, this.options.data, this.options.color, this.options.border, this.options.fill, this.options.tooltip);
 	}
 
-	/**
-	 * Init chart
-	 * @param src: any
-	 * @param data: any
-	 * @param color: any
-	 * @param border: any
-	 * @param fill: any
-	 * @param tooltip: any
-	 */
 	initChart(src: any, data: any, color: any, border: any, fill: any, tooltip: any) {
 		if (src.length === 0) return;
-		
 		// set default values
 		fill = (typeof fill !== 'undefined') ? fill : false;
 		tooltip = (typeof tooltip !== 'undefined') ? tooltip : false;
@@ -63,7 +42,6 @@ export class SparklineChartDirective implements AfterViewInit {
 					label: '',
 					borderColor: color,
 					borderWidth: border,
-
 					pointHoverRadius: 4,
 					pointHoverBorderWidth: 12,
 					pointBackgroundColor: Chart.helpers.color('#000000').alpha(0).rgbString(),
@@ -118,14 +96,12 @@ export class SparklineChartDirective implements AfterViewInit {
 						}
 					}]
 				},
-
 				elements: {
 					point: {
 						radius: 4,
 						borderWidth: 12
 					},
 				},
-
 				layout: {
 					padding: {
 						left: 0,
@@ -139,9 +115,6 @@ export class SparklineChartDirective implements AfterViewInit {
 		this.chart = new Chart(src, config);
 	}
 
-	/**
-	 * Returns the chart
-	 */
 	getChart() {
 		return this.chart;
 	}

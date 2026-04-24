@@ -14,8 +14,7 @@ export class PermissionUrl implements CanActivate, CanActivateChild, CanLoad {
 	constructor(private router: Router,
 		private tokenStorage: TokenStorage,
 		private per: UserProfileService,
-		private snackBar: MatSnackBar
-	) { }
+		private snackBar: MatSnackBar) { }
 
 	canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 		throw new Error("Method not implemented.");
@@ -55,10 +54,8 @@ export class PermissionUrl implements CanActivate, CanActivateChild, CanLoad {
 			.catch(() => false);
 
 		this.permissionCache.set(urlKey, re);
-
-		if (!re) {
+		if (!re) 
 			this.router.navigate(['/error/403'], { queryParams: { url: state.url } });
-		}
 		return re;
 	}
 }

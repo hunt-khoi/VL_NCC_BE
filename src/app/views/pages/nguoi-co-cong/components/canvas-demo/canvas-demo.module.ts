@@ -14,7 +14,7 @@ import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
 import { CanvasDemoComponent } from './canvas-demo.component';
 import { CanvasDemoService } from './canvas-demo.service';
 import { TypesUtilsService, LayoutUtilsService, HttpUtilsService, InterceptService } from '../../../../../../../src/app/core/_base/crud';
-import { DeleteEntityDialogComponent, UpdateStatusDialogComponent, ActionNotificationComponent } from '../../../../../../../src/app/views/partials/content/crud';
+import { DeleteEntityDialogComponent, ActionNotificationComponent } from '../../../../../../../src/app/views/partials/content/crud';
 import { CanvasDemoDialogComponent } from './canvas-demo-dialog.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -73,7 +73,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 	],
 	entryComponents: [
 		DeleteEntityDialogComponent,
-		UpdateStatusDialogComponent,
 		ActionNotificationComponent,
 		CanvasDemoDialogComponent
 	],

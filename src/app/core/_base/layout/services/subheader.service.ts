@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import * as objectPath from 'object-path';
-// Services
 import { PageConfigService } from './page-config.service';
 import { MenuConfigService } from './menu-config.service';
+import objectPath from 'object-path';
 
 export interface Breadcrumb {
 	title: string;
@@ -23,7 +22,6 @@ export class SubheaderService {
 	title$: BehaviorSubject<BreadcrumbTitle> = new BehaviorSubject<BreadcrumbTitle>({title: '', desc: ''});
 	breadcrumbs$: BehaviorSubject<Breadcrumb[]> = new BehaviorSubject<Breadcrumb[]>([]);
 	disabled$: Subject<boolean> = new Subject<boolean>();
-
 	// Private properties
 	private manualBreadcrumbs: any = {};
 	private appendingBreadcrumbs: any = {};
@@ -32,13 +30,6 @@ export class SubheaderService {
 	private headerMenus: any;
 	private pageConfig: any;
 
-	/**
-	 * Service Constructor
-	 *
-	 * @param router: Router
-	 * @param pageConfigService: PageConfigServie
-	 * @param menuConfigService: MenuConfigService
-	 */
 	constructor(
 		private router: Router,
 		private pageConfigService: PageConfigService,
@@ -54,7 +45,8 @@ export class SubheaderService {
 
 			if (objectPath.get(this.manualTitle, this.router.url)) {
 				this.setTitle(this.manualTitle[this.router.url]);
-			} else {
+			} 
+			else {
 				// get updated page title on every route changed
 				this.title$.next(objectPath.get(this.pageConfig, 'page'));
 				// subheader enable/disable
@@ -160,7 +152,6 @@ export class SubheaderService {
 		const path: any[] = [];
 		let found = false;
 		const search = (haystack: any) => {
-			// tslint:disable-next-line:forin
 			for (const key in haystack) {
 				path.push(key);
 				if (haystack[key] === value) {

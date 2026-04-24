@@ -6,13 +6,9 @@ import { LayoutConfigModel } from '../models/layout-config.model';
 
 @Injectable()
 export class LayoutConfigService {
-	// Public properties
 	onConfigUpdated$: Subject<LayoutConfigModel>;
 	layoutConfig: LayoutConfigModel | undefined;
 
-	/**
-	 * Servcie constructor
-	 */
 	constructor() {
 		// register on config changed event and set default config
 		this.onConfigUpdated$ = new Subject();
@@ -84,7 +80,6 @@ export class LayoutConfigService {
 		const menuAsideLeftSkin = objectPath.get(this.layoutConfig, 'brand.self.skin');
 		// set brand logo
 		const logoObject = objectPath.get(this.layoutConfig, 'self.logo');
-
 		let logo;
 		if (typeof logoObject === 'string') {
 			logo = logoObject;

@@ -2,7 +2,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatProgressBarModule, MatProgressSpinnerModule } from '@angular/material';
-
 // Module
 import { CoreModule } from '../../../../../core/core.module';
 // Portlet
@@ -31,5 +30,5 @@ import { PortletFooterComponent } from './portlet-footer.component';
 		PortletFooterComponent,
 	]
 })
-export class PortletModule {
-}
+
+export class PortletModule { }

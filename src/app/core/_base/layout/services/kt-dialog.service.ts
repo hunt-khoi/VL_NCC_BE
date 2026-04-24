@@ -6,7 +6,6 @@ export class KtDialogService {
 	private ktDialog: any;
 	private currentState: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-	// Public properties
 	constructor() {
 		this.ktDialog = new KTDialog({type: 'loader', placement: 'top center', message: 'Loading ...'});
 	}

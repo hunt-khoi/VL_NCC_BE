@@ -13,35 +13,20 @@ export interface MenuOptions {
 	exportAs: 'ktMenu',
 })
 export class MenuDirective implements AfterViewInit {
-	// Public propeties
 	@Input() options: MenuOptions | undefined;
-	// Private properites
 	private menu: any;
 
-	/**
-	 * Directive Constructor
-	 * @param el: ElementRef
-	 */
 	constructor(private el: ElementRef) { }
 
-	/**
-	 * After view init
-	 */
 	ngAfterViewInit(): void {
 		this.setupOptions();
 		this.menu = new KTMenu(this.el.nativeElement, this.options);
 	}
 
-	/**
-	 * Return the menu
-	 */
 	getMenu() {
 		return this.menu;
 	}
 
-	/**
-	 * Setup menu options
-	 */
 	private setupOptions() {
 		// init aside menu
 		let menuDesktopMode = 'accordion';

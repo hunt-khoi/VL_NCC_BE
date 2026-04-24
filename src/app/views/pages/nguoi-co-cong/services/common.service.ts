@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { LayoutUtilsService, QueryParamsModel, QueryResultsModel, HttpUtilsService } from '../../../../core/_base/crud';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
-import { TokenStorage } from '../../../../core/auth/_services/token-storage.service';
-import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
-import { environment } from '../../../../../environments/environment';
-import { AuthService } from '../../../../core/auth';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
+import { AuthService } from '../../../../core/auth';
+import { TokenStorage } from '../../../../core/auth/_services/token-storage.service';
+import { LayoutUtilsService, QueryParamsModel, QueryResultsModel, HttpUtilsService } from '../../../../core/_base/crud';
+import { environment } from '../../../../../environments/environment';
 
 @Injectable()
 export class CommonService {
@@ -990,6 +990,7 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/thong-ke/bieudo-vanban', { headers: httpHeaders });
 	}
+	
 	LastestFeedbackDasboard(queryParams: QueryParamsModel) {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParms = this.httpUtils.getFindHTTPParams(queryParams)

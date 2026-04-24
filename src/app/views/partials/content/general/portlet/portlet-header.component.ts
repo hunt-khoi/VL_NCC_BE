@@ -56,7 +56,9 @@ export class PortletHeaderComponent implements OnInit, AfterViewInit, OnDestroy 
 
 	private subscriptions: Subscription[] = [];
 
-	constructor(private el: ElementRef, @Inject(PLATFORM_ID) private platformId: string, private ktDialogService: KtDialogService) {
+	constructor(private el: ElementRef, 
+		@Inject(PLATFORM_ID) private platformId: string, 
+		private ktDialogService: KtDialogService) {
 		this.stickyDirective = new StickyDirective(this.el, this.platformId);
 	}
 

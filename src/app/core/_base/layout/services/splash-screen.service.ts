@@ -6,11 +6,6 @@ export class SplashScreenService {
 	private el: ElementRef | undefined;
 	private stopped: boolean = false;
 
-	/**
-	 * Service constctuctor
-	 *
-	 * @param animationBuilder: AnimationBuilder
-	 */
 	constructor(private animationBuilder: AnimationBuilder) { }
 
 	/**
@@ -33,6 +28,7 @@ export class SplashScreenService {
 			animate(800, style({opacity: '0'}))
 		]).create(this.el.nativeElement);
 		player.onDone(() => {
+			if (!this.el) return;
 			if (typeof this.el.nativeElement.remove === 'function') {
 				this.el.nativeElement.remove();
 			} else {

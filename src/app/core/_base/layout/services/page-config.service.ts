@@ -1,19 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import * as objectPath from 'object-path';
 import { merge } from 'lodash';
+import objectPath from 'object-path';
 
 @Injectable()
 export class PageConfigService {
 	onConfigUpdated$: Subject<any>;
 	pageConfig: any;
 
-	/**
-	 * Service Constructor
-	 *
-	 * @param router: Router
-	 */
 	constructor(private router: Router) {
 		// register on config changed event and set default config
 		this.onConfigUpdated$ = new Subject();

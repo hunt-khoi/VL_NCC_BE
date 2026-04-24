@@ -345,7 +345,7 @@ export class TableService {
 		return -1;
 	}
 
-	menuChange(e: any, type: 0 | 1 = 0) {
+	menuChange() {
 		this.layoutUtilsService.menuSelectColumns_On_Off();
 	}
 	//#endregion

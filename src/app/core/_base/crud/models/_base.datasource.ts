@@ -1,4 +1,4 @@
-import { CollectionViewer, DataSource } from '@angular/cdk/collections';
+import { DataSource } from '@angular/cdk/collections';
 import { Observable, BehaviorSubject, Subscription, of } from 'rxjs';
 import { HttpExtenstionsModel } from './http-extentsions-model';
 import { QueryParamsModel } from './query-models/query-params.model';
@@ -28,15 +28,13 @@ export class BaseDataSource implements DataSource<BaseModel> {
 	constructor() {
 		this.loading$ = this.loadingSubject.asObservable();
 		this.paginatorTotal$ = this.paginatorTotalSubject.asObservable();
-		// subscribe hasItems to (entitySubject.length==0)
-		const hasItemsSubscription = this.paginatorTotal$.pipe(
+		const hasItemsSubscription = this.paginatorTotal$
+		.pipe(
 			distinctUntilChanged(),
 			skip(1)
 		).subscribe(res => this.hasItems = res > 0);
 		this.subscriptions.push(hasItemsSubscription);
-		this.paginatorTotalSubject.subscribe(res => {
-			this.hasItems = res > 0;
-		})
+		this.paginatorTotalSubject.subscribe(res => this.hasItems = res > 0)
 	}
 
 	connect(): Observable<any[]> {
@@ -47,8 +45,8 @@ export class BaseDataSource implements DataSource<BaseModel> {
 	disconnect(): void {
 		// Disonnecting data source
         this.entitySubject.complete();
-		      this.paginatorTotalSubject.complete();
-		      this.subscriptions.forEach(sb => sb.unsubscribe());
+		this.paginatorTotalSubject.complete();
+		this.subscriptions.forEach(sb => sb.unsubscribe());
 	}
 
 	baseFilter(_entities: any[], _queryParams: QueryParamsModel, _filtrationFields: string[] = []): QueryResultsModel {

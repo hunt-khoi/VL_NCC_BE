@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, HostBinding, HostListener, Inject, Input, isDevMode, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostBinding, HostListener, Inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
@@ -56,7 +56,7 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 			.pipe(
 				throttleTime(0, animationFrame),
 				// emit once since we are currently using combineLatest
-				startWith(null),
+				startWith(undefined),
 				share()
 			);
 
@@ -103,7 +103,6 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 		}
 	}
 
-
 	/**
 	 * This is nasty code that should be refactored at some point.
 	 *
@@ -116,7 +115,6 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 		if (!isPlatformBrowser(this.platformId)) {
 			return false;
 		}
-
 		if (enabled) {
 			// reset the gate
 			this.filterGate = false;
@@ -133,8 +131,6 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 				return true;
 			}
 		}
-
-
 	}
 
 	@HostListener('window:resize', [])
@@ -181,7 +177,7 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 	private getScrollTarget(): Element | Window {
 		let target: Element | Window;
 		if (this.scrollContainer && typeof this.scrollContainer === 'string') {
-			target = document.querySelector(this.scrollContainer);
+			target = document.querySelector(this.scrollContainer) || window;
 		} else if (this.scrollContainer && this.scrollContainer instanceof HTMLElement) {
 			target = this.scrollContainer;
 		} else {
@@ -236,19 +232,6 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 			this.spacerElement.style.height = `${spacerHeight}px`;
 		}
 	}
-
-// 	private checkSetup() {
-// 		if (isDevMode() && !this.spacerElement) {
-// 			console.warn(`******There might be an issue with your sticky directive!******
-// You haven't specified a spacer element. This will cause the page to jump.
-// Best practise is to provide a spacer element (e.g. a div) right before/after the sticky element.
-// Then pass the spacer element as input:
-// <div #spacer></div>
-// <div stickyThing="" [spacer]="spacer">
-//     I am sticky!
-// </div>`);
-// 		}
-// 	}
 
 	private setSticky(status: StickyStatus): void {
 		if (status.isSticky) {

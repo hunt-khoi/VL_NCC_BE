@@ -1,0 +1,19 @@
+<mat-chip-list>
+	<ng-container *ngFor="let chip of gridService.model.lstChip">
+		<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
+			{{chip.title}}: {{chip.data}}
+			<mat-icon matChipRemove>cancel</mat-icon>
+		</mat-chip>
+		<ng-container *ngIf="chip.type==1">
+			<mat-chip *ngFor="let item of chip.data" removable="true"
+				(removed)="gridService.remove(item,chip.key); gridService.showClearAllButton()">
+				{{chip.title}}: {{item.name}}
+				<mat-icon matChipRemove>cancel</mat-icon>
+			</mat-chip>
+		</ng-container>
+	</ng-container>
+	<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll"
+		(click)="gridService.Clear()">
+		Đặt lại
+	</mat-chip>
+</mat-chip-list>

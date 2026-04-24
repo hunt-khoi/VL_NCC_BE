@@ -27,12 +27,8 @@
 			<div class="kt-error_number">
 				<h1>{{code}}</h1>
 			</div>
-			<p class="kt-error_title kt-font-light">
-				{{title}}
-			</p>
-			<p class="kt-error_subtitle">
-				{{subtitle}}
-			</p>
+			<p class="kt-error_title kt-font-light">{{title}}</p>
+			<p class="kt-error_subtitle">{{subtitle}}</p>
 			<p class="kt-error_description" [innerHTML]="desc"></p>
 			<div class="text-center">
 				<button mat-raised-button (click)="close()">{{return}}</button>
@@ -42,15 +38,9 @@
 
 	<ng-container *ngIf="type === 'error-v4'">
 		<div class="kt-error_container">
-			<h1 class="kt-error_number">
-				{{code}}
-			</h1>
-			<p class="kt-error_title">
-				{{title}}
-			</p>
-			<p class="kt-error_subtitle">
-				{{subtitle}}
-			</p>
+			<h1 class="kt-error_number">{{code}}</h1>
+			<p class="kt-error_title">{{title}}</p>
+			<p class="kt-error_subtitle">{{subtitle}}</p>
 			<p class="kt-error_description" [innerHTML]="desc"></p>
 			<div class="text-center">
 				<button mat-raised-button (click)="close()">{{return}}</button>
@@ -63,9 +53,7 @@
 			<div class="kt-error_title">
 				<h1>{{title}}</h1>
 			</div>
-			<p class="kt-error_subtitle">
-				{{subtitle}}
-			</p>
+			<p class="kt-error_subtitle">{{subtitle}}</p>
 			<p class="kt-error_description" [innerHTML]="desc"></p>
 			<div class="text-center">
 				<button mat-raised-button (click)="close()">{{return}}</button>

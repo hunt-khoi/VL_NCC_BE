@@ -14,8 +14,8 @@ const API_LOGOUT_URL = environment.ApiRoot + '/user/Logout';
 
 @Injectable()
 export class AuthService {
-	constructor(private http: HttpClient, 
-		private tokenStorage: TokenStorage) { }
+
+	constructor(private http: HttpClient, private tokenStorage: TokenStorage) { }
 
 	// Authentication/Authorization
 	login(username: string, password: string, checkReCaptCha: boolean, GReCaptCha: string): Observable<any> {
@@ -36,6 +36,7 @@ export class AuthService {
 				catchError(this.handleError('login', []))
 			);
 	}
+
 	private saveAccessData(response: any) {
 		if (response && response.status === 1) {
 			this.tokenStorage.updateStorage(response.data);
@@ -61,7 +62,7 @@ export class AuthService {
 					return res;
 				}),
 				catchError(() => {
-					return null;
+					return of(null);
 				})
 			);
 	}
@@ -111,9 +112,7 @@ export class AuthService {
 
 	resetSession(): Observable<any> {
 		const userToken = localStorage.getItem(environment.authTokenKey);
-		const httpHeaders = new HttpHeaders({
-			'Authorization': 'Bearer ' + userToken,
-		});
+		const httpHeaders = new HttpHeaders({ 'Authorization': 'Bearer ' + userToken });
 		httpHeaders.append("Content-Type", "application/json");
 		return this.http.post<any>(environment.ApiRoot + '/user/ResetSession', null, { headers: httpHeaders })
 			.pipe(
@@ -131,16 +130,17 @@ export class AuthService {
 			res => {
 				this.tokenStorage.clear();
 				if (refresh) {
-					location.reload(true);
+					location.reload();
 				}
 			},
 			err => {
 				this.tokenStorage.clear();
 				if (refresh) {
-					location.reload(true);
+					location.reload();
 				}
 			});
 	}
+	
 	logout_new(): Observable<any> {
 		const userToken = localStorage.getItem(environment.authTokenKey);
 		const httpHeaders = new HttpHeaders({

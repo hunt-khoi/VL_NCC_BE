@@ -35,7 +35,7 @@ export class TreeDonViDialogComponent implements OnInit, OnDestroy {
 
 	GetTreeDonVi() {
 		this.viewLoading = true;
-		this.service.GetTreeDonVi().subscribe(res => {
+		this.service.getTreeDonVi().subscribe(res => {
 			// res.data.anCss= {
 			// 	collapse: true,
 			// 	lastChild: false,

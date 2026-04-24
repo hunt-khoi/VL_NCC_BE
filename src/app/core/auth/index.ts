@@ -12,7 +12,7 @@ export {
 } from './_actions/auth.actions';
 
 // GUARDS
-export { AuthGuard } from './_guards/auth.guard';
+export { AuthGuard } from './_services/auth.guard';
 
 // MODELS
 export { User } from './_models/user.model';

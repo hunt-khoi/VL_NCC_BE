@@ -33,6 +33,5 @@ export class PortletComponent implements OnInit {
 		this.loader.complete();
 	}
 
-	ngOnInit() {
-	}
+	ngOnInit() { }
 }

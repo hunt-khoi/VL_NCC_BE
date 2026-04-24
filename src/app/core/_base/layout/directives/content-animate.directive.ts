@@ -7,26 +7,15 @@ import { Subscription } from 'rxjs';
 	selector: '[ktContentAnimate]'
 })
 export class ContentAnimateDirective implements OnInit, OnDestroy {
-	// Public properties
 	player: AnimationPlayer | undefined;
-	// Private properties
 	private events: Subscription | undefined;
 
-	/**
-	 * Directive Consturctor
-	 * @param el: ElementRef
-	 * @param router: Router
-	 * @param animationBuilder: AnimationBuilder
-	 */
 	constructor(
 		private el: ElementRef,
 		private router: Router,
 		private animationBuilder: AnimationBuilder) {
 	}
 
-	/**
-	 * On init
-	 */
 	ngOnInit(): void {
 		// animate the content
 		this.initAnimate();
@@ -39,9 +28,6 @@ export class ContentAnimateDirective implements OnInit, OnDestroy {
 		});
 	}
 
-	/**
-	 * On destroy
-	 */
 	ngOnDestroy(): void {
 		if (this.events) 
 			this.events.unsubscribe();
@@ -49,9 +35,6 @@ export class ContentAnimateDirective implements OnInit, OnDestroy {
 			this.player.destroy();
 	}
 
-	/**
-	 * Animate page load
-	 */
 	initAnimate() {
 		this.player = this.animationBuilder
 			.build([

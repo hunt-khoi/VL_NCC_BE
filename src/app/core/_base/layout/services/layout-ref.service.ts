@@ -13,7 +13,7 @@ export class LayoutRefService {
 	 * @param element: any
 	 */
 	addElement(name: any, element: any) {
-		const obj = {};
+		const obj: { [key: string]: any } = {};
 		obj[name] = element;
 		this.layoutRefs = Object.assign({}, this.layoutRefs, obj);
 		this.layoutRefs$.next(this.layoutRefs);

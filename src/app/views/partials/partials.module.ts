@@ -39,8 +39,6 @@ import {
 	ActionNotificationComponent,
 	AlertComponent,
 	DeleteEntityDialogComponent,
-	FetchEntityDialogComponent,
-	UpdateStatusDialogComponent,
 } from './content/crud';
 // Layout partials
 import {
@@ -63,8 +61,6 @@ import { NoticeComponent } from './content/general/notice/notice.component';
 import { PortletModule } from './content/general/portlet/portlet.module';
 // Errpr
 import { ErrorComponent } from './content/general/error/error.component';
-// Extra module
-//import { WidgetModule } from './content/widgets/widget.module';
 // SVG inline
 import { InlineSVGModule } from 'ng-inline-svg';
 import { CommonService } from '../pages/nguoi-co-cong/services/common.service';
@@ -81,8 +77,6 @@ import { AvatarModule } from 'ngx-avatar';
 		NoticeComponent,
 		ActionNotificationComponent,
 		DeleteEntityDialogComponent,
-		FetchEntityDialogComponent,
-		UpdateStatusDialogComponent,
 		AlertComponent,
 
 		// topbar components
@@ -111,8 +105,6 @@ import { AvatarModule } from 'ngx-avatar';
 		NoticeComponent,
 		ActionNotificationComponent,
 		DeleteEntityDialogComponent,
-		FetchEntityDialogComponent,
-		UpdateStatusDialogComponent,
 		AlertComponent,
 
 		// topbar components

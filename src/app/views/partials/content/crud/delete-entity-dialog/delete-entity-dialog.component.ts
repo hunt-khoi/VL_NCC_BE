@@ -12,8 +12,7 @@ export class DeleteEntityDialogComponent implements OnInit {
 		public dialogRef: MatDialogRef<DeleteEntityDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any) { }
 
-	ngOnInit() {
-	}
+	ngOnInit() { }
 
 	onNoClick(): void {
 		this.dialogRef.close();
