@@ -9,7 +9,7 @@ export {
     Register,
     AuthActionTypes,
     AuthActions
-} from './_actions/auth.actions';
+} from './_services/auth.actions';
 
 // GUARDS
 export { AuthGuard } from './_services/auth.guard';
