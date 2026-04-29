@@ -1,6 +1,6 @@
 import { BaseModel } from 'app/core/_base/crud';
-import { environment } from 'environments/environment';
 import { SelectionModel } from '@angular/cdk/collections';
+import { environment } from 'environments/environment';
 
 export class TableModel extends BaseModel {
 	pageSize: number[] = environment.pageSize;
@@ -14,17 +14,17 @@ export class TableModel extends BaseModel {
 	tmpfilterText: any = {};
 	disableButtonFilter: any = {};
 	isClearAll: boolean = false;
-	
 	//#endregion
 
 	//#region drag drop
-	previousIndex: number;
-	availableColumns: any[];
-	selectedColumns: SelectionModel<any>;
-	displayedColumns: string[];
+	previousIndex: number = 0;
+	availableColumns: any[] = [];
+	selectedColumns: SelectionModel<any> | undefined;
+	displayedColumns: string[] = [];
 	//#endregion
 
-	lstChip: any[];
+	lstChip: any[] = [];
+
 	clear() {
 		this.pageSize = environment.pageSize;
 		this.haveFilter = false;
@@ -41,8 +41,8 @@ export class TableModel extends BaseModel {
 		this.selectedColumns = new SelectionModel<any>();
 		this.displayedColumns = [];
 		this.lstChip = [];
-		
 	}
+
 	copy(item: TableModel) {
 		this.pageSize = item.pageSize;
 		this.haveFilter = item.haveFilter;

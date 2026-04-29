@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, Input, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
 import { TableService } from '../table.service';
 
 @Component({
@@ -14,13 +13,11 @@ export class ColumnFilterComponent implements OnInit, OnDestroy {
 	@Input() gridService: TableService | undefined;
 	private isDestroyed = false;
 
-	constructor(
-		private translate: TranslateService,
-		private changeDetect: ChangeDetectorRef) { }
+	constructor(private changeDetect: ChangeDetectorRef) { }
 
 	ngOnInit() {
 		if (this.gridService) {
-			this.gridService.getOutput().subscribe((val: any) => {
+			this.gridService.getOutput().subscribe(_ => {
 				if (!this.isDestroyed) {
                     this.changeDetect.detectChanges();
                 }

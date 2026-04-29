@@ -1,8 +1,8 @@
 import { Injectable, ApplicationRef, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SelectionModel } from '@angular/cdk/collections';
-import { LayoutUtilsService } from '../../../core/_base/crud';
 import { CdkDragStart, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { LayoutUtilsService } from '../../../core/_base/crud';
 import { TableModel } from './table.model';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -53,7 +53,8 @@ export class TableService {
 
 	LoadDataDropFilter(col: any) {
 		this.model.tmpfilterText = Object.assign({}, this.model.filterText);
-		if (this.model.filterGroupDataChecked && this.model.filterGroupDataCheckedFake && this.model.filterGroupDataCheckedFake[col] && this.model.filterGroupDataChecked[col]) {
+		if (this.model.filterGroupDataChecked && this.model.filterGroupDataCheckedFake 
+			&& this.model.filterGroupDataCheckedFake[col] && this.model.filterGroupDataChecked[col]) {
 			this.model.filterGroupDataCheckedFake[col] = this.model.filterGroupDataChecked[col].map((x: any) => Object.assign({}, x));
 		}
 	}
@@ -96,6 +97,7 @@ export class TableService {
 	}
 
 	filterHead(col: any) {
+		console.log('hii', col)
 		if (this.model.filterGroupDataCheckedFake && this.model.filterGroupDataCheckedFake[col]) {
 			for (var elementFake of this.model.filterGroupDataCheckedFake[col]) {
 				let index = this.model.filterGroupDataChecked[col].findIndex((x: any) => x.value == elementFake.value)
@@ -113,10 +115,6 @@ export class TableService {
 			this.model.tmpfilterText[col] = '';
 		}
 		this.model.filterText = Object.assign({}, this.model.tmpfilterText);
-		if (this.model.filterText) {
-			//this.filterConfiguration();
-		}
-		//this.loadPhieuKiemKeList();
 		this.model.isClearAll = this.checkFilterHasValue(this.model.filterGroupDataChecked, 'ALL');
 		this.getChip();
 	}
@@ -162,9 +160,8 @@ export class TableService {
 			}
 		}
 		for (var key in this.model.filterText) {
-			if (this.model.filterText.hasOwnProperty(key)) {
+			if (this.model.filterText.hasOwnProperty(key)) 
 				this.model.filterText[key] = "";
-			}
 		}
 		this.model.isClearAll = false;
 		this.getChip();
@@ -187,18 +184,16 @@ export class TableService {
 					text += this.model.filterText[key];
 				}
 			}
-			if (count > 0 || text) {
+			if (count > 0 || text) 
 				return true;
-			}
 		}
 		else { // check in 1 column
 			if (data && data[col]) {
 				let _arrflt = data[col].filter((opt: any) => opt.checked);
 				count += _arrflt ? _arrflt.length : 0;
 			}
-			if (count > 0) {
+			if (count > 0) 
 				return true;
-			}
 		}
 		return false;
 	}
@@ -262,7 +257,7 @@ export class TableService {
 	}
 
 	applySelectedColumns() {
-		//this.model.availableColumns = this.model.availableColumns.sort((a, b) => a.stt - b.stt);
+		if (!this.model.selectedColumns) return;
 		let _selectedColumns = this.model.selectedColumns.selected;
 		this.model.selectedColumns = new SelectionModel<any>(true, this.model.availableColumns);
 		for (let i = 0; i < this.model.availableColumns.length; i++) {
@@ -281,6 +276,7 @@ export class TableService {
 
 	applySelectedColumnsV2(cookie: boolean = false) {
 		if (!cookie && this.cookieService != null) {
+			if (!this.model.selectedColumns) return;
 			let _selectedColumns = this.model.selectedColumns.selected;
 			this.model.selectedColumns = new SelectionModel<any>(true, this.model.availableColumns);
 			for (let i = 0; i < this.model.availableColumns.length; i++) {
@@ -316,22 +312,28 @@ export class TableService {
 
 	//Apply selected Column
 	IsAllColumnsChecked() {
+		if (!this.model.selectedColumns) return;
 		const numSelected = this.model.selectedColumns.selected.length;
 		const numRows = this.model.availableColumns.length;
 		return numSelected === numRows;
 	}
 
 	CheckAllColumns() {
+		let selectedColumns = this.model.selectedColumns;
+		if (!selectedColumns) return;
 		if (this.IsAllColumnsChecked()) {
-			this.model.availableColumns.forEach(row => { if (!row.alwaysChecked) this.model.selectedColumns.deselect(row); });
+			this.model.availableColumns.forEach(row => { 
+				if (!row.alwaysChecked) 
+					selectedColumns.deselect(row);
+			});
 		} else {
-			this.model.availableColumns.forEach(row => this.model.selectedColumns.select(row));
+			this.model.availableColumns.forEach(row => selectedColumns.select(row));
 		}
 	}
 
 	showColumnsInTable() {
 		for (let i = 0; i < this.model.availableColumns.length; i++) {
-			if (this.model.availableColumns[i].isShow == false) {
+			if (!this.model.availableColumns[i].isShow && this.model.selectedColumns) {
 				this.model.selectedColumns.toggle(this.model.availableColumns[i]);
 			}
 		}
