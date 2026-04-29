@@ -1,20 +1,20 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatPaginator, MatSort, MatDialog, MatMenuTrigger } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
-import { NhomNguoiDungDPSDataSource } from '../Model/data-sources/nhom-nguoi-dung-dps.datasource';
-import { NhomNguoiDungDPSService } from '../Services/nhom-nguoi-dung-dps.service';
-import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
-import { NhomNguoiDungDPSEditComponent } from '../nhom-nguoi-dung-dps-edit/nhom-nguoi-dung-dps-edit.component';
-import { NhomNguoiDungDPSModel } from '../Model/nhom-nguoi-dung-dps.model';
-import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
+import { BehaviorSubject, merge } from 'rxjs';
 import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
+import { NhomNguoiDungDPSModel } from '../Model/nhom-nguoi-dung-dps.model';
+import { NhomNguoiDungDPSService } from '../Services/nhom-nguoi-dung-dps.service';
+import { NhomNguoiDungDPSDataSource } from '../Model/data-sources/nhom-nguoi-dung-dps.datasource';
 import { PhanQuyenComponent } from '../phan-quyen/phan-quyen.component';
-import { TableModel } from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
+import { NhomNguoiDungDPSEditComponent } from '../nhom-nguoi-dung-dps-edit/nhom-nguoi-dung-dps-edit.component';
+import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -48,6 +48,7 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 	girdModel: TableModel | undefined;
 	disabledBtn: boolean = false;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		private apiService: NhomNguoiDungDPSService,
@@ -59,9 +60,10 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 		private tokenStorage: TokenStorage,
 		private commonService: CommonService, ) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		this.tokenStorage.getUserRolesObject().subscribe(t => {
 			this.rR = t;
 		});
@@ -114,7 +116,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			{
-
 				stt: 3,
 				name: 'GroupName',
 				displayName: 'Tên vai trò',
@@ -122,7 +123,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			{
-
 				stt: 4,
 				name: 'Ma',
 				displayName: 'Mã vai trò',
@@ -130,7 +130,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			{
-
 				stt: 5,
 				name: 'GhiChu',
 				displayName: 'Mô tả',
@@ -138,7 +137,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			//{
-
 			//	stt: 6,
 			//	name: 'DonVi',
 			//	displayName: 'Đơn vị',
@@ -146,7 +144,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 			//	isShow: true
 			//},
 			//{
-
 			//	stt: 7,
 			//	name: 'ChucVu',
 			//	displayName: 'Chức vụ',
@@ -154,7 +151,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 			//	isShow: false
 			//},
 			//{
-
 			//	stt: 8,
 			//	name: 'IsDefault',
 			//	displayName: 'Vai trò mặc định',
@@ -162,7 +158,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 			//	isShow: false
 			//},
 			{
-
 				stt: 9,
 				name: 'DisplayOrder',
 				displayName: 'Thứ tự',
@@ -170,7 +165,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			{
-
 				stt: 10,
 				name: 'Locked',
 				displayName: 'Trạng thái',
@@ -178,7 +172,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			{
-
 				stt: 11,
 				name: 'ModifiedBy',
 				displayName: 'Người cập nhật cuối',
@@ -186,7 +179,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 				isShow: false
 			},
 			{
-
 				stt: 12,
 				name: 'ModifiedDate',
 				displayName: 'Lần cập nhật cuối',
@@ -277,7 +269,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 		this.dataSource.loadNhomNguoiDungDPSs(queryParams);
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		const filter: any = {};
 		if (this.DonVi > 0)
@@ -290,8 +281,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 		return filter;
 	}
 
-	/** ACTIONS */
-	/** Delete */
 	delete(item: NhomNguoiDungDPSModel) {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn xóa vai trò?';
@@ -364,7 +353,6 @@ export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	/* UI */
 	getItemStatusString(status: boolean = false): string {
 		switch (status) {
 			case true:

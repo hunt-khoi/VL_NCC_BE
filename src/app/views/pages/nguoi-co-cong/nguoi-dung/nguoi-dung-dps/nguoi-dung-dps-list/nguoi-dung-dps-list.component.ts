@@ -1,28 +1,23 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy, ApplicationRef, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { DatePipe } from '@angular/common';
-// Material
 import { MatPaginator, MatSort, MatDialog, MatMenuTrigger } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
+import { DatePipe } from '@angular/common';
 import { tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
-//Datasource
-import { NguoiDungDPSDataSource } from '../Model/data-sources/nguoi-dung-dps.datasource';
-//Service
-import { NguoiDungDPSService } from '../Services/nguoi-dung-dps.service';
-import { NguoiDungDPSEditComponent } from '../nguoi-dung-dps-edit/nguoi-dung-dps-edit.component';
-//Model
-import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
-import { CommonService } from '../../../services/common.service';
+import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
+import { NguoiDungDPSService } from '../Services/nguoi-dung-dps.service';
+import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
+import { NguoiDungDPSDataSource } from '../Model/data-sources/nguoi-dung-dps.datasource';
+import { NguoiDungDPSEditComponent } from '../nguoi-dung-dps-edit/nguoi-dung-dps-edit.component';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { NguoiDungVaiTroComponent } from '../nguoi-dung-vai-tro/nguoi-dung-vai-tro.component';
 import { NguoiDungDPSImportComponent } from '../nguoi-dung-dps-import/nguoi-dung-dps-import.component';
 import { NguoiDungDPSResetPasswordComponent } from '../nguoi-dung-dps-reset-password/nguoi-dung-dps-reset-password.component';
-import { TableModel } from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -61,9 +56,10 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 	gridService: TableService | undefined;
 	girdModel: TableModel | undefined;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
-		private nguoidungdpssService: NguoiDungDPSService,
+		private apiService: NguoiDungDPSService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
@@ -73,9 +69,10 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		private commonService: CommonService,
 		private translate: TranslateService) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		this.tokenStorage.getUserRolesObject().subscribe(t => {
 			this.rR = t;
 		});
@@ -279,11 +276,11 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		}
 
 		// Init DataSource
-		this.dataSource = new NguoiDungDPSDataSource(this.nguoidungdpssService);
+		this.dataSource = new NguoiDungDPSDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
 		this.route.queryParams.subscribe(_ => {
 			if (this.dataSource) {
-				queryParams = this.nguoidungdpssService.lastFilter$.getValue();
+				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadNguoiDungDPSs(queryParams);
 			}
 		});
@@ -392,7 +389,6 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 	}
 
 	/** ACTIONS */
-	/** Delete */
 	delete(item: NguoiDungDPSModel) {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn xóa người dùng?';
@@ -402,7 +398,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.nguoidungdpssService.deleteNguoiDungDPS(item.UserID).subscribe(res => {
+			this.apiService.deleteNguoiDungDPS(item.UserID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -416,7 +412,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 
 	lock(item: any, islock = true) {
 		let _message = (islock ? "Khóa" : "Mở khóa") + " người dùng thành công";
-		this.nguoidungdpssService.lock(item.UserID, islock).subscribe(res => {
+		this.apiService.lock(item.UserID, islock).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_message);
 			}
@@ -443,7 +439,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	addNguoiDungDPS() {
+	add() {
 		const newNguoiDungDPS = new NguoiDungDPSModel();
 		newNguoiDungDPS.clear(); // Set all defaults fields
 		this.edit(newNguoiDungDPS);
@@ -480,11 +476,11 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn gia hạn mật khẩu cho người dùng?';
 		const _waitDesciption: string = 'Người dùng đang được gia hạn...';
-		const _deleteMessage = `Gian hạn mật người cho dùng thành công`;
+		const _deleteMessage = `Gia hạn mật khẩu người dùng thành công`;
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
-			this.nguoidungdpssService.GiaHan(item.UserID).subscribe(res => {
+			this.apiService.GiaHan(item.UserID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -496,7 +492,6 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	/* UI */
 	getItemStatusString(status: number = 0): string {
 		switch (status) {
 			case 0:
@@ -525,8 +520,8 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	ExportFile() {
-		this.nguoidungdpssService.ExportFile().subscribe(response => {
+	exportFile() {
+		this.apiService.ExportFile().subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

@@ -46,11 +46,11 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	constructor(
 		public dialogRef: MatDialogRef<NhomNguoiDungDPSEditComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private NhomNguoiDungDPSFB: FormBuilder,
+		private itemFB: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private nhomnguoidungdpssService: NhomNguoiDungDPSService,
+		private apiService: NhomNguoiDungDPSService,
 		private commonService: CommonService) { }
 
 	ngOnInit() {
@@ -60,7 +60,7 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		this.getTree();
 		this.createForm();
 		if (this.data.NhomNguoiDungDPS && this.data.NhomNguoiDungDPS.IdGroup > 0) {
-			this.nhomnguoidungdpssService.getById(this.data.NhomNguoiDungDPS.IdGroup).subscribe(res => {
+			this.apiService.getById(this.data.NhomNguoiDungDPS.IdGroup).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.NhomNguoiDungDPS = res.data;
@@ -91,6 +91,7 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			this.changeDetectorRefs.detectChanges();
 		})
 	}
+	
 	getTree() {
 		let Locked = this.NhomNguoiDungDPS.IdGroup > 0;
 		this.commonService.TreeDonVi(0, 0, Locked).subscribe(res => {
@@ -119,7 +120,7 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	}
 
 	createForm() {
-		this.itemForm = this.NhomNguoiDungDPSFB.group({
+		this.itemForm = this.itemFB.group({
 			groupName: [this.NhomNguoiDungDPS.GroupName, [Validators.required, Validators.maxLength(250)]],
 			ma: [this.NhomNguoiDungDPS.Ma, [Validators.required, Validators.maxLength(250)]],
 			ghiChu: [this.NhomNguoiDungDPS.GhiChu, Validators.maxLength(500)],
@@ -193,7 +194,7 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	}
 
 	add(item: NhomNguoiDungDPSModel, withBack: boolean = false) {
-		this.nhomnguoidungdpssService.create(item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Thêm mới vai trò thành công`;
@@ -210,7 +211,7 @@ export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	}
 
 	update(item: NhomNguoiDungDPSModel) {
-		this.nhomnguoidungdpssService.update(item).subscribe(res => {
+		this.apiService.update(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Cập nhật vai trò thành công`;

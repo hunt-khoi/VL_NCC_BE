@@ -14,11 +14,6 @@
     <div class="kt-portlet__head kt-portlet__head__custom">
         <div class="kt-portlet__head-label">
             <h3 class="kt-portlet__head-title">Import dữ liệu từ excel</h3>
-            <!-- <div class="button-dialog" [ngStyle]="{'position' : 'absolute', 'left' : '85%' }">
-				<button style="padding: 0px 30px;" type="button" color="warn" mat-raised-button (click)="closeDialog()">
-					Trở lại
-				</button>&nbsp;
-			</div> -->
         </div>
     </div>
     <form class="kt-form" [formGroup]="itemForm">
@@ -26,14 +21,12 @@
             <div class="kt-portlet__body-progress">
                 <mat-spinner [diameter]="20"></mat-spinner>
             </div>
-            <kt-alert *ngIf="hasFormErrors" type="warn" [duration]="30000" [showCloseButton]="true"
-                (close)="onAlertClose($event)">
+            <kt-alert *ngIf="hasFormErrors" type="warn" [duration]="30000" [showCloseButton]="true" (close)="onAlertClose()">
                 Không thể lưu, vui lòng nhập đủ thông tin!
             </kt-alert>
             <div class="form-group kt-form__group row">
                 <div class="col-md-6 kt-margin-bottom-10-mobile" style="color: red;"
                     [innerHTML]="itemForm.controls['ErrorMessage'].value">
-
                 </div>
                 <div class="col-md-8 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
@@ -45,8 +38,7 @@
                     <mat-form-field class="mat-form-field-fluid" appearance="none">
                         <input matInput placeholder="" formControlName="FileDuLieu" style="display:none;" readonly
                             (click)="selectFile()">
-                        <button mat-raised-button style="padding: 0px 20px;" color="primary" (click)="selectFile()"
-                            type="button">
+                        <button mat-raised-button style="padding: 0px 20px;" color="primary" (click)="selectFile()" type="button">
                             Chọn file
                         </button>
                         <input placeholder="Chọn file" #fileUpload id="fileUploadExcel" type="file" name="fileUpload"

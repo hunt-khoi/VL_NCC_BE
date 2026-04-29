@@ -4,23 +4,23 @@ import { catchError, finalize, tap } from 'rxjs/operators';
 import { NguoiDungDPSService } from '../../Services/nguoi-dung-dps.service';
 
 export class NguoiDungDPSDataSource extends BaseDataSource {
-	constructor(private productsService: NguoiDungDPSService) {
+	constructor(private apiService: NguoiDungDPSService) {
 		super();
 	}
 
 	loadNguoiDungDPSs(queryParams: QueryParamsModel) {
-		this.productsService.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
         this.loadingSubject.next(true);
-		this.productsService.getData(queryParams)
+		this.apiService.getData(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					if (resultFromServer.data != null && resultFromServer.data != undefined) {
-						this.entitySubject.next(resultFromServer.data);
-						this.paginatorTotalSubject.next(resultFromServer.page.TotalCount);
+				tap(res => {
+					if (res.data != null && res.data != undefined) {
+						this.entitySubject.next(res.data);
+						this.paginatorTotalSubject.next(res.page.TotalCount);
 					}
 					else {
-						this.entitySubject.next(null);
-						this.paginatorTotalSubject.next(null);
+						this.entitySubject.next([]);
+						this.paginatorTotalSubject.next(0);
 					}
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),

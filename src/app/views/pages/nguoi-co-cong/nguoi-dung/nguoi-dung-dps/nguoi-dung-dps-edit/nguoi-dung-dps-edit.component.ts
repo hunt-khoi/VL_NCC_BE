@@ -2,13 +2,13 @@ import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRe
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { NguoiDungDPSService } from '../Services/nguoi-dung-dps.service';
 import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
 import { ConfirmPasswordValidator } from '../../../../auth/register/confirm-password.validator';
 import { CommonService } from '../../../services/common.service';
-import { ChonNhieuDonViComponent } from '../../../components/chon-nhieu-don-vi/chon-nhieu-don-vi.component';
-import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ChonNhieuDoiTuongListComponent } from '../../../components';
+import { ChonNhieuDonViComponent } from '../../../components/chon-nhieu-don-vi/chon-nhieu-don-vi.component';
 import moment from 'moment';
 
 @Component({
@@ -35,7 +35,7 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 
 	datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	lstChucVu: any[] = [];
-	lstLoaiChungThu: any[] = [];
+	// lstLoaiChungThu: any[] = [];
 	lstGioiTinh: any[] = [];
 	maxNS = moment(new Date()).add(-16, 'year').toDate();
 
@@ -125,12 +125,12 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		let temp: any = {
 			fullname: [this.NguoiDungDPS.FullName, [Validators.required, Validators.maxLength(100)]],
 			userName: [this.NguoiDungDPS.UserName, [Validators.required, Validators.maxLength(50)]],
-			viettelStudy: [this.NguoiDungDPS.ViettelStudy, Validators.maxLength(100)],
+			// viettelStudy: [this.NguoiDungDPS.ViettelStudy, Validators.maxLength(100)],
 			email: [this.NguoiDungDPS.Email, [Validators.email, Validators.maxLength(100), Validators.required]],
 			phoneNumber: [this.NguoiDungDPS.PhoneNumber, [Validators.pattern("[0][0-9]{9}"), Validators.maxLength(20)]],
-			simCA: [this.NguoiDungDPS.SimCA, Validators.maxLength(100)],
-			loaiChungThu: [this.NguoiDungDPS.LoaiChungThu == null ? '0' : this.NguoiDungDPS.LoaiChungThu + ''],
-			serialToken: [this.NguoiDungDPS.SerialToken, Validators.maxLength(100)],
+			// simCA: [this.NguoiDungDPS.SimCA, Validators.maxLength(100)],
+			// loaiChungThu: [this.NguoiDungDPS.LoaiChungThu == null ? '0' : this.NguoiDungDPS.LoaiChungThu + ''],
+			// serialToken: [this.NguoiDungDPS.SerialToken, Validators.maxLength(100)],
 			donVi: [this.NguoiDungDPS.IdDonVi, Validators.required],
 			chucVu: [this.NguoiDungDPS.IdChucVu == null ? '0' : this.NguoiDungDPS.IdChucVu + '', Validators.required],
 			maNV: [this.NguoiDungDPS.MaNV, Validators.maxLength(50)],
@@ -173,7 +173,6 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		this.hasFormErrors = false;
 		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/** check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -202,12 +201,12 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 		_item.clear();
 		_item.FullName = controls['fullname'].value;
 		_item.UserName = controls['userName'].value;
-		_item.ViettelStudy = controls['viettelStudy'].value;
+		// _item.ViettelStudy = controls['viettelStudy'].value;
 		_item.Email = controls['email'].value;
 		_item.PhoneNumber = controls['phoneNumber'].value;
-		_item.SimCA = controls['simCA'].value;
-		_item.LoaiChungThu = controls['loaiChungThu'].value;
-		_item.SerialToken = controls['serialToken'].value;
+		// _item.SimCA = controls['simCA'].value;
+		// _item.LoaiChungThu = controls['loaiChungThu'].value;
+		// _item.SerialToken = controls['serialToken'].value;
 		_item.IdDonVi = controls['donVi'].value;
 		_item.IdChucVu = controls['chucVu'].value;
 		_item.MaNV = controls['maNV'].value;
@@ -292,16 +291,16 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 				this.changeDetectorRefs.detectChanges();
 			};
 		});
-		this.commonService.ListLoaiChungThu().subscribe(res => {
-			if (res && res.status == 1) {
-				this.lstLoaiChungThu = res.data;
-			}
-			else {
-				this.lstLoaiChungThu = [];
-				this.layoutUtilsService.showError(res.error.message);
-			}
-			this.changeDetectorRefs.detectChanges();
-		})
+		// this.commonService.ListLoaiChungThu().subscribe(res => {
+		// 	if (res && res.status == 1) {
+		// 		this.lstLoaiChungThu = res.data;
+		// 	}
+		// 	else {
+		// 		this.lstLoaiChungThu = [];
+		// 		this.layoutUtilsService.showError(res.error.message);
+		// 	}
+		// 	this.changeDetectorRefs.detectChanges();
+		// })
 		this.commonService.ListGioiTinh().subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstGioiTinh = res.data;
@@ -317,7 +316,6 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	closeDialog() {
 		this.dialogRef.close(this.isChange);
 	}
-
 
 	//loai=0: đối tượng NCC
 	remove(item: any, loai = 0): void {

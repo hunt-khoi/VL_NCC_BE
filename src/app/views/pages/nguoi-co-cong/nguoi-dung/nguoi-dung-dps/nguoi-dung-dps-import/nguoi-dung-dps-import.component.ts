@@ -119,6 +119,10 @@ export class NguoiDungDPSImportComponent implements OnInit, OnDestroy {
 		return isControlValid && hasSelectedFile;
 	}
 
+	onAlertClose() {
+		this.hasFormErrors = false;
+	}
+
 	DocDuLieu() {
 		let t = this.checkDataIsValid();
 		if (t) this.Importfile();

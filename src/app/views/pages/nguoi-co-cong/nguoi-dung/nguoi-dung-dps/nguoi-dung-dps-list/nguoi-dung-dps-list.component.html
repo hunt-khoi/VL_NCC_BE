@@ -28,15 +28,15 @@
 			<mat-menu #chucnang="matMenu">
 				<button mat-menu-item color="info" matTooltip="In danh sách người dùng" printTitle="Danh sách người dùng" (click)="LoadPagePrint()">In</button>
 				<button mat-menu-item (click)="import()" color="primary" matTooltip="Import người dùng">Import</button>
-				<button mat-menu-item (click)="ExportFile()" color="info" matTooltip="Export người dùng">Export</button>
-				<button mat-menu-item (click)="addNguoiDungDPS()" color="primary" matTooltip="Thêm mới người dùng">Thêm mới</button>
+				<button mat-menu-item (click)="exportFile()" color="info" matTooltip="Export người dùng">Export</button>
+				<button mat-menu-item (click)="add()" color="primary" matTooltip="Thêm mới người dùng">Thêm mới</button>
 			</mat-menu>
 			<!-- view nhỏ hơn 768 bị ẩn -->
 			<div class="hide-view-sm">
 				<button mat-raised-button color="info" matTooltip="In danh sách người dùng" printTitle="Danh sách người dùng" (click)="LoadPagePrint()">In</button>
 				<button (click)="import()" mat-raised-button color="primary" matTooltip="Import người dùng">Import</button>
-				<button (click)="ExportFile()" mat-raised-button color="info" matTooltip="Export người dùng">Export</button>
-				<button (click)="addNguoiDungDPS()" mat-raised-button color="primary" matTooltip="Thêm mới người dùng">Thêm mới</button>
+				<button (click)="exportFile()" mat-raised-button color="info" matTooltip="Export người dùng">Export</button>
+				<button (click)="add()" mat-raised-button color="primary" matTooltip="Thêm mới người dùng">Thêm mới</button>
 			</div>
 			<button class="d-none" #printPage [useExistingCss]="true" printSectionId="print-section"
 				ngxPrint>Import</button>
@@ -53,16 +53,14 @@
 				</div>
 				<div class="col-md-3 kt-margin-bottom-10-mobile">
 					<mat-form-field class="mat-form-field-fluid">
-						<mat-select [(ngModel)]="VaiTro" placeholder="Vai trò"
-							(selectionChange)="loadNguoiDungDPSsList(true)">
+						<mat-select [(ngModel)]="VaiTro" placeholder="Vai trò" (selectionChange)="loadDataList(true)">
 							<mat-option value="0">-- Tất cả --</mat-option>
 							<mat-option *ngFor="let opt of lstVaiTro" [value]="opt.id">{{opt.title}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 				<div class="col-md-3 kt-margin-bottom-10-mobile">
-					<mat-checkbox [(ngModel)]="ChuaCoVaiTro" (change)="loadNguoiDungDPSsList(true)">Chưa có vai trò
-					</mat-checkbox>
+					<mat-checkbox [(ngModel)]="ChuaCoVaiTro" (change)="loadDataList(true)">Chưa có vai trò</mat-checkbox>
 				</div>
 			</div>
 		</div>
@@ -91,7 +89,7 @@
 							column_title="Tên đăng nhập"></kt-column-filter>
 					</th>
 					<td mat-cell class="m--padding-10 td-padding" *matCellDef="let item">
-						<a href="javascript:;" (click)="editNguoiDungDPS(item,false)">{{item.UserName}}</a> 
+						<a href="javascript:;" (click)="edit(item, false)">{{item.UserName}}</a> 
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="FullName">
@@ -117,13 +115,13 @@
 						<kt-column-filter [gridService]="gridService" column_name="ChucVu" column_title="Chức vụ">
 						</kt-column-filter>
 					</th>
-					<td mat-cell *matCellDef="let item" style="min-width:80px">
+					<td mat-cell *matCellDef="let item" style="min-width: 80px">
 						<div class="dt-overflow" matTooltip="{{item.ChucVu}}">{{item.ChucVu}}</div>
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="DonVi">
 					<th mat-header-cell *matHeaderCellDef>Đơn vị</th>
-					<td mat-cell *matCellDef="let item" style="min-width:80px">
+					<td mat-cell *matCellDef="let item" style="min-width: 80px">
 						<div class="dt-overflow" matTooltip="{{item.DonVi}}">{{item.DonVi}}</div>
 					</td>
 				</ng-container>
@@ -146,11 +144,8 @@
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="ExpDate">
-					<th mat-header-cell *matHeaderCellDef>
-						Ngày hết hạn
-					</th>
-					<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px"
-						*matCellDef="let item">
+					<th mat-header-cell *matHeaderCellDef>Ngày hết hạn</th>
+					<td mat-cell class="m--padding-10" style="text-align: left; padding-bottom: 4px" *matCellDef="let item">
 						<span style="color:red" *ngIf="item.IsQuaHan" title="Quá hạn">
 							{{item.ExpDate}}
 						</span>
@@ -162,16 +157,14 @@
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Active"
 							column_title="Tình trạng"></kt-column-filter>
 					</th>
-					<td mat-cell [ngClass]="{'m--padding-10': true}" style="white-space: nowrap; text-align: left"
-						*matCellDef="let item">
+					<td mat-cell [ngClass]="{'m--padding-10': true}" style="white-space: nowrap; text-align: left" *matCellDef="let item">
 						<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide 
 							{{getItemCssClassByStatus(item.Active)}}">{{getItemStatusString(item.Active)}}</span>
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="GioiTinh">
 					<th mat-header-cell *matHeaderCellDef>Giới tính</th>
-					<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px"
-						*matCellDef="let item">
+					<td mat-cell class="m--padding-10" style="text-align: left; padding-bottom: 4px" *matCellDef="let item">
 						{{item.GioiTinh}}
 					</td>
 				</ng-container>
@@ -180,8 +173,7 @@
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="LastLogin"
 							column_title="Lần đăng nhập cuối"></kt-column-filter>
 					</th>
-					<td mat-cell class="m--padding-10" style="text-align: left;padding-bottom: 4px"
-						*matCellDef="let item">
+					<td mat-cell class="m--padding-10" style="text-align: left; padding-bottom: 4px" *matCellDef="let item">
 						{{item.LastLogin}}
 					</td>
 				</ng-container>
@@ -190,46 +182,44 @@
 					<th mat-header-cell *matHeaderCellDef class="hiden-print">
 						Thao tác
 					</th>
-					<td mat-cell *matCellDef="let nguoidungdps" class="hiden-print action-cell" [ngClass]="list_button?'list-button':''">
-						<button type="button" (click)="edit(nguoidungdps,false)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
-								color="info" matTooltip="{{ 'COMMON.DETAIL' | translate }}">
+					<td mat-cell *matCellDef="let item" class="hiden-print action-cell" [ngClass]="list_button ? 'list-button' : ''">
+						<button mat-button (click)="edit(item, false)" [ngClass]="btnClass"
+							matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" type="button">
 							<mat-icon>visibility</mat-icon>
 							<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 						</button>
 						<ng-container *ngIf="rR.r10">
-							<button type="button" (click)="edit(nguoidungdps)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
-									color="primary" matTooltip="{{ 'COMMON.UPDATE' | translate }}">
+							<button mat-button (click)="edit(item)" [ngClass]="btnClass"
+								matTooltip="{{ 'COMMON.UPDATE' | translate }}" color="primary" type="button">
 								<mat-icon>create</mat-icon>
 								<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
 							</button>
-							<button type="button" (click)="lock(nguoidungdps,false)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary"
-									matTooltip="Mở khóa" *ngIf="nguoidungdps.Active==0">
+							<button mat-button (click)="lock(item, false)" [ngClass]="btnClass" *ngIf="item.Active==0"
+								matTooltip="Mở khóa" color="primary" type="button">
 								<mat-icon>lock_open</mat-icon>
 								<span class="button-text">Mở khóa</span>
 							</button>
 							<!--User đang đăng nhập không được tự khóa, xóa tài khoản-->
-							<button type="button" (click)="lock(nguoidungdps)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn"
-									matTooltip="Khóa" *ngIf="nguoidungdps.Active==1"
-									[disabled]="curUser.id==nguoidungdps.UserID">
+							<button mat-button (click)="lock(item)" [ngClass]="btnClass" *ngIf="item.Active==1" [disabled]="curUser.id==item.UserID"
+								matTooltip="Khóa" color="warn" type="button">
 								<mat-icon>lock</mat-icon>
 								<span class="button-text">Khóa</span>
 							</button>
 							<!--User đang đăng nhập không được tự khóa, xóa tài khoản-->
-							<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" type="button"
-									(click)="delete(nguoidungdps)" matTooltip="{{ 'COMMON.DELETE' | translate }}"
-									[disabled]="curUser.id==nguoidungdps.UserID">
+							<button mat-button (click)="delete(item)" [ngClass]="btnClass" [disabled]="curUser.id==item.UserID"
+							 	matTooltip="{{ 'COMMON.DELETE' | translate }}" color="warn" type="button">
 								<mat-icon>delete</mat-icon>
 								<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
 							</button>
-							<button mat-button [matMenuTriggerFor]="menu" [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary"
-									*ngIf="rR.r24 || rR.r11" matTooltip="Thao tác khác">
+							<button mat-button [matMenuTriggerFor]="menu" [ngClass]="btnClass" *ngIf="rR.r24 || rR.r11"
+								matTooltip="Thao tác khác" color="primary" type="button">
 								<mat-icon>settings</mat-icon>
 								<span class="button-text">Khác</span>
 							</button>
 							<mat-menu #menu="matMenu">
-								<button mat-menu-item (click)="vaitro(nguoidungdps, false)" *ngIf="rR.r24">Vai trò</button>
-								<button mat-menu-item (click)="resetPass(nguoidungdps)" *ngIf="rR.r11">Đặt lại mật khẩu</button>
-								<button mat-menu-item (click)="giahan(nguoidungdps)" *ngIf="rR.r11">Gia hạn mật khẩu</button>
+								<button mat-menu-item (click)="vaitro(item, false)" *ngIf="rR.r24">Vai trò</button>
+								<button mat-menu-item (click)="resetPass(item)" *ngIf="rR.r11">Đặt lại mật khẩu</button>
+								<button mat-menu-item (click)="giahan(item)" *ngIf="rR.r11">Gia hạn mật khẩu</button>
 							</mat-menu>
 						</ng-container>
 					</td>
@@ -242,30 +232,13 @@
 
 		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 			<div class="flt-selected" *ngIf="gridService.model.haveFilter">
-				<mat-chip-list>
-					<ng-container *ngFor="let chip of gridService.model.lstChip">
-						<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
-							{{chip.title}}: {{chip.data}}
-							<mat-icon matChipRemove>cancel</mat-icon>
-						</mat-chip>
-						<ng-container *ngIf="chip.type==1">
-							<mat-chip *ngFor="let item of chip.data" removable="true"
-								(removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
-								{{chip.title}}: {{item.name}}
-								<mat-icon matChipRemove>cancel</mat-icon>
-							</mat-chip>
-						</ng-container>
-					</ng-container>
-					<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll"
-						(click)="gridService.Clear()">
-						Đặt lại
-					</mat-chip>
-				</mat-chip-list>
+				<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
 			</div>
 			<div class="flt-page">
 				<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
 				<mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize"
-					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+				</mat-paginator>
 			</div>
 		</div>
 	</kt-portlet-body>

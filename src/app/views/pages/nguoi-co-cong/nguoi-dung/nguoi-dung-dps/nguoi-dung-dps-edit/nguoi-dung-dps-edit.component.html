@@ -9,10 +9,10 @@
             <h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
         </div>
         <div class="col-md-{{ !NguoiDungDPS.UserID ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
-            <button type="button" mat-raised-button color="primary" (click)="onSubmit(true)">
+            <button mat-raised-button (click)="onSubmit(true)" color="primary" type="button">
 				<span translate="COMMON.LUU_DONG"></span>
 			</button>
-            <button class="view-pc" *ngIf="!NguoiDungDPS.UserID" type="button" mat-raised-button color="primary" (click)="onSubmit(false)">
+            <button mat-raised-button (click)="onSubmit(false)" class="hide-view-sm" *ngIf="!NguoiDungDPS.UserID" color="primary" type="button">
 				<span translate="COMMON.LUU_TIEPTUC"></span>
 			</button>
         </div>
@@ -51,7 +51,7 @@
                             <label class="kt-avatar__upload" *ngIf="allowEdit" data-toggle="kt-tooltip" title="" data-original-title="Change avatar">
                                 <i class="fa fa-pen"></i>
                                 <input type="file" name="profile_avatar" (change)="FileSelectedPrivate($event,2)"
-                                       id="imgInpdd2" accept=".png, .jpg, .jpeg">
+                                    id="imgInpdd2" accept=".png, .jpg, .jpeg">
                             </label>
                             <span class="kt-avatar__cancel" data-toggle="kt-tooltip" title="" data-original-title="Cancel avatar">
                                 <i class="fa fa-times"></i>
@@ -62,8 +62,7 @@
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Nhập họ tên" required formControlName="fullname" type="text">
-                        <mat-error>
-                            Họ và tên
+                        <mat-error>Họ và tên
                             <strong *ngIf="itemForm.controls['fullname'].errors && itemForm.controls['fullname'].errors.required">
 								bắt buộc nhập</strong>
                             <strong *ngIf="itemForm.controls['fullname'].errors && itemForm.controls['fullname'].errors.maxlength">
@@ -74,8 +73,7 @@
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Nhập tên đăng nhập" required formControlName="userName" type="text" autocomplete="off">
-                        <mat-error>
-                            Tên đăng nhập
+                        <mat-error>Tên đăng nhập
                             <strong *ngIf="itemForm.controls['userName'].errors && itemForm.controls['userName'].errors.required">
 								bắt buộc nhập</strong>
                             <strong *ngIf="itemForm.controls['userName'].errors && itemForm.controls['userName'].errors.maxlength">
@@ -87,8 +85,7 @@
                     <div class="col-md-6 kt-margin-bottom-10-mobile">
                         <mat-form-field class="mat-form-field-fluid">
                             <input matInput placeholder="Nhập mật khẩu" required formControlName="password" type="password" autocomplete="off">
-                            <mat-error>
-                                Mật khẩu
+                            <mat-error>Mật khẩu
                                 <strong *ngIf="itemForm.controls['password'].errors && itemForm.controls['password'].errors.required">
 									bắt buộc nhập</strong>
                             </mat-error>
@@ -97,8 +94,7 @@
                     <div class="col-md-6 kt-margin-bottom-10-mobile">
                         <mat-form-field class="mat-form-field-fluid">
                             <input matInput placeholder="Nhập xác nhận mật khấu" required formControlName="confirmPassword" type="password" autocomplete="off">
-                            <mat-error>
-                                Xác nhận mật khẩu
+                            <mat-error>Xác nhận mật khẩu
                                 <strong *ngIf="itemForm.controls['confirmPassword'].errors && itemForm.controls['confirmPassword'].errors.required">
 									bắt buộc nhập</strong>
                                 <strong *ngIf="itemForm.get('confirmPassword').errors && itemForm.get('confirmPassword').errors.ConfirmPassword">
@@ -107,21 +103,21 @@
                         </mat-form-field>
                     </div>
                 </ng-container>
-                <div class="col-md-6 kt-margin-bottom-10-mobile" *ngIf="false">
+                <!-- <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Tài khoản Viettel study" formControlName="viettelStudy" type="text" autocomplete="off">
-                        <mat-error>
-                            Tài khoản Viettel study
+                        <mat-error>Tài khoản Viettel study
                             <strong *ngIf="itemForm.controls['viettelStudy'].errors && itemForm.controls['viettelStudy'].errors.maxlength">
 								tối đa 100 ký tự</strong>
                         </mat-error>
                     </mat-form-field>
-                </div>
+                </div> -->
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Thư điện tử" required formControlName="email" type="text" autocomplete="off">
-                        <mat-error>
-                            Thư điện tử
+                        <mat-error>Thư điện tử
+                            <strong *ngIf="itemForm.controls['email'].errors && itemForm.controls['email'].errors.required">
+								bắt buộc nhập</strong>
                             <strong *ngIf="itemForm.controls['email'].errors && itemForm.controls['email'].errors.email">
 								không hợp lệ</strong>
                             <strong *ngIf="itemForm.controls['email'].errors && itemForm.controls['email'].errors.maxlength">
@@ -132,8 +128,7 @@
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Số điện thoại" formControlName="phoneNumber" type="text" autocomplete="off">
-                        <mat-error>
-                            Số điện thoại
+                        <mat-error>Số điện thoại
                             <strong *ngIf="itemForm.controls['phoneNumber'].errors && itemForm.controls['phoneNumber'].errors.pattern">
 								không hợp lệ</strong>
                             <strong *ngIf="itemForm.controls['phoneNumber'].errors && itemForm.controls['phoneNumber'].errors.maxlength">
@@ -141,17 +136,16 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
-                <div class="col-md-6 kt-margin-bottom-10-mobile" *ngIf="false">
+                <!-- <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Sim CA" formControlName="simCA" type="text" autocomplete="off">
-                        <mat-error>
-                            Sim CA
+                        <mat-error>Sim CA
                             <strong *ngIf="itemForm.controls['simCA'].errors && itemForm.controls['simCA'].errors.maxlength">
 								tối đa 100 ký tự</strong>
                         </mat-error>
                     </mat-form-field>
                 </div>
-                <div class="col-md-6 kt-margin-bottom-10-mobile" *ngIf="false">
+                <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <mat-select formControlName="loaiChungThu" placeholder="Loại chứng thư">
                             <mat-option value="0">-- Chọn --</mat-option>
@@ -160,7 +154,7 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="col-md-6 kt-margin-bottom-10-mobile" *ngIf="false">
+                <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Số serial token" formControlName="serialToken" type="text">
                         <mat-error>
@@ -169,7 +163,7 @@
 								tối đa 100 ký tự</strong>
                         </mat-error>
                     </mat-form-field>
-                </div>
+                </div> -->
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <m-dropdown-tree [data]="datatree" [FieldTitle]="'title'" [FieldId]="'id'" [FieldChildren]="'data'" [FieldDisable]="'disabled'" [DropdownTitle]="'Đơn vị'" (SelectedItemTree)="GetValueNode($event)" formControlName="donVi">
                     </m-dropdown-tree>
@@ -185,8 +179,7 @@
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Mã NV" formControlName="maNV" type="text" autocomplete="off">
-                        <mat-error>
-                            Mã NV
+                        <mat-error>Mã NV
                             <strong *ngIf="itemForm.controls['maNV'].errors && itemForm.controls['maNV'].errors.maxlength">
 								tối đa 50 ký tự</strong>
                         </mat-error>
@@ -200,19 +193,18 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="col-md-6 kt-margin-bottom-10-mobile" *ngIf="false">
+                <!-- <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-checkbox formControlName="nhanLichDonVi">Nhận lịch cho đơn vị</mat-checkbox>
                 </div>
-                <div class="col-md-6 kt-margin-bottom-10-mobile" *ngIf="false">
+                <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="CMTND" formControlName="cmtnd" type="text">
-                        <mat-error>
-                            CMND/CCCD
+                        <mat-error>CMND/CCCD
                             <strong *ngIf="itemForm.controls['cmtnd'].errors && itemForm.controls['cmtnd'].errors.maxlength">
 								tối đa 50 ký tự</strong>
                         </mat-error>
                     </mat-form-field>
-                </div>
+                </div> -->
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="Ngày sinh" formControlName="ngaySinh" type="text" [matDatepicker]="picker" [max]="maxNS">
@@ -220,12 +212,13 @@
                         <mat-datepicker #picker></mat-datepicker>
                     </mat-form-field>
                 </div>
-                <div class="col-md-12 kt-margin-bottom-10-mobile" *ngIf="false">
+                <!-- <div class="col-md-12 kt-margin-bottom-10-mobile">
                     <label>Đơn vị quan tâm</label>
                     <mat-form-field class="mat-form-field-fluid example-chip-list">
                         <mat-chip-list #chipList aria-label="Đơn vị quan tâm">
-                            <mat-chip *ngFor="let fruit of NguoiDungDPS.DonViQuanTam" [selectable]="selectable && allowEdit" [removable]="removable && allowEdit" (removed)="remove(fruit,1)">
-                                {{fruit.title}}
+                            <mat-chip *ngFor="let dv of NguoiDungDPS.DonViQuanTam" [selectable]="selectable && allowEdit" 
+                                [removable]="removable && allowEdit" (removed)="remove(dv, 1)">
+                                {{dv.title}}
                                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                             </mat-chip>
                         </mat-chip-list>
@@ -237,12 +230,13 @@
 						</button>
                     </mat-form-field>
                 </div>
-                <div class="col-md-12 kt-margin-bottom-10-mobile" *ngIf="false">
+                <div class="col-md-12 kt-margin-bottom-10-mobile">
                     <label>Đơn vị lấy hạn xử lý</label>
                     <mat-form-field class="mat-form-field-fluid example-chip-list">
                         <mat-chip-list #chipList aria-label="Đơn vị lấy hạn xử lý">
-                            <mat-chip *ngFor="let fruit of NguoiDungDPS.DonViLayHanXuLy" [selectable]="selectable && allowEdit" [removable]="removable && allowEdit" (removed)="remove(fruit,2)">
-                                {{fruit.title}}
+                            <mat-chip *ngFor="let dv of NguoiDungDPS.DonViLayHanXuLy" [selectable]="selectable && allowEdit" 
+                                [removable]="removable && allowEdit" (removed)="remove(dv, 2)">
+                                {{dv.title}}
                                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                             </mat-chip>
                         </mat-chip-list>
@@ -253,13 +247,14 @@
 							<mat-icon>clear</mat-icon>
 						</button>
                     </mat-form-field>
-                </div>
+                </div> -->
                 <div class="col-md-12 kt-margin-bottom-10-mobile" *ngIf="Capcocau==1">
                     <label>Đối tượng người có công được quản lý</label>
                     <mat-form-field class="mat-form-field-fluid example-chip-list">
                         <mat-chip-list #chipList aria-label="Đối tượng người có công được quản lý">
-                            <mat-chip *ngFor="let fruit of NguoiDungDPS.lstDoiTuongNCC" [selectable]="selectable && allowEdit" [removable]="removable && allowEdit" (removed)="remove(fruit)">
-                                {{fruit.title}}
+                            <mat-chip *ngFor="let dt of NguoiDungDPS.lstDoiTuongNCC" [selectable]="selectable && allowEdit" 
+                                [removable]="removable && allowEdit" (removed)="remove(dt)">
+                                {{dt.title}}
                                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
                             </mat-chip>
                         </mat-chip-list>

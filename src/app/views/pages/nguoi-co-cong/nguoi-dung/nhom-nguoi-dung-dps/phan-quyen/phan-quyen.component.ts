@@ -1,11 +1,11 @@
+import { Component, ChangeDetectionStrategy, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { Component, ChangeDetectionStrategy, OnInit, Inject, ChangeDetectorRef, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { NhomNguoiDungDPSService } from '../Services/nhom-nguoi-dung-dps.service';
 import { NhomNguoiDungDPSModel } from '../Model/nhom-nguoi-dung-dps.model';
-import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
 import { CommonService } from '../../../services/common.service';
 
 export class TodoItemNode {
@@ -176,6 +176,7 @@ export class PhanQuyenComponent implements OnInit {
 			this.checklistSelection.select(node);
 		}
 	}
+	
 	/* Get the parent node of a node */
 	getParentNode(node: TodoItemNode): TodoItemNode | null {
 		let arr = this.TREE_DATA;

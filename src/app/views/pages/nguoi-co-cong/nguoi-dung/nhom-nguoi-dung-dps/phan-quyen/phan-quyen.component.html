@@ -5,17 +5,13 @@
 </div>
 <div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
 	<div class="kt-portlet__head kt-portlet__head__custom">
-
 		<div class="col-md-{{NhomNguoiDungDPS.IdGroup == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
 		<div class="col-md-{{NhomNguoiDungDPS.IdGroup == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
 			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="onSubmit()">
 				Lưu
-			</button>&nbsp;
-			<!--<button style="padding: 0px 10px;" type="button" color="accent" mat-raised-button (click)="resizeDialog()">
-				{{isZoomSize ? 'Thu nhỏ' : 'Phóng to'}}
-			</button>&nbsp;-->
+			</button>
 		</div>
 	</div>
 	<form class="kt-form">
@@ -26,11 +22,9 @@
 			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="30000" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
-
 			<div class="form-group kt-form__group row">
 				<div class="col-md-12">
 					<cdk-tree [dataSource]="dataSource" [treeControl]="treeControl" class="dl-tree-dropdown">
-
 						<!-- This is the tree node template for leaf nodes -->
 						<cdk-nested-tree-node *cdkTreeNodeDef="let node" cdkTreeNodePadding class="example-tree-node">
 							<div class="dl-cover-tree-node">
@@ -38,9 +32,9 @@
 									<div class="name-txt">
 										<div class="cover-drag-item">
 											<span style="padding-left: 5px;">
-												<mat-checkbox class="checklist-leaf-node"
-													[checked]="checklistSelection.isSelected(node)"
-													(change)="todoLeafItemSelectionToggle(node)">{{node.item}}</mat-checkbox>
+												<mat-checkbox class="checklist-leaf-node" [checked]="checklistSelection.isSelected(node)"
+													(change)="todoLeafItemSelectionToggle(node)">{{node.item}}
+												</mat-checkbox>
 											</span>
 										</div>
 									</div>
@@ -59,9 +53,9 @@
 												<img src="/assets/images/_sub.png" *ngIf="treeControl.isExpanded(node)">
 											</button>
 											<span style="padding-left: 5px; ">
-												<mat-checkbox [checked]="descendantsAllSelected(node)"
-													[indeterminate]="descendantsPartiallySelected(node)"
-													(change)="todoItemSelectionToggle(node)">{{node.item}}</mat-checkbox>
+												<mat-checkbox [checked]="descendantsAllSelected(node)" [indeterminate]="descendantsPartiallySelected(node)"
+													(change)="todoItemSelectionToggle(node)">{{node.item}}
+												</mat-checkbox>
 											</span>
 										</div>
 									</div>
@@ -71,7 +65,6 @@
 								<ng-container cdkTreeNodeOutlet></ng-container>
 							</div>
 						</cdk-nested-tree-node>
-						
 					</cdk-tree>
 				</div>
 			</div>

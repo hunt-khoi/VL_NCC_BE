@@ -110,7 +110,6 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 	}
 
 
-	/** Delete */
 	delete(item: any) {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn xóa vai trò người dùng không?';
@@ -119,6 +118,7 @@ export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
+			
 			this.disabledBtn = true;
 			this.service.deleteVaiTro(item.IdRow).subscribe(res => {
 				if (res && res.status === 1) {

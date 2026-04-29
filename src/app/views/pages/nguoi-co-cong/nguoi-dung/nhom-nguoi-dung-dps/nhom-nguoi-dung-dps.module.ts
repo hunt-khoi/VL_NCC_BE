@@ -1,18 +1,13 @@
-// Angular
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-//Component
+import { CdkTreeModule } from '@angular/cdk/tree';
+import { DPSCommonModule } from '../../dps-common.module';
+import { NhomNguoiDungDPSService } from './Services/nhom-nguoi-dung-dps.service';
+import { PhanQuyenComponent } from './phan-quyen/phan-quyen.component';
 import { NhomNguoiDungDPSComponent } from './nhom-nguoi-dung-dps.component';
 import { NhomNguoiDungDPSListComponent } from './nhom-nguoi-dung-dps-list/nhom-nguoi-dung-dps-list.component';
 import { NhomNguoiDungDPSEditComponent } from './nhom-nguoi-dung-dps-edit/nhom-nguoi-dung-dps-edit.component';
-//Service
-import { NhomNguoiDungDPSService } from './Services/nhom-nguoi-dung-dps.service';
-import { DPSCommonModule } from '../../dps-common.module';
-import { PhanQuyenComponent } from './phan-quyen/phan-quyen.component';
-import { CdkTreeModule } from '@angular/cdk/tree';
 
-// Material
 const routes: Routes = [
 	{
 		path: '',
@@ -46,4 +41,5 @@ const routes: Routes = [
 		PhanQuyenComponent
 	]
 })
+
 export class NhomNguoiDungDPSModule {}
