@@ -4,13 +4,13 @@ import { User } from '../_models/user.model';
 export interface AuthState {
     loggedIn: boolean;
     authToken: string;
-    user: User;
+    user: User | undefined;
     isUserLoaded: boolean;
 }
 
 export const initialAuthState: AuthState = {
     loggedIn: false,
-    authToken: undefined,
+    authToken: '',
     user: undefined,
     isUserLoaded: false
 };
