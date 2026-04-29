@@ -9,7 +9,6 @@ export class LoaiDieuDuongComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
 }

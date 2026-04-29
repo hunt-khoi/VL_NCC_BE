@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
-import { solieuListComponent } from './solieu-list/solieu-list.component';
-import { solieuService } from './Services/solieu.service';
 import { DPSCommonModule } from '../../dps-common.module';
+import { solieuService } from './Services/solieu.service';
+import { solieuListComponent } from './solieu-list/solieu-list.component';
 import { solieuEditDialogComponent } from './solieu-edit/solieu-edit.dialog.component';
-import { filterEditComponent } from './filter-edit/filter-edit.component';
-import { FilterComponent } from './filter/filter.component';
 import { filterService } from './Services/filter.service';
+import { FilterComponent } from './filter/filter.component';
+import { filterEditComponent } from './filter-edit/filter-edit.component';
 import { cachNhapService } from './Services/cachnhap.service';
-import { cachnhapEditDialogComponent } from './cachnhap-edit/cachnhap-edit.dialog.component';
 import { cachNhapListComponent } from './cachnhap-list/cachnhap-list.component';
+import { cachnhapEditDialogComponent } from './cachnhap-edit/cachnhap-edit.dialog.component';
 
 @NgModule({
 	imports: [
@@ -38,4 +38,5 @@ import { cachNhapListComponent } from './cachnhap-list/cachnhap-list.component';
 		cachNhapListComponent
 	]
 })
+
 export class solieuRefModule { }

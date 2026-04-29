@@ -14,10 +14,9 @@ import moment from 'moment';
 })
 
 export class dungcuchinhhinhEditDialogComponent implements OnInit {
-	item: dungcuchinhhinhModel;
-	oldItem: dungcuchinhhinhModel;
-
-	itemForm: FormGroup;
+	item: dungcuchinhhinhModel = new dungcuchinhhinhModel();
+	oldItem: dungcuchinhhinhModel = new dungcuchinhhinhModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -28,7 +27,7 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	allowUpdateCost: boolean = false;
 	listdungcus: any[] = [];
 	isPhu: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -48,7 +47,7 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		private danhMucService: CommonService,
-		public dungcuchinhhinhService: dungcuchinhhinhService,
+		public apiService: dungcuchinhhinhService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
@@ -69,7 +68,7 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		this.createForm();
         if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			this.dungcuchinhhinhService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -103,12 +102,12 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 			temp.Id_Child = [this.item.Id_Child == null ? '0' : '' + this.item.Id_Child];
 			this.itemForm = this.fb.group(temp);
 		}
-        
 		if (!this.allowEdit) 
 			this.itemForm.disable();
 	}
 
-	checkPhu($event) {
+	checkPhu($event: any) {
+		if (!this.itemForm) return;
 		if ($event.checked) {
 			this.isPhu = true;
 			this.itemForm.controls.Id_Child.setValue('0')
@@ -119,17 +118,16 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('DUNG_CU_CHINH_HINH.ADD');
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-		if(this.allowEdit == false) { 
+		if (!this.allowEdit) { 
 			result = this.translate.instant('DUNG_CU_CHINH_HINH.DETAIL') + ` - ${this.item.DungCu}`;
 			return result;
 		}
-		if(this.allowUpdateCost == true) { 
+		if (this.allowUpdateCost) { 
 			result = this.translate.instant('DUNG_CU_CHINH_HINH.UPDATE_COST') + ` - ${this.item.DungCu}`;
 			return result;
 		} 
@@ -137,8 +135,8 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): dungcuchinhhinhModel {
+	prepare(): dungcuchinhhinhModel {
+		if (!this.itemForm) return new dungcuchinhhinhModel();
 		const controls = this.itemForm.controls;
 		const _item = new dungcuchinhhinhModel();
 		_item.Id = this.item.Id;
@@ -149,35 +147,32 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		_item.Priority = controls['Priority'].value;
 		_item.IsVatPhamPhu = controls['IsPhu'].value;
 		_item.Id_Child = controls['Id_Child'].value;
-		
 		return _item;
 	}
 
 	prepareUpdateTriGia(): TriGiaDungCuModel {
+		if (!this.itemForm) return new TriGiaDungCuModel();
 		const controls = this.itemForm.controls;
 		const _item = new TriGiaDungCuModel();
 		_item.Id = 0;
 		_item.Id_DungCu = this.item.Id;
 		if (controls['ThoiGian'].value)
 			_item.ThoiGian = this.danhMucService.f_convertDate(controls['ThoiGian'].value);
-
 		_item.TriGia = controls['TriGia'].value;
 		_item.NienHan = controls['NienHan'].value;
 		_item.MoTa = controls['MoTa'].value
-
 		return _item;
 	}
 
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -186,16 +181,16 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 			const UpdateTriGia = this.prepareUpdateTriGia();
 			this.UpdateTriGia(UpdateTriGia, withBack);
 		}
-		else{
+		else {
 			if (controls.Priority.value < 0 || controls.Priority.value === '') {
 				this.hasFormErrors = true;
 				return;
 			}
-			const EditDungCu = this.prepareCustomer();
-			if (EditDungCu.Id > 0) {
-				this.UpdateNhom(EditDungCu, withBack);
+			const Edit = this.prepare();
+			if (Edit.Id > 0) {
+				this.Update(Edit, withBack);
 			} else {
-				this.CreateNhom(EditDungCu, withBack);
+				this.Create(Edit, withBack);
 			}
 		}
 	}
@@ -204,47 +199,20 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	UpdateNhom(_item: dungcuchinhhinhModel, withBack: boolean) {
+	Create(item: dungcuchinhhinhModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		this.viewLoading = true;
+		// this.viewLoading = true;
 		this.disabledBtn = true;
-		this.dungcuchinhhinhService.updateDungCu(_item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
-					this.ngOnInit();
-					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
-				}
-			}
-			else {
-				this.layoutUtilsService.showError(res.error.message);
-			}
-		});
-	}
-
-	UpdateTriGia(_item: TriGiaDungCuModel, withBack: boolean) {
-		this.loadingAfterSubmit = true;
-		this.viewLoading = true;
-		this.dungcuchinhhinhService.updateTriGia(_item).subscribe(res => {
-			this.changeDetectorRefs.detectChanges();
-			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
-				}
-				else {
-					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
+					this.layoutUtilsService.showInfo(_messageType);
 					this.ngOnInit();
 				}
 			}
@@ -255,23 +223,45 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateNhom(_item: dungcuchinhhinhModel, withBack: boolean) {
+	Update(item: dungcuchinhhinhModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		// this.viewLoading = true;
+		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.dungcuchinhhinhService.createDungCu(_item).subscribe(res => {
+		this.apiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
-					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					// this.focusInput.nativeElement.focus();
+					this.ngOnInit();
+					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
+				}
+			}
+			else {
+				this.layoutUtilsService.showError(res.error.message);
+			}
+		});
+	}
+
+	UpdateTriGia(item: TriGiaDungCuModel, withBack: boolean) {
+		this.loadingAfterSubmit = true;
+		this.viewLoading = true;
+		this.apiService.updateTriGia(item).subscribe(res => {
+			this.changeDetectorRefs.detectChanges();
+			if (res && res.status === 1) {
+				if (withBack) {
+					this.dialogRef.close({ item });
+				}
+				else {
+					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -288,12 +278,13 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	    this.allowUpdateCost = false;
 		this.createForm();
         this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

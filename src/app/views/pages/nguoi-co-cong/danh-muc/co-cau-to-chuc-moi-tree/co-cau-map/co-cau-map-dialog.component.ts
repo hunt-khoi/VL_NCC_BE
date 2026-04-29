@@ -1,11 +1,9 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { TranslateService } from '@ngx-translate/core';
-import { CommonService } from '../../../services/common.service';
+import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { cocautochucMoiTreeService } from '../Services/co-cau-to-chuc-moi-tree.service';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
 
 export class TodoItemNode {
 	children?: TodoItemNode[];
@@ -43,17 +41,15 @@ export class CoCauMapDialogComponent implements OnInit {
 	constructor(
 		public dialogRef: MatDialogRef<CoCauMapDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private danhMucService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private service: cocautochucMoiTreeService,
-		private translate: TranslateService) {
+		private service: cocautochucMoiTreeService) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		if (this.data.allowEdit)
 			this.allowEdit = this.data.allowEdit;
+
 		this.treeControl = new NestedTreeControl<TodoItemNode>(node => node.children);
 		this.dataSource = new ArrayDataSource(this.TREE_DATA);
 		this.viewLoading = true;
@@ -192,12 +188,10 @@ export class CoCauMapDialogComponent implements OnInit {
 		}
 	}
 	
-	/** UI */
 	getTitle(): string {
 		return "Đơn vị hành chánh tương ứng";
 	}
 
-	/** ACTIONS */
 	prepareCustomer(): any {
 		let indetermine: any[] = [];
 		this.TREE_DATA.forEach(t => {

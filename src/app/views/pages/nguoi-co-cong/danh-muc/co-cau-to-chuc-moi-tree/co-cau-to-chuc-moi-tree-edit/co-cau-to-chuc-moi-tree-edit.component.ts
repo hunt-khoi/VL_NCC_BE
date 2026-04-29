@@ -1,7 +1,6 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { TranslateService } from '@ngx-translate/core';
 import { OrgStructureModel } from '../Model/CoCauToChuc.model';
 import { cocautochucMoiTreeService } from '../Services/co-cau-to-chuc-moi-tree.service';
@@ -16,23 +15,23 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 
 export class CoCauToChucEditComponent implements OnInit {
 	filterprovinces: string = '';
-	item: OrgStructureModel;
-	oldItem: OrgStructureModel
-	itemForm: FormGroup;
+	item: OrgStructureModel = new OrgStructureModel();
+	oldItem: OrgStructureModel = new OrgStructureModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
-	NoiDung: string;
+	NoiDung: string = "";
 	listorgstructure: any[] = [];
 	listDV: any[] = [];
 	disabledBtn: boolean = false;
 	listCheDoLamViec: any[] = [];
 	allowEdit: boolean = true;
 	isZoomSize:boolean=false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
-	ID_Goc_Pa: number = undefined;
-	filtercalamvic: number;
+	ID_Goc_Pa: number | null = null;
+	filtercalamvic: number = 0;
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
@@ -49,10 +48,9 @@ export class CoCauToChucEditComponent implements OnInit {
 
 	constructor(public dialogRef: MatDialogRef<CoCauToChucEditComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private fb: FormBuilder,
 		private itemFB: FormBuilder,
 		private danhMucChungService: CommonService,
-		private cocautochucMoiService: cocautochucMoiTreeService,
+		private apiService: cocautochucMoiTreeService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private translate: TranslateService,
@@ -60,7 +58,6 @@ export class CoCauToChucEditComponent implements OnInit {
 		this._name = this.translate.instant("CO_CAU_TO_CHUC.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.filterprovinces = res.IdTinh;
@@ -85,10 +82,10 @@ export class CoCauToChucEditComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 		});
 		this.createForm();
-		this.focusInput.nativeElement.focus();
+		
 	}
 
-	changeCap(value) {
+	changeCap(value: any) {
 		this.listDV = [];
 		if (value == 2)
 			this.danhMucChungService.GetListDistrictByProvinces(this.filterprovinces).subscribe(res => {
@@ -111,13 +108,14 @@ export class CoCauToChucEditComponent implements OnInit {
 			id_ca: [this.item.WorkingModeID],
 			Vitri: [this.item.Position, Validators.required],
 			CapCoCau: [this.item.Level, Validators.required],
-			idgoc: [+this.item.ID_Goc],
+			idgoc: [this.item.ID_Goc],
 		});
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('COMMON.CREATE');
 		if (this.item.RowID <= 0) {
@@ -127,8 +125,8 @@ export class CoCauToChucEditComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): OrgStructureModel {
+	prepare(): OrgStructureModel {
+		if (!this.itemForm) return new OrgStructureModel();
 		const controls = this.itemForm.controls;
 		const _item = new OrgStructureModel();
 		_item.RowID = this.item.RowID;
@@ -145,13 +143,12 @@ export class CoCauToChucEditComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -161,31 +158,30 @@ export class CoCauToChucEditComponent implements OnInit {
 			this.itemForm.controls["Vitri"].setValue("");
 			return;
 		}
-		const capcocau = this.prepareCustomer();
-		if (capcocau.RowID > 0) {
-			this.Update(capcocau, withBack);
+		const data = this.prepare();
+		if (data.RowID > 0) {
+			this.Update(data, withBack);
 		} else {
-			this.Create(capcocau, withBack);
+			this.Create(data, withBack);
 		}
 	}
 
-	Update(_item: OrgStructureModel, withBack: boolean) {
+	Update(item: OrgStructureModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.cocautochucMoiService.Updateorgstructure(_item).subscribe(res => {
+		this.apiService.Updateorgstructure(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -196,34 +192,23 @@ export class CoCauToChucEditComponent implements OnInit {
 		});
 	}
 
-	reset() {
-		this.item = Object.assign({}, this.item);
-		this.createForm();
-		this.hasFormErrors = false;
-		this.itemForm.markAsPristine();
-		this.itemForm.markAsUntouched();
-		this.itemForm.updateValueAndValidity();
-	}
-
-	Create(_item: OrgStructureModel, withBack: boolean) {
+	Create(item: OrgStructureModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.cocautochucMoiService.Createorgstructure(_item).subscribe(res => {
+		this.apiService.Createorgstructure(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					// this.reset();
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.changeDetectorRefs.detectChanges();
 				}
 			}
@@ -234,8 +219,14 @@ export class CoCauToChucEditComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
+	reset() {
+		this.item = Object.assign({}, this.item);
+		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
+		this.itemForm.markAsPristine();
+		this.itemForm.markAsUntouched();
+		this.itemForm.updateValueAndValidity();
 	}
 
 	close() {

@@ -1,16 +1,15 @@
-import { stringify } from 'querystring';
 import { BaseModel } from "../../../../../../core/_base/crud";
 
 export class chedouudaiModel extends BaseModel {
-    Id: number;
-    CheDoUuDai: string;
-    MoTa: string;
-    Locked: boolean;
-    Priority: number;
-    CreatedBy: number;
-    CreatedDate: string;
-    UpdatedBy: number;
-    UpdatedDate: string;
+    Id: number = 0;
+    CheDoUuDai: string = "";
+    MoTa: string = "";
+    Locked: boolean = false;
+    Priority: number = 0;
+    CreatedBy: number = 0;
+    CreatedDate: string = "";
+    UpdatedBy: number = 0;
+    UpdatedDate: string = "";
 
 	clear() {
         this.CheDoUuDai = '';
@@ -21,7 +20,6 @@ export class chedouudaiModel extends BaseModel {
         this.CreatedDate = '';
         this.UpdatedBy = 0;
         this.UpdatedDate = '';
-
         this.Id = 0;
 	}
 }

@@ -4,76 +4,61 @@ import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../..
 import { donvihanhchinhService } from '../../Services/donvihanhchinh.service';
 
 export class donvihanhchinhDataSource extends BaseDataSource {
-	constructor(private _services: donvihanhchinhService,
-	) {
+	constructor(private apiService: donvihanhchinhService) {
 		super();
 	}
+
 	loadListprovices(queryParams: QueryParamsModel) {
-		this._services.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
 		this.loadingSubject.next(true);
-
-		this._services.findDataProvinces(queryParams)
+		this.apiService.findDataProvinces(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					this.entitySubject.next(res.data);
+					var totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 					this.paginatorTotalSubject.next(totalCount);
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),
 				finalize(() => this.loadingSubject.next(false))
-		).subscribe(res => {
-			this._services.ReadOnlyControl = res.Visible;
-			});
+			).subscribe(res => {
+				this.apiService.ReadOnlyControl = res.Visible;
+			}
+		);
 	}
-	loadListDistrict(queryParams: QueryParamsModel) {
-		this._services.lastFilter$.next(queryParams);
-		this.loadingSubject.next(true);
 
-		this._services.findDataDistrict(queryParams)
-			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
-					this.paginatorTotalSubject.next(totalCount);
-				}),
-				catchError(err => of(new QueryResultsModel([], err))),
-				finalize(() => this.loadingSubject.next(false))
-		).subscribe(res => {
-			this._services.ReadOnlyControl = res.Visible;
-			});
-	}
 	loadListward(queryParams: QueryParamsModel) {
-		this._services.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
 		this.loadingSubject.next(true);
-
-		this._services.findDataWard(queryParams)
+		this.apiService.findDataWard(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					this.entitySubject.next(res.data);
+					var totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 					this.paginatorTotalSubject.next(totalCount);
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),
 				finalize(() => this.loadingSubject.next(false))
-		).subscribe(res => {
-			this._services.ReadOnlyControl = res.Visible;
-			});
+			).subscribe(res => {
+				this.apiService.ReadOnlyControl = res.Visible;
+			}
+		);
 	}
-	loadListKhomAp(queryParams: QueryParamsModel) {
-		this._services.lastFilter$.next(queryParams);
-		this.loadingSubject.next(true);
 
-		this._services.findDataKhomAp(queryParams)
+	loadListKhomAp(queryParams: QueryParamsModel) {
+		this.apiService.lastFilter$.next(queryParams);
+		this.loadingSubject.next(true);
+		this.apiService.findDataKhomAp(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					this.entitySubject.next(res.data);
+					var totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 					this.paginatorTotalSubject.next(totalCount);
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),
 				finalize(() => this.loadingSubject.next(false))
-		).subscribe(res => {
-			this._services.ReadOnlyControl = res.Visible;
-			});
+			).subscribe(res => {
+				this.apiService.ReadOnlyControl = res.Visible;
+			}
+		);
 	}
 }

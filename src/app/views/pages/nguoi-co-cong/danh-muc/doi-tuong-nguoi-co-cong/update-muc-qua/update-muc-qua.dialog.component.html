@@ -12,7 +12,7 @@
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
 		<div class="col-md-5 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
-			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit()" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
 				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>
 		</div>
@@ -20,7 +20,7 @@
 
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert>
 
@@ -45,7 +45,8 @@
 				</div>
 				<div class="col-lg-3 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="{{'MUCQUA.NAME' | translate }}" formControlName="SoTien" class="require" required  mask="separator,3" thousandSeparator="{{danhMucService.thousandSeparator}}" />
+						<input matInput placeholder="{{'MUCQUA.NAME' | translate }}" formControlName="SoTien" class="require" required 
+							mask="separator,3" thousandSeparator="{{danhMucService.thousandSeparator}}" />
 					</mat-form-field>
 				</div>
 			</div>
@@ -54,11 +55,13 @@
 				<table mat-table style="width: 100%;" [dataSource]="datasource">
 					<ng-container matColumnDef="select">
 						<th mat-header-cell *matHeaderCellDef class="mat-column-checkbox" style="padding-right: 20px;">
-							<mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'" [disabled]="thaotac==0">
+							<mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" 
+							[indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'" [disabled]="thaotac==0">
 							</mat-checkbox>
 						</th>
 						<td mat-cell *matCellDef="let row" class="mat-column-checkbox" style="padding-right: 20px;">
-							<mat-checkbox [(ngModel)]="row.selected" [ngModelOptions]="{standalone: true}" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [color]="'primary'">
+							<mat-checkbox (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [(ngModel)]="row.selected"
+							[ngModelOptions]="{standalone: true}" (click)="$event.stopPropagation()" [color]="'primary'">
 							</mat-checkbox>
 						</td>
 					</ng-container>
@@ -74,7 +77,6 @@
 					<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 				</table>
 			</div>
-
 		</div>
 	</form>
 </div>

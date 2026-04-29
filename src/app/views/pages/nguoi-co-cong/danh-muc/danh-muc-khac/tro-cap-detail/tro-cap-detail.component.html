@@ -65,8 +65,8 @@
 				</div>
 				<div class="col-md-6">
 					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="{{ 'TROCAP.TienTroCap' | translate }}" formControlName="TienTroCap" [readonly]="itemForm.controls['Id_Parent'].value>0" 
-							mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+						<input matInput placeholder="{{ 'TROCAP.TienTroCap' | translate }}" formControlName="TienTroCap" 
+							[readonly]="itemForm.controls['Id_Parent'].value>0" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
 					</mat-form-field>
 				</div>
 				<div class="col-md-6">
@@ -96,7 +96,8 @@
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select disableOptionCentering placeholder="Biểu mẫu trợ cấp" formControlName="Id_Template">
 							<mat-option>
-								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrl" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+									[(ngModel)]="FilterCtrl" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
 								</ngx-mat-select-search>
 							</mat-option>
 							<mat-option [value]="0">--Chọn--</mat-option>
@@ -108,7 +109,8 @@
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select disableOptionCentering placeholder="Biểu mẫu thôi trả trợ cấp" formControlName="Id_Template_Cat">
 							<mat-option>
-								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrl1" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter1()">
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+									[(ngModel)]="FilterCtrl1" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter1()">
 								</ngx-mat-select-search>
 							</mat-option>
 							<mat-option [value]="0">--Chọn--</mat-option>

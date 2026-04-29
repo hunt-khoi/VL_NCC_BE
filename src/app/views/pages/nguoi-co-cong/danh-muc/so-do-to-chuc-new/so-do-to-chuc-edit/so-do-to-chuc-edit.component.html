@@ -57,8 +57,7 @@
 	
 	<form [formGroup]="itemForm" *ngIf="item" class="kt-form kt-form--group-seperator-dashed">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0"
-				(close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert>
 

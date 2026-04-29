@@ -1,21 +1,18 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-// Material
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-import { loaisolieuEditDialogComponent } from '../loaisolieu-edit/loaisolieu-edit.dialog.component';
-import { loaisolieuDataSource } from '../Model/data-sources/loaisolieu.datasource';
-import { loaisolieuModel } from '../Model/loaisolieu.model';
-import { loaisolieuService } from '../Services/loaisolieu.service';
-import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel} from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
+import { CommonService } from '../../../services/common.service';
+import { loaisolieuService } from '../Services/loaisolieu.service';
+import { loaisolieuModel } from '../Model/loaisolieu.model';
+import { loaisolieuDataSource } from '../Model/data-sources/loaisolieu.datasource';
+import { loaisolieuEditDialogComponent } from '../loaisolieu-edit/loaisolieu-edit.dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -25,12 +22,11 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class loaisolieuListComponent implements OnInit {
-
     // Table fields
-    dataSource: loaisolieuDataSource;
+    dataSource: loaisolieuDataSource | undefined;
     displayedColumns = ['STT', 'LoaiSoLieu', 'MoTa', 'Locked', 'Priority', 'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
-	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
     filterStatus = '';
 	filterCondition = '';
     // Selection
@@ -38,35 +34,35 @@ export class loaisolieuListComponent implements OnInit {
     productsResult: loaisolieuModel[] = [];
     _name = "";
     
-    gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+    gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+    btnClass: string = "";
     
-	constructor(public loaisolieuService1: loaisolieuService,
-		private danhMucService: CommonService,
+	constructor(public apiService: loaisolieuService,
         public dialog: MatDialog,
         private cookieService: CookieService,
         private route: ActivatedRoute,
         private ref: ApplicationRef,
         private layoutUtilsService: LayoutUtilsService,
-        private translate: TranslateService) 
-    {
+        private translate: TranslateService) {
         this._name = this.translate.instant("LOAI_SO_LIEU.NAME");
     }
 
     /** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-        if (this.loaisolieuService1 !== undefined) {
-			this.loaisolieuService1.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
-		} //mặc định theo priority
+        this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
+        if (this.apiService !== undefined) {
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
+		} 
 
         this.gridModel = new TableModel();
 		this.gridModel.clear();
 		this.gridModel.haveFilter = true;
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
         this.gridModel.filterText['LoaiSoLieu'] = "";
-
         this.gridModel.disableButtonFilter['Locked'] = true;
 
         let optionsTinhTrang = [
@@ -79,7 +75,6 @@ export class loaisolieuListComponent implements OnInit {
 				value: 'False',
 			}
 		];
-
         this.gridModel.filterGroupDataChecked['Locked'] = optionsTinhTrang.map(x => {
 			return {
 				name: x.name,
@@ -87,7 +82,6 @@ export class loaisolieuListComponent implements OnInit {
 				checked: false
 			}
         });
-        
         this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
         let availableColumns = [
@@ -175,7 +169,6 @@ export class loaisolieuListComponent implements OnInit {
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns)
 
-
 		this.gridService = new TableService(
 			this.layoutUtilsService,
 			this.ref,
@@ -183,34 +176,33 @@ export class loaisolieuListComponent implements OnInit {
 			this.cookieService
 		);
         this.gridService.cookieName = 'displayedColumns_loaisolieu'
-
 		this.gridService.showColumnsInTable();
         this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_loaisolieu'));
 
-        // If the user changes the sort order, reset back to the first page.
-        this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-        merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-            .pipe(
-                tap(() => {
-                    this.loadDataList();
-                })
-            )
-            .subscribe();
+        if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
         // Init DataSource
-        this.dataSource = new loaisolieuDataSource(this.loaisolieuService1);
+        this.dataSource = new loaisolieuDataSource(this.apiService);
         let queryParams = new QueryParamsModel({});
-
-        // Read from URL itemId, for restore previous state
-        this.route.queryParams.subscribe(params => {
-            queryParams = this.loaisolieuService1.lastFilter$.getValue();
-            // First load
-            this.dataSource.loadList(queryParams);
+        this.route.queryParams.subscribe(_ => {
+            if (this.dataSource) {
+                queryParams = this.apiService.lastFilter$.getValue();
+                this.dataSource.loadList(queryParams);
+            }
         });
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -219,6 +211,7 @@ export class loaisolieuListComponent implements OnInit {
     }
 
 	loadDataList(holdCurrentPage: boolean = true) {
+        if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
         const queryParams = new QueryParamsModel(
             this.filterConfiguration(),
             this.sort.direction,
@@ -229,37 +222,31 @@ export class loaisolieuListComponent implements OnInit {
         );
         this.dataSource.loadList(queryParams);
     }
-    filterConfiguration(): any {
 
+    filterConfiguration(): any {
         const filter: any = {};
         if (this.filterStatus && this.filterStatus.length > 0) {
 			filter.status = +this.filterStatus;
 		}
-
 		if (this.filterCondition && this.filterCondition.length > 0) {
             filter.type = +this.filterCondition;
         }
-
-        if (this.gridService.model.filterText) 
+        if (this.gridService && this.gridService.model.filterText) {
             filter.LoaiSoLieu = this.gridService.model.filterText['LoaiSoLieu'];
-
-        return filter; //trả về đúng biến filter
+        }
+        return filter; 
     }
 
-    /** Delete */
-    DeleteWorkplace(_item: loaisolieuModel) {
+    Delete(item: loaisolieuModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
         const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
         dialogRef.afterClosed().subscribe(res => {
-            if (!res) {
-                return;
-            }
-
-            this.loaisolieuService1.deleteItem(_item.Id).subscribe(res => {
+            if (!res) return;
+            
+            this.apiService.delete(item.Id).subscribe(res => {
                 if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
                 }
@@ -271,32 +258,29 @@ export class loaisolieuListComponent implements OnInit {
         });
     }
 
-    //Khóa
-    BlockWorkplace(_item: loaisolieuModel) {
+    Block(item: loaisolieuModel) {
         let _description = '';
         let _waitDesciption = '';
         let _title = '';
-
-        if(_item.Locked == false) { 
+        if (item.Locked == false) { 
             _description = 'Bạn có chắc chắn muốn khóa loại số liệu này không ??';
             _waitDesciption = 'Đang cập nhật ...';
             _title = 'Khóa loại số liệu';
-            _item.Locked = true;
+            item.Locked = true;
         }
         else {
             _description = 'Bạn có chắc chắn muốn mở khóa loại số liệu này không ??';
             _waitDesciption = 'Đang cập nhật ...';
             _title = 'Mở khóa loại số liệu';
-            _item.Locked = false;
+            item.Locked = false;
         }
-
         const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption); //thay đổi titile là ra confirm khác
         dialogRef.afterClosed().subscribe(res => {
             if (!res) {
                 this.loadDataList(); //để không biến mất ổ khóa
                 return;
             }
-		    this.loaisolieuService1.updateloaisolieu(_item).subscribe(res => {
+		    this.apiService.update(item).subscribe(res => {
                 if (res && res.status === 1) {
                     const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -310,38 +294,14 @@ export class loaisolieuListComponent implements OnInit {
 
     }
 
-    // lock(_item: any, islock = true) {
-	// 	let _message = (islock ? "Khóa" : "Mở khóa") + " người dùng thành công";
-	// 	this.nguoidungdpssService.lock(_item.UserID, islock).subscribe(res => {
-	// 		if (res && res.status === 1) {
-	// 			this.layoutUtilsService.showInfo(_message);
-	// 		}
-	// 		else {
-	// 			this.layoutUtilsService.showError(res.error.message);
-	// 		}
-	// 		this.loadNguoiDungDPSsList(true);
-	// 	});
-	// }
-
-    AddWorkplace() {
+    Add() {
         const loaisolieuModels = new loaisolieuModel();
         loaisolieuModels.clear(); // Set all defaults fields
-        this.EditNhom(loaisolieuModels);
+        this.Edit(loaisolieuModels);
     }
 
-    restoreState(queryParams: QueryParamsModel, id: number) {
-        if (id > 0) {
-        }
-
-        if (!queryParams.filter) {
-            return;
-        }
-    }
-
-    EditNhom(_item: loaisolieuModel, allowEdit: boolean = true) {
-        let saveMessageTranslateParam = '';
-        //câu thông báo khi thực hiện trong tác vụ
-        saveMessageTranslateParam += _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';  
+    Edit(_item: loaisolieuModel, allowEdit: boolean = true) {
+        let saveMessageTranslateParam = _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';  
         const _saveMessage = this.translate.instant(saveMessageTranslateParam, {name:this._name});
         const dialogRef = this.dialog.open(loaisolieuEditDialogComponent, { data: { _item, allowEdit } });
         dialogRef.afterClosed().subscribe(res => {
@@ -355,6 +315,7 @@ export class loaisolieuListComponent implements OnInit {
 
         });
     }
+
     getHeight(): any {
 		let obj = window.location.href.split("/").find(x => x == "tabs-references");
 		if (obj) {
@@ -367,7 +328,6 @@ export class loaisolieuListComponent implements OnInit {
 			return tmp_height + 'px';
 		}
     }
-
 
     //phục vụ CSS
     covertLockButton(lock:boolean): string {
@@ -404,6 +364,5 @@ export class loaisolieuListComponent implements OnInit {
 			case true:
 				return 'kt-badge--metal';
 		}
-		return '';
 	}
 }

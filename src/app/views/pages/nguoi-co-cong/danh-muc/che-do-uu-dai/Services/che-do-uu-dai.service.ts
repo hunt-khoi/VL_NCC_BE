@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { chedouudaiModel } from '../Model/che-do-uu-dai.model';
 import { Injectable } from '@angular/core';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
@@ -11,20 +10,16 @@ const API_PRODUCTS_URL = environment.ApiRoot + '/che-do-uu-dai';
 @Injectable()
 export class chedouudaiService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) { }
+	ReadOnlyControl: boolean = false;
+	
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-
-	// READ
 	getAllItems(): Observable<chedouudaiModel[]> {
-
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<chedouudaiModel[]>(API_PRODUCTS_URL + '?more=true', { headers: httpHeaders });
 	}
 
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
-
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
 		const url = API_PRODUCTS_URL;
@@ -33,28 +28,24 @@ export class chedouudaiService {
 			params: httpParams
 		});
 	}
+
 	getItem(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_PRODUCTS_URL}/${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
     }
-    
 
-	// CREATE =>  POST: add a new oduct to the server
-	createCheDo(item): Observable<any> {
+	create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL, item, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
-	updateCheDo(item: chedouudaiModel): Observable<any> {
-		// Note: Add headers if needed (tokens/bearer)
+	update(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_PRODUCTS_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
-	deleteItem(itemId: number): Observable<any> {
+	delete(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_PRODUCTS_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });

@@ -1,21 +1,21 @@
 import { BaseModel } from '../../../../../../core/_base/crud';
 
 export class DanhmuckhacModel extends BaseModel {
-    Id: number;
-	MaLoaiHoSo: string;
-    LoaiHoSo: string;
-    LoaiGiayTo: string;
-    Id_LoaiGiayTo: string;
-    LoaiGiayToCC: string;
-    Id_LoaiGiayTo_CC: string;
-    Id_Template: number;
-    Id_Template_CongNhan: number;
-	Id_Template_ThanNhan: number;
-	MoTa: string;
-	Id_DoiTuongNCC: number;
-	GiayTos: any[];
-	BieuMaus: any[];
-	DoiTuongs: any;
+    Id: number = 0;
+	MaLoaiHoSo: string = "";
+    LoaiHoSo: string = "";
+    LoaiGiayTo: string = "";
+    Id_LoaiGiayTo: string = "";
+    LoaiGiayToCC: string = "";
+    Id_LoaiGiayTo_CC: string = "";
+    Id_Template: number = 0;
+    Id_Template_CongNhan: number = 0;
+	Id_Template_ThanNhan: number = 0;
+	MoTa: string = "";
+	Id_DoiTuongNCC: number = 0;
+	GiayTos: any[] = [];
+	BieuMaus: any[] = [];
+	DoiTuongs: any = {};
 
     clear() {
         this.Id = 0;
@@ -32,14 +32,14 @@ export class DanhmuckhacModel extends BaseModel {
 		this.Id_DoiTuongNCC = 0;
 		this.GiayTos = [];
 		this.BieuMaus = [];
-		this.DoiTuongs = [];
+		this.DoiTuongs = {};
     }
 }
 
 export class NoiDungChiModel extends BaseModel {
-    Id: number;
-	NoiDung: string;
-    GhiChu: string;
+    Id: number = 0;
+	NoiDung: string = "";
+    GhiChu: string = "";
 
     clear() {
         this.Id = 0;
@@ -47,4 +47,3 @@ export class NoiDungChiModel extends BaseModel {
 		this.GhiChu = '';
     }
 }
-

@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { cocautochucmoitreeComponent } from './co-cau-to-chuc-moi-tree-list/co-cau-to-chuc-moi-tree-list.component';
+import { DPSCommonModule } from '../../dps-common.module';
+import { cocautochucmoiTreeRefModule } from './co-cau-to-chuc-moi-tree-ref.module';
 import { cocautochucMoiTreeService } from './Services/co-cau-to-chuc-moi-tree.service';
 import { cocautochucComponent } from './co-cau-to-chuc-moi-tree.component';
-import { cocautochucmoiTreeRefModule } from './co-cau-to-chuc-moi-tree-ref.module';
-import { DPSCommonModule } from '../../dps-common.module';
+import { cocautochucmoitreeComponent } from './co-cau-to-chuc-moi-tree-list/co-cau-to-chuc-moi-tree-list.component';
+
 const routes: Routes = [
 	{
 		path: '',
@@ -28,4 +29,5 @@ const routes: Routes = [
 		cocautochucComponent,
 	],
 })
+
 export class cocautochucmoiTreeModule { }

@@ -1,9 +1,8 @@
 import { NgModule } from '@angular/core';
-import { LoaiGiayToListComponent } from './loaigiayto-list/loaigiayto-list.component';
-import { loaiGiayToServices } from './Services/loaigiayto.service';
 import { DPSCommonModule } from '../../dps-common.module';
+import { loaiGiayToServices } from './Services/loaigiayto.service';
+import { LoaiGiayToListComponent } from './loaigiayto-list/loaigiayto-list.component';
 import { LoaiGiayToEditDialogComponent } from './loaigiayto-edit/loaigiayto-edit.dialog.component';
-
 
 @NgModule({
 	imports: [
@@ -23,4 +22,5 @@ import { LoaiGiayToEditDialogComponent } from './loaigiayto-edit/loaigiayto-edit
 		LoaiGiayToListComponent
 	]
 })
+
 export class loaiGiayToRefModule { }

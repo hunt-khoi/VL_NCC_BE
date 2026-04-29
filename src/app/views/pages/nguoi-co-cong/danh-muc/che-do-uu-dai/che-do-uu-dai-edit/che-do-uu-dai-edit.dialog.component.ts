@@ -1,10 +1,9 @@
 import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { chedouudaiModel } from '../../che-do-uu-dai/Model/che-do-uu-dai.model';
 import { TranslateService } from '@ngx-translate/core';
 import { chedouudaiService } from '../Services/che-do-uu-dai.service';
-import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
@@ -13,9 +12,9 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 })
 
 export class chedouudaiEditDialogComponent implements OnInit {
-	item: chedouudaiModel;
-	oldItem: chedouudaiModel;
-	itemForm: FormGroup;
+	item: chedouudaiModel = new chedouudaiModel();
+	oldItem: chedouudaiModel = new chedouudaiModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -24,7 +23,7 @@ export class chedouudaiEditDialogComponent implements OnInit {
 	allowEdit = false;
 	isZoomSize: boolean = false;
 	change: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -43,7 +42,6 @@ export class chedouudaiEditDialogComponent implements OnInit {
 	constructor(public dialogRef: MatDialogRef<chedouudaiEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
-		private danhMucService: CommonService,
 		public chedouudaiService: chedouudaiService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
@@ -51,15 +49,12 @@ export class chedouudaiEditDialogComponent implements OnInit {
 			this._name = this.translate.instant("CHE_DO_UU_DAI.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item; 
 		this.allowEdit = this.data.allowEdit; 
-		
 		this.createForm();
         if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			
 			this.chedouudaiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
@@ -80,15 +75,13 @@ export class chedouudaiEditDialogComponent implements OnInit {
             Locked: ['' + this.item.Locked],
             Priority: ['' + this.item.Priority, Validators.min(1)]
         });
-        
 		this.itemForm.controls["CheDoUuDai"].markAsTouched();
-        this.focusInput.nativeElement.focus();
-
+		if (this.focusInput)
+    		this.focusInput.nativeElement.focus();
 		if (!this.allowEdit) //false thì không cho sửa
 			this.itemForm.disable();
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('CHE_DO_UU_DAI.ADD');
 		if (!this.item || !this.item.Id) {
@@ -102,8 +95,8 @@ export class chedouudaiEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): chedouudaiModel {
+	prepare(): chedouudaiModel {
+		if (!this.itemForm) return new chedouudaiModel();
 		const controls = this.itemForm.controls;
 		const _item = new chedouudaiModel();
 		_item.Id = this.item.Id;
@@ -111,49 +104,46 @@ export class chedouudaiEditDialogComponent implements OnInit {
 		_item.MoTa = controls['MoTa'].value;
         _item.Locked = controls['Locked'].value;
 		_item.Priority = controls['Priority'].value;
-
 		return _item;
 	}
 
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditNhomLeTet = this.prepareCustomer();
+		const EditNhomLeTet = this.prepare();
 		if (EditNhomLeTet.Id > 0) {
-			this.UpdateNhom(EditNhomLeTet, withBack);
+			this.Update(EditNhomLeTet, withBack);
 		} else {
-			this.CreateNhom(EditNhomLeTet, withBack);
+			this.Create(EditNhomLeTet, withBack);
 		}
 	}
 
-	UpdateNhom(_item: chedouudaiModel, withBack: boolean) {
+	Update(item: chedouudaiModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.chedouudaiService.updateCheDo(_item).subscribe(res => {
+		this.chedouudaiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -162,36 +152,29 @@ export class chedouudaiEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateNhom(_item: chedouudaiModel, withBack: boolean) {
+	Create(item: chedouudaiModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.chedouudaiService.createCheDo(_item).subscribe(res => {
+		this.chedouudaiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
-					this.change=true;
+					this.change = true;
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
 			else {
-				this.viewLoading = false;
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
-	}
-
-	onAlertClose($event) {
-		this.hasFormErrors = false;
 	}
 
 	close() {

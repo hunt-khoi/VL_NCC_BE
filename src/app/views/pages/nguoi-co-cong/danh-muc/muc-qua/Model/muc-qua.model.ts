@@ -1,16 +1,16 @@
 import { BaseModel } from 'app/core/_base/crud';
 
 export class MucQuaModel extends BaseModel {
-	Id: number;
-	MucQua: string;
-	MoTa: string;
-	SoTien: number;
-	Locked: boolean;
-	Priority: number;
-	CreatedBy: number;
-	CreatedDate: string;
-	UpdatedBy: number;
-	UpdatedDate: string;
+	Id: number = 0;
+	MucQua: string = '';
+	MoTa: string = '';
+	SoTien: number | null = null;
+	Locked: boolean = false;
+	Priority: number = 1;
+	CreatedBy: number = 0;
+	CreatedDate: string = '';
+	UpdatedBy: number = 0;
+	UpdatedDate: string = '';
 
 	clear() {
 		this.Id = 0;

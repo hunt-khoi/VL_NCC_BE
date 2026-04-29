@@ -12,8 +12,7 @@ const API_PRODUCTS_URL = environment.ApiRoot + '/co-cau-to-chuc';
 export class cocautochucMoiTreeService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) { }
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	Get_CoCauToChuc(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
@@ -28,15 +27,12 @@ export class cocautochucMoiTreeService {
 		return this.http.post<any>(API_PRODUCTS_URL, item, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
 	Updateorgstructure(item: OrgStructureModel): Observable<any> {
-		// Note: Add headers if needed (tokens/bearer)
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_PRODUCTS_URL + `/${item.RowID}`, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
-	Deleteorgstructure(itemId: number, title: string): Observable<any> {
+	Deleteorgstructure(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_PRODUCTS_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
@@ -44,12 +40,14 @@ export class cocautochucMoiTreeService {
 
 	handleDropLevel(item: OrgStructureModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post(API_PRODUCTS_URL + '/handleDropOrgChart?idfrom=' + item.drop_idfrom + '&namefrom=' + item.drop_namefrom + '&idto=' + item.drop_idto + '&nameto=' + item.drop_nameto + '&IsAbove=' + item.IsAbove, item, { headers: httpHeaders });
+		return this.http.post(API_PRODUCTS_URL + '/handleDropOrgChart?idfrom=' + item.drop_idfrom + '&namefrom=' + item.drop_namefrom + '&idto=' + item.drop_idto + '&nameto=' + item.drop_nameto + '&IsAbove=' + item.IsAbove, 
+			item, { headers: httpHeaders });
 	}
 
 	handleDropParent(item: OrgStructureModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post(API_PRODUCTS_URL + '/handleDropOrgChart?idfrom=' + item.drop_idfrom + '&namefrom=' + item.drop_namefrom + '&idto=' + item.drop_idto + '&level=' + item.level + '&nameto=' + item.drop_nameto, item, { headers: httpHeaders });
+		return this.http.post(API_PRODUCTS_URL + '/handleDropOrgChart?idfrom=' + item.drop_idfrom + '&namefrom=' + item.drop_namefrom + '&idto=' + item.drop_idto + '&level=' + item.level + '&nameto=' + item.drop_nameto, 
+			item, { headers: httpHeaders });
 	}
 
 	getCoCauMap() {

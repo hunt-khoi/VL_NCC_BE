@@ -13,17 +13,16 @@ import { ChonNhieuDungCuListComponent } from '../../../components';
 })
 
 export class DoiTuongDungCuEditComponent implements OnInit {
-
-  	item: DoiTuongDCCHModel;
-	oldItem: DoiTuongDCCHModel;
-	itemForm: FormGroup;
+  	item: DoiTuongDCCHModel = new DoiTuongDCCHModel();
+	oldItem: DoiTuongDCCHModel = new DoiTuongDCCHModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 	lstNhomLoaiDoiTuongNCC: any[] = [];
 	lstConstLoaiHoSo: any[] = [];
@@ -47,23 +46,20 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		public dialog: MatDialog,
-		private doiTuongNguoiCoCongService: DoiTuongNguoiCoCongService,
+		private apiService: DoiTuongNguoiCoCongService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 		this._NAME = this.translate.instant('DOITUONGBHYT.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
-
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.doiTuongNguoiCoCongService.getItemDCCH(this.item.Id).subscribe(res => {
+			this.apiService.getItemDCCH(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -76,6 +72,7 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 			});
 		}
 	}
+
 	createForm() {
 		const temp: any = {
 			DoiTuong: ['' + this.item.DoiTuong?this.item.DoiTuong:'', Validators.required],
@@ -86,7 +83,8 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 
 		if (this.allowEdit) {
 			this.itemForm = this.fb.group(temp);
-			this.focusInput.nativeElement.focus();
+			if (this.focusInput)
+				this.focusInput.nativeElement.focus();
 		} else {
 			temp.CreatedBy = ['' + this.item.CreatedBy];
 			temp.CreatedDate = ['' + this.item.CreatedDate];
@@ -94,12 +92,11 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 			temp.UpdatedDate = ['' + this.item.UpdatedDate];
 			this.itemForm = this.fb.group(temp);
 			this.itemForm.disable();
-			this.focusInput.nativeElement.focus();
+			if (this.focusInput)
+				this.focusInput.nativeElement.focus();
 		}
-
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('COMMON.CREATE');
 		if (!this.allowEdit) {
@@ -109,14 +106,12 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` đối tượng dụng cụ chỉnh hình`;
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): DoiTuongDCCHModel {
-
+	prepare(): DoiTuongDCCHModel {
+		if (!this.itemForm) return new DoiTuongDCCHModel();
 		const controls = this.itemForm.controls;
 		const _item = new DoiTuongDCCHModel();
 		_item.Id = this.item.Id;
@@ -127,16 +122,16 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 		_item.DungCuCHs = this.item.DungCuCHs;
 		return _item;
 	}
+
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -144,52 +139,52 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditDoiTuongDCCH = this.prepareCustomer();
-		if (EditDoiTuongDCCH.Id > 0) {
-			this.UpdateDoiTuongDCCH(EditDoiTuongDCCH, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateDoiTuongDCCH(EditDoiTuongDCCH, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
-	UpdateDoiTuongDCCH(_item: DoiTuongDCCHModel, withBack: boolean) {
+
+	Update(item: DoiTuongDCCHModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		// this.viewLoading = true;
 		this.disabledBtn = true;
-		this.doiTuongNguoiCoCongService.UpdateDoiTuongDCCH(_item).subscribe(res => {
+		this.apiService.UpdateDoiTuongDCCH(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else { 
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
-	CreateDoiTuongDCCH(_item: DoiTuongDCCHModel, withBack: boolean) {
+
+	Create(item: DoiTuongDCCHModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.doiTuongNguoiCoCongService.CreateDoiTuongDCCH(_item).subscribe(res => {
+		this.apiService.CreateDoiTuongDCCH(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -198,34 +193,35 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 			}
 		});
 	}
+
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close();
 	}
 
 	chonDT() {
-		let selected = this.item.DungCuCHs.map(x => {
+		let selected = this.item.DungCuCHs.map((x: any) => {
 			return { Id: x.Id, DungCu: x.DungCu };
 		});
 		const dialogRef = this.dialog.open(ChonNhieuDungCuListComponent, { data: { selected: selected } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
+			if (!res) 
 				this.item.DungCuCHs = [];
-			} else
+			else
 				this.item.DungCuCHs = res.itemSelected;
 		});
 	}
-	xoaDT(index) {
+
+	xoaDT(index: number) {
 		this.item.DungCuCHs.splice(index, 1);
 	}
 }

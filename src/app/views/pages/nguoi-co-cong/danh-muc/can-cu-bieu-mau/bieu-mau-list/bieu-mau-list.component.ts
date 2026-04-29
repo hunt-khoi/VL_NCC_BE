@@ -1,21 +1,18 @@
-import { QueryParamsModel } from './../../../../../../core/_base/crud/models/query-models/query-params.model';
+import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatPaginator, MatSort, MatDialog, MatMenuTrigger } from '@angular/material';
+import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { ActivatedRoute } from '@angular/router';
+import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
-import { SelectionModel } from '@angular/cdk/collections';
-import { MatPaginator, MatSort, MatMenuTrigger, MatDialog } from '@angular/material';
-import { TokenStorage } from './../../../../../../core/auth/_services/token-storage.service';
-import { loaiDieuDuongModel } from './../../loai-dieu-duong/Model/loaidieuduong.model';
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
-import { BieuMauService } from '../services/bieu-mau.service';
+import { BieuMauService } from '../Services/bieu-mau.service';
+import { CanCuService } from '../Services/can-cu.service';
 import { CanCuBieuMauDataSource } from '../Models/data-sources/can-cu-bieu-mau.datasource';
-import { CanCuService } from '../services/can-cu.service';
 import { BieuMauEditDialogComponent } from '../bieu-mau-edit/bieu-mau-edit.dialog.component';
-import { CommonService } from '../../../services/common.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -23,44 +20,44 @@ import { CookieService } from 'ngx-cookie-service';
 	templateUrl: './bieu-mau-list.component.html'
 })
 export class BieuMauListComponent implements OnInit {
-	dataSource: CanCuBieuMauDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
+	dataSource: CanCuBieuMauDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
+	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Filter fields
-	curUser: any = {};
 	// Selection
-	selection = new SelectionModel<loaiDieuDuongModel>(true, []);
-	productsResult: loaiDieuDuongModel[] = [];
+	selection = new SelectionModel<any>(true, []);
+	productsResult: any[] = [];
 	_name: string = "";
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
+	gridService: TableService | undefined;
+	gridModel: TableModel | undefined;
 	lstLoai: any[] = [];
-	list_button: boolean;
+	list_button: boolean = false;
+	btnClass: string = "";
+
 	constructor(
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
-		private TokenStorage: TokenStorage,
 		private translate: TranslateService,
 		private cookieService: CookieService,
 		private bmService: BieuMauService,
 		private ccService: CanCuService,
-		private commonService: CommonService
-	) {
+		private commonService: CommonService) {
 		this._name = this.translate.instant("BIEUMAU.NAME");
 	}
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-		this.girdModel.haveFilter = true;
-		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
-		this.girdModel.filterText['So'] = "";
-		this.girdModel.filterText['BieuMau'] = "";
-		this.girdModel.filterText['Version'] = "";
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
+		this.gridModel = new TableModel();
+		this.gridModel.haveFilter = true;
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
+		this.gridModel.filterText['So'] = "";
+		this.gridModel.filterText['BieuMau'] = "";
+		this.gridModel.filterText['Version'] = "";
 		let optionsTinhTrang = [
 			{
 				name: 'Chưa có hiệu lực',
@@ -75,19 +72,19 @@ export class BieuMauListComponent implements OnInit {
 				value: 'False',
 			}
 		];
-
-		this.girdModel.filterGroupDataChecked['IsHieuLuc'] = optionsTinhTrang.map(x => {
+		this.gridModel.filterGroupDataChecked['IsHieuLuc'] = optionsTinhTrang.map(x => {
 			return {
 				name: x.name,
 				value: x.value,
 				checked: false
 			}
 		});
+		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
-		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
 		this.commonService.liteCanCu().subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
-				let lst = res.data.map(x => {
+				let lst = res.data.map((x: any) => {
 					return {
 						name: x.title,
 						value: x.id,
@@ -99,6 +96,7 @@ export class BieuMauListComponent implements OnInit {
 			}
 		})
 		this.commonService.ListLoaiBieuMau().subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.lstLoai = res.data;
 				this.gridService.model.filterGroupDataChecked['Loai'] = this.lstLoai.map(x => {
@@ -195,45 +193,41 @@ export class BieuMauListComponent implements OnInit {
 				isShow: true
 			},
 		];
-		this.girdModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.girdModel.selectedColumns = new SelectionModel<any>(true, this.girdModel.availableColumns);
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService, 
 			this.ref, 
-			this.girdModel,
+			this.gridModel,
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_bieumau1'
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_bieumau1'));
 
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
-		// this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 		this.dataSource = new CanCuBieuMauDataSource(this.bmService, this.ccService);
-		this.route.queryParams.subscribe(params => {
-			let queryParams = this.bmService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadListBieuMau(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				let queryParams = this.bmService.lastFilter$.getValue();
+				this.dataSource.loadListBieuMau(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -242,10 +236,12 @@ export class BieuMauListComponent implements OnInit {
 	}
 
 	ngOnDestroy() {
-		this.gridService.Clear();
+		if (this.gridService) 
+			this.gridService.Clear();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -259,7 +255,7 @@ export class BieuMauListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.So = this.gridService.model.filterText['So'];
 			filter.BieuMau = this.gridService.model.filterText['BieuMau'];
 			filter.Version = this.gridService.model.filterText['Version'];
@@ -268,37 +264,33 @@ export class BieuMauListComponent implements OnInit {
 	}
 
 	Add() {
-		let _item: any = { Id: 0, Version: '1.0.0', content: '$', isTinh: true, isHuyen: false, isXa: false }; //ko tự check huyện, xã
-		this.Edit(_item);
+		let item: any = { Id: 0, Version: '1.0.0', content: '$', isTinh: true, isHuyen: false, isXa: false }; //ko tự check huyện, xã
+		this.Edit(item);
 	}
 
-	Edit(_item, allowEdit: boolean = true) {
+	Edit(_item: any, allowEdit: boolean = true) {
 		let saveMessageTranslateParam = '';
 		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(BieuMauEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			}
-			else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
 		});
 	}
-	delete(_item: any) {
+
+	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
-			this.bmService.Delete(_item.Id).subscribe(res => {
+			this.bmService.Delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -332,15 +324,15 @@ export class BieuMauListComponent implements OnInit {
 		}
 	}
 
-	getLoai(loai) {
+	getLoai(loai: any) {
 		let find = this.lstLoai.find(x => x.id == loai);
 		if (find)
 			return find.title;
 		return '';
 	}
 
-	download(danhmuckhac) {
-		let IdTemplate = danhmuckhac.Id;
+	download(item: any) {
+		let IdTemplate = item.Id;
 		//this.bmService.previewByTemplate(IdTemplate).subscribe(res => {
 		//	if (res && res.status == 1) {
 		//		const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });

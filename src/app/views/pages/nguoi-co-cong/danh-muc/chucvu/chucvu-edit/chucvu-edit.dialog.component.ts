@@ -13,9 +13,9 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 })
 
 export class chucvuEditDialogComponent implements OnInit {
-	item: chucvuModel;
-	oldItem: chucvuModel
-	itemForm: FormGroup;
+	item: chucvuModel = new chucvuModel();
+	oldItem: chucvuModel = new chucvuModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -24,7 +24,7 @@ export class chucvuEditDialogComponent implements OnInit {
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -44,12 +44,11 @@ export class chucvuEditDialogComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		private danhMucService: CommonService,
-		public chucvuService: chucvuService,
+		public apiService: chucvuService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("CHUC_VU.NAME");
-
 	}
 
 	/** LOAD DATA */
@@ -58,10 +57,11 @@ export class chucvuEditDialogComponent implements OnInit {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.createForm();
 		if (this.item.Id_row > 0) {
 			this.viewLoading = true;
-			this.chucvuService.getItem(this.item.Id_row).subscribe(res => {
+			this.apiService.getItem(this.item.Id_row).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -72,7 +72,6 @@ export class chucvuEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
-
 		//Load unit list
 		this.danhMucService.getAllChucdanh().subscribe(res => {
 			this.listchucdanh = res.data;
@@ -87,15 +86,14 @@ export class chucvuEditDialogComponent implements OnInit {
 		});
 		this.itemForm.controls["Tenchucdanh"].markAsTouched();
 		this.itemForm.controls["chucdanh"].markAsTouched();
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
 
-	/** UI */
 	getTitle(): string {
-		if (!this.allowEdit)
-			return 'Xem chi tiết';
+		if (!this.allowEdit) return 'Xem chi tiết';
 		let result = this.translate.instant('COMMON.CREATE');
 		if (!this.item || !this.item.Id_row) {
 			return result;
@@ -104,8 +102,8 @@ export class chucvuEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): chucvuModel {
+	prepare(): chucvuModel {
+		if (!this.itemForm) return new chucvuModel();
 		const controls = this.itemForm.controls;
 		const _item = new chucvuModel();
 		_item.Id_row = this.item.Id_row;
@@ -116,45 +114,42 @@ export class chucvuEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditChucVu = this.prepareCustomer();
+		const EditChucVu = this.prepare();
 		if (EditChucVu.Id_row > 0) {
-			this.UpdateChucVu(EditChucVu, withBack);
+			this.Update(EditChucVu, withBack);
 		} else {
-			this.CreateChucVu(EditChucVu, withBack);
+			this.Create(EditChucVu, withBack);
 		}
 	}
 
-	UpdateChucVu(_item: chucvuModel, withBack: boolean) {
+	Update(item: chucvuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.chucvuService.UpdateChucVu(_item).subscribe(res => {
+		this.apiService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -163,42 +158,38 @@ export class chucvuEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateChucVu(_item: chucvuModel, withBack: boolean) {
+	Create(item: chucvuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-		this.disabledBtn = true;
-		this.chucvuService.CreateChucVu(_item).subscribe(res => {
+		this.apiService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
 			else {
-				this.viewLoading = false;
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
+
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
-	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
 	}
 
 	close() {

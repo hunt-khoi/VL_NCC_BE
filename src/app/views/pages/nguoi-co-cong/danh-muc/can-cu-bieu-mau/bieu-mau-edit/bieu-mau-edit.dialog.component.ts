@@ -4,7 +4,7 @@ import { CommonService } from './../../../services/common.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
-import { BieuMauService } from '../services/bieu-mau.service';
+import { BieuMauService } from '../Services/bieu-mau.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { KeyWordListDialogComponent } from '../key-word-list-dialog/key-word-list-dialog.component';
 
@@ -14,16 +14,16 @@ import { KeyWordListDialogComponent } from '../key-word-list-dialog/key-word-lis
 })
 export class BieuMauEditDialogComponent implements OnInit {
 	item: any;
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
-	lstCanCu: any[];
+	lstCanCu: any[] = [];
 	change: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	arr: string[] = [];
 	_name = "";
 	strHtml: any;
@@ -49,24 +49,23 @@ export class BieuMauEditDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		public dialog: MatDialog,
 		public commonService: CommonService,
-		private danhmuckhacService: BieuMauService,
+		private apiService: BieuMauService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private translate: TranslateService,
 		private sanitized: DomSanitizer) {
 		this._name = this.translate.instant("LOAI_DD.NAME");
 	}
-	transform(value) {
-		return this.sanitized.bypassSecurityTrustHtml(value);
-	}
+
 	ngOnInit() {
-		this.danhmuckhacService.ListKey().subscribe(res => {
-			this.keys = res.data;
-		});
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+		
 		this.createForm();
+		this.apiService.ListKey().subscribe(res => {
+			this.keys = res.data;
+		});
 		this.commonService.liteCanCu().subscribe(res => {
 			this.lstCanCu = res.data;
 		});
@@ -79,7 +78,7 @@ export class BieuMauEditDialogComponent implements OnInit {
 				this.lstLoaiQD = res.data;
 		});
 		if (+this.item.Id > 0) {
-			this.danhmuckhacService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				if (res && res.status == 1) {
 					this.item = res.data;
 					this.strHtml = this.parseHtml(this.item.content);
@@ -89,9 +88,13 @@ export class BieuMauEditDialogComponent implements OnInit {
 			})
 		}
 	}
-	parseHtml(str) {
-		if (!str)
-			return '';
+
+	transform(value: string) {
+		return this.sanitized.bypassSecurityTrustHtml(value);
+	}
+
+	parseHtml(str: any) {
+		if (!str) return '';
 		var html = str;
 		var reg = /\:[A-Za-z](\w*\([0-9]*\))\:/gm //:TienTroCap(22):
 		var match1 = html.match(reg);
@@ -99,7 +102,6 @@ export class BieuMauEditDialogComponent implements OnInit {
 			for (var i = 0; i < match1.length; i++) {
 				var key = match1[i] + '';
 				var key_c = key.replace(/\([0-9]*\)/gm, "");
-
 				// var re = `<span style="color:green">${key}</span>`;
 				// 	html = html.replaceAll(key, re);
 				let index = this.keys.findIndex(x => (':' + x.key + ':') == key_c);
@@ -115,7 +117,6 @@ export class BieuMauEditDialogComponent implements OnInit {
 		if (match != null) {
 			for (var i = 0; i < match.length; i++) {
 				var key = match[i] + '';
-
 				// var re = `<span style="color:green">${key}</span>`;
 				// 	html = html.replaceAll(key, re);
 				let index = this.keys.findIndex(x => (':' + x.key + ':') == key);
@@ -129,7 +130,7 @@ export class BieuMauEditDialogComponent implements OnInit {
 	}
 
 	createForm() {
-		let temp = {
+		let temp: any = {
 			So: [this.item.So, Validators.required],
 			BieuMau: [this.item.BieuMau, Validators.required],
 			Id_CanCu: [this.item.Id_CanCu, Validators.required],
@@ -146,13 +147,12 @@ export class BieuMauEditDialogComponent implements OnInit {
 		};
 		if (this.item.content) {
 			this.arr = [this.item.content];
-			for (let i = 0; i < this.arr.length; i++) {
+			for (let i = 0; i < this.arr.length; i++) 
 				temp['content' + i] = this.arr[i]
-			}
 		}
 		this.itemForm = this.fb.group(temp);
-
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
 		this.changeDetectorRefs.detectChanges();
@@ -162,14 +162,24 @@ export class BieuMauEditDialogComponent implements OnInit {
 		if (this.item.Id > 0) {
 			if (this.allowEdit)
 				return 'Cập nhật biểu mẫu';
-			else
-				return 'Chi tiết biểu mẫu';
+			return 'Chi tiết biểu mẫu';
 		}
-		else
-			return 'Thêm mới biểu mẫu';
+		return 'Thêm mới biểu mẫu';
 	}
-	/** ACTIONS */
-	prepareCustomer(): any {
+
+	displayKeyword() {
+		this.isZoomSize = !this.isZoomSize;
+		this.dialogRef.updateSize(this.isZoomSize ? "90%" : "900px");
+		return;
+	}
+
+	viewKeyword() {
+		const dialogRef = this.dialog.open(KeyWordListDialogComponent, { data: null });
+		dialogRef.afterClosed().subscribe(res => { });
+	}
+
+	prepare(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -188,6 +198,7 @@ export class BieuMauEditDialogComponent implements OnInit {
 		let f = controls['fileDinhKem'].value;
 		if (f && f.length > 0) 
 			_item.FileDinhKem = f[0];
+
 		let str = '';
 		if (this.arr) {
 			for (let i = 0; i < this.arr.length; i++) {
@@ -196,21 +207,19 @@ export class BieuMauEditDialogComponent implements OnInit {
 			}
 		}
 		_item.content = str;
-
 		return _item;
 	}
+
 	fileDinhKem: any;
 	onSubmit(withBack: boolean = false) {
-
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -227,53 +236,39 @@ export class BieuMauEditDialogComponent implements OnInit {
 			return;
 		}
 
-		const EditDanhmucKhac = this.prepareCustomer();
-		if (EditDanhmucKhac.Id > 0) {
-			this.UpdateDanhmuc(EditDanhmucKhac);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit);
 		} else {
-			this.CreateDanhmuc(EditDanhmucKhac, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
-	UpdateDanhmuc(_item: any) {
+
+	Update(item: any) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.danhmuckhacService.UpdateItem(_item).subscribe(res => {
+		this.apiService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.dialogRef.close({
-					_item
-				});
+				this.dialogRef.close({ item });
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
-	displayKeyword() {
-		this.isZoomSize = !this.isZoomSize;
-		this.dialogRef.updateSize(this.isZoomSize ? "90%" : "900px");
-		return;
-	}
-	viewKeyword() {
-		const dialogRef = this.dialog.open(KeyWordListDialogComponent, { data: null });
-		dialogRef.afterClosed().subscribe(res => {
 
-		});
-	}
-	CreateDanhmuc(_item: any, withBack: boolean) {
+	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		//	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.danhmuckhacService.CreateItem(_item).subscribe(res => {
+		this.apiService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.change = true;
@@ -281,23 +276,22 @@ export class BieuMauEditDialogComponent implements OnInit {
 				}
 			}
 			else {
-				this.viewLoading = false;
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
+
 	reset() {
 		this.item = { Id: 0, Version: '1.0.0', content: '$' };
 		this.createForm();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close(this.change);
 	}
+
 	download() {
-		this.danhmuckhacService.download(this.item.Id).subscribe(response => {
+		this.apiService.download(this.item.Id).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

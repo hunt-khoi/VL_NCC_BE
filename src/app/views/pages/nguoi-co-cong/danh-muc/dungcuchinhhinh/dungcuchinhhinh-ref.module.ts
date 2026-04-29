@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
-
-import { dungcuchinhhinhListComponent } from './dungcuchinhhinh-list/dungcuchinhhinh-list.component';
-import { dungcuchinhhinhService } from './Services/dungcuchinhhinh.service';
 import { DPSCommonModule } from '../../dps-common.module';
+import { dungcuchinhhinhService } from './Services/dungcuchinhhinh.service';
+import { dungcuchinhhinhListComponent } from './dungcuchinhhinh-list/dungcuchinhhinh-list.component';
 import { dungcuchinhhinhEditDialogComponent } from './dungcuchinhhinh-edit/dungcuchinhhinh-edit.dialog.component';
 
 @NgModule({
@@ -24,4 +23,5 @@ import { dungcuchinhhinhEditDialogComponent } from './dungcuchinhhinh-edit/dungc
 		dungcuchinhhinhListComponent,
 	]
 })
+
 export class dungcuchinhhinhRefModule { }

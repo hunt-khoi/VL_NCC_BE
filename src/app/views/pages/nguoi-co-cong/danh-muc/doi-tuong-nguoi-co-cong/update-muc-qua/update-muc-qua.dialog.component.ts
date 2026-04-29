@@ -1,10 +1,9 @@
 import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatTableDataSource, MatDialog } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { SelectionModel } from '@angular/cdk/collections';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { SelectionModel } from '@angular/cdk/collections';
 import { DoiTuongNguoiCoCongService } from '../Services/doi-tuong-nguoi-co-cong.service';
 
 @Component({
@@ -12,7 +11,7 @@ import { DoiTuongNguoiCoCongService } from '../Services/doi-tuong-nguoi-co-cong.
 	templateUrl: './update-muc-qua.dialog.component.html',
 })
 export class UpdateMucQuaDialogComponent implements OnInit {
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -20,7 +19,7 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 	listNhomLeTet: any[] = [];
 	listNguon: any[] = [];
 
-	datasource: MatTableDataSource<any>;
+	datasource: MatTableDataSource<any> | undefined;
 	displayedColumns = ['select', 'STT', 'DoiTuong'];
 	loadingAfterSubmit: boolean = false;
 	disabledBtn = false;
@@ -33,14 +32,9 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		// lưu đóng
 		if (event.altKey && event.keyCode == 13) { //phím Enter
-			this.onSubmit(true);
+			this.onSubmit();
 		}
-		//lưu tiếp tục
-		// if (event.ctrlKey && event.keyCode == 13) { //phím Enter
-		// 	this.onSubmit(false);
-		// }
 	}
 
 	constructor(public dialogRef: MatDialogRef<UpdateMucQuaDialogComponent>,
@@ -48,13 +42,11 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 		public dialog: MatDialog,
 		private fb: FormBuilder,
 		public danhMucService: CommonService,
-		public doiTuongNguoiCoCongService: DoiTuongNguoiCoCongService,
+		public apiService: DoiTuongNguoiCoCongService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private layoutUtilsService: LayoutUtilsService,
-		private translate: TranslateService) {
+		private layoutUtilsService: LayoutUtilsService) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.createForm();
 		this.viewLoading = true;
@@ -78,7 +70,6 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 			this.listNhomLeTet = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-
 		this.danhMucService.liteNguonKinhPhi().subscribe(res => {
 			this.listNguon = res.data;
 			this.changeDetectorRefs.detectChanges();
@@ -93,55 +84,50 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 		});
 	}
 
-	/** UI */
 	getTitle(): string {
 		return 'Cập nhật mức quà cho nhiều đối tượng';
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): any {
+	prepare(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		let _item: any = {};
-		_item.Id_NguonKinhPhi = controls['Id_NguonKinhPhi'].value;
-		_item.Id_NhomLeTet = controls['Id_NhomLeTet'].value;
-		_item.SoTien = +controls['SoTien'].value;
-		_item.DoiTuongs = this.listNCC.filter(x => x.selected).map(x => x.id);
-		return _item;
+		let item: any = {};
+		item.Id_NguonKinhPhi = controls['Id_NguonKinhPhi'].value;
+		item.Id_NhomLeTet = controls['Id_NhomLeTet'].value;
+		item.SoTien = +controls['SoTien'].value;
+		item.DoiTuongs = this.listNCC.filter(x => x.selected).map(x => x.id);
+		return item;
 	}
 
-	onSubmit(withBack: boolean = false) {
+	onSubmit() {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditDot = this.prepareCustomer();
-		this.UpdateDot(EditDot, withBack);
+		const EditDot = this.prepare();
+		this.Update(EditDot);
 	}
 
 	closeForm() {
 		this.dialogRef.close();
 	}
 	
-	UpdateDot(_item: any, withBack: boolean) {
+	Update(item: any) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.doiTuongNguoiCoCongService.UpdateMucQuaDoiTuongs(_item).subscribe(res => {
-			/* Server loading imitation. Remove this on real code */
+		this.apiService.UpdateMucQuaDoiTuongs(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.dialogRef.close({
-					_item
-				});
+				this.dialogRef.close({ item });
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -149,7 +135,7 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

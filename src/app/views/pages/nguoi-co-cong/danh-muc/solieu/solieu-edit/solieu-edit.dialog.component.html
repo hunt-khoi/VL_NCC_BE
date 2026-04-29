@@ -20,7 +20,7 @@
 	</div>
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 
@@ -28,7 +28,7 @@
 				<div class="col-lg-8 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
 						<input matInput placeholder="{{ 'SO_LIEU.NAME' | translate }}" formControlName="SoLieu"
-							   class="require" required #focusInput />
+							class="require" required #focusInput />
 					</mat-form-field>
 				</div>
 				
@@ -40,8 +40,7 @@
 						<span *ngIf="itemForm.controls.Priority.value === '' || itemForm.controls.Priority.value < 0">
 							Thứ tự
 						</span>
-						<strong
-							*ngIf="itemForm.controls.Priority.value === ''">
+						<strong *ngIf="itemForm.controls.Priority.value === ''">
 							bắt buộc nhập
 						</strong>
 						<strong *ngIf="itemForm.controls.Priority.value < 0">
@@ -79,7 +78,8 @@
 					<mat-form-field class="mat-form-field-fluid " *ngIf="listSLCons.length == 0">
 						<mat-select formControlName="Id_SoLieuParent" placeholder="Số liệu cha">
 							<mat-option>
-								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrl1" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter1()">
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+									[(ngModel)]="FilterCtrl1" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter1()">
 								</ngx-mat-select-search>
 							</mat-option>
 							<mat-option [value]="0" selected>-- Chọn --</mat-option>
@@ -95,7 +95,6 @@
 							formControlName="MoTa"></textarea>
 					</mat-form-field>
                 </div>
-                
 			</div>
 			
 			<div class="form-group kt-form__group row" *ngIf="listSLCons.length > 0">
@@ -105,15 +104,12 @@
 						<th>STT</th>
 						<th>Tên số liệu</th>
 					</tr>
-					
 						<ng-container *ngFor="let item of listSLCons; let i=index">
 							<tr>
 								<td>{{i+1}}</td>
-							<td>{{item.SoLieu}}</td>
+								<td>{{item.SoLieu}}</td>
 							</tr>
-							
 						</ng-container>
-					
 				</table>
 			</div>
 		</div>

@@ -22,20 +22,20 @@
                 <span translate="COMMON.LUU_TIEPTUC"></span>
             </button>&nbsp;
         </div>
-
     </div>
+
     <form class="kt-form" [formGroup]="itemForm">
         <div class="kt-portlet__body">
             <div class="kt-portlet__body-progress">
                 <mat-spinner [diameter]="20"></mat-spinner>
             </div>
-            <kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" (close)="onAlertClose($event)">
+            <kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" (close)="onAlertClose()">
                 Không thể lưu, vui lòng kiểm tra lại thông tin!
             </kt-alert>
             <div class="form-group kt-form__group row">
                 <div class="col-md-12 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
-                        <input matInput placeholder="{{ 'DONVI.TEN' | translate }} *" formControlName="donVi" type="text" [readonly]="data.DM_DonVi.IsShow">
+                        <input matInput placeholder="{{ 'DONVI.TEN' | translate }}*" formControlName="donVi" type="text" [readonly]="data.DM_DonVi.IsShow">
                         <mat-error>{{ 'DONVI.TEN' | translate }}
                             <strong *ngIf="itemForm.controls['donVi'].errors && itemForm.controls['donVi'].errors.required"> bắt buộc nhập</strong>
                         </mat-error>
@@ -102,8 +102,9 @@
 
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
-                        <input matInput (input)="ValidateChangeNumberEvent($event)" min="1" [readonly]="data.DM_DonVi.IsShow" formControlName="priority" type="number"
-                        (change)="$event ? changeValueOfForm('priority',$event) : null" placeholder="Nhập thứ tự ưu tiên*" >
+                        <input matInput (input)="ValidateChangeNumberEvent($event)" min="1" [readonly]="data.DM_DonVi.IsShow" 
+                        (change)="$event ? changeValueOfForm('priority',$event) : null"
+                        formControlName="priority" type="number" placeholder="Nhập thứ tự ưu tiên*">
                         <mat-error>Thứ tự ưu tiên
                             <strong *ngIf="itemForm.controls['priority'].errors && itemForm.controls['priority'].errors.required">
                                 bắt buộc nhập </strong>
@@ -126,3 +127,4 @@
             </div>
         </div>
     </form>
+</div>

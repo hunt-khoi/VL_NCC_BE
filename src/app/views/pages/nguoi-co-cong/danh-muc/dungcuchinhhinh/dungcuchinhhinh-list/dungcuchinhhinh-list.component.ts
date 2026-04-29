@@ -1,20 +1,18 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-import { dungcuchinhhinhEditDialogComponent } from '../dungcuchinhhinh-edit/dungcuchinhhinh-edit.dialog.component';
-import { dungcuchinhhinhDataSource } from '../Model/data-sources/dungcuchinhhinh.datasource';
-import { dungcuchinhhinhModel } from '../Model/dungcuchinhhinh.model';
-import { dungcuchinhhinhService } from '../Services/dungcuchinhhinh.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel} from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
+import { dungcuchinhhinhModel } from '../Model/dungcuchinhhinh.model';
+import { dungcuchinhhinhService } from '../Services/dungcuchinhhinh.service';
+import { dungcuchinhhinhDataSource } from '../Model/data-sources/dungcuchinhhinh.datasource';
+import { dungcuchinhhinhEditDialogComponent } from '../dungcuchinhhinh-edit/dungcuchinhhinh-edit.dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -22,14 +20,12 @@ import { CookieService } from 'ngx-cookie-service';
     templateUrl: './dungcuchinhhinh-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-
 export class dungcuchinhhinhListComponent implements OnInit {
-    
     // Table fields
-    dataSource: dungcuchinhhinhDataSource;
+    dataSource: dungcuchinhhinhDataSource | undefined;
     displayedColumns = ['Id', 'DungCu', 'MaDungCu', 'MoTa', 'Locked', 'Priority', 'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'ThoiGian', 'TriGia', 'actions'];
-	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 
     filterStatus = '';
 	filterCondition = '';
@@ -39,27 +35,27 @@ export class dungcuchinhhinhListComponent implements OnInit {
     showTruyCapNhanh: boolean = true;
     _name = "";
     
-    gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+    gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+    btnClass: string = "";
     
-	constructor(public dungcuchinhhinhService1: dungcuchinhhinhService,
-		private danhMucService: CommonService,
+	constructor(public apiService: dungcuchinhhinhService,
         public dialog: MatDialog,
         private cookieService: CookieService,
         private route: ActivatedRoute,
         private ref: ApplicationRef,
         private layoutUtilsService: LayoutUtilsService,
-        private translate: TranslateService) 
-    {
+        private translate: TranslateService) {
         this._name = this.translate.instant("DUNG_CU_CHINH_HINH.NAME");
     }
 
-    /** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-        if (this.dungcuchinhhinhService1 !== undefined) {
-			this.dungcuchinhhinhService1.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
+        this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
+        if (this.apiService !== undefined) {
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
 		}
         this.gridModel = new TableModel();
 		this.gridModel.clear();
@@ -68,7 +64,6 @@ export class dungcuchinhhinhListComponent implements OnInit {
         this.gridModel.filterText['DungCu'] = "";
         this.gridModel.filterText['MaDungCu'] = "";
         this.gridModel.filterText['MoTa'] = "";
-
         this.gridModel.disableButtonFilter['Locked'] = true;
 
         let optionsTinhTrang = [
@@ -89,7 +84,6 @@ export class dungcuchinhhinhListComponent implements OnInit {
 				checked: false
 			}
         });
-        
         this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
         let availableColumns = [
@@ -195,7 +189,6 @@ export class dungcuchinhhinhListComponent implements OnInit {
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns)
 
-
 		this.gridService = new TableService(
 			this.layoutUtilsService,
 			this.ref,
@@ -203,34 +196,34 @@ export class dungcuchinhhinhListComponent implements OnInit {
 			this.cookieService
 		);
         this.gridService.cookieName = 'displayedColumns_dcch';
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_dcch'));
 
-        // If the user changes the sort order, reset back to the first page.
-        this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-        merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-            .pipe(
-                tap(() => {
-                    this.loadDataList();
-                })
-            )
-            .subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
         // Init DataSource
-        this.dataSource = new dungcuchinhhinhDataSource(this.dungcuchinhhinhService1);
+        this.dataSource = new dungcuchinhhinhDataSource(this.apiService);
         let queryParams = new QueryParamsModel({});
-
         // Read from URL itemId, for restore previous state
-        this.route.queryParams.subscribe(params => {
-            queryParams = this.dungcuchinhhinhService1.lastFilter$.getValue();
-            // First load
-            this.dataSource.loadList(queryParams);
+        this.route.queryParams.subscribe(_ => {
+            if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
         });
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -239,6 +232,7 @@ export class dungcuchinhhinhListComponent implements OnInit {
     }
 
 	loadDataList(holdCurrentPage: boolean = true) {
+        if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
         const queryParams = new QueryParamsModel(
             this.filterConfiguration(),
             this.sort.direction,
@@ -249,39 +243,33 @@ export class dungcuchinhhinhListComponent implements OnInit {
         );
         this.dataSource.loadList(queryParams);
     }
-    filterConfiguration(): any {
 
+    filterConfiguration(): any {
         const filter: any = {};
         if (this.filterStatus && this.filterStatus.length > 0) {
 			filter.status = +this.filterStatus;
 		}
-
 		if (this.filterCondition && this.filterCondition.length > 0) {
             filter.type = +this.filterCondition;
         }
-
-        if (this.gridService.model.filterText) 
+        if (this.gridService &&this.gridService.model.filterText) {
             filter.DungCu = this.gridService.model.filterText['DungCu'];
             filter.MaDungCu = this.gridService.model.filterText['MaDungCu'];
             filter.MoTa = this.gridService.model.filterText['MoTa'];
-
-        return filter; //trả về đúng biến filter
+        }
+        return filter;
     }
 
-    /** Delete */
-    DeleteWorkplace(_item: dungcuchinhhinhModel) {
+    Delete(item: dungcuchinhhinhModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
         const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
         dialogRef.afterClosed().subscribe(res => {
-            if (!res) {
-                return;
-            }
-
-            this.dungcuchinhhinhService1.deleteItem(_item.Id).subscribe(res => {
+            if (!res) return;
+            
+            this.apiService.delete(item.Id).subscribe(res => {
                 if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
                 }
@@ -293,23 +281,21 @@ export class dungcuchinhhinhListComponent implements OnInit {
         });
     }
 
-    //Khóa
-    BlockWorkplace(_item: dungcuchinhhinhModel) {
+    Block(item: dungcuchinhhinhModel) {
         let _description = '';
         let _waitDesciption = '';
         let _title = '';
-
-        if(_item.Locked == false) { 
+        if (!item.Locked) { 
             _description = 'Bạn có chắc chắn muốn khóa dụng cụ này không ??';
             _waitDesciption = 'Đang cập nhật ...';
             _title = 'Khóa dụng cụ chỉnh hình';
-            _item.Locked = true;
+            item.Locked = true;
         }
         else {
             _description = 'Bạn có chắc chắn muốn mở khóa dụng cụ này không ??';
             _waitDesciption = 'Đang cập nhật ...';
             _title = 'Mở khóa dụng cụ chỉnh hình';
-            _item.Locked = false;
+            item.Locked = false;
         }
 
         const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption); //thay đổi titile là ra confirm khác
@@ -318,7 +304,7 @@ export class dungcuchinhhinhListComponent implements OnInit {
                 this.loadDataList(); //để không biến mất ổ khóa
                 return;
             }
-		    this.dungcuchinhhinhService1.updateDungCu(_item).subscribe(res => {
+		    this.apiService.update(item).subscribe(res => {
                 if (res && res.status === 1) {
                     const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -332,24 +318,14 @@ export class dungcuchinhhinhListComponent implements OnInit {
 
     }
 
-    AddWorkplace() {
-        const dungcuchinhhinhModels = new dungcuchinhhinhModel();
-        dungcuchinhhinhModels.clear(); // Set all defaults fields
-        this.EditDungCu(dungcuchinhhinhModels);
-    }
-
-    restoreState(queryParams: QueryParamsModel, id: number) {
-        if (id > 0) {
-        }
-
-        if (!queryParams.filter) {
-            return;
-        }
+    Add() {
+        const dataModel = new dungcuchinhhinhModel();
+        dataModel.clear(); // Set all defaults fields
+        this.EditDungCu(dataModel);
     }
 
     EditDungCu(_item: dungcuchinhhinhModel, allowEdit: boolean = true, allowUpdateCost: boolean = false) {
-        let saveMessageTranslateParam = '';
-        saveMessageTranslateParam += _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE'; 
+        let saveMessageTranslateParam = _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE'; 
         //thông báo khi thực hiện trong tác vụ
         const _saveMessage = this.translate.instant(saveMessageTranslateParam, {name:this._name});
         const dialogRef = this.dialog.open(dungcuchinhhinhEditDialogComponent, { data: { _item, allowEdit, allowUpdateCost } });
@@ -364,6 +340,7 @@ export class dungcuchinhhinhListComponent implements OnInit {
 
         });
     }
+
     getHeight(): any {
 		let obj = window.location.href.split("/").find(x => x == "tabs-references");
 		if (obj) {
@@ -413,6 +390,5 @@ export class dungcuchinhhinhListComponent implements OnInit {
 			case true:
 				return 'kt-badge--metal';
 		}
-		return '';
 	}
 }

@@ -1,27 +1,27 @@
 import { BaseModel } from 'app/core/_base/crud';
 
 export class DM_DonViModel extends BaseModel {    
-    Id : number
-    LoaiDonVi : number
-    DonVi : string
-    MaDonvi : string
-    MaDinhDanh : string
-    Parent : number
-    ParentName : string
-    SDT : string
-    Email : string
-    DiaChi : string
-    Logo : string
-    Locked : boolean
-    Priority : number
-    DangKyLichLanhDao : boolean
-    KhongCoVanThu : boolean
-    CreatedDate : string
-    UpdatedBy : string
-    UpdatedDate : string
-    Disabled : boolean
-    listLinkImage: ListImageModel[]
-    IsShow: boolean;
+    Id: number = 0;
+    LoaiDonVi: number = 0;
+    DonVi: string = "";
+    MaDonvi: string = "";
+    MaDinhDanh: string = "";
+    Parent: number = 0;
+    ParentName: string = "";
+    SDT: string = "";
+    Email: string = "";
+    DiaChi: string = "";
+    Logo: string = "";
+    Locked: boolean = false;
+    Priority: number = 0;
+    DangKyLichLanhDao: boolean = false;
+    KhongCoVanThu: boolean = false;
+    CreatedDate: string = "";
+    UpdatedBy: string = "";
+    UpdatedDate: string = "";
+    Disabled: boolean = false;
+    listLinkImage: ListImageModel[] = [];
+    IsShow: boolean = false;
     LoaiXL: number = 3
 
     clear() {      
@@ -45,10 +45,9 @@ export class DM_DonViModel extends BaseModel {
         this.Disabled = false;
         this.IsShow = false;
         this.LoaiXL = 3;
-        
     }
         
-    copy(item:DM_DonViModel) {
+    copy(item: DM_DonViModel) {
         this.Id = item.Id;
         this.LoaiDonVi = item.LoaiDonVi;
         this.DonVi = item.DonVi;
@@ -73,17 +72,17 @@ export class DM_DonViModel extends BaseModel {
 }
 
 export class DM_User_DonViModel extends BaseModel {
-    UserID : number
-    Username : string
-    FullName : string
-    PhoneNumber : string
-    ChucVu : string    
-    Email : string    
-    Active : number
-    LoaiXL: number = 3
-    Type: number;//0: người dùng , 1: đơn vị,
-    TenDonVi: string;     
-    IdDV: number;     
+    UserID: number = 0;
+    Username: string = "";
+    FullName: string = "";
+    PhoneNumber: string = "";
+    ChucVu: string = "";    
+    Email: string = "";    
+    Active: number = 0;
+    LoaiXL: number = 3;
+    Type: number = 0; //0: người dùng, 1: đơn vị,
+    TenDonVi: string = "";     
+    IdDV: number = 0;     
 
     clear() {   
         this.UserID = 0;        
@@ -96,8 +95,8 @@ export class DM_User_DonViModel extends BaseModel {
         this.LoaiXL = 3; 
         this.Type = 0;
         this.TenDonVi = '';
-        
     }
+
     copy(item: DM_User_DonViModel) {
         this.UserID = item.UserID;        
         this.Username = item.Username;
@@ -128,13 +127,13 @@ export class DM_User_DonViModel extends BaseModel {
 }
 
 export class ListImageModel extends BaseModel {
-    strBase64 : string
-    filename : string
-    type : string
-    src : string
-    IsAdd : boolean
-    IsDel : boolean
-    IsImagePresent : boolean
+    strBase64: string = "";
+    filename: string = "";
+    type: string = "";
+    src: string = "";
+    IsAdd: boolean = false;
+    IsDel: boolean = false;
+    IsImagePresent: boolean = false;
 
     clear() {
         this.strBase64 = '';

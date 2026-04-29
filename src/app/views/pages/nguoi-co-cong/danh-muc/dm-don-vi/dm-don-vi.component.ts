@@ -13,21 +13,22 @@ export class DM_DonViComponent implements OnInit {
 	donvi: string = "";
 	donvi_user: string = "";
 	dataTreeDonVi: any[] = [];
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> = of(false);
+
 	constructor(
-		private dMDonViService: DM_DonViService,
-		private changeDetect: ChangeDetectorRef,
-	) { }
+		private apiService: DM_DonViService,
+		private changeDetect: ChangeDetectorRef) { }
 
 	ngOnInit() {
-		if (this.dMDonViService != undefined)
-			this.dMDonViService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
+		if (this.apiService != undefined)
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 		this.GetTreeDonVi();
 	}
+
 	GetTreeDonVi() {
 		this.loading$ = of(true);
 		this.dataTreeDonVi = [];
-		this.dMDonViService.GetTreeDonVi().subscribe(res => {
+		this.apiService.getTreeDonVi().subscribe(res => {
 			this.loading$ = of(false);
 			// res.data.anCss= {
 			// 	collapse: true,
@@ -36,10 +37,10 @@ export class DM_DonViComponent implements OnInit {
 			// 	checked: false,
 			// 	parentChk: ''
 			// }
-			let tree = [];
+			let tree: any[] = [];
 			if (res.data) {
 				let i = 0;
-				res.data.forEach(element => {
+				res.data.forEach((element: any) => {
 					let item = element;
 					if (i == 0) {
 						item.anCss = {
@@ -61,7 +62,6 @@ export class DM_DonViComponent implements OnInit {
 
 						}
 					}
-
 					tree.push(item);
 					i++;
 				});
@@ -70,13 +70,15 @@ export class DM_DonViComponent implements OnInit {
 			this.changeDetect.detectChanges();
 		});
 	}
-	treeDonViChanged(item) {
+
+	treeDonViChanged(item: any) {
 		if (item) {
 			this.donvi = item.data.IdGroup;
 			this.donvi_user = item.data.IdGroup;
 		}
 	}
-	ChangeListUser(item) {
+
+	ChangeListUser(item: any) {
 		this.donvi_user = item.Id;
 	}
 }

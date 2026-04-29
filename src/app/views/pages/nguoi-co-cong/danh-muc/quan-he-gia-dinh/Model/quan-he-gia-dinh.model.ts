@@ -1,16 +1,16 @@
 import { BaseModel } from 'app/core/_base/crud';
 
 export class QuanHeGiaDinhModel extends BaseModel {
-	Id: number;
-	QHGiaDinh: string;
-	Locked: boolean;
-	Priority: number;
-	CreatedBy: number;
-	CreatedDate: string;
-	UpdatedBy: number;
-	UpdatedDate: string;
-	ByQua: boolean;
-	IsChuYeu: boolean;
+	Id: number = 0;
+	QHGiaDinh: string = '';
+	Locked: boolean = false;
+	Priority: number = 1;
+	CreatedBy: number = 0;
+	CreatedDate: string = '';
+	UpdatedBy: number = 0;
+	UpdatedDate: string = '';
+	ByQua: boolean = false;
+	IsChuYeu: boolean = false;
 
 	clear() {
 		this.Id = 0;

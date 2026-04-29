@@ -12,13 +12,13 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 })
 
 export class dantocEditDialogComponent implements OnInit {
-	item: dantocModel;
-	oldItem: dantocModel
-	itemForm: FormGroup;
+	item: dantocModel = new dantocModel();
+	oldItem: dantocModel = new dantocModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
@@ -40,7 +40,7 @@ export class dantocEditDialogComponent implements OnInit {
 	constructor(public dialogRef: MatDialogRef<dantocEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
-		private dantocService: dantocService,
+		private apiService: dantocService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
@@ -49,7 +49,6 @@ export class dantocEditDialogComponent implements OnInit {
 
 	/** LOAD DATA */
 	ngOnInit() {
-
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
@@ -60,11 +59,11 @@ export class dantocEditDialogComponent implements OnInit {
 			this.viewLoading = false;
 		}
 		this.createForm();
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 	}
 
 	createForm() {
-
 		this.itemForm = this.fb.group({
 			Tendantoc: ['' + this.item.Tendantoc, Validators.required],
 			Priority: ['' + this.item.Priority]
@@ -72,22 +71,19 @@ export class dantocEditDialogComponent implements OnInit {
 		if (!this.allowEdit)
 			this.itemForm.disable()
 	}
-	/** UI */
+
 	getTitle(): string {
-		if (!this.allowEdit)
-			return 'Xem chi tiết';
+		if (!this.allowEdit) return 'Xem chi tiết';
 		let result = this.translate.instant('COMMON.CREATE');
 		if (!this.item || !this.item.Id_row) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` - Tên dân tộc: ${this.item.Tendantoc}`;
 		return result;
 	}
 	
-	/** ACTIONS */
-	prepareCustomer(): dantocModel {
-
+	prepare(): dantocModel {
+		if (!this.itemForm) return new dantocModel();
 		const controls = this.itemForm.controls;
 		const _item = new dantocModel();
 		_item.Id_row = this.item.Id_row;
@@ -99,17 +95,16 @@ export class dantocEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const updatedantoc = this.prepareCustomer();
+		const updatedantoc = this.prepare();
 		if (updatedantoc.Id_row > 0) {
 			this.Update(updatedantoc, withBack);
 		} else {
@@ -117,24 +112,23 @@ export class dantocEditDialogComponent implements OnInit {
 		}
 	}
 
-	Update(_item: dantocModel, withBack: boolean) {
+	Update(item: dantocModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.dantocService.UpdateDanToc(_item).subscribe(res => {
+		this.apiService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType);
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -143,29 +137,25 @@ export class dantocEditDialogComponent implements OnInit {
 		});
 	}
 
-	Create(_item: dantocModel, withBack: boolean) {
+	Create(item: dantocModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		//	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.dantocService.CreateDanToc(_item).subscribe(res => {
+		this.apiService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType);
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
-
 			}
 			else {
-				this.viewLoading = false;
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
@@ -175,12 +165,10 @@ export class dantocEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
-	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
 	}
 
 	close() {

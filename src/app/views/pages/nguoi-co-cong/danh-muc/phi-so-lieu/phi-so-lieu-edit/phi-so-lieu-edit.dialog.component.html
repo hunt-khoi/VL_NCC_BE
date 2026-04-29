@@ -20,7 +20,7 @@
 	</div>
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 
@@ -43,7 +43,6 @@
 						<strong *ngIf="itemForm.controls.Priority.value < 0">bắt buộc không phải là số âm</strong>
 					</mat-error>
 				</div>
-
 				<div class="col-lg-4 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select formControlName="Id_Filter" placeholder="Trích xuất từ">
@@ -60,8 +59,7 @@
 				</div>
 				<div class="col-md-12 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid">
-						<textarea matInput rows="4" placeholder="{{ 'PHI_SO_LIEU.MOTA' | translate }}"
-							formControlName="MoTa"></textarea>
+						<textarea matInput rows="4" placeholder="{{ 'PHI_SO_LIEU.MOTA' | translate }}" formControlName="MoTa"></textarea>
 					</mat-form-field>
 				</div>
 

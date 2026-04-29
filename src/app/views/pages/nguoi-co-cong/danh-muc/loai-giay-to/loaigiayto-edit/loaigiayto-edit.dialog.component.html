@@ -18,9 +18,10 @@
 			</button>
 		</div>
 	</div>
+
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 			<div class="form-group kt-form__group row">
@@ -49,11 +50,9 @@
 				</div>
 				<div class="col-md-12 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid">
-						<textarea matInput rows="4" placeholder="{{ 'LOAI_GT.MOTA' | translate }}"
-							formControlName="MoTa"></textarea>
+						<textarea matInput rows="4" placeholder="{{ 'LOAI_GT.MOTA' | translate }}" formControlName="MoTa"></textarea>
 					</mat-form-field>
 				</div>
-
 			</div>
 		</div>
 	</form>

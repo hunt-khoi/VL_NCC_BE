@@ -20,10 +20,9 @@
 	</div>
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body"> 
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert> 
-
 			<div class="form-group kt-form__group row">
 				<div class="col-lg-8 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
@@ -47,7 +46,7 @@
 				<div class="col-lg-8 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select formControlName="MauQD" placeholder="Mẫu quyết định duyệt đề xuất" class="require" required>
-							<mat-option *ngFor="let opt of listQD;" [value]="opt.id">
+							<mat-option *ngFor="let opt of listQD" [value]="opt.id">
 								{{opt.title}}
 							</mat-option>
 						</mat-select>

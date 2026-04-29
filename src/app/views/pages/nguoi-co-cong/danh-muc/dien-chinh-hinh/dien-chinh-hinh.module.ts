@@ -1,12 +1,11 @@
-import { DienChinhHinhService } from './Services/dien-chinh-hinh.service';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-import { DienChinhHinhEditDialogComponent } from './dien-chinh-hinh-edit/dien-chinh-hinh-edit-dialog.component';
-import { DienChinhHinhListComponent } from './dien-chinh-hinh-list/dien-chinh-hinh-list.component';
+import { DienChinhHinhService } from './Services/dien-chinh-hinh.service';
 import { DienChinhHinhRefModule } from './dien-chinh-hinh-ref.module';
 import { DienChinhHinhComponent } from './dien-chinh-hinh.component';
-
+import { DienChinhHinhListComponent } from './dien-chinh-hinh-list/dien-chinh-hinh-list.component';
+import { DienChinhHinhEditDialogComponent } from './dien-chinh-hinh-edit/dien-chinh-hinh-edit-dialog.component';
 
 const routes: Routes = [
 	{
@@ -38,10 +37,10 @@ const routes: Routes = [
 	providers: [
 		DienChinhHinhService
 	],
-	entryComponents: [
-	],
+
 	declarations: [
 		DienChinhHinhComponent
 	]
 })
+
 export class DienChinhHinhModule { }

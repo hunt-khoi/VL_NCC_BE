@@ -8,7 +8,6 @@ import { CoCauToChucEditComponent } from '../co-cau-to-chuc-moi-tree-edit/co-cau
 import { MatDialog } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { CommonService } from '../../../services/common.service';
 import { CoCauMapDialogComponent } from '../co-cau-map/co-cau-map-dialog.component';
 
 interface TreeNode {
@@ -31,11 +30,11 @@ interface TreeNode {
 export class cocautochucmoitreeComponent implements OnInit {
 
 	treeControl = new NestedTreeControl<TreeNode>(node => node.Children);
-	dataSource;
+	dataSource: any;
 	Title: string = "";
 	selectedNode: any;
 	Visible: boolean = false;
-	public datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	public datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	positionTo: string = '';
 	parentTo: string = '';
 	positionFrom: string = '';
@@ -44,13 +43,12 @@ export class cocautochucmoitreeComponent implements OnInit {
 	idTo: string = '';
 	nameTo: string = '';
 	namefrom: string = '';
-	showTruyCapNhanh: boolean = true;
-	id_menu: number = 3;
-	_itemchart: OrgStructureModel;
+
+	_itemchart: OrgStructureModel = new OrgStructureModel();
 	dragNodeExpandOverWaitTimeMs = 300;
 	dragNodeExpandOverNode: any;
-	dragNodeExpandOverTime: number;
-	dragNodeExpandOverArea: string;
+	dragNodeExpandOverTime: number = 0;
+	dragNodeExpandOverArea: string = "";
 	dragNode: any;
 	viewLoading: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(false);
@@ -58,13 +56,11 @@ export class cocautochucmoitreeComponent implements OnInit {
 	_name = "";
 
 	constructor(
-		private _cocaumoiService: cocautochucMoiTreeService,
+		private apiService: cocautochucMoiTreeService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		public dialog: MatDialog,
-		private danhMucService: CommonService,
 		private translate: TranslateService,
-		private layoutUtilsService: LayoutUtilsService
-	) {
+		private layoutUtilsService: LayoutUtilsService) {
 		this._name = this.translate.instant("CO_CAU_TO_CHUC.NAME");
 	}
 
@@ -74,10 +70,7 @@ export class cocautochucmoitreeComponent implements OnInit {
 
 	hasChild = (_: number, node: TreeNode) => !!node.Children && node.Children.length > 0;
 
-
-	getParent(data: TreeNode[], node: TreeNode) {
-		if (data == undefined)
-			data = [];
+	getParent(data: TreeNode[] = [], node: TreeNode): any {
 		for (var i = 0; i < data.length; i++) {
 			const currentNode = data[i];
 			if (currentNode.RowID == node.Parentid)
@@ -93,7 +86,7 @@ export class cocautochucmoitreeComponent implements OnInit {
 	//DEMO Treeview
 	async getTreeValue() {
 		this.loadingSubject.next(true);
-		this._cocaumoiService.Get_CoCauToChuc().subscribe(res => {
+		this.apiService.Get_CoCauToChuc().subscribe(res => {
 			this.loadingSubject.next(false);
 			if (res.Visible != undefined)
 				this.Visible = res.Visible;
@@ -107,26 +100,30 @@ export class cocautochucmoitreeComponent implements OnInit {
 	}
 	
 	// Kéo
-	handleDragStart(event, node) {
+	handleDragStart(node: TreeNode) {
 		this.idFrom = node.RowID;
 		this.namefrom = node.Title;
 		this.removeClass("dl-drag");
 		let el = document.getElementById(node.RowID);
-		el.classList.add("dl-drag");
+		if (el) 
+			el.classList.add("dl-drag");
 		this.dragNode = node;
 		this.treeControl.collapse(node);
 	}
-	removeClass(className) {
+
+	removeClass(className: any) {
 		let c = document.getElementsByClassName(className);
 		for (let i = 0; i < c.length; i++) {
 			c[i].classList.remove(className);
 		}
 	}
-	handleDragOver(event, node) {
+
+	handleDragOver(event: any, node: TreeNode) {
 		event.preventDefault();
 		this.removeClass("dl-drag-over");
 		let el = document.getElementById(node.RowID);
-		el.classList.add("dl-drag-over");
+		if (el) 
+			el.classList.add("dl-drag-over");
 		if (node === this.dragNodeExpandOverNode) {
 			if (this.dragNode !== node && !this.treeControl.isExpanded(node)) {
 				if ((new Date().getTime() - this.dragNodeExpandOverTime) > this.dragNodeExpandOverWaitTimeMs) {
@@ -139,9 +136,7 @@ export class cocautochucmoitreeComponent implements OnInit {
 		}
 
 		// Handle drag area
-		const percentageX = event.offsetX / event.target.clientWidth;
 		const percentageY = event.offsetY / event.target.offsetParent.clientHeight;
-
 		if (percentageY < 0.25) {
 			this.dragNodeExpandOverArea = 'above';
 		} else if (percentageY > 0.75) {
@@ -151,7 +146,8 @@ export class cocautochucmoitreeComponent implements OnInit {
 			this.dragNodeExpandOverArea = 'center';
 		}
 	}
-	getPosition(event) {
+	
+	getPosition(event: any) {
 		let offsetLeft = 0;
 		let offsetTop = 0;
 		let el = event.srcElement;
@@ -164,13 +160,11 @@ export class cocautochucmoitreeComponent implements OnInit {
 	}
 
 	//#region ==================== Thả
-	handleDrop(event, node) {
+	handleDrop(event: any, node: any) {
 		event.preventDefault();
 		this._itemchart = new OrgStructureModel();
-		this._cocaumoiService.Get_CoCauToChuc().subscribe(res => {
-			;
+		this.apiService.Get_CoCauToChuc().subscribe(res => {
 			this.dataSource.data = res.data;
-
 			if (!res.data.Visible) {
 				this.layoutUtilsService.showError('Bạn không có quyền thao tác');
 				this.ngOnInit();
@@ -185,30 +179,27 @@ export class cocautochucmoitreeComponent implements OnInit {
 			this.ngOnInit();
 		}
 
-		if (this.dragNodeExpandOverArea === 'above') // update vị trí phía trên item chọn
-		{
+		if (this.dragNodeExpandOverArea === 'above') { // update vị trí phía trên item chọn
 			this._itemchart.IsAbove = true;
-			this._cocaumoiService.handleDropLevel(this._itemchart).subscribe(res => {
+			this.apiService.handleDropLevel(this._itemchart).subscribe(_ => {
 				this.treeControl.expandAll();
 			});
-		} else
-			if (this.dragNodeExpandOverArea === 'below') // Update vị trí phía dưới item chọn
-			{
+		} 
+		else
+			if (this.dragNodeExpandOverArea === 'below') { // Update vị trí phía dưới item chọn
 				this._itemchart.IsAbove = false;
-				this._cocaumoiService.handleDropLevel(this._itemchart).subscribe(res => {
+				this.apiService.handleDropLevel(this._itemchart).subscribe(_ => {
 					this.treeControl.expandAll();
 				});
 			}
-			else // update cha con -- center
-			{
+			else {// update cha con -- center
 				let vitritieptheo = 0;
-				if (node.Children.length > 0) {
+				if (node.Children.length > 0) 
 					vitritieptheo = parseInt(node.Children[node.Children.length - 1].Level) + 1;
-				}
 				else
 					vitritieptheo = 1;
 				this._itemchart.level = '' + vitritieptheo;
-				this._cocaumoiService.handleDropParent(this._itemchart).subscribe(res => {
+				this.apiService.handleDropParent(this._itemchart).subscribe(_ => {
 					this.treeControl.expandAll();
 				});
 				// newItem = this.database.copyPasteItem(this.flatNodeMap.get(this.dragNode), this.flatNodeMap.get(node));
@@ -218,15 +209,15 @@ export class cocautochucmoitreeComponent implements OnInit {
 		this.dragNodeExpandOverTime = 0;
 	}
 	//#endregion ===================== End di chuyển node
-	handleDragEnd(event) {
+
+	handleDragEnd() {
 		this.removeClass("dl-drag");
 		this.removeClass("dl-drag-over");
 		this.dragNode = null;
 		this.dragNodeExpandOverNode = null;
 		this.dragNodeExpandOverTime = 0;
 	}
-	SelectItemTree(node) {
-	}
+
 	Add(item: TreeNode) {
 		let _item: any = {};
 		_item.IDParent = item.RowID;
@@ -240,16 +231,15 @@ export class cocautochucmoitreeComponent implements OnInit {
 		this.CapNhatCapCoCau(_item, item);
 	}
 
-	CapNhatCapCoCau(_item: TreeNode, parent: TreeNode = null) {
+	CapNhatCapCoCau(_item: TreeNode, parent: TreeNode | null = null) {
 		if (parent == null)
 			parent = this.getParent(this.treeControl.dataNodes, _item);
 		let ID_Goc = null;
-		if (parent)
+		if (parent) 
 			ID_Goc = parent.ID_Goc;
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 
+		let saveMessageTranslateParam = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
+		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(CoCauToChucEditComponent, { data: { _item, ID_Goc } });
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) {
@@ -263,17 +253,17 @@ export class cocautochucmoitreeComponent implements OnInit {
 			}
 		});
 	}
-	removeNode(_item: OrgStructureModel) {
+
+	removeNode(item: OrgStructureModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this._cocaumoiService.Deleteorgstructure(_item.RowID, _item.Title).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.Deleteorgstructure(item.RowID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -289,14 +279,11 @@ export class cocautochucmoitreeComponent implements OnInit {
 	map() {
 		const dialogRef = this.dialog.open(CoCauMapDialogComponent, { data: { allowEdit: this.Visible } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			}
-			else {
+			if (res) {
 				this.layoutUtilsService.showInfo("Map thành công");
 				this.getTreeValue();
 				this.changeDetectorRefs.detectChanges();
 			}
 		});
-
 	}
 }

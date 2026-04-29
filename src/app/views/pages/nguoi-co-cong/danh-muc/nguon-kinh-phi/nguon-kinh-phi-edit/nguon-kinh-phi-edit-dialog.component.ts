@@ -4,8 +4,7 @@ import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewC
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
 	selector: 'kt-nguon-kinh-phi-edit',
@@ -14,16 +13,16 @@ import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_b
 })
 
 export class NguonKinhPhiEditDialogComponent implements OnInit {
-	item: NguonKinhPhiModel;
-	oldItem: NguonKinhPhiModel;
-	itemForm: FormGroup;
+	item: NguonKinhPhiModel = new NguonKinhPhiModel();
+	oldItem: NguonKinhPhiModel = new NguonKinhPhiModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 
 	/* Keyboard Shortcut Keys */
@@ -43,24 +42,20 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 		public dialogRef: MatDialogRef<NguonKinhPhiEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
-		private danhMucService: CommonService,
-		private objectService: NguonKinhPhiService,
+		private apiService: NguonKinhPhiService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 			this._NAME = this.translate.instant('NGUONKINHPHI.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
-
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.objectService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -78,21 +73,14 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 			NguonKinhPhi: ['' + this.item.NguonKinhPhi, Validators.required],
 			Priority: [this.item.Priority > -1 ? this.item.Priority : 0],
 		};
+		this.itemForm = this.fb.group(temp);
 
-		if (this.allowEdit) {
-			this.itemForm = this.fb.group(temp);
-
+		if (this.focusInput)
 			this.focusInput.nativeElement.focus();
-		} else {
-
-			this.itemForm = this.fb.group(temp);
+		if (!this.allowEdit) 
 			this.itemForm.disable();
-			this.focusInput.nativeElement.focus();
-		}
-
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('COMMON.CREATE');
 		if (!this.allowEdit) {
@@ -102,13 +90,12 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` nguồn kinh phí`;
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): NguonKinhPhiModel {
+	prepare(): NguonKinhPhiModel {
+		if (!this.itemForm) return new NguonKinhPhiModel();
 		const controls = this.itemForm.controls;
 		const _item = new NguonKinhPhiModel();
 		_item.Id = this.item.Id;
@@ -120,13 +107,12 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -134,31 +120,30 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditNguonKinhPhi = this.prepareCustomer();
-		if (EditNguonKinhPhi.Id > 0) {
-			this.UpdateNguonKinhPhi(EditNguonKinhPhi, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateNguonKinhPhi(EditNguonKinhPhi, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
 
-	UpdateNguonKinhPhi(_item: NguonKinhPhiModel, withBack: boolean) {
+	Update(item: NguonKinhPhiModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.UpdateNguonKinhPhi(_item).subscribe(res => {
+		this.apiService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -166,22 +151,21 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateNguonKinhPhi(_item: NguonKinhPhiModel, withBack: boolean) {
+	Create(item: NguonKinhPhiModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.CreateNguonKinhPhi(_item).subscribe(res => {
+		this.apiService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -195,12 +179,13 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
 	
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

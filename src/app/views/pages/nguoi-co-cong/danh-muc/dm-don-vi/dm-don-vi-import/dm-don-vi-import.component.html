@@ -15,12 +15,12 @@
             <h3 class="kt-portlet__head-title">Import dữ liệu từ excel</h3>
         </div>
     </div>
-    <form class="kt-form" [formGroup]="DM_DonViForm">
+    <form class="kt-form" [formGroup]="itemForm">
         <div class="kt-portlet__body">
             <div class="kt-portlet__body-progress">
                 <mat-spinner [diameter]="20"></mat-spinner>
             </div>
-            <kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" (close)="onAlertClose($event)">
+            <kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" (close)="onAlertClose()">
                 Không thể lưu, vui lòng nhập đủ thông tin!
             </kt-alert>
             <div class="form-group kt-form__group row">
@@ -31,7 +31,7 @@
                 </div>
                 <div class="col-md-4 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid" appearance="none">
-                        <input matInput placeholder="" formControlName="FileDuLieu" style="display:none;" readonly (click)="selectFile()">
+                        <input matInput placeholder="" formControlName="FileDuLieu" style="display: none;" readonly (click)="selectFile()">
                         <button mat-raised-button style="padding: 0px 20px;" color="primary" (click)="selectFile()" type="button">
 							Chọn file
 						</button>

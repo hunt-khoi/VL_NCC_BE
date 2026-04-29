@@ -7,7 +7,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 })
 export class KeyWordListDialogComponent implements OnInit {
 	item: any;
-	_name = "Danh sách từ khóa";
+	_name: string = "Danh sách từ khóa";
 	dataSource: any[] = [];
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;

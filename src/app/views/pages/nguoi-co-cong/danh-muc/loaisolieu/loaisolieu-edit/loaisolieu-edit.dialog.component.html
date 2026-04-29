@@ -18,9 +18,10 @@
 			</button>
 		</div>
 	</div>
+
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="10000" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="10000" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert> 
 			<div class="form-group kt-form__group row">

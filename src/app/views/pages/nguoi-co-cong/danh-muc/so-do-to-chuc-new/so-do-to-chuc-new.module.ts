@@ -1,15 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
+import { DndModule } from 'ngx-drag-drop';
+import { DPSCommonModule } from '../../dps-common.module';
+import { OrgChartService } from './Services/so-do-to-chuc.service';
 import { SodotochucComponent } from './so-do-to-chuc-new.component';
 import { SodotochucListComponent } from './so-do-to-chuc-new-list/so-do-to-chuc-new-list.component';
-import { OrgChartService } from './Services/so-do-to-chuc.service';
-
 import { DrawListComponent } from './draw-chart/draw-chart-list.component';
 import { sodotochuceditComponent } from './so-do-to-chuc-edit/so-do-to-chuc-edit.component';
 import { OrgChartRefNewModule } from './OrgChart-ref.module';
-import { DndModule } from 'ngx-drag-drop';
-import { DPSCommonModule } from '../../dps-common.module';
 
 const routes: Routes = [
 	{
@@ -41,7 +39,6 @@ const routes: Routes = [
 	],
 	providers: [
 		OrgChartService,
-
 	],
 	entryComponents: [
 		SodotochucComponent,
@@ -52,4 +49,5 @@ const routes: Routes = [
 		SodotochucComponent,
 	],
 })
+
 export class SoDoToChucModule { }

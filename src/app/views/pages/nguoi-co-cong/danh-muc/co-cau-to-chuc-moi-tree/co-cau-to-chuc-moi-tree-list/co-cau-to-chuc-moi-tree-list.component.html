@@ -14,12 +14,12 @@
 		<cdk-tree [dataSource]="dataSource" [treeControl]="treeControl" class="dl-tree-dropdown">
 			
 			<cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
-				<div class="dl-cover-tree-node" (click)="SelectItemTree(node)">
+				<div class="dl-cover-tree-node">
 					<div class="dl-name-node">
 						<div class="name-txt">
 							<div class="cover-drag-item" [id]="node.RowID" draggable="true"
-								(dragstart)="handleDragStart($event, node);" (dragover)="handleDragOver($event, node);"
-								(drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);">
+								(dragstart)="handleDragStart(node);" (dragover)="handleDragOver($event, node);"
+								(drop)="handleDrop($event, node);" (dragend)="handleDragEnd();">
 								<span style="padding-left: 5px;" [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
                             		'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
                             		'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node,
@@ -37,8 +37,7 @@
 										translate="CO_CAU_TO_CHUC.themmoi"></span>
 								</button>
 								<button class="btn-node btn-node-2" mat-menu-item (click)="removeNode(node)"
-									matTooltip="{{ 'CO_CAU_TO_CHUC.xoacocau' | translate }}"
-									*ngIf="Visible && node.ParentID != 0">
+									matTooltip="{{ 'CO_CAU_TO_CHUC.xoacocau' | translate }}" *ngIf="Visible && node.ParentID != 0">
 									<mat-icon style="color: red;">close</mat-icon>
 									<span style="font-size: 9pt; color: red !important;"
 										translate="CO_CAU_TO_CHUC.xoacocau"></span>
@@ -56,12 +55,12 @@
 			</cdk-nested-tree-node>
 
 			<cdk-nested-tree-node *cdkTreeNodeDef="let node; when: hasChild" class="example-tree-node">
-				<div class="dl-cover-tree-node " (click)="SelectItemTree(node)">
+				<div class="dl-cover-tree-node">
 					<div class="dl-name-node">
 						<div class="name-txt">
 							<div class="cover-drag-item" [id]="node.RowID" draggable="true"
-								(dragstart)="handleDragStart($event, node);" (dragover)="handleDragOver($event, node);"
-								(drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);">
+								(dragstart)="handleDragStart(node);" (dragover)="handleDragOver($event, node);"
+								(drop)="handleDrop($event, node);" (dragend)="handleDragEnd();">
 								<button mat-icon-button [attr.aria-label]="'toggle ' + node.Title" cdkTreeNodeToggle>
 									<img src="/assets/images/_plus.png" *ngIf="!treeControl.isExpanded(node)">
 									<img src="/assets/images/_sub.png" *ngIf="treeControl.isExpanded(node)">
@@ -93,7 +92,7 @@
 										(click)="CapNhatCapCoCau(node)" style="size: 10px" color="accent">
 									<mat-icon style="color: darkorange;">create</mat-icon>
 									<span style="font-size: 9pt; color: darkorange !important;"
-										  translate="CO_CAU_TO_CHUC.capnhat"></span>
+										translate="CO_CAU_TO_CHUC.capnhat"></span>
 								</button>
 							</mat-menu>
 						</div>

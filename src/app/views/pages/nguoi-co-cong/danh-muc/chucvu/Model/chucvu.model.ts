@@ -1,12 +1,11 @@
 import { BaseModel } from "../../../../../../core/_base/crud";
 
 export class chucvuModel extends BaseModel {
-	Id_row: number;
-	Id_CV: string;
-	Tenchucdanh: string;
-	Tentienganh: string;
-	tenchucvu: string;
-
+	Id_row: number = 0;
+	Id_CV: string = "";
+	Tenchucdanh: string = "";
+	Tentienganh: string = "";
+	tenchucvu: string = "";
 
 	clear() {
 		this.Id_CV = '';

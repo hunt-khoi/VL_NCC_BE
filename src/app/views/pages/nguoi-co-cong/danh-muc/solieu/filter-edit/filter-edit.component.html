@@ -23,13 +23,13 @@
 			<div class="row">
 				<div class="col-md-12 kt--margin-bottom-10-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Bộ trích xuất" class="require" required
-							   formControlName="title" />
+						<input matInput placeholder="Bộ trích xuất" class="require" required formControlName="title" />
 					</mat-form-field>
 				</div>
 				<div class="col-md-4 kt-margin-bottom-10-mobile">
 					<mat-form-field class="mat-form-field-fluid">
-						<mat-select formControlName="bang" class="require" required placeholder="Nguồn dữ liệu" (selectionChange)="changebang($event.value);listColumn=[];">
+						<mat-select formControlName="bang" class="require" required placeholder="Nguồn dữ liệu" 
+							(selectionChange)="changebang($event.value); listColumn=[];">
 							<mat-option [value]="opt.id" *ngFor="let opt of list_bang">
 								{{opt.title}}
 							</mat-option>
@@ -100,7 +100,7 @@
 					</button>
 				</div>
 			</div>
-			<div style="display: flex;" *ngFor="let list of listColumn;  let i = index">
+			<div style="display: flex;" *ngFor="let list of listColumn; let i=index">
 				<div class="text-center" style="width:50px">
 					<i class="fa fa-plus"></i>&nbsp;
 				</div>

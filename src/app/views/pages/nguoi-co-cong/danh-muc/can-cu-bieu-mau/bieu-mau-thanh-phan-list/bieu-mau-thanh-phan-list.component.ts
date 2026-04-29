@@ -2,17 +2,15 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef }
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from '../../../../../partials/table';
 import { TableService } from '../../../../../partials/table/table.service';
+import { BieuMauService } from '../Services/bieu-mau.service';
 import { CanCuBieuMauDataSource } from '../Models/data-sources/can-cu-bieu-mau.datasource';
-import { BieuMauService } from '../services/bieu-mau.service';
 import { BieuMauThanhPhanEditDialogComponent } from '../bieu-mau-thanh-phan-edit/bieu-mau-thanh-phan-edit-dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -23,25 +21,23 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class BieuMauThanhPhanListComponent implements OnInit {
-	
 	// Table fields
-	dataSource: CanCuBieuMauDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
+	dataSource: CanCuBieuMauDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 	filterStatus = '';
 	filterCondition = '';
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
-	showTruyCapNhanh: boolean = true;
 	_name = "";
 
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
-	
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
+
 	constructor(public objectSetvice: BieuMauService,
-		private danhMucService: CommonService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private cookieService: CookieService,
@@ -54,6 +50,8 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		if (this.objectSetvice !== undefined) {
 			this.objectSetvice.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'ThanhPhan', 0, 10));
 		} //mặc định theo priority
@@ -63,7 +61,6 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 		this.gridModel.haveFilter = true;
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText['ThanhPhan'] = "";
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		let availableColumns = [
@@ -142,7 +139,6 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns)
 
-
 		this.gridService = new TableService(
 			this.layoutUtilsService,
 			this.ref,
@@ -150,34 +146,33 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_bieumautp'
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_bieumautp'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
 		// Init DataSource
 		this.dataSource = new CanCuBieuMauDataSource(this.objectSetvice, null, null);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectSetvice.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadListTP(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectSetvice.lastFilter$.getValue();
+				this.dataSource.loadListTP(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -186,6 +181,7 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -202,14 +198,12 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 		if (this.filterStatus && this.filterStatus.length > 0) {
 			filter.status = +this.filterStatus;
 		}
-
 		if (this.filterCondition && this.filterCondition.length > 0) {
 			filter.type = +this.filterCondition;
 		}
-
-		if (this.gridService.model.filterText)
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.ThanhPhan = this.gridService.model.filterText['ThanhPhan'];
-
+		}
 		return filter; //trả về đúng biến filter
 	}
 
@@ -220,20 +214,16 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(BieuMauThanhPhanEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			}
-			else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
 
-	download(danhmuckhac, isfail:boolean=false) {
-		let IdTemplate = danhmuckhac.Id;
-
-		this.objectSetvice.downloadTP(IdTemplate,isfail).subscribe(response => {
+	download(item: any, isfail: boolean = false) {
+		let IdTemplate = item.Id;
+		this.objectSetvice.downloadTP(IdTemplate, isfail).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

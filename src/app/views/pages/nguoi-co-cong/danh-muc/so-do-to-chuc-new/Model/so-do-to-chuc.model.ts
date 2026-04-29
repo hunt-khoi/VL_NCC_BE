@@ -1,21 +1,21 @@
 import { BaseModel } from "../../../../../../core/_base/crud";
 
 export class OrgChartModel extends BaseModel {
-	ID_PhongBan: string;
-	ID_ChucDanh: string;
-	ViTri: number;
-	ID: string;
-	drop_idfrom: string;
-	drop_id_parent: string;
-	drop_namefrom: string;
-	drop_idto: string;
-	drop_levelto: string;
-	drop_nameto: string;
-	drop_childrensto: string;
-	StructureID: string;
-	Id_parent: string;
-	chucdanhParent: string;
-	IsAbove: boolean;
+	ID_PhongBan: string = '0';
+	ID_ChucDanh: string = '0';
+	ViTri: number = 0;
+	ID: string = '0';
+	drop_idfrom: string = '0';
+	drop_id_parent: string = '0';
+	drop_namefrom: string = '';
+	drop_idto: string = '';
+	drop_levelto: string = '';
+	drop_nameto: string = '';
+	drop_childrensto: string = '';
+	StructureID: string = '';
+	Id_parent: string = '';
+	chucdanhParent: string = '';
+	IsAbove: boolean = false;
 
 	clear() {
 		this.ID_PhongBan = '0';
@@ -29,24 +29,24 @@ export class OrgChartModel extends BaseModel {
 }
 
 export class UpdateThongTinChucVuModel extends BaseModel {
-	MaCD: string;
-	SoNhanVien: string;
-	ViTri: string;
-	ID_ChucVu: string;
-	ID_ChucDanh: string;
-	TenChucVu: string;
-	TenTiengAnh: string;
-	ID_DonVi: string;
-	ID_PhongBan: string;
-	ID_Cap: number;
-	HienThiDonVi: boolean;
-	DungChuyenCap: boolean;
-	HienThiCap: boolean;
-	HienThiPhongBan: boolean;
-	ID: number;
-	ID_Parent: number;
+	MaCD: string = '';
+	SoNhanVien: string = '';
+	ViTri: string = '';
+	ID_ChucVu: string = '';
+	ID_ChucDanh: string = '';
+	TenChucVu: string = '';
+	TenTiengAnh: string = '';
+	ID_DonVi: string = '';
+	ID_PhongBan: string = '';
+	ID_Cap: number = 0;
+	HienThiDonVi: boolean = false;
+	DungChuyenCap: boolean = false;
+	HienThiCap: boolean = false;
+	HienThiPhongBan: boolean = false;
+	ID: number = 0;
+	ID_Parent: number = 0;
 	StructureID: string = '';
-	HienThiID: boolean;
+	HienThiID: boolean = false;
 
 	clear() {
 		this.MaCD = '';
@@ -71,8 +71,7 @@ export class UpdateThongTinChucVuModel extends BaseModel {
 }
 
 export class ChartStaffModel {
-	id_nv: string;
-	id_chucdanhmoi: string;
+	id_nv: string = '';
+	id_chucdanhmoi: string = '';
 
 }
-

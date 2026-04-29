@@ -4,25 +4,25 @@ import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../..
 import { dantocService } from '../../Services/dantoc.service';
 
 export class dantocDataSource extends BaseDataSource {
-	constructor(private dantocService: dantocService) {
+	constructor(private apiService: dantocService) {
 		super();
 	}
 
 	loadList(queryParams: QueryParamsModel) {
-		this.dantocService.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
 		this.loadingSubject.next(true);
-
-		this.dantocService.findData(queryParams)
+		this.apiService.findData(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					this.entitySubject.next(res.data);
+					var totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 					this.paginatorTotalSubject.next(totalCount);
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),
 				finalize(() => this.loadingSubject.next(false))
 			).subscribe(res => {
-				this.dantocService.ReadOnlyControl = res.Visible;
-			});
+				this.apiService.ReadOnlyControl = res.Visible;
+			}
+		);
 	}
 }

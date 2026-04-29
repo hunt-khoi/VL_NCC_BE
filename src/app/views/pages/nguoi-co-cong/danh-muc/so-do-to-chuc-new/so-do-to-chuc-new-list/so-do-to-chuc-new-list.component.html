@@ -12,6 +12,7 @@
 			</button>-->
 		</ng-container>
 	</kt-portlet-header>
+
 	<div class="kt-portlet-body overflow-auto">
 		<div class="row">
 			<div class="col-lg-12 m--margin-bottom-20-mobile">
@@ -34,42 +35,29 @@
 											<mat-icon>more_vert</mat-icon>
 										</button>
 									</div>
-									<!-- <span (click)="selectedItem(node)" [id]="node.RowID" [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-									'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
-									'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node,
-									'selected-node' : __selectedNode === node}" draggable="true" (dragstart)="handleDragStart($event, node);" (dragover)="handleDragOver($event, node);" (drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);"
-										innerHTML='{{node.Name}}' style="padding-left: 5px;"></span> -->
 
 									<mat-menu #menu="matMenu">
 										<button mat-menu-item *ngIf="Visible" (click)="addNewItem(node)"
 											style="color: blue">
 											<mat-icon style="color: darkgreen !important;">add</mat-icon>
-											<span>
-												<span style="font-size: 9pt; color: darkgreen !important;"
-													translate="SO_DO_TO_CHUC.themchucdanhnhohonchucdanhchon"></span>
-											</span>
+											<span style="font-size: 9pt; color: darkgreen !important;"
+												translate="SO_DO_TO_CHUC.themchucdanhnhohonchucdanhchon"></span>
 										</button>
 										<button mat-menu-item (click)="removeItem(node)" color="warn">
 											<mat-icon style="color: red !important;">clear</mat-icon>
-											<span>
-												<span style="font-size: 9pt; color: red !important;"
-													translate="SO_DO_TO_CHUC.xoachucdanhchon"></span>
-											</span>
+											<span style="font-size: 9pt; color: red !important;"
+												translate="SO_DO_TO_CHUC.xoachucdanhchon"></span>
 										</button>
 										<button mat-menu-item (click)="CapNhatThongTinChucVu(node.ID)" color="primary">
 											<mat-icon style="color: darkorange !important;">create</mat-icon>
-											<span>
-												<span style="font-size: 9pt; color: darkorange !important;"
-													translate="SO_DO_TO_CHUC.capnhatthongtinchucvu"></span>
-											</span>
+											<span style="font-size: 9pt; color: darkorange !important;"
+												translate="SO_DO_TO_CHUC.capnhatthongtinchucvu"></span>
 										</button>
 										<button mat-menu-item color="accent">
 											<mat-icon style="color: darkblue !important;">arrow_forward</mat-icon>
 											<a [routerLink]="['./drawchart', node.ID]" mat-icon-button color="accent">
-												<span>
-													<span style="font-size: 9pt; color: darkblue !important;"
-														translate="SO_DO_TO_CHUC.vesodotochuc"></span>
-												</span>
+											<span style="font-size: 9pt; color: darkblue !important;"
+												translate="SO_DO_TO_CHUC.vesodotochuc"></span>
 											</a>
 										</button>
 									</mat-menu>
@@ -92,53 +80,37 @@
 										</button>
 										<!-- <span dndHandle class="flaticon-more-v5"></span>   -->
 										<span style="padding-left: 5px;" [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-                                                'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
-                                                'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node,
-                                                'selected-node' : __selectedNode === node
-                                            }" innerHTML='{{node.Name}}'></span>
+                                            'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
+                                            'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node,
+                                            'selected-node' : __selectedNode === node }" innerHTML='{{node.Name}}'>
+										</span>
 										<button mat-icon-button *ngIf="Visible" [matMenuTriggerFor]="menu">
 											<mat-icon>more_vert</mat-icon>
 										</button>
 									</div>
 
-									<!-- <span (click)="selectedItem(node)" [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-									'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
-									'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node,
-									'selected-node' : __selectedNode === node}" draggable="true" (dragstart)="handleDragStart($event, node);" (dragover)="handleDragOver($event, node);" (drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);"
-										innerHTML='{{node.Name}}' style="padding-left: 5px;"></span> -->
-									<!-- <button mat-icon-button *ngIf="Visible" [matMenuTriggerFor]="menu">
-										<mat-icon>more_vert</mat-icon>
-									</button> -->
 									<mat-menu #menu="matMenu">
 										<button mat-menu-item *ngIf="Visible" (click)="addNewItem(node)"
 											style="color: blue">
 											<mat-icon style="color: darkgreen !important;">add</mat-icon>
-											<span>
-												<span style="font-size: 9pt; color: darkgreen !important;"
-													translate="SO_DO_TO_CHUC.themchucdanhnhohonchucdanhchon"></span>
-											</span>
+											<span style="font-size: 9pt; color: darkgreen !important;"
+												translate="SO_DO_TO_CHUC.themchucdanhnhohonchucdanhchon"></span>
 										</button>
 										<button mat-menu-item (click)="removeItem(node)" color="warn">
 											<mat-icon style="color: red !important;">clear</mat-icon>
-											<span>
-												<span style="font-size: 9pt; color: red !important;"
-													translate="SO_DO_TO_CHUC.xoachucdanhchon"></span>
-											</span>
+											<span style="font-size: 9pt; color: red !important;"
+												translate="SO_DO_TO_CHUC.xoachucdanhchon"></span>
 										</button>
 										<button mat-menu-item (click)="CapNhatThongTinChucVu(node.ID)" color="primary">
 											<mat-icon style="color: darkorange !important;">create</mat-icon>
-											<span>
-												<span style="font-size: 9pt; color: darkorange !important;"
-													translate="SO_DO_TO_CHUC.capnhatthongtinchucvu"></span>
-											</span>
+											<span style="font-size: 9pt; color: darkorange !important;"
+												translate="SO_DO_TO_CHUC.capnhatthongtinchucvu"></span>
 										</button>
 										<button mat-menu-item color="accent">
 											<mat-icon style="color: darkblue !important;">arrow_forward</mat-icon>
 											<a [routerLink]="['./drawchart', node.ID]" mat-icon-button color="accent">
-												<span>
-													<span style="font-size: 9pt; color: darkblue !important;"
-														translate="SO_DO_TO_CHUC.vesodotochuc"></span>
-												</span>
+											<span style="font-size: 9pt; color: darkblue !important;"
+												translate="SO_DO_TO_CHUC.vesodotochuc"></span>
 											</a>
 										</button>
 									</mat-menu>

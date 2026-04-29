@@ -1,21 +1,20 @@
 import { BaseModel } from "../../../../../../core/_base/crud";
 
 export class solieuModel extends BaseModel {
-    Id: number;
-    SoLieu: string;
-    Id_LoaiSoLieu: number;
-    Id_Parent: number;
-    LoaiSoLieu: string;
-    MoTa: string;
-    Locked: boolean;
-	Id_Filter: number;
-    Priority: number;
-    CreatedBy: number;
-    CreatedDate: string;
-    UpdatedBy: number;
-    UpdatedDate: string;
-
-    Detail: number;
+    Id: number = 0;
+    SoLieu: string = '';
+    Id_LoaiSoLieu: number = 0;
+    Id_Parent: number = 0;
+    LoaiSoLieu: string = '';
+    MoTa: string = '';
+    Locked: boolean = false;
+	Id_Filter: number = 0;
+    Priority: number = 0;
+    CreatedBy: number = 0;
+    CreatedDate: string = '';
+    UpdatedBy: number = 0;
+    UpdatedDate: string = '';
+    Detail: number = 0;
 
 	clear() {
         this.SoLieu = '';
@@ -30,7 +29,6 @@ export class solieuModel extends BaseModel {
         this.CreatedDate = '';
         this.UpdatedBy = 0;
         this.UpdatedDate = '';
-
         this.Id = 0;
 	}
 }

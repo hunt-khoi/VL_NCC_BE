@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import { loaisolieuListComponent } from './loaisolieu-list/loaisolieu-list.component';
+import { DPSCommonModule } from '../../dps-common.module';
 import { loaisolieuComponent } from './loaisolieu.component';
 import { loaisolieuService } from './Services/loaisolieu.service';
+import { loaisolieuListComponent } from './loaisolieu-list/loaisolieu-list.component';
 import { loaisolieuRefModule } from './loaisolieu-ref.module';
-import { DPSCommonModule } from '../../dps-common.module';
+
 const routes: Routes = [
 	{
 		path: '',
@@ -34,4 +34,5 @@ const routes: Routes = [
 		loaisolieuComponent,
 	]
 })
+
 export class loaisolieuModule { }

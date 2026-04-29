@@ -5,23 +5,23 @@
 	<table mat-table [dataSource]="dataSource">
 		<ng-container matColumnDef="stt">
 			<th mat-header-cell *matHeaderCellDef>STT</th>
-			<td mat-cell *matCellDef="let element; let index = index" style="width:60px">{{index + 1}} </td>
+			<td mat-cell *matCellDef="let item; let index = index" style="width:60px">{{index + 1}} </td>
 		</ng-container>
 		<ng-container matColumnDef="keys">
 			<th mat-header-cell *matHeaderCellDef>Từ khóa</th>
-			<td mat-cell *matCellDef="let element" style="width:200px">{{element.key}}</td>
+			<td mat-cell *matCellDef="let item" style="width:200px">{{item.key}}</td>
 		</ng-container>
 		<ng-container matColumnDef="desciption">
 			<th mat-header-cell *matHeaderCellDef>Mô tả</th>
-			<td mat-cell *matCellDef="let element" style="width:250px">{{element.description}}</td>
+			<td mat-cell *matCellDef="let item" style="width:250px">{{item.description}}</td>
 		</ng-container>
 		<ng-container matColumnDef="format">
 			<th mat-header-cell *matHeaderCellDef [hidden]="!IsFull">Định dạng</th>
-			<td mat-cell *matCellDef="let element" style="width:200px" [hidden]="!IsFull">{{element.format}}</td>
+			<td mat-cell *matCellDef="let item" style="width:200px" [hidden]="!IsFull">{{item.format}}</td>
 		</ng-container>
 		<ng-container matColumnDef="default">
 			<th mat-header-cell *matHeaderCellDef [hidden]="!IsFull">Dữ liệu mặc định</th>
-			<td mat-cell *matCellDef="let element" [hidden]="!IsFull">{{element._default}}</td>
+			<td mat-cell *matCellDef="let item" [hidden]="!IsFull">{{item._default}}</td>
 		</ng-container>
 
 		<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

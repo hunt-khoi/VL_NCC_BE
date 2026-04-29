@@ -1,20 +1,21 @@
 import { BaseModel } from '../../../../../../core/_base/crud';
 
 export class DoiTuongNguoiCoCongModel extends BaseModel {
-	Id: number;
-	DoiTuong: string;
-	MaDoiTuong: string;
-	MoTa: string;
-	Locked: boolean;
-	Id_LoaiQuyetDinh: number;
-	Priority: number;
-	CreatedBy: string;
-	CreatedDate: string;
-	UpdatedBy: number;
-	Loai: number;
-	NhomLoaiDoiTuongNCC: string;
-	UpdatedDate: string;
-	IsThanNhan: boolean;
+	Id: number = 0;
+	DoiTuong: string = '';
+	MaDoiTuong: string = '';
+	MoTa: string = '';
+	Locked: boolean = false;
+	Id_LoaiQuyetDinh: number | null = null;
+	Priority: number = 0;
+	CreatedBy: string = '';
+	CreatedDate: string = '';
+	UpdatedBy: number = 0;
+	Loai: number = 0;
+	NhomLoaiDoiTuongNCC: string = '';
+	UpdatedDate: string = '';
+	IsThanNhan: boolean = false;
+
 	clear() {
 		this.Id = 0;
 		this.DoiTuong = '';
@@ -33,18 +34,18 @@ export class DoiTuongNguoiCoCongModel extends BaseModel {
 	}
 }
 
-
 export class DoiTuongNhanQuaModel extends BaseModel {
-	Id: number;
-	DoiTuong: string;
-	MaDoiTuong: string;
-	MoTa: string;
-	Locked: boolean;
-	Priority: number;
-	CreatedBy: string;
-	CreatedDate: string;
-	UpdatedBy: number;
-	UpdatedDate: string;
+	Id: number = 0;
+	DoiTuong: string = '';
+	MaDoiTuong: string = '';
+	MoTa: string = '';
+	Locked: boolean = false;
+	Priority: number = 0;
+	CreatedBy: string = '';
+	CreatedDate: string = '';
+	UpdatedBy: number = 0;
+	UpdatedDate: string = '';
+
 	clear() {
 		this.Id = 0;
 		this.DoiTuong = '';
@@ -60,17 +61,18 @@ export class DoiTuongNhanQuaModel extends BaseModel {
 }
 
 export class DoiTuongBHYTModel extends BaseModel {
-	Id: number;
-	DoiTuong: string;
-	MaDoiTuong: string;
-	Type: number;
-	MoTa: string;
-	Locked: boolean;
-	Priority: number;
-	CreatedBy: string;
-	CreatedDate: string;
-	UpdatedBy: number;
-	UpdatedDate: string;
+	Id: number = 0;
+	DoiTuong: string = '';
+	MaDoiTuong: string = '';
+	Type: number = 0;
+	MoTa: string = '';
+	Locked: boolean = false;
+	Priority: number = 0;
+	CreatedBy: string = '';
+	CreatedDate: string = '';
+	UpdatedBy: number = 0;
+	UpdatedDate: string = '';
+
 	clear() {
 		this.Id = 0;
 		this.DoiTuong = '';
@@ -87,16 +89,16 @@ export class DoiTuongBHYTModel extends BaseModel {
 }
 
 export class DoiTuongDCCHModel extends BaseModel {
-	Id: number;
-	DoiTuong: string;
-	MaDoiTuong: string;
-	MoTa: string;
-	Locked: boolean;
-	Priority: number;
-	CreatedBy: string;
-	CreatedDate: string;
-	UpdatedBy: number;
-	UpdatedDate: string;
+	Id: number = 0;
+	DoiTuong: string = '';
+	MaDoiTuong: string = '';
+	MoTa: string = '';
+	Locked: boolean = false;
+	Priority: number = 0;
+	CreatedBy: string = '';
+	CreatedDate: string = '';
+	UpdatedBy: number = 0;
+	UpdatedDate: string = '';
 	DungCuCHs: any;
 
 	clear() {

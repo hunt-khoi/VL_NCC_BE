@@ -19,7 +19,7 @@
 	</div>
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert>
 			<div class="form-group kt-form__group row">
@@ -30,7 +30,7 @@
 				</div>
 				<div class="col-lg-4 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="{{ 'DIENCHINHHINH.PRIORITY' | translate }}" formControlName="Priority" />
+						<input matInput placeholder="{{ 'DIENCHINHHINH.PRIORITY' | translate }}" formControlName="Priority" type="number"/>
 					</mat-form-field>
 					<mat-error *ngIf="hasFormErrors">
 						<span *ngIf="itemForm.controls.Priority.value === '' || itemForm.controls.Priority.value <= -1 ">

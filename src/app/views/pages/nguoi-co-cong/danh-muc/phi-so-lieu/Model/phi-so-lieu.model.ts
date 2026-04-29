@@ -1,12 +1,13 @@
 import { BaseModel } from '../../../../../../core/_base/crud';
 
 export class PhiSoLieuModel extends BaseModel {
-    Id: number;
-    PhiSoLieu: string;
-    MoTa: string;
-    Locked: boolean;
-    Priority: number;
-	Id_Filter: number;
+    Id: number = 0;
+    PhiSoLieu: string = "";
+    MoTa: string = "";
+    Locked: boolean = false;
+    Priority: number = 0;
+	Id_Filter: number = 0;
+
     clear (){
         this.Id = 0;
         this.PhiSoLieu = '';

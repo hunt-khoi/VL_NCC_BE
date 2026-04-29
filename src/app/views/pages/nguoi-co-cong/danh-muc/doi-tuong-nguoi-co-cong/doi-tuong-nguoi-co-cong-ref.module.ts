@@ -1,9 +1,10 @@
-import { DoiTuongNguoiCoCongEditDialogComponent } from './doi-tuong-nguoi-co-cong-edit/doi-tuong-nguoi-co-cong-edit-dialog.component';
-import { DoiTuongNguoiCoCongListComponent } from './doi-tuong-nguoi-co-cong-list/doi-tuong-nguoi-co-cong-list.component';
-import { DoiTuongNguoiCoCongComponent } from './doi-tuong-nguoi-co-cong.component';
+
 import { NgModule } from '@angular/core';
 import { DPSCommonModule } from '../../dps-common.module';
 import { DoiTuongNguoiCoCongService } from '../doi-tuong-nguoi-co-cong/Services/doi-tuong-nguoi-co-cong.service';
+import { DoiTuongNguoiCoCongComponent } from './doi-tuong-nguoi-co-cong.component';
+import { DoiTuongNguoiCoCongListComponent } from './doi-tuong-nguoi-co-cong-list/doi-tuong-nguoi-co-cong-list.component';
+import { DoiTuongNguoiCoCongEditDialogComponent } from './doi-tuong-nguoi-co-cong-edit/doi-tuong-nguoi-co-cong-edit-dialog.component';
 import { DoiTuongNhanQuaListComponent } from './doi-tuong-nhan-qua-list/doi-tuong-nhan-qua-list.component';
 import { DoiTuongNhanQuaEditComponent } from './doi-tuong-nhan-qua-edit/doi-tuong-nhan-qua-edit.component';
 import { DoiTuongNhanQuaMucQuaComponent } from './doi-tuong-nhan-qua-muc-qua/doi-tuong-nhan-qua-muc-qua.component';

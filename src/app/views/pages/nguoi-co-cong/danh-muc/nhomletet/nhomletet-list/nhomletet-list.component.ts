@@ -2,19 +2,17 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef }
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-import { nhomletetEditDialogComponent } from '../nhomletet-edit/nhomletet-edit.dialog.component';
-import { nhomletetDataSource } from '../Model/data-sources/nhomletet.datasource';
-import { nhomletetModel } from '../Model/nhomletet.model';
-import { nhomletetService } from '../Services/nhomletet.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel} from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
+import { nhomletetModel } from '../Model/nhomletet.model';
+import { nhomletetService } from '../Services/nhomletet.service';
+import { nhomletetDataSource } from '../Model/data-sources/nhomletet.datasource';
+import { nhomletetEditDialogComponent } from '../nhomletet-edit/nhomletet-edit.dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -24,27 +22,24 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class nhomletetListComponent implements OnInit {
-
     // Table fields
-    dataSource: nhomletetDataSource;
+    dataSource: nhomletetDataSource | undefined;
     displayedColumns = ['STT', 'NhomLeTet', 'MoTa', 'Locked', 'Priority', 'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
-	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
     filterStatus = '';
 	filterCondition = '';
     // Selection
     selection = new SelectionModel<nhomletetModel>(true, []);
     productsResult: nhomletetModel[] = [];
-    showTruyCapNhanh: boolean = true;
-	// filter: any = {};
+
     _name = "";
+    gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
     
-    gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
-    
-	constructor(public nhomletetService1: nhomletetService,
-		private danhMucService: CommonService,
+	constructor(public apiService: nhomletetService,
         private cookieService: CookieService,
         public dialog: MatDialog,
         private route: ActivatedRoute,
@@ -54,12 +49,13 @@ export class nhomletetListComponent implements OnInit {
             this._name = this.translate.instant("NHOM_LE_TET.NAME");
     }
 
-    /** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-        if (this.nhomletetService1 !== undefined) {
-			this.nhomletetService1.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
-		} //mặc định theo priority
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
+        if (this.apiService !== undefined) {
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
+		} 
 
         this.gridModel = new TableModel();
 		this.gridModel.clear();
@@ -67,7 +63,6 @@ export class nhomletetListComponent implements OnInit {
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
         this.gridModel.filterText['NhomLeTet'] = "";
         this.gridModel.filterText['MoTa'] = "";
-
         this.gridModel.disableButtonFilter['Locked'] = true;
 
         let optionsTinhTrang = [
@@ -80,7 +75,6 @@ export class nhomletetListComponent implements OnInit {
 				value: 'False',
 			}
 		];
-
         this.gridModel.filterGroupDataChecked['Locked'] = optionsTinhTrang.map(x => {
 			return {
 				name: x.name,
@@ -88,7 +82,6 @@ export class nhomletetListComponent implements OnInit {
 				checked: false
 			}
         });
-        
         this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
         let availableColumns = [
@@ -183,7 +176,6 @@ export class nhomletetListComponent implements OnInit {
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns)
 
-
         this.gridService = new TableService(
 			this.layoutUtilsService,
 			this.ref,
@@ -191,34 +183,33 @@ export class nhomletetListComponent implements OnInit {
 			this.cookieService
 		);
         this.gridService.cookieName = 'displayedColumns_nhomletet';
-
 		this.gridService.showColumnsInTable();
         this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_nhomletet'));
 
-        // If the user changes the sort order, reset back to the first page.
-        this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-        merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-            .pipe(
-                tap(() => {
-                    this.loadDataList();
-                })
-            )
-            .subscribe();
+        if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
         // Init DataSource
-        this.dataSource = new nhomletetDataSource(this.nhomletetService1);
+        this.dataSource = new nhomletetDataSource(this.apiService);
         let queryParams = new QueryParamsModel({});
-
-        // Read from URL itemId, for restore previous state
-        this.route.queryParams.subscribe(params => {
-            queryParams = this.nhomletetService1.lastFilter$.getValue();
-            // First load
-            this.dataSource.loadList(queryParams);
+        this.route.queryParams.subscribe(_ => {
+            if (this.dataSource) {
+                queryParams = this.apiService.lastFilter$.getValue();
+                this.dataSource.loadList(queryParams);
+            }
         });
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -227,6 +218,7 @@ export class nhomletetListComponent implements OnInit {
     }
 
 	loadDataList(holdCurrentPage: boolean = true) {
+        if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
         const queryParams = new QueryParamsModel(
             this.filterConfiguration(),
             this.sort.direction,
@@ -237,38 +229,32 @@ export class nhomletetListComponent implements OnInit {
         );
         this.dataSource.loadList(queryParams);
     }
-    filterConfiguration(): any {
 
+    filterConfiguration(): any {
         const filter: any = {};
         if (this.filterStatus && this.filterStatus.length > 0) {
 			filter.status = +this.filterStatus;
 		}
-
 		if (this.filterCondition && this.filterCondition.length > 0) {
             filter.type = +this.filterCondition;
         }
-
-        if (this.gridService.model.filterText) 
+        if (this.gridService && this.gridService.model.filterText) {
             filter.NhomLeTet = this.gridService.model.filterText['NhomLeTet'];
             filter.MoTa = this.gridService.model.filterText['MoTa'];
-
+        }
         return filter; //trả về đúng biến filter
     }
 
-    /** Delete */
-    DeleteWorkplace(_item: nhomletetModel) {
+    Delete(item: nhomletetModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
         const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
         dialogRef.afterClosed().subscribe(res => {
-            if (!res) {
-                return;
-            }
-
-            this.nhomletetService1.deleteItem(_item.Id).subscribe(res => {
+            if (!res)  return;
+            
+            this.apiService.delete(item.Id).subscribe(res => {
                 if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
                 }
@@ -281,22 +267,21 @@ export class nhomletetListComponent implements OnInit {
     }
 
     //Khóa
-    BlockWorkplace(_item: nhomletetModel) {
+    Block(item: nhomletetModel) {
         let _description = '';
         let _waitDesciption = '';
         let _title = '';
-
-        if(_item.Locked == false) { 
+        if (!item.Locked) { 
             _description = 'Bạn có chắc chắn muốn khóa nhóm lễ tết này không ??';
             _waitDesciption = 'Đang cập nhật ...';
             _title = 'Khóa nhóm lễ tết';
-            _item.Locked = true;
+            item.Locked = true;
         }
         else {
             _description = 'Bạn có chắc chắn muốn mở khóa nhóm lễ tết này không ??';
             _waitDesciption = 'Đang cập nhật ...';
             _title = 'Mở khóa nhóm lễ tết';
-            _item.Locked = false;
+            item.Locked = false;
         }
 
         const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption); //thay đổi titile là ra confirm khác
@@ -305,7 +290,7 @@ export class nhomletetListComponent implements OnInit {
                 this.loadDataList(); //để không biến mất ổ khóa
                 return;
             }
-		    this.nhomletetService1.updateNhomLeTet(_item).subscribe(res => {
+		    this.apiService.update(item).subscribe(res => {
                 if (res && res.status === 1) {
                     const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -316,25 +301,15 @@ export class nhomletetListComponent implements OnInit {
                 this.loadDataList();
             });
         });
-
     }
 
-    AddWorkplace() {
-        const nhomletetModels = new nhomletetModel();
-        nhomletetModels.clear(); // Set all defaults fields
-        this.EditNhom(nhomletetModels);
+    Add() {
+        const dataModel = new nhomletetModel();
+        dataModel.clear(); // Set all defaults fields
+        this.Edit(dataModel);
     }
 
-    restoreState(queryParams: QueryParamsModel, id: number) {
-        if (id > 0) {
-        }
-
-        if (!queryParams.filter) {
-            return;
-        }
-    }
-
-    EditNhom(_item: nhomletetModel, allowEdit: boolean = true) {
+    Edit(_item: nhomletetModel, allowEdit: boolean = true) {
         let saveMessageTranslateParam = '';
         //câu thông báo khi thực hiện trong tác vụ
         saveMessageTranslateParam += _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';  
@@ -351,6 +326,7 @@ export class nhomletetListComponent implements OnInit {
 
         });
     }
+
     getHeight(): any {
 		let obj = window.location.href.split("/").find(x => x == "tabs-references");
 		if (obj) {
@@ -363,7 +339,6 @@ export class nhomletetListComponent implements OnInit {
 			return tmp_height + 'px';
 		}
     }
-
 
     //phục vụ CSS
     covertLockButton(lock:boolean): string {
@@ -400,6 +375,5 @@ export class nhomletetListComponent implements OnInit {
 			case true:
 				return 'kt-badge--metal';
 		}
-		return '';
 	}
 }

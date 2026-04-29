@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { DPSCommonModule } from '../../dps-common.module';
+import { capquanlyService } from './Services/capquanly.service';
+import { capquanlyComponent } from './capquanly.component';
 import { capquanlyListComponent } from './capquanly-list/capquanly-list.component';
 import { capquanlyEditDialogComponent } from './capquanly-edit/capquanly-edit.dialog.component';
-import { capquanlyComponent } from './capquanly.component';
-import { capquanlyService } from './Services/capquanly.service';
-import { capquanlyRefModule } from './capquanly-ref.module';
-import { DPSCommonModule } from '../../dps-common.module';
 
 const routes: Routes = [
 	{
@@ -32,15 +31,18 @@ const routes: Routes = [
 	imports: [
 		RouterModule.forChild(routes),
 		DPSCommonModule,
-		capquanlyRefModule
 	],
 	providers: [
 		capquanlyService
 	],
 	entryComponents: [
+		capquanlyListComponent,
 	],
 	declarations: [
-		capquanlyComponent
+		capquanlyComponent,
+		capquanlyListComponent,
+		capquanlyEditDialogComponent,
 	]
 })
+
 export class capquanlyModule { }

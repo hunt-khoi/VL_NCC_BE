@@ -1,21 +1,19 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { capquanlyModel } from '../../capquanly/Model/capquanly.model';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { TranslateService } from '@ngx-translate/core';
 import { capquanlyService } from '../Services/capquanly.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
 	selector: 'm-capquanly-edit-dialog',
 	templateUrl: './capquanly-edit.dialog.component.html',
 })
-
 export class capquanlyEditDialogComponent implements OnInit {
-	item: capquanlyModel;
-	oldItem: capquanlyModel
-	itemForm: FormGroup;
+	item: capquanlyModel = new capquanlyModel();
+	oldItem: capquanlyModel = new capquanlyModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -23,7 +21,7 @@ export class capquanlyEditDialogComponent implements OnInit {
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
 	change: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -42,23 +40,22 @@ export class capquanlyEditDialogComponent implements OnInit {
 	constructor(public dialogRef: MatDialogRef<capquanlyEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
-		private capquanlyService: capquanlyService,
+		private apiService: capquanlyService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("CAP_QL.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.createForm();
 		if (this.item.RowID > 0) {
 			this.viewLoading = true;
-			this.capquanlyService.getItem(this.item.RowID).subscribe(res => {
+			this.apiService.getItem(this.item.RowID).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -77,27 +74,24 @@ export class capquanlyEditDialogComponent implements OnInit {
 			Range: ['' + this.item.Range, [Validators.required, Validators.pattern(/^-?(0|[1-9]\d*)?$/)]],
 			Summary: [this.item.Summary],
 		});
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
 
-	/** UI */
 	getTitle(): string {
-		if (!this.allowEdit)
-			return 'Xem chi tiết';
+		if (!this.allowEdit) return 'Xem chi tiết';
 		let result = this.translate.instant('COMMON.CREATE');
 		if (!this.item || !this.item.RowID) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` - ${this.item.Title}`;
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): capquanlyModel {
-
+	prepare(): capquanlyModel {
+		if (!this.itemForm) return new capquanlyModel();
 		const controls = this.itemForm.controls;
 		const _item = new capquanlyModel();
 		_item.RowID = this.item.RowID;
@@ -106,45 +100,44 @@ export class capquanlyEditDialogComponent implements OnInit {
 		_item.Summary = controls['Summary'].value;
 		return _item;
 	}
-	onSubmit(withBack: boolean = false) {
 
+	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditCapQuanLy = this.prepareCustomer();
-		if (EditCapQuanLy.RowID > 0) {
-			this.UpdateCapQuanLy(EditCapQuanLy, withBack);
+		const Edit = this.prepare();
+		if (Edit.RowID > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateCapQuanLy(EditCapQuanLy, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
-	UpdateCapQuanLy(_item: capquanlyModel, withBack: boolean) {
+
+	Update(item: capquanlyModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.capquanlyService.UpdateCapQuanLy(_item).subscribe(res => {
+		this.apiService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -152,46 +145,43 @@ export class capquanlyEditDialogComponent implements OnInit {
 			}
 		});
 	}
-	CreateCapQuanLy(_item: capquanlyModel, withBack: boolean) {
+
+	Create(item: capquanlyModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		//	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.capquanlyService.CreateCapQuanLy(_item).subscribe(res => {
+		this.apiService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
-					this.change=true;
+					this.change = true;
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
 			else {
-				this.viewLoading = false;
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
+
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close(this.change);
 	}
-
 }

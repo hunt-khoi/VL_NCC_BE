@@ -1,8 +1,8 @@
 import { BaseModel } from "../../../../../../core/_base/crud";
 
 export class cachNhapModel extends BaseModel {
-    Id: number;
-    CachNhap: string;
+    Id: number = 0;
+    CachNhap: string = '';
 
 	clear() {
         this.CachNhap = '';

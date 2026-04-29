@@ -1,11 +1,10 @@
 import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { TypesUtilsService } from './../../../../../../core/_base/crud/utils/types-utils.service';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
 import { CommonService } from './../../../services/common.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { CanCuService } from '../services/can-cu.service';
+import { CanCuService } from '../Services/can-cu.service';
 
 @Component({
 	selector: 'kt-can-cu-edit',
@@ -13,7 +12,7 @@ import { CanCuService } from '../services/can-cu.service';
 })
 export class CanCuEditDialogComponent implements OnInit {
 	item: any;
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -22,7 +21,7 @@ export class CanCuEditDialogComponent implements OnInit {
 	isZoomSize: boolean = false;
 	listLoaiGiayTo: any;
 	change: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -42,10 +41,9 @@ export class CanCuEditDialogComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		private commonService: CommonService,
-		private danhmuckhacService: CanCuService,
+		private apiService: CanCuService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("CANCU.NAME");
 	}
@@ -54,14 +52,16 @@ export class CanCuEditDialogComponent implements OnInit {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.createForm();
 		if (+this.item.Id > 0) {
-			this.danhmuckhacService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				if (res && res.status == 1) {
 					this.item = res.data;
 					this.createForm();
-				} else
+				} else {
 					this.layoutUtilsService.showError(res.error.message);
+				}
 			})
 		}
 	}
@@ -80,8 +80,8 @@ export class CanCuEditDialogComponent implements OnInit {
 			Priority: [this.item.Priority, Validators.min(1)],
 			FileDinhKem: [this.item.FileDinhKem ? [this.item.FileDinhKem] : null]
 		});
-
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
 		this.changeDetectorRefs.detectChanges();
@@ -91,15 +91,14 @@ export class CanCuEditDialogComponent implements OnInit {
 		if (this.item.Id > 0) {
 			if (this.allowEdit)
 				return 'Cập nhật căn cứ';
-			else
-				return 'Chi tiết căn cứ';
+			return 'Chi tiết căn cứ';
 		}
-		else
-			return 'Thêm mới căn cứ';
+		return 'Thêm mới căn cứ';
 	}
 
 	/** ACTIONS */
-	prepareCustomer(): any {
+	prepare(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -115,7 +114,7 @@ export class CanCuEditDialogComponent implements OnInit {
 		_item.Priority = controls['Priority'].value;
 		let temp = controls['FileDinhKem'].value;
 		if (temp) {
-			temp = temp.filter(x => !x.IsDel);
+			temp = temp.filter((x: any) => !x.IsDel);
 			if (temp && temp.length > 0)
 				_item.FileDinhKem = temp[0];
 			else
@@ -123,56 +122,52 @@ export class CanCuEditDialogComponent implements OnInit {
 		}
 		return _item;
 	}
-	onSubmit(withBack: boolean = false) {
 
+	onSubmit(withBack: boolean = false) {
+		if (!this.itemForm) return;
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditDanhmucKhac = this.prepareCustomer();
-
-		if (EditDanhmucKhac.Id > 0) {
-			this.UpdateDanhmuc(EditDanhmucKhac);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit);
 		} else {
-			this.CreateDanhmuc(EditDanhmucKhac, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
-	UpdateDanhmuc(_item: any) {
+
+	Update(item: any) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.danhmuckhacService.UpdateItem(_item).subscribe(res => {
+		this.apiService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.dialogRef.close({
-					_item
-				});
+				this.dialogRef.close({ item });
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
-	CreateDanhmuc(_item: any, withBack: boolean) {
+
+	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.danhmuckhacService.CreateItem(_item).subscribe(res => {
+		this.apiService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					this.change = true;
 					this.reset();
@@ -184,13 +179,12 @@ export class CanCuEditDialogComponent implements OnInit {
 			}
 		});
 	}
+
 	reset() {
 		this.item = { Id: 0 };
 		this.createForm();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close(this.change);
 	}

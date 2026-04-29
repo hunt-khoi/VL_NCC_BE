@@ -2,11 +2,9 @@ import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewC
 import { loaiGiayToModel } from '../Model/loaigiayto.model';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { TranslateService } from '@ngx-translate/core';
 import { loaiGiayToServices } from '../Services/loaigiayto.service';
-import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
 	selector: 'kt-loai-giay-to-edit',
@@ -15,15 +13,15 @@ import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_b
 })
 
 export class LoaiGiayToEditDialogComponent implements OnInit {
-	item: loaiGiayToModel;
-	itemForm: FormGroup;
+	item: loaiGiayToModel = new loaiGiayToModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -42,11 +40,9 @@ export class LoaiGiayToEditDialogComponent implements OnInit {
 	constructor(public dialogRef: MatDialogRef<LoaiGiayToEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
-		private danhMucService: CommonService,
-		private loaiGiayToServices: loaiGiayToServices,
+		private apiService: loaiGiayToServices,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("LOAI_GT.NAME");
 	}
@@ -58,7 +54,7 @@ export class LoaiGiayToEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.loaiGiayToServices.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -79,8 +75,8 @@ export class LoaiGiayToEditDialogComponent implements OnInit {
 			Priority: [this.item.Priority],
 			Keys_ID: [this.item.Keys_ID]
 		});
-
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput) 
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
@@ -90,16 +86,15 @@ export class LoaiGiayToEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-		if (this.allowEdit == false) {
+		if (!this.allowEdit) {
 			return 'Xem chi tiết loại giấy tờ';
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ' loại giấy tờ';
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): loaiGiayToModel {
+	prepare(): loaiGiayToModel {
+		if (!this.itemForm) return new loaiGiayToModel();
 		const controls = this.itemForm.controls;
 		const _item = new loaiGiayToModel();
 		_item.Id = this.item.Id;
@@ -113,13 +108,12 @@ export class LoaiGiayToEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -127,33 +121,31 @@ export class LoaiGiayToEditDialogComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-
-		const EditLoaiGiayTo = this.prepareCustomer();
-		if (EditLoaiGiayTo.Id > 0) {
-			this.UpdateLoaiGiayTo(EditLoaiGiayTo, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateLoaiGiayTo(EditLoaiGiayTo, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
 
-	UpdateLoaiGiayTo(_item: loaiGiayToModel, withBack: boolean) {
+	Update(item: loaiGiayToModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.loaiGiayToServices.UpdateLoaiGiayTo(_item).subscribe(res => {
+		this.apiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -162,23 +154,22 @@ export class LoaiGiayToEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateLoaiGiayTo(_item: loaiGiayToModel, withBack: boolean) {
+	Create(item: loaiGiayToModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.loaiGiayToServices.CreateLoaiGiayTo(_item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -189,7 +180,7 @@ export class LoaiGiayToEditDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

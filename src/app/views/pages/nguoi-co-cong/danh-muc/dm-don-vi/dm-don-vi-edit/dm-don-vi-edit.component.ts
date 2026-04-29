@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRe
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-import { LayoutUtilsService, MessageType, QueryParamsModel } from 'app/core/_base/crud';
+import { LayoutUtilsService } from 'app/core/_base/crud';
 import { DM_DonViService } from '../Services/dm-don-vi.service';
 import { DM_DonViModel, ListImageModel } from '../Model/dm-don-vi.model';
 import { TreeDonViDialogComponent } from '../../../components/tree-don-vi-dialog/tree-don-vi-dialog.component';
@@ -16,12 +16,12 @@ import { environment } from 'environments/environment';
 
 export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	// Public properties
-	DM_DonVi: DM_DonViModel;
-	itemForm: FormGroup;
+	DM_DonVi: DM_DonViModel = new DM_DonViModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	disabledBtn: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 	fixedPoint = 0;
@@ -30,8 +30,7 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	parentDV: number = 0;
 	parentName: string = "";
 	isShowImage: boolean = false;
-	private componentSubscriptions: Subscription;
-	// imageLogo:any;
+	private componentSubscriptions: Subscription | undefined;
 	picLogo: ListImageModel[] = [];
 	imgvlLogo: any;
 
@@ -55,7 +54,7 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private dm_donvisService: DM_DonViService) { }
+		private apiService: DM_DonViService) { }
 
 	async ngOnInit() {
 		// this.imageLogo = {
@@ -70,7 +69,7 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 		this.DM_DonVi.clear();
 		this.createForm();
 		if (this.data.DM_DonVi && this.data.DM_DonVi.Id > 0) {
-			this.dm_donvisService.getDM_DonViById(this.data.DM_DonVi.Id).subscribe(res => {
+			this.apiService.getById(this.data.DM_DonVi.Id).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.DM_DonVi = res.data;
@@ -94,7 +93,6 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 		}
-
 	}
 
 	ngOnDestroy() {
@@ -123,67 +121,55 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	}
 
 	getTitle(): string {
-		if (this.DM_DonVi.Id == 0) {
+		if (this.DM_DonVi.Id == 0) 
 			return 'Thêm mới đơn vị';
-		}
-		if(this.data.DM_DonVi.IsShow){
+		if (this.data.DM_DonVi.IsShow)
 			return `Xem đơn vị - ${this.DM_DonVi.DonVi} `;
-		}
 		return `Chỉnh sửa đơn vị - ${this.DM_DonVi.DonVi}(${this.DM_DonVi.MaDonvi}) `;
-	}
-
-	isControlInvalid(controlName: string): boolean {
-		const control = this.itemForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
 	}
 
 	onSubmit(type: boolean) {
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/** check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			let invalid = <FormControl[]>Object.keys(this.itemForm.controls).map(key => this.itemForm.controls[key]).filter(ctl => ctl.invalid);
+			let invalid = <FormControl[]>Object.keys(controls).map(key => controls[key]).filter(ctl => ctl.invalid);
 			let invalidElem: any = invalid[0];
 			invalidElem.nativeElement.focus();
 			this.hasFormErrors = true;
 			return;
 		}
 		this.disabledBtn = true;
-		let editedDM_DonVi = this.prepareDM_DonVis();
+		let editedDM_DonVi = this.prepare();
 		if (this.DM_DonVi.Id > 0) {
-			this.updateDM_DonVi(editedDM_DonVi)
+			this.update(editedDM_DonVi)
 			return;
 		}
-
-		this.addDM_DonVi(editedDM_DonVi, type);
+		this.add(editedDM_DonVi, type);
 	}
 
-	/**
-	 * Returns object for saving
-	 */
-	prepareDM_DonVis(): DM_DonViModel {
+	prepare(): DM_DonViModel {
+		if (!this.itemForm) return new DM_DonViModel();
 		const controls = this.itemForm.controls;
-		const _DM_DonVi = new DM_DonViModel();
-		_DM_DonVi.clear();
-		_DM_DonVi.DonVi = controls['donVi'].value;
+		const _item = new DM_DonViModel();
+		_item.clear();
+		_item.DonVi = controls['donVi'].value;
+		_item.MaDonvi = controls['maDonvi'].value;
+		_item.MaDinhDanh = controls['maDinhDanh'].value;
+		_item.LoaiDonVi = controls['loaiDonVi'].value ? Number(controls['loaiDonVi'].value) : 0;
+		_item.Parent = this.parentDV;
+		_item.SDT = controls['sDT'].value;
+		_item.Email = controls['email'].value;
+		_item.DiaChi = controls['diaChi'].value;
+		_item.Logo = controls['logo'].value;
+		_item.Priority = controls['priority'].value ? Number(controls['priority'].value) :1;
+		_item.DangKyLichLanhDao = controls['dangKyLichLanhDao'].value?controls['dangKyLichLanhDao'].value:false;
+		_item.KhongCoVanThu = controls['khongCoVanThu'].value?controls['khongCoVanThu'].value:false;
+		_item.listLinkImage = [];	
 
-		_DM_DonVi.MaDonvi = controls['maDonvi'].value;
-		_DM_DonVi.MaDinhDanh = controls['maDinhDanh'].value;
-		_DM_DonVi.LoaiDonVi = controls['loaiDonVi'].value ? Number(controls['loaiDonVi'].value) : 0;
-		_DM_DonVi.Parent = this.parentDV;
-		_DM_DonVi.SDT = controls['sDT'].value;
-		_DM_DonVi.Email = controls['email'].value;
-		_DM_DonVi.DiaChi = controls['diaChi'].value;
-		_DM_DonVi.Logo = controls['logo'].value;
-		_DM_DonVi.Priority = controls['priority'].value ? Number(controls['priority'].value) :1;
-		_DM_DonVi.DangKyLichLanhDao = controls['dangKyLichLanhDao'].value?controls['dangKyLichLanhDao'].value:false;
-
-		_DM_DonVi.KhongCoVanThu = controls['khongCoVanThu'].value?controls['khongCoVanThu'].value:false;
-		_DM_DonVi.listLinkImage = [];	
 		this.imgvlLogo = controls['imageLogo'].value;
 		if (this.imgvlLogo.length > 0) {
 			for (let i = 0; i < this.imgvlLogo.length; i++) {
@@ -194,27 +180,42 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 				md.IsAdd = this.imgvlLogo[i].IsAdd;
 				md.IsDel = this.imgvlLogo[i].IsDel;
 				md.IsImagePresent = true;
-				_DM_DonVi.listLinkImage.push(md);
+				_item.listLinkImage.push(md);
 			}
-		} //gán lại giá trị id 
-			if (this.DM_DonVi.Id > 0) {
-				_DM_DonVi.Id = this.DM_DonVi.Id;
-				_DM_DonVi.Locked = controls['locked'].value ;
-			}
-
-			return _DM_DonVi;
-
+		} 
+		if (this.DM_DonVi.Id > 0) {
+			_item.Id = this.DM_DonVi.Id;
+			_item.Locked = controls['locked'].value ;
+		}
+		return _item;
 	}
 
-	addDM_DonVi(_DM_DonVi: DM_DonViModel, withBack: boolean = false) {
-		this.dm_donvisService.createDM_DonVi(_DM_DonVi).subscribe(res => {
+	add(item: DM_DonViModel, withBack: boolean = false) {
+		this.apiService.create(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
-				const message = `Thêm thành công`;
+				const message = "Thêm thành công";
 				this.layoutUtilsService.showInfo(message);
-				this.itemForm.reset();
+				if (this.itemForm)
+					this.itemForm.reset();
 				if (withBack)
 					this.dialogRef.close(this.isChange);
+			}
+			else {
+				this.layoutUtilsService.showError(res.error.message);
+			}
+			this.disabledBtn = false;
+			this.changeDetectorRefs.detectChanges();
+		});
+	}
+
+	update(item: DM_DonViModel) {
+		this.apiService.update(item).subscribe(res => {
+			if (res.status == 1) {
+				this.isChange = true;
+				const message = "Cập nhật thành công";
+				this.layoutUtilsService.showInfo(message);
+				this.dialogRef.close(this.isChange);
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -227,9 +228,8 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	openTreeDonVi() {
 		const dialogRef = this.dialog.open(TreeDonViDialogComponent, { data: {} });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
+			if (!this.itemForm || !res) 
 				return;
-			}
 			this.parentDV = res.data.IdGroup;
 			this.itemForm.controls["parentName"].setValue(res.text);
 			this.changeDetectorRefs.detectChanges();
@@ -238,27 +238,12 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 
 	clearCapTren() {
 		this.parentDV = 0;
+		if (!this.itemForm) return;
 		this.itemForm.controls["parentName"].setValue("");
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	updateDM_DonVi(_DM_DonVi: DM_DonViModel, withBack: boolean = false) {
-		this.dm_donvisService.updateDM_DonVi(_DM_DonVi).subscribe(res => {
-			if (res.status == 1) {
-				this.isChange = true;
-				const message = `Cập nhật thành công`;
-				this.layoutUtilsService.showInfo(message);
-				this.dialogRef.close(this.isChange);
-			}
-			else {
-				this.layoutUtilsService.showError(res.error.message);
-			}
-			this.disabledBtn = false;
-			this.changeDetectorRefs.detectChanges();
-		});
-	}
-
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -301,43 +286,33 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	}
 
 	changeValueOfForm(controlName: string, event: any) {
+		if (!this.itemForm) return;
 		if (this.ValidateChangeNumberEvent(event)) {
 			let tmpValue = this.itemForm.controls[controlName].value.replace(/,/g, "");
-			this.itemForm.controls[controlName].setValue(
-				this.f_currency_V2(tmpValue)
-			);
+			this.itemForm.controls[controlName].setValue(this.f_currency_V2(tmpValue));
 		}
 		else {
 			this.itemForm.controls[controlName].setValue(event.target.value);
 		}
 	}
 
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-
-	}
 	selectFile() {
 		let f = document.getElementById("FileUpLoad");
-		f.click();
+		if (f) f.click();
 	}
+
 	DeleteFile() {
 		let f = document.getElementById("img_icon");
-		f.setAttribute("src", "");
-		let a = document.getElementById("img_icon");
+		let a = document.getElementById("img_icon") as HTMLInputElement;
+		if (!this.itemForm || !a || !f) 
+			return;
 
-		a["type"] = "text";
-		a["type"] = "file";
+		f.setAttribute("src", "");
+		a.type = "text";
+		a.type = "file";
 
 		this.itemForm.controls['strBase64'].setValue('');
 		this.itemForm.controls['isnew'].setValue(true);
-
 		if (this.itemForm.controls['strBase64'].value != '') {
 			this.isShowImage = true;
 		}
@@ -348,7 +323,7 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	}
 
 	FileChoose(evt: any) {
-		if (evt.target.files && evt.target.files.length) {//Nếu có file
+		if (evt.target.files && evt.target.files.length) { // Nếu có file
 			let file = evt.target.files[0]; // Ví dụ chỉ lấy file đầu tiên
 			let size = file.size;
 			if (size >= environment.DungLuong) {
@@ -358,15 +333,16 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 			}
 			let reader = new FileReader();
 			reader.readAsDataURL(evt.target.files[0]);
-			let base64Str;
-			let extension
+			let base64Str: any;
+			let extension: any;
 			reader.onload = function () {
 				base64Str = reader.result as String;
 				extension = base64Str.match(/[^:/]\w+(?=;|,)/)[0];
 				var metaIdx = base64Str.indexOf(';base64,');
 				base64Str = base64Str.substr(metaIdx + 8); // Cắt meta data khỏi chuỗi base64
 			};
-			setTimeout(res => {
+			setTimeout(_ => {
+				if (!this.itemForm) return;
 				this.itemForm.controls['strBase64'].setValue(base64Str);
 				this.itemForm.controls['filename'].setValue(`${evt.target.files[0].name}`);
 				this.itemForm.controls['extension'].setValue(extension);
@@ -380,7 +356,8 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 				this.changeDetectorRefs.detectChanges();
 
 				let f = document.getElementById("img_icon");
-				f.setAttribute("src", `data:image/${extension};base64,` + base64Str);
+				if (f)
+					f.setAttribute("src", `data:image/${extension};base64,` + base64Str);
 			}, 1000);
 		}
 	}

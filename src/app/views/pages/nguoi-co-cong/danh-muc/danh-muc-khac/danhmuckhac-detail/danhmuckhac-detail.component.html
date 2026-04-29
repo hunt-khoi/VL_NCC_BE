@@ -60,8 +60,8 @@
 								<td class="text-center stt-cell" style="font-weight: bold;">{{i+1}}</td>
 								<td style="font-weight: bold;">{{dt.DoiTuong}}</td>
 								<td class="text-center" colspan="3">
-									<button type="button" mat-raised-button color="accent" *ngIf="allowEdit" 
-										(click)="chonBM(dt.Id)" [disabled]="disabledBtn" matTooltip="Chọn các biểu mẫu áp dụng">
+									<button type="button" mat-raised-button color="accent" *ngIf="allowEdit" (click)="chonBM(dt.Id)" 
+										[disabled]="disabledBtn" matTooltip="Chọn các biểu mẫu áp dụng">
 										Chọn
 									</button>
 								</td>
@@ -73,15 +73,16 @@
 									<td>{{bm.BieuMau}}</td>
 									<td class="text-center stt-cell">
 										<button type="button" color="warn" mat-icon-button matTooltip="Xóa biểu mẫu" *ngIf="allowEdit"
-										(click)="xoaBM(j, dt.Id)"><mat-icon>delete</mat-icon>
+											(click)="xoaBM(j, dt.Id)"><mat-icon>delete</mat-icon>
 										</button>
 									</td>
 								</tr>
 							</ng-container>
 							
-							<tr *ngIf="dt.BieuMaus && dt.BieuMaus.length==0"><td colspan="6" class="text-center">Chưa có quyết định</td></tr>
+							<tr *ngIf="dt.BieuMaus && dt.BieuMaus.length==0">
+								<td colspan="6" class="text-center">Chưa có quyết định</td>
+							</tr>
 						</ng-container>
-						
 					</table>
 				</div>
 			</div>
@@ -95,9 +96,15 @@
 							<th class="text-center">Bắt buộc nhập</th>
 						</tr>
 						<tr *ngFor="let loai of listLoaiGiayTo">
-							<td class="text-center"><mat-checkbox [(ngModel)]="loai.Checked" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit || loai.Disabled" (change)="change($event,loai)"></mat-checkbox></td>
+							<td class="text-center">
+								<mat-checkbox [(ngModel)]="loai.Checked" [ngModelOptions]="{standalone: true}" 
+								[disabled]="!allowEdit || loai.Disabled" (change)="change($event,loai)"></mat-checkbox>
+							</td>
 							<td>{{loai.title}}</td>
-							<td class="text-center"><mat-checkbox [(ngModel)]="loai.IsRequired" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit || loai.Disabled || !loai.Checked" color="warn"></mat-checkbox></td>
+							<td class="text-center">
+								<mat-checkbox [(ngModel)]="loai.IsRequired" [ngModelOptions]="{standalone: true}" 
+								[disabled]="!allowEdit || loai.Disabled || !loai.Checked" color="warn"></mat-checkbox>
+							</td>
 						</tr>
 					</table>
 				</div>

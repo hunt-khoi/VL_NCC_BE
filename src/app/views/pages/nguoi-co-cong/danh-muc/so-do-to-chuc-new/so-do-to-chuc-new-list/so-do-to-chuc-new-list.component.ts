@@ -4,12 +4,10 @@ import { ArrayDataSource } from '@angular/cdk/collections';
 import { BehaviorSubject } from 'rxjs';
 import { MatDialog} from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
-import { ActivatedRoute } from '@angular/router';
 import { OrgChartModel } from '../Model/so-do-to-chuc.model';
 import { OrgChartService } from '../Services/so-do-to-chuc.service';
 import { sodotochuceditComponent } from '../so-do-to-chuc-edit/so-do-to-chuc-edit.component';
-import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 interface TreeNode {
 	Name: string;
@@ -53,20 +51,18 @@ export class ChecklistDatabase {
 	 * Build the file structure tree. The `value` is the Json object, or a sub-tree of a Json object.
 	 * The return value is the list of `TodoItemNode`.
 	 */
-	buildFileTree(obj: object, level: number): TodoItemNode[] {
+	buildFileTree(obj: { [key: string]: any }, level: number): TodoItemNode[] {
 		return Object.keys(obj).reduce<TodoItemNode[]>((accumulator, key) => {
 			const value = obj[key];
 			const node = new TodoItemNode();
 			node.item = key;
-
-			if (value != null) {
+			if (value) {
 				if (typeof value === 'object') {
 					node.children = this.buildFileTree(value, level + 1);
 				} else {
 					node.item = value;
 				}
 			}
-
 			return accumulator.concat(node);
 		}, []);
 	}
@@ -110,9 +106,8 @@ export class ChecklistDatabase {
 		for (let i = 0; i < this.data.length; ++i) {
 			const currentRoot = this.data[i];
 			const parent = this.getParent(currentRoot, node);
-			if (parent != null) {
+			if (parent) 
 				return parent;
-			}
 		}
 		return null;
 	}
@@ -125,9 +120,8 @@ export class ChecklistDatabase {
 					return currentRoot;
 				} else if (child.children && child.children.length > 0) {
 					const parent = this.getParent(child, node);
-					if (parent != null) {
+					if (parent) 
 						return parent;
-					}
 				}
 			}
 		}
@@ -145,7 +139,6 @@ export class ChecklistDatabase {
 	}
 
 	copyPasteItem(from: TodoItemNode, to: TodoItemNode): TodoItemNode {
-
 		const newItem = this.insertItem(to, from.item);
 		if (from.children) {
 			from.children.forEach(child => {
@@ -196,11 +189,10 @@ export class ChecklistDatabase {
 	providers: [ChecklistDatabase],
 	encapsulation: ViewEncapsulation.None
 })
-
 export class SodotochucListComponent implements OnInit {
 	// displayedColumns = ['STT', 'ChucVu', 'NgayCap', 'actions'];
 	treeControl = new NestedTreeControl<TreeNode>(node => node.children);
-	dataSource;
+	dataSource: any;
 	selectedNode: any;
 	positionFrom: string = '';
 	parentFrom: string = '';
@@ -216,43 +208,38 @@ export class SodotochucListComponent implements OnInit {
 	jobtitleid: string = "";
 	id_menu: number = 8;
 	Visible: boolean = false;
-	public datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	public datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	disabledBtn: boolean = false;
 	flatNodeMap = new Map<TodoItemFlatNode, TodoItemNode>();
 	dragNode: any;
-	/** Map from nested node to flattened node. This helps us to keep the same object for selectio
-	 * n */
+	/** Map from nested node to flattened node. This helps us to keep the same object for selection */
 	nestedNodeMap = new Map<TodoItemNode, TodoItemFlatNode>();
 	dragNodeExpandOverWaitTimeMs = 300;
 	dragNodeExpandOverNode: any;
-	dragNodeExpandOverTime: number;
-	dragNodeExpandOverArea: string;
+	dragNodeExpandOverTime: number = 0;
+	dragNodeExpandOverArea: string = "";
 	/** A selected parent node to be inserted */
 	selectedParent: TodoItemFlatNode | null = null;
-	// @ViewChild('emptyItem') emptyItem: ElementRef;
 	/** The new item's name */
 	newItemName = '';
-	_itemchart: OrgChartModel;
-	__selectedNode: TodoItemFlatNode = null;
+	_itemchart: OrgChartModel = new OrgChartModel();
+	__selectedNode: TodoItemFlatNode | null = null;
 	showTruyCapNhanh: boolean = true;
+
 	getLevel = (node: TodoItemFlatNode) => node.level;
-
 	isExpandable = (node: TodoItemFlatNode) => node.expandable;
-
 	getChildren = (node: TodoItemNode): TodoItemNode[] => node.children;
-
 	hasNoContent = (_: number, _nodeData: TodoItemFlatNode) => _nodeData.item === '';
+	hasChild = (_: number, node: TreeNode) => !!node.children && node.children.length > 0;
+
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	_name = "";
 
 	constructor(
-		private database: ChecklistDatabase,
-		private _orgChartService: OrgChartService,
+		private apiService: OrgChartService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		public dialog: MatDialog,
-		private danhMucChungService: CommonService,
-		private route: ActivatedRoute,
 		private translate: TranslateService,
 		private layoutUtilsService: LayoutUtilsService) {
 		this._name = this.translate.instant("SO_DO_TO_CHUC.NAME");
@@ -262,21 +249,14 @@ export class SodotochucListComponent implements OnInit {
 		await this.getTreeValue();
 		this.changeDetectorRefs.detectChanges();
 	};
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
 
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-	hasChild = (_: number, node: TreeNode) => !!node.children && node.children.length > 0;
+
 	//DEMO Treeview
 	async getTreeValue() {
 		this.loadingSubject.next(true);
 		this.viewLoading = true;
 		this.changeDetectorRefs.detectChanges();
-		this._orgChartService.GetOrganizationalChart(this.jobtitleid).subscribe(res => {
+		this.apiService.GetOrganizationalChart(this.jobtitleid).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
@@ -293,8 +273,7 @@ export class SodotochucListComponent implements OnInit {
 
 
 	addNewItem(node: TodoItemFlatNode) {
-		const itemNode = this.flatNodeMap.get(node);
-		var nodenew: TodoItemFlatNode;
+		// const itemNode = this.flatNodeMap.get(node);
 		this._itemchart = new OrgChartModel();
 		this._itemchart.ID = node.ID;
 		let saveMessageTranslateParam = '';
@@ -305,26 +284,23 @@ export class SodotochucListComponent implements OnInit {
 		let chucdanhParent = node.chucdanhParent;
 		let vitriMax = 0;
 
-		if (node.children.length > 0) {
+		if (node.children.length > 0) 
 			vitriMax = parseInt(node.children[node.children.length - 1].level) + 1;
-		}
 		else
 			vitriMax = 1;
+		
 		const dialogRef = this.dialog.open(sodotochuceditComponent, { data: { Id_parent, id_cd, chucdanhParent, vitriMax }, width: '65%', });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			else {
+			this.getTreeValue();
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 			}
-			this.getTreeValue();
 		});
 	}
 
 	//#region =================== Delete node
 	removeItem(node: TodoItemFlatNode) {
-		const itemNode = this.flatNodeMap.get(node);
+		// const itemNode = this.flatNodeMap.get(node);
 		// this.database.deleteItem(itemNode);
 		//Gọi api delete node
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
@@ -333,11 +309,9 @@ export class SodotochucListComponent implements OnInit {
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
-			this._orgChartService.DeleteOrgChart(node.ID).subscribe(res => {
+			this.apiService.DeleteOrgChart(node.ID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage)
 				}
@@ -348,32 +322,38 @@ export class SodotochucListComponent implements OnInit {
 			});
 		});
 	}
-	handleDragStart(event, node) {
+
+	handleDragStart(event: any, node: any) {
 		// this.idFrom = node.ID;
 		// this.namefrom = node.Name;
 		this.removeClass("dl-drag");
 		let el = document.getElementById(node.ID);
-		el.classList.add("dl-drag");
+		if (el)
+			el.classList.add("dl-drag");
 		event.dataTransfer.setData('foo', 'bar');
 		// event.dataTransfer.setDragImage(this.emptyItem.nativeElement, 0, 0);
 		this.dragNode = node;
 		this.treeControl.collapse(node);
 	}
-	removeClass(className) {
+
+	removeClass(className: any) {
 		let c = document.getElementsByClassName(className);
 		for (let i = 0; i < c.length; i++) {
 			c[i].classList.remove(className);
 		}
 	}
+
 	selectedItem(node: TodoItemFlatNode) {
 		this.__selectedNode = node;
 		//Gọi j thi gọi làm j làm
 	}
-	handleDragOver(event, node) {
+
+	handleDragOver(event: any, node: any) {
 		event.preventDefault();
 		this.removeClass("dl-drag-over");
 		let el = document.getElementById(node.ID);
-		el.classList.add("dl-drag-over");
+		if (el)
+			el.classList.add("dl-drag-over");
 		if (node === this.dragNodeExpandOverNode) {
 			if (this.dragNode !== node && !this.treeControl.isExpanded(node)) {
 				if ((new Date().getTime() - this.dragNodeExpandOverTime) > this.dragNodeExpandOverWaitTimeMs) {
@@ -386,8 +366,8 @@ export class SodotochucListComponent implements OnInit {
 		}
 
 		// Handle drag area
-		const percentageX = event.offsetX / event.target.offsetWidth;
-		//const percentageY = event.offsetY / event.target.offsetHeight;
+		// const percentageX = event.offsetX / event.target.offsetWidth;
+		// const percentageY = event.offsetY / event.target.offsetHeight;
 
 		const percentageY = event.offsetY / event.target.offsetParent.clientHeight;
 		if (percentageY < 0.25) {
@@ -400,18 +380,19 @@ export class SodotochucListComponent implements OnInit {
 				this.dragNodeExpandOverArea = 'center';
 			}
 	}
-	handleDragEnd(event) {
+
+	handleDragEnd(event: any) {
 		this.dragNode = null;
 		this.dragNodeExpandOverNode = null;
 		this.dragNodeExpandOverTime = 0;
 		this.removeClass("dl-drag");
 		this.removeClass("dl-drag-over");
 	}
-	handleDrop(event, node) {
-		event.preventDefault();
-		this._orgChartService.GetOrganizationalChart(this.jobtitleid).subscribe(res => {
-			this.dataSource.data = res.data;
 
+	handleDrop(event: any, node: any) {
+		event.preventDefault();
+		this.apiService.GetOrganizationalChart(this.jobtitleid).subscribe(res => {
+			this.dataSource.data = res.data;
 			if (!res.Visible) {
 				this.layoutUtilsService.showError('Bạn không có quyền thao tác');
 				this.getTreeValue();
@@ -419,13 +400,11 @@ export class SodotochucListComponent implements OnInit {
 			}
 		});
 		if (node !== this.dragNode) {
-			let newItem: TodoItemNode;
-
-			let fromNode = this.flatNodeMap.get(this.dragNode);
-			let toNode = this.flatNodeMap.get(node);
+			// let newItem: TodoItemNode;
+			// let fromNode = this.flatNodeMap.get(this.dragNode);
+			// let toNode = this.flatNodeMap.get(node);
 
 			this._itemchart = new OrgChartModel();
-
 			this._itemchart.drop_nameto = node.chucdanhParent;
 			this._itemchart.drop_namefrom = this.dragNode.chucdanhParent;
 			this._itemchart.drop_idfrom = this.dragNode.ID;
@@ -433,29 +412,28 @@ export class SodotochucListComponent implements OnInit {
 
 			if (this.dragNodeExpandOverArea === 'above') {
 				this._itemchart.IsAbove = true;
-				this._orgChartService.handleDropLevel(this._itemchart).subscribe(res => {
+				this.apiService.handleDropLevel(this._itemchart).subscribe(res => {
 					this.treeControl.expandAll();
 				});
 				// newItem = this.database.copyPasteItemAbove(this.flatNodeMap.get(this.dragNode), this.flatNodeMap.get(node));
-			} else
-				if (this.dragNodeExpandOverArea === 'below') // Update vị trí 
-				{
+			} 
+			else
+				if (this.dragNodeExpandOverArea === 'below') {// Update vị trí 
 					this._itemchart.IsAbove = false;
-					this._orgChartService.handleDropLevel(this._itemchart).subscribe(res => {
+					this.apiService.handleDropLevel(this._itemchart).subscribe(res => {
 						this.treeControl.expandAll();
 					});
 					// newItem = this.database.copyPasteItemBelow(this.flatNodeMap.get(this.dragNode), this.flatNodeMap.get(node));
 				}
-				else // update cha con
-				{
+				else {// update cha con
 					let vitritieptheo = 0;
-					if (node.children.length > 0) {
+					if (node.children.length > 0) 
 						vitritieptheo = parseInt(node.children[node.children.length - 1].level) + 1;
-					}
 					else
 						vitritieptheo = 1;
+
 					this._itemchart.drop_levelto = '' + vitritieptheo;
-					this._orgChartService.handleDropParent(this._itemchart).subscribe(res => {
+					this.apiService.handleDropParent(this._itemchart).subscribe(res => {
 						this.treeControl.expandAll();
 					});
 					// newItem = this.database.copyPasteItem(this.flatNodeMap.get(this.dragNode), this.flatNodeMap.get(node));
@@ -469,6 +447,7 @@ export class SodotochucListComponent implements OnInit {
 		this.dragNodeExpandOverNode = null;
 		this.dragNodeExpandOverTime = 0;
 	}
+
 	CapNhatThongTinChucVu(id_cd: string) {
 		let saveMessageTranslateParam = '';
 		saveMessageTranslateParam += this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
@@ -477,13 +456,10 @@ export class SodotochucListComponent implements OnInit {
 		let chucdanhParent = '';
 		const dialogRef = this.dialog.open(sodotochuceditComponent, { data: { Id_parent, id_cd, chucdanhParent }, width: '65%', });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			else {
+			this.getTreeValue();
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 			}
-			this.getTreeValue();
 		});
 	}
 }

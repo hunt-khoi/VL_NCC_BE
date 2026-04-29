@@ -19,19 +19,18 @@
 	</div>
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert>
 			<div class="form-group kt-form__group row">
-				<div class="col-lg-12 m--margin-bottom-20-mobile">
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
 						<input matInput placeholder="{{ 'NGUONKINHPHI.NAME' | translate }}" formControlName="NguonKinhPhi" class="require" required #focusInput />
 					</mat-form-field>
 				</div>
-
-				<div class="col-lg-12 m--margin-bottom-20-mobile">
+				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="{{ 'NGUONKINHPHI.PRIORITY' | translate }}" formControlName="Priority" />
+						<input matInput placeholder="{{ 'NGUONKINHPHI.PRIORITY' | translate }}" formControlName="Priority" type="number"/>
 					</mat-form-field>
 					<mat-error *ngIf = "hasFormErrors">
 						<span *ngIf="itemForm.controls.Priority.value === '' || itemForm.controls.Priority.value <= -1 ">

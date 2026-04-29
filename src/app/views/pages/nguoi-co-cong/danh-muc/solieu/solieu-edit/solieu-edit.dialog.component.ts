@@ -1,8 +1,7 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { solieuModel } from '../../solieu/Model/solieu.model';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { TranslateService } from '@ngx-translate/core';
 import { solieuService } from '../Services/solieu.service';
 import { CommonService } from '../../../services/common.service';
@@ -15,14 +14,12 @@ import { ReplaySubject } from 'rxjs';
 })
 
 export class solieuEditDialogComponent implements OnInit {
-	item: solieuModel;
-	oldItem: solieuModel
-	itemForm: FormGroup;
+	item: solieuModel = new solieuModel();
+	oldItem: solieuModel = new solieuModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
-	filterDonVi: string = '';
 	loadingAfterSubmit: boolean = false;
-	listchucdanh: any[] = [];
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
@@ -31,13 +28,12 @@ export class solieuEditDialogComponent implements OnInit {
 	listOptSLCha: any[] = []
 	listSLCha: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 
-	listSLCons: any[] = []
+	listSLCons: any[] = [];
+	listSLLite: any[] = [];
+	id: number = 0;
+	idloai: number = 0;
 
-	listSLLite: any[] = []
-	id: number
-	idloai: number
-
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 	listLoaiSoLieu: any[] = [];
 
@@ -61,7 +57,7 @@ export class solieuEditDialogComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		private danhMucService: CommonService,
-		public solieuService: solieuService,
+		public apiService: solieuService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
@@ -69,18 +65,15 @@ export class solieuEditDialogComponent implements OnInit {
 
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item; 
 		this.allowEdit = this.data.allowEdit;
 		this.id = this.item.Id;
-
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
 			this.loadCacSLCon(this.id)
-
-			this.solieuService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -109,7 +102,8 @@ export class solieuEditDialogComponent implements OnInit {
 	}
 
 	loadSLCha() {
-		this.solieuService.loadParent(this.itemForm.controls.Id_LoaiSoLieu.value).subscribe(res => {
+		if (!this.itemForm) return;
+		this.apiService.loadParent(this.itemForm.controls.Id_LoaiSoLieu.value).subscribe(res => {
 			this.listOptSLCha = res.data;
 			if (this.item.Id > 0)
 				this.listOptSLCha = this.listOptSLCha.filter(x => x.Id != this.item.Id);
@@ -119,16 +113,14 @@ export class solieuEditDialogComponent implements OnInit {
 	}
 
 	loadCacSLCon(id: number) {
-		this.solieuService.loadChilds(id).subscribe(res => {
+		this.apiService.loadChilds(id).subscribe(res => {
 			this.listSLCons = res.data;
 			this.changeDetectorRefs.detectChanges();
 		})
 	}
 
 	filter() {
-		if (!this.listOpt) {
-			return;
-		}
+		if (!this.listOpt) return;
 		let search = this.FilterCtrl;
 		if (!search) {
 			this.listFilter.next(this.listOpt.slice());
@@ -137,16 +129,13 @@ export class solieuEditDialogComponent implements OnInit {
 			search = search.toLowerCase();
 		}
 		this.listFilter.next(
-			this.listOpt.filter(ts =>
-				ts.title.toLowerCase().indexOf(search) > -1)
+			this.listOpt.filter(ts => ts.title.toLowerCase().indexOf(search) > -1)
 		);
 		this.changeDetectorRefs.detectChanges();
 	}
 
 	filter1() {
-		if (!this.listOptSLCha) {
-			return;
-		}
+		if (!this.listOptSLCha) return;
 		let search = this.FilterCtrl1;
 		if (!search) {
 			this.listSLCha.next(this.listOptSLCha.slice());
@@ -155,8 +144,7 @@ export class solieuEditDialogComponent implements OnInit {
 			search = search.toLowerCase();
 		}
 		this.listSLCha.next(
-			this.listOptSLCha.filter(ts =>
-				ts.SoLieu.toLowerCase().indexOf(search) > -1)
+			this.listOptSLCha.filter(ts => ts.SoLieu.toLowerCase().indexOf(search) > -1)
 		);
 		this.changeDetectorRefs.detectChanges();
 	}
@@ -171,13 +159,13 @@ export class solieuEditDialogComponent implements OnInit {
 			Priority: [this.item.Priority],
 			Id_Filter: [this.item.Id_Filter == null ? 0 : this.item.Id_Filter]
 		});
-		this.focusInput.nativeElement.focus();
 
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit) //false thì không cho sửa
 			this.itemForm.disable();
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('SO_LIEU.ADD');
 		if (!this.item || !this.item.Id) {
@@ -191,8 +179,8 @@ export class solieuEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): solieuModel {
+	prepare(): solieuModel {
+		if (!this.itemForm) return new solieuModel();
 		const controls = this.itemForm.controls;
 		const _item = new solieuModel();
 		_item.Id = this.item.Id;
@@ -209,13 +197,12 @@ export class solieuEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -223,12 +210,11 @@ export class solieuEditDialogComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-
-		const Editsolieu = this.prepareCustomer();
-		if (Editsolieu.Id > 0) {
-			this.UpdateNhom(Editsolieu, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateNhom(Editsolieu, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
 
@@ -236,30 +222,28 @@ export class solieuEditDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	UpdateNhom(_item: solieuModel, withBack: boolean) {
+	Update(item: solieuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-		if (_item.Id_LoaiSoLieu != this.idloai && this.listSLCons.length > 0) { //số liệu có số liệu con ko dc thay đổi loại số liệu
+		if (item.Id_LoaiSoLieu != this.idloai && this.listSLCons.length > 0) { //số liệu có số liệu con ko dc thay đổi loại số liệu
 			this.layoutUtilsService.showError("Số liệu này không được cập nhật loại số liệu");
 			return;
 		}
 
 		this.disabledBtn = true;
-		this.solieuService.updatesolieu(_item).subscribe(res => {
-			/* Server loading imitation. Remove this on real code */
+		this.apiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {  //lưu và đóng, withBack = true
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {  
+					this.dialogRef.close({ item });
 				}
-				else { //lưu và thêm mới, withBack = false
-					this.ngOnInit(); //khởi tạo lại dialog
+				else { 
+					this.ngOnInit(); 
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -268,23 +252,22 @@ export class solieuEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateNhom(_item: solieuModel, withBack: boolean) {
+	Create(item: solieuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.solieuService.createsolieu(_item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -295,7 +278,7 @@ export class solieuEditDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

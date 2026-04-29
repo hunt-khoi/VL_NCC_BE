@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { loaisolieuModel } from '../../loaisolieu/Model/loaisolieu.model';
 import { TranslateService } from '@ngx-translate/core';
 import { loaisolieuService } from '../Services/loaisolieu.service';
-import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
@@ -13,9 +12,9 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 })
 
 export class loaisolieuEditDialogComponent implements OnInit {
-	item: loaisolieuModel;
-	oldItem: loaisolieuModel
-	itemForm: FormGroup;
+	item: loaisolieuModel = new loaisolieuModel;
+	oldItem: loaisolieuModel = new loaisolieuModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -23,7 +22,7 @@ export class loaisolieuEditDialogComponent implements OnInit {
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -42,8 +41,7 @@ export class loaisolieuEditDialogComponent implements OnInit {
 	constructor(public dialogRef: MatDialogRef<loaisolieuEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
-		private danhMucService: CommonService,
-		public loaisolieuService: loaisolieuService,
+		public apiService: loaisolieuService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
@@ -55,12 +53,10 @@ export class loaisolieuEditDialogComponent implements OnInit {
 	ngOnInit() {
 		this.item = this.data._item; 
 		this.allowEdit = this.data.allowEdit; 
-
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			
-			this.loaisolieuService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -85,9 +81,10 @@ export class loaisolieuEditDialogComponent implements OnInit {
         this.itemForm.controls["MoTa"];
         this.itemForm.controls["Locked"];
         this.itemForm.controls["Priority"];
-        this.focusInput.nativeElement.focus();
-        
-		if (!this.allowEdit) //false thì không cho sửa
+
+		if (this.focusInput) 
+        	this.focusInput.nativeElement.focus();
+		if (!this.allowEdit) 
 			this.itemForm.disable();
 	}
 
@@ -105,8 +102,8 @@ export class loaisolieuEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): loaisolieuModel {
+	prepare(): loaisolieuModel {
+		if (!this.itemForm) return new loaisolieuModel();
 		const controls = this.itemForm.controls;
 		const _item = new loaisolieuModel();
 		_item.Id = this.item.Id;
@@ -120,13 +117,12 @@ export class loaisolieuEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -134,12 +130,11 @@ export class loaisolieuEditDialogComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-
-		const Editloaisolieu = this.prepareCustomer();
-		if (Editloaisolieu.Id > 0) {
-			this.UpdateNhom(Editloaisolieu, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateNhom(Editloaisolieu, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
 
@@ -147,24 +142,23 @@ export class loaisolieuEditDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	UpdateNhom(_item: loaisolieuModel, withBack: boolean) {
+	Update(item: loaisolieuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.loaisolieuService.updateloaisolieu(_item).subscribe(res => {
+		this.apiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {  //lưu và đóng, withBack = true
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack == true) {  
+					this.dialogRef.close({ item });
 				}
-				else { //lưu và thêm mới, withBack = false
-					this.ngOnInit(); //khởi tạo lại dialog
+				else { 
+					this.ngOnInit(); 
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -173,23 +167,22 @@ export class loaisolieuEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateNhom(_item: loaisolieuModel, withBack: boolean) {
+	Create(item: loaisolieuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.loaisolieuService.createloaisolieu(_item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -200,7 +193,7 @@ export class loaisolieuEditDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

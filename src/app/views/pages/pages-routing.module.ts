@@ -253,7 +253,6 @@ const routes: Routes = [
 				canActivate: [PermissionUrl],
 				loadChildren: () => import('../../views/pages/nguoi-co-cong/ho-so-nguoi-co-cong/thong-ke-so-luong/thong-ke-so-luong.module').then(m => m.ThongKeSoLuongModule)
 			},
-
 			//#endregion
 			//#region Quà lễ tết
 			{
@@ -314,7 +313,7 @@ const routes: Routes = [
 				loadChildren: () => import('../../views/pages/nguoi-co-cong/qua-le-tet/in-quyet-dinh/in-quyet-dinh.module').then(m => m.InQuyetDinhModule)
 			},
 			//#endregion
-			//#region Quản lý so dữ liệu
+			//#region Quản lý số liệu
 			{
 				path: 'mau-so-lieu',
 				canActivate: [PermissionUrl],

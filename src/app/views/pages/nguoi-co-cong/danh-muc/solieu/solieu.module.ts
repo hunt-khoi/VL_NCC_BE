@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-
-import { solieuListComponent } from './solieu-list/solieu-list.component';
+import { DPSCommonModule } from '../../dps-common.module';
 import { solieuComponent } from './solieu.component';
 import { solieuRefModule } from './solieu-ref.module';
-import { DPSCommonModule } from '../../dps-common.module';
-import { DatePipe } from '@angular/common';
+import { solieuListComponent } from './solieu-list/solieu-list.component';
 import { PhiSoLieuServices } from '../phi-so-lieu/Services/phi-so-lieu.service';
 import { PhiSoLieuRefModule } from '../phi-so-lieu/phi-so-lieu-ref.module';
 
@@ -33,10 +32,9 @@ const routes: Routes = [
 		DatePipe,
         PhiSoLieuServices,
 	],
-	entryComponents: [
-	],
 	declarations: [
 		solieuComponent,
 	]
 })
+
 export class solieuModule { }

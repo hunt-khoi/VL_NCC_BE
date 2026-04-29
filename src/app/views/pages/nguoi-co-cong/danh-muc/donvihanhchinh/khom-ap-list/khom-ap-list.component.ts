@@ -1,21 +1,17 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { fromEvent, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-// Models
-import { donvihanhchinhDataSource } from '../Model/data-sources/donvihanhchinh.datasource';
-import { districtModel, wardModel } from '../Model/donvihanhchinh.model';
-import { QueryParamsModel, LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { CommonService } from '../../../services/common.service';
-import { TableModel } from 'app/views/partials/table';
-import { TableService } from 'app/views/partials/table/table.service';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { donvihanhchinhService } from '../Services/donvihanhchinh.service';
+import { donvihanhchinhDataSource } from '../Model/data-sources/donvihanhchinh.datasource';
 import { KhomApEditDialogComponent } from '../khom-ap-edit/khom-ap-edit.dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -26,19 +22,15 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class KhomApListComponent implements OnInit {
-	
 	// Table fields
-	dataSource: donvihanhchinhDataSource;
+	dataSource: donvihanhchinhDataSource | undefined;
 	displayedColumns = ['RowID','Title', 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
+
 	// Filter fields
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
-
-	filterdistrict = '';
-	listdistrict: any[] = [];
-
 	filterward = '';
 	listward: any[] = [];
 	// Selection
@@ -46,11 +38,12 @@ export class KhomApListComponent implements OnInit {
 	productsResult: any[] = [];
 	_name = '';
 
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+    gridService: TableService | undefined;
+    gridModel: TableModel | undefined;
+	list_button: boolean = false;
+
 	constructor(
-		public wardService: donvihanhchinhService,
+		public apiService: donvihanhchinhService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private changeDetectorRefs: ChangeDetectorRef,
@@ -69,12 +62,12 @@ export class KhomApListComponent implements OnInit {
 		// Load unit list
 		this.danhMucService.GetAllProvinces().subscribe(res => {
 			this.listprovinces = res.data;
-			// this.filterprovinces=this.listprovinces[0].Id_row+'';
+			// this.filterprovinces = this.listprovinces[0].Id_row + '';
 			// this.loadDataList();
 		});
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.filterprovinces = res.IdTinh;
-			this.loadQuanHuyenChange();
+			// this.loadQuanHuyenChange();
 		})
 
 		this.gridModel = new TableModel();
@@ -111,13 +104,6 @@ export class KhomApListComponent implements OnInit {
 				isShow: true,
 			},
 			{
-				stt: 4,
-				name: 'DistrictName',
-				displayName: 'Tên quận huyện',
-				alwaysChecked: false,
-				isShow: true,
-			},
-			{
 				stt: 5,
 				name: 'NguoiCapNhat',
 				displayName: 'Người cập nhật',
@@ -139,10 +125,7 @@ export class KhomApListComponent implements OnInit {
 			}
 		];
 
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
 			this.gridModel.availableColumns
@@ -155,44 +138,41 @@ export class KhomApListComponent implements OnInit {
 			this.gridModel,
 			this.cookieService
 		);
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
-		// Init DataSource
-		this.dataSource = new donvihanhchinhDataSource(this.wardService);
+		this.dataSource = new donvihanhchinhDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.wardService.lastFilterKhomAp$.getValue();
-			// First load
-			this.dataSource.loadListKhomAp(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilterKhomAp$.getValue();
+				this.dataSource.loadListKhomAp(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
 			}
 		});
 	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -204,27 +184,21 @@ export class KhomApListComponent implements OnInit {
 	}
 
 	filterConfiguration(): any {
-
 		const filter: any = {};
-		if (this.filterdistrict && this.filterdistrict.length > 0) {
-			filter.DistrictID = +this.filterdistrict;
-		}
 		if (this.filterward && this.filterward.length > 0) {
 			filter.WardID = +this.filterward;
 		}
-
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.WardName = this.gridService.model.filterText.WardName;
 			filter.Title = this.gridService.model.filterText.Title;
 			filter.DistrictName = this.gridService.model.filterText.DistrictName?this.gridService.model.filterText.DistrictName:'';
 		}
-
 		return filter;
 
 	}
 
 	/** Delete */
-	Delete(_item: wardModel) {
+	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
@@ -232,11 +206,9 @@ export class KhomApListComponent implements OnInit {
 
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
-			this.wardService.deleteKhomAp(_item.RowID).subscribe(res => {
+			this.apiService.DeleteKhomAp(item.RowID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -246,20 +218,13 @@ export class KhomApListComponent implements OnInit {
 			});
 		});
 	}
-	Add() {
-		const districtModels = new wardModel();
-		districtModels.clear(); // Set all defaults fields
-		this.Update(districtModels);
-	}
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
 
-		if (!queryParams.filter) {
-			return;
-		}
+	Add() {
+		const models: any = {};
+		this.Update(models);
 	}
-	Update(_item: wardModel) {
+
+	Update(_item: any) {
 		let saveMessageTranslateParam = '';
 		saveMessageTranslateParam += _item.RowID > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
@@ -275,23 +240,14 @@ export class KhomApListComponent implements OnInit {
 	}
 
 	// ====================Hàm change
-
-	loadQuanHuyenChange() {
-		this.danhMucService.GetListDistrictByProvinces(this.filterprovinces).subscribe(res => {
-			this.listdistrict = res.data;
-			// this.itemForm.controls['xa'].setValue('');
-			this.changeDetectorRefs.detectChanges();
-		});
-		this.loadDataList();
-	}
 	loadWard() {
 		this.filterward = '';
-		this.danhMucService.GetListWardByDistrict(this.filterdistrict).subscribe(res => {
-			this.listward = res.data;
-			// this.itemForm.controls['xa'].setValue('');
-			this.changeDetectorRefs.detectChanges();
-		});
-		this.loadDataList();
+		// this.danhMucService.GetListWardByDistrict(this.filterdistrict).subscribe(res => {
+		// 	this.listward = res.data;
+		// 	// this.itemForm.controls['xa'].setValue('');
+		// 	this.changeDetectorRefs.detectChanges();
+		// });
+		// this.loadDataList();
 	}
 
 	getHeight(): any {

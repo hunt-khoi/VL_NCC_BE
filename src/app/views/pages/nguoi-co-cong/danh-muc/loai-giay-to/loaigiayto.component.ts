@@ -9,7 +9,5 @@ export class LoaiGiayToComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-  }
-
+  ngOnInit() { }
 }

@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { cachNhapModel } from '../Model/cachnhap.model';
 import { TranslateService } from '@ngx-translate/core';
 import { cachNhapService } from '../Services/cachnhap.service';
-import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ReplaySubject } from 'rxjs';
 
@@ -14,9 +13,9 @@ import { ReplaySubject } from 'rxjs';
 })
 
 export class cachnhapEditDialogComponent implements OnInit {
-	item: cachNhapModel;
-	oldItem: cachNhapModel
-	itemForm: FormGroup;
+	item: cachNhapModel = new cachNhapModel();
+	oldItem: cachNhapModel = new cachNhapModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -25,8 +24,8 @@ export class cachnhapEditDialogComponent implements OnInit {
 	allowEdit = false;
 	isZoomSize: boolean = false;
 
-	id: number
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	id: number = 0;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 	listLoaiSoLieu: any[] = [];
 
@@ -50,15 +49,13 @@ export class cachnhapEditDialogComponent implements OnInit {
 	constructor(public dialogRef: MatDialogRef<cachnhapEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
-		private danhMucService: CommonService,
-		public cachNhapService: cachNhapService,
+		public apiService: cachNhapService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("CACH_NHAP.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item; 
 		this.allowEdit = this.data.allowEdit;
@@ -66,8 +63,7 @@ export class cachnhapEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-
-			this.cachNhapService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -84,13 +80,13 @@ export class cachnhapEditDialogComponent implements OnInit {
 		this.itemForm = this.fb.group({
 			CachNhap: [this.item.CachNhap, Validators.required],
 		});
-		this.focusInput.nativeElement.focus();
 
-		if (!this.allowEdit) //false thì không cho sửa
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
+		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('CACH_NHAP.ADD');
 		if (!this.item || !this.item.Id) {
@@ -104,8 +100,8 @@ export class cachnhapEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): cachNhapModel {
+	prepare(): cachNhapModel {
+		if (!this.itemForm) return new cachNhapModel();
 		const controls = this.itemForm.controls;
 		const _item = new cachNhapModel();
 		_item.Id = this.item.Id;
@@ -116,22 +112,21 @@ export class cachnhapEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
 
-		const Editsolieu = this.prepareCustomer();
-		if (Editsolieu.Id > 0) {
-			this.UpdateNhom(Editsolieu, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateNhom(Editsolieu, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
 
@@ -139,25 +134,23 @@ export class cachnhapEditDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	UpdateNhom(_item: cachNhapModel, withBack: boolean) {
+	Update(item: cachNhapModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.cachNhapService.updatesolieu(_item).subscribe(res => {
-			/* Server loading imitation. Remove this on real code */
+		this.apiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {  //lưu và đóng, withBack = true
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {  
+					this.dialogRef.close({ item });
 				}
-				else { //lưu và thêm mới, withBack = false
-					this.ngOnInit(); //khởi tạo lại dialog
+				else { 
+					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -166,23 +159,22 @@ export class cachnhapEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateNhom(_item: cachNhapModel, withBack: boolean) {
+	Create(item: cachNhapModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.cachNhapService.createsolieu(_item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -193,7 +185,7 @@ export class cachnhapEditDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

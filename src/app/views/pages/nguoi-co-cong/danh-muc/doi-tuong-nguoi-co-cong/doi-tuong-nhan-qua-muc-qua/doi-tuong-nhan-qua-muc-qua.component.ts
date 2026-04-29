@@ -1,8 +1,7 @@
 import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { DoiTuongNguoiCoCongService } from './../Services/doi-tuong-nguoi-co-cong.service';
 
 @Component({
@@ -16,13 +15,12 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 	isZoomSize: boolean = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	lstNhom: any[] = [];
 	lstNguon: any[] = [];
 	ready: boolean = false;
 	allowEdit: boolean = true;
 
-	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
@@ -35,14 +33,11 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 		public dialogRef: MatDialogRef<DoiTuongNhanQuaMucQuaComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private danhMucService: CommonService,
-		private doiTuongNguoiCoCongService: DoiTuongNguoiCoCongService,
+		private apiService: DoiTuongNguoiCoCongService,
 		private layoutUtilsService: LayoutUtilsService,
-		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
-		private translate: TranslateService) {
+		private changeDetectorRefs: ChangeDetectorRef) {
 	}
 
-	/** LOAD DATA */
 	async ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
@@ -61,7 +56,7 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 
 		if (this.data._item.Id > 0) {
 			this.viewLoading = true;
-			this.doiTuongNguoiCoCongService.getItemNhanQua(this.item.Id).subscribe(res => {
+			this.apiService.getItemNhanQua(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.ready = true;
 				this.changeDetectorRefs.detectChanges();
@@ -73,24 +68,26 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 			});
 		}
 	}
-	getValue(id_nhom, id_nguon) {
-		let find = this.item.Details.filter(x => x.Id_NhomLeTet == id_nhom && x.Id_NguonKinhPhi == id_nguon);
+
+	getValue(id_nhom: number, id_nguon: number) {
+		let find = this.item.Details.filter((x: any) => x.Id_NhomLeTet == id_nhom && x.Id_NguonKinhPhi == id_nguon);
 		if (find != null && find.length > 0)
 			return this.danhMucService.f_currency_V2(find[0].SoTien);
 		return '';
 	}
-	changeMuc($event, id_nhom, id_nguon) {
+
+	changeMuc($event: any, id_nhom: number, id_nguon: number) {
 		let v = 0;
 		if ($event.target.value !== "") { //bị lỗi NaN và api ko bắt
 			v = this.danhMucService.stringToInt($event.target.value);
 		}
-		let find = this.item.Details.find(x => x.Id_NhomLeTet == id_nhom && x.Id_NguonKinhPhi == id_nguon);
+		let find = this.item.Details.find((x: any) => x.Id_NhomLeTet == id_nhom && x.Id_NguonKinhPhi == id_nguon);
 		if (find != null)
 			find.SoTien = v;
 		else
 			this.item.Details.push({ Id_DoiTuongNhanQua: this.item.Id, Id_NhomLeTet: id_nhom, Id_NguonKinhPhi: id_nguon, SoTien: v });
 	}
-	/** UI */
+
 	getTitle(): string {
 		if (!this.allowEdit)
 			return 'Chi tiết mức quà cho đối tượng';
@@ -101,7 +98,7 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.doiTuongNguoiCoCongService.UpdateMucQua(this.item.Id, this.item.Details).subscribe(res => {
+		this.apiService.UpdateMucQua(this.item.Id, this.item.Details).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

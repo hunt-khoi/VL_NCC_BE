@@ -1,23 +1,15 @@
-import { TableModel } from './../../../../../partials/table/table.model';
-import { TableService } from './../../../../../partials/table/table.service';
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-// Material
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { fromEvent, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-
-// Models
-import { provincesEditDialogComponent } from '../provinces-edit/provinces-edit.dialog.component';
-import { provincesModel } from '../Model/donvihanhchinh.model';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { donvihanhchinhService } from '../Services/donvihanhchinh.service';
 import { donvihanhchinhDataSource } from '../Model/data-sources/donvihanhchinh.datasource';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { CommonService } from '../../../services/common.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -28,24 +20,22 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class provincesListComponent implements OnInit {
 	// Table fields
-	dataSource: donvihanhchinhDataSource;
+	dataSource: donvihanhchinhDataSource | undefined;
 	displayedColumns = ['STT', 'Id_row', 'ProvinceName', 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	listchucdanh: any[] = [];
 	// Selection
-	selection = new SelectionModel<provincesModel>(true, []);
-	productsResult: provincesModel[] = [];
-	showTruyCapNhanh = true;
-	id_menu = 30614;
+	selection = new SelectionModel<any>(true, []);
+	productsResult: any[] = [];
 	_name = '';
 
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+    gridService: TableService | undefined;
+    gridModel: TableModel | undefined;
+
 	constructor(
-		public provincesService1: donvihanhchinhService,
+		public apiService: donvihanhchinhService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private ref: ApplicationRef,
@@ -57,19 +47,13 @@ export class provincesListComponent implements OnInit {
 
 	/** LOAD DATA */
 	ngOnInit() {
-		this.list_button = CommonService.list_button();
-
 		//#region ***Filter***
 		this.gridModel = new TableModel();
 		this.gridModel.clear();
 		this.gridModel.haveFilter = true;
-		this.gridModel.tmpfilterText = Object.assign(
-			{},
-			this.gridModel.filterText
-		);
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText.ProvinceName = '';
 
-		// displayedColumns = ['STT', 'Id_row', 'ProvinceName', 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
 		const availableColumns = [
 			{
 				stt: 1,
@@ -107,10 +91,7 @@ export class provincesListComponent implements OnInit {
 			}
 		];
 
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
 			this.gridModel.availableColumns
@@ -122,35 +103,34 @@ export class provincesListComponent implements OnInit {
 			this.gridModel,
 			this.cookieService
 		);
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
+		//#endregion
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
+
 		// Init DataSource
-		this.dataSource = new donvihanhchinhDataSource(this.provincesService1);
+		this.dataSource = new donvihanhchinhDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			if (params.id) {
-				queryParams = this.provincesService1.lastFilter$.getValue();
-				this.restoreState(queryParams, +params.id);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadListprovices(queryParams);
 			}
-			// First load
-			this.dataSource.loadListprovices(queryParams);
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -159,7 +139,7 @@ export class provincesListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
-
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -169,62 +149,13 @@ export class provincesListComponent implements OnInit {
 		);
 		this.dataSource.loadListprovices(queryParams);
 	}
+
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.ProvinceName = this.gridService.model.filterText.ProvinceName;
 		}
 		return filter;
-	}
-
-	/** Delete */
-	Delete(_item: provincesModel) {
-		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
-		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
-		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
-		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
-		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.provincesService1.deleteProvinces(_item.Id_row).subscribe(res => {
-				if (res && res.status === 1) {
-					this.layoutUtilsService.showInfo(_deleteMessage);
-					this.loadDataList();
-				} else {
-					this.layoutUtilsService.showError(res.error.message);
-				}
-			});
-		});
-	}
-	Add() {
-		const provincesModels = new provincesModel();
-		provincesModels.clear(); // Set all defaults fields
-		this.Update(provincesModels);
-	}
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-	Update(_item: provincesModel) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id_row > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
-		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
-		const dialogRef = this.dialog.open(provincesEditDialogComponent, { data: { _item }, width: '500px' });
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				this.loadDataList();
-			} else {
-				this.layoutUtilsService.showInfo(_saveMessage);
-				this.loadDataList();
-			}
-		});
 	}
 
 	getHeight(): any {

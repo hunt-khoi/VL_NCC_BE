@@ -1,35 +1,32 @@
-import { DanhmuckhacDetailComponent } from './../danhmuckhac-detail/danhmuckhac-detail.component';
-import { DanhMucKhacDataSource } from './../Models/data-sources/danh-muc-khac.datasource';
-import { DanhMucKhacService } from './../services/danh-muc-khac.service';
-import { QueryParamsModel } from './../../../../../../core/_base/crud/models/query-models/query-params.model';
+import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatPaginator, MatSort, MatMenuTrigger, MatDialog } from '@angular/material';
+import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { ActivatedRoute } from '@angular/router';
+import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
-import { SelectionModel } from '@angular/cdk/collections';
-import { MatPaginator, MatSort, MatMenuTrigger, MatDialog } from '@angular/material';
 import { TokenStorage } from './../../../../../../core/auth/_services/token-storage.service';
-import { loaiDieuDuongModel } from './../../loai-dieu-duong/Model/loaidieuduong.model';
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
 import { DanhmuckhacModel } from '../Models/danh-muc-khac.model';
-import { CommonService } from '../../../services/common.service';
+import { loaiDieuDuongModel } from './../../loai-dieu-duong/Model/loaidieuduong.model';
+import { DanhMucKhacDataSource } from './../Models/data-sources/danh-muc-khac.datasource';
+import { DanhmuckhacDetailComponent } from './../danhmuckhac-detail/danhmuckhac-detail.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
 	selector: 'kt-danh-muc-khac-list',
 	templateUrl: './danh-muc-khac-list.component.html'
 })
-
 export class DanhMucKhacListComponent implements OnInit {
-
-	dataSource: DanhMucKhacDataSource;
+	dataSource: DanhMucKhacDataSource | undefined;
 	haveFilter: boolean = false;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
+	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
 	// Filter fields
 	curUser: any = {};
@@ -38,9 +35,11 @@ export class DanhMucKhacListComponent implements OnInit {
 	productsResult: loaiDieuDuongModel[] = [];
 	_name: string = "";
 	_listHoso: any;
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
-	list_button: boolean;
+
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		public dialog: MatDialog,
@@ -48,26 +47,27 @@ export class DanhMucKhacListComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
 		private cookieService: CookieService,
-		private TokenStorage: TokenStorage,
+		private tokenStorage: TokenStorage,
 		private translate: TranslateService,
-		private danhmuckhacService: DanhMucKhacService) {
+		private apiService: DanhMucKhacService) {
 		this._name = this.translate.instant("LOAIHOSO.NAME");
 	}
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
-		this.TokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.curUser = res;
 		})
 
-		this.girdModel.haveFilter = true;
-		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
-		this.girdModel.filterText['MaLoaiHoSo'] = "";
-		this.girdModel.filterText['LoaiHoSo'] = "";
-		this.girdModel.filterText['MoTa'] = "";
-
-		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
+		this.gridModel = new TableModel();
+		this.gridModel.haveFilter = true;
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
+		this.gridModel.filterText['MaLoaiHoSo'] = "";
+		this.gridModel.filterText['LoaiHoSo'] = "";
+		this.gridModel.filterText['MoTa'] = "";
+		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		//#region ***Drag Drop***
 		let availableColumns = [
@@ -138,39 +138,36 @@ export class DanhMucKhacListComponent implements OnInit {
 				isShow: true
 			},
 		];
-		this.girdModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.girdModel.selectedColumns = new SelectionModel<any>(true, this.girdModel.availableColumns);
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
-		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.girdModel, this.cookieService);
+		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.gridModel, this.cookieService);
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
 
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
-		// this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		this.dataSource = new DanhMucKhacDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-		this.dataSource = new DanhMucKhacDataSource(this.danhmuckhacService);
-		this.route.queryParams.subscribe(params => {
-				queryParams = this.danhmuckhacService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -180,10 +177,12 @@ export class DanhMucKhacListComponent implements OnInit {
 	}
 
 	ngOnDestroy() {
-		this.gridService.Clear();
+		if (this.gridService)
+			this.gridService.Clear();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -196,9 +195,8 @@ export class DanhMucKhacListComponent implements OnInit {
 	}
 
 	filterConfiguration(): any {
-
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.MaLoaiHoSo = this.gridService.model.filterText['MaLoaiHoSo'];
 			filter.LoaiHoSo = this.gridService.model.filterText['LoaiHoSo'];
 			filter.MoTa = this.gridService.model.filterText['MoTa'];
@@ -207,24 +205,14 @@ export class DanhMucKhacListComponent implements OnInit {
 	}
 
 
-	AddWorkplace() {
+	Add() {
 		let item = new DanhmuckhacModel();
 		item.clear();
 		this.Config(item);
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	Config(_item, allowEdit = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+	Config(_item: any, allowEdit = true) {
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(DanhmuckhacDetailComponent, { data: { _item: _item, allowEdit: allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
@@ -235,32 +223,6 @@ export class DanhMucKhacListComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
-		});
-	}
-
-	/** Delete */
-	delete(_item: any) {
-		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
-		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
-		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
-		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
-		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.danhmuckhacService.delete(_item.Id).subscribe(res => {
-				if (res && res.status === 1) {
-					this.layoutUtilsService.showInfo(_deleteMessage);
-				}
-				else {
-					this.layoutUtilsService.showError(res.error.message);
-				}
-				this.loadDataList();
-			});
 		});
 	}
 }

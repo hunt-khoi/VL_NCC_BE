@@ -1,11 +1,10 @@
-import { dantocService } from './Services/dantoc.service';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-import { dantocEditDialogComponent } from './dantoc-edit/dantoc-edit.dialog.component';
-import { dantocListComponent } from './dantoc-list/dantoc-list.component';
+import { dantocService } from './Services/dantoc.service';
 import { dantocComponent } from './dantoc.component';
-
+import { dantocListComponent } from './dantoc-list/dantoc-list.component';
+import { dantocEditDialogComponent } from './dantoc-edit/dantoc-edit.dialog.component';
 
 const routes: Routes = [
 	{
@@ -37,4 +36,5 @@ const routes: Routes = [
 		dantocEditDialogComponent
 	]
 })
+
 export class dantocModule { }

@@ -13,9 +13,9 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 })
 
 export class nhomletetEditDialogComponent implements OnInit {
-	item: nhomletetModel;
-	oldItem: nhomletetModel
-	itemForm: FormGroup;
+	item: nhomletetModel = new nhomletetModel();
+	oldItem: nhomletetModel = new nhomletetModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -25,7 +25,7 @@ export class nhomletetEditDialogComponent implements OnInit {
 	allowEdit = false;
 	isZoomSize: boolean = false;
 
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -45,23 +45,20 @@ export class nhomletetEditDialogComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		private danhMucService: CommonService,
-		public nhomletetService: nhomletetService,
+		public apiService: nhomletetService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 			this._name = this.translate.instant("NHOM_LE_TET.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item; 
 		this.allowEdit = this.data.allowEdit; 
-
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			
-			this.nhomletetService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -93,7 +90,6 @@ export class nhomletetEditDialogComponent implements OnInit {
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('NHOM_LE_TET.ADD');
 		if (!this.item || !this.item.Id) {
@@ -107,8 +103,8 @@ export class nhomletetEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): nhomletetModel {
+	prepare(): nhomletetModel {
+		if (!this.itemForm) return new nhomletetModel();
 		const controls = this.itemForm.controls;
 		const _item = new nhomletetModel();
 		_item.Id = this.item.Id;
@@ -124,14 +120,13 @@ export class nhomletetEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
-			let invalid = <FormControl[]>Object.keys(this.itemForm.controls).map(key => this.itemForm.controls[key]).filter(ctl => ctl.invalid);
+			let invalid = <FormControl[]>Object.keys(controls).map(key => controls[key]).filter(ctl => ctl.invalid);
 			let invalidElem: any = invalid[0];
 			invalidElem.nativeElement.focus();
 			this.hasFormErrors = true;
@@ -141,12 +136,11 @@ export class nhomletetEditDialogComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-
-		const EditNhomLeTet = this.prepareCustomer();
-		if (EditNhomLeTet.Id > 0) {
-			this.UpdateNhom(EditNhomLeTet, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateNhom(EditNhomLeTet, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
 
@@ -154,25 +148,23 @@ export class nhomletetEditDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	UpdateNhom(_item: nhomletetModel, withBack: boolean) {
+	Update(item: nhomletetModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.nhomletetService.updateNhomLeTet(_item).subscribe(res => {
-			/* Server loading imitation. Remove this on real code */
+		this.apiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {  //lưu và đóng, withBack = true
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {  
+					this.dialogRef.close({ item });
 				}
-				else { //lưu và thêm mới, withBack = false
-					this.ngOnInit(); //khởi tạo lại dialog
+				else { 
+					this.ngOnInit(); 
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -181,23 +173,22 @@ export class nhomletetEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateNhom(_item: nhomletetModel, withBack: boolean) {
+	Create(item: nhomletetModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.nhomletetService.createNhomLeTet(_item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -208,7 +199,7 @@ export class nhomletetEditDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

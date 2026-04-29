@@ -1,9 +1,7 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { DM_DonViService } from '../Services/dm-don-vi.service';
 import { DM_DonViModel } from '../Model/dm-don-vi.model';
@@ -16,119 +14,103 @@ import { DM_DonViModel } from '../Model/dm-don-vi.model';
 
 export class DM_DonViImportComponent implements OnInit, OnDestroy {
 	// Public properties
-
-	@ViewChild('fileUpload', { static: true }) fileUpload;
-	
-	DM_DonVi: DM_DonViModel;
-	DM_DonViForm: FormGroup;
+	@ViewChild('fileUpload', { static: true }) fileUpload: any; 
+	DM_DonVi: DM_DonViModel = new DM_DonViModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
-
+	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 	_soLanImport: number = 0;
 	_dataImport: any[] = [];
 	disabledBtn:boolean=false;
 
-	private componentSubscriptions: Subscription;
+	private componentSubscriptions: Subscription | undefined;
 
 	constructor(
 		public dialogRef: MatDialogRef<DM_DonViImportComponent>,
-		private DM_DonViFB: FormBuilder,
+		private itemFB: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private dm_donvisService: DM_DonViService) {}
-	/**
-	 * On init
-	 */
+		private apiService: DM_DonViService) {}
+
 	ngOnInit() {
 		this.viewLoading = false;
-		this.dm_donvisService.data_import.subscribe(res => {
+		this.apiService.data_import.subscribe(res => {
 			this._dataImport = [...res];
 		});
 		this.createForm();
 	}
-	/**
-	 * On destroy
-	 */
+
 	ngOnDestroy() {
 		if (this.componentSubscriptions) {
 			this.componentSubscriptions.unsubscribe();
 		}
-		this.dm_donvisService.data_import.next([]);
+		this.apiService.data_import.next([]);
 	}
-	/**
-	 * Create form
-	 */
+
 	createForm() {
-		this.DM_DonViForm = this.DM_DonViFB.group({
+		this.itemForm = this.itemFB.group({
 			FileDuLieu: [''],
 		});
 	}
 
-	/**
-	 * Check control is invalid
-	 * @param controlName: string
-	 */
-	isControlInvalid(controlName: string): boolean {
-		const control = this.DM_DonViForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
-	}
-
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
-	numberOnly(event): boolean {
+
+	numberOnly(event: any): boolean {
 		const charCode = (event.which) ? event.which : event.keyCode;
 		if (charCode > 31 && (charCode < 48 || charCode > 57)) {
 			return false;
 		}
 		return true;
 	}
+
 	closeDialog() {
 		this.dialogRef.close(this.isChange); 
 	}
+
 	selectFile() {
 		let el: HTMLElement = this.fileUpload.nativeElement as HTMLElement;
 		el.click();
 	}
+
 	FileSelected(evt: any) {
+		if (!this.itemForm) return;
 		if (evt.target.files && evt.target.files.length) {//Nếu có file
 			let file = evt.target.files[0]; // Ví dụ chỉ lấy file đầu tiên
 			let fileName = file.name;
-
 			var res = fileName.match(/.xls$|.xlsx$/g);
-			if (res) {
-				if (!res["includes"]('.xlsx') && !res["includes"]('.xls')) {
-					this.layoutUtilsService.showError('File không hợp lệ.');
-					return;
-				}
-				else {
-					this.DM_DonViForm.controls['FileDuLieu'].patchValue(fileName); // Set value cho control dùng để validate (trường hợp base64)
-					this.DocDuLieu();
-				}
-			}
-			else {
+			if (!res) {
 				this.layoutUtilsService.showError('File không hợp lệ');
 				return;
 			}
+			if (!res["includes"]('.xlsx') && !res["includes"]('.xls')) {
+				this.layoutUtilsService.showError('File không hợp lệ.');
+				return;
+			}
+			else {
+				this.itemForm.controls['FileDuLieu'].patchValue(fileName); // Set value cho control dùng để validate (trường hợp base64)
+				this.DocDuLieu();
+			}
 		}
 		else {//Không có file
-			this.DM_DonViForm.controls['FileDuLieu'].patchValue('');
+			this.itemForm.controls['FileDuLieu'].patchValue('');
 		}
 	}
 
 	checkDataIsValid(): boolean {
+		if (!this.itemForm) return false;
 		let p = document.getElementById("fileUploadExcel");
-		return this.DM_DonViForm.controls['FileDuLieu'] && this.DM_DonViForm.controls['FileDuLieu'].valid && (p ? (p["type"] == 'file' ? p["files"]["length"] > 0 : false) : false);
+		return this.itemForm.controls['FileDuLieu'] && this.itemForm.controls['FileDuLieu'].valid 
+		&& (p ? (p["type"] == 'file' ? p["files"]["length"] > 0 : false) : false);
 	}
 
 	DocDuLieu() {
-		
 		let t = this.checkDataIsValid();
 		if (t) this.Importfile();
 		else this.layoutUtilsService.showError("Mời chọn file");
@@ -136,7 +118,7 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 
 	Importfile() {
 		let el: any = this.fileUpload.nativeElement;
-		var service = this.dm_donvisService;
+		var service = this.apiService;
 		var useBase64: boolean = true;
 		for (var idx = 0; idx < el.files.length; idx++) {
 			if (useBase64) {
@@ -152,7 +134,7 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 						base64: base64Str,
 					};
 					service.lastFileUpload$.next(data);
-					service.uploadFileDM_DonVi(data).subscribe(res => {
+					service.uploadFile(data).subscribe(res => {
 						if (res && res.status == 1) {
 							service.data_import.next(res.data);
 						}
@@ -170,18 +152,20 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 			}
 		}
 	}
+
 	luuImport() {
 		if (this._dataImport.length > 0) {
-			this.dm_donvisService.importDM_DonVi(this._dataImport).subscribe(res => {
+			this.apiService.import(this._dataImport).subscribe(res => {
+				if (!this.itemForm) return;
 				if (res && res.status == 1) {
 					this.isChange = true;
-					this.DM_DonViForm.controls['FileDuLieu'].setValue('');
+					this.itemForm.controls['FileDuLieu'].setValue('');
 					this._dataImport = [];
 					this.layoutUtilsService.showInfo('Import thành công!');
 					this.dialogRef.close(this.isChange);
 				}
 				else {
-					this.DM_DonViForm.controls['FileDuLieu'].setValue('');
+					this.itemForm.controls['FileDuLieu'].setValue('');
 					this._dataImport = [];
 					this.layoutUtilsService.showError('Import thất bại, vui lòng kiểm tra lại file excel!');
 				}
@@ -194,7 +178,7 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 	}
 
 	ImportFileMau() {
-		let linkdownload = this.dm_donvisService.downloadTemplate();
+		let linkdownload = this.apiService.downloadTemplate();
 		window.open(linkdownload);
 	}
 }

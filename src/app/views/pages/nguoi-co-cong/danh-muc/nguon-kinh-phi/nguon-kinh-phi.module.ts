@@ -1,12 +1,11 @@
-import { NguonKinhPhiService } from './Services/nguon-kinh-phi.service';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-import { NguonKinhPhiEditDialogComponent } from './nguon-kinh-phi-edit/nguon-kinh-phi-edit-dialog.component';
-import { NguonKinhPhiListComponent } from './nguon-kinh-phi-list/nguon-kinh-phi-list.component';
+import { NguonKinhPhiService } from './Services/nguon-kinh-phi.service';
 import { NguonKinhPhiRefModule } from './nguon-kinh-phi-ref.module';
 import { NguonKinhPhiComponent } from './nguon-kinh-phi.component';
-
+import { NguonKinhPhiListComponent } from './nguon-kinh-phi-list/nguon-kinh-phi-list.component';
+import { NguonKinhPhiEditDialogComponent } from './nguon-kinh-phi-edit/nguon-kinh-phi-edit-dialog.component';
 
 const routes: Routes = [
 	{
@@ -38,10 +37,9 @@ const routes: Routes = [
 	providers: [
 		NguonKinhPhiService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		NguonKinhPhiComponent
 	]
 })
+
 export class NguonKinhPhiModule { }

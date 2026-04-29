@@ -1,10 +1,9 @@
-import { DienChinhHinhEditDialogComponent } from './dien-chinh-hinh-edit/dien-chinh-hinh-edit-dialog.component';
-import { DienChinhHinhListComponent } from './dien-chinh-hinh-list/dien-chinh-hinh-list.component';
-import { DienChinhHinhComponent } from './dien-chinh-hinh.component';
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
 import { DienChinhHinhService } from '../dien-chinh-hinh/Services/dien-chinh-hinh.service';
+import { DienChinhHinhComponent } from './dien-chinh-hinh.component';
+import { DienChinhHinhListComponent } from './dien-chinh-hinh-list/dien-chinh-hinh-list.component';
+import { DienChinhHinhEditDialogComponent } from './dien-chinh-hinh-edit/dien-chinh-hinh-edit-dialog.component';
 
 @NgModule({
 	imports: [
@@ -22,6 +21,5 @@ import { DienChinhHinhService } from '../dien-chinh-hinh/Services/dien-chinh-hin
 	],
 	exports: [DienChinhHinhListComponent]
 })
-
 
 export class DienChinhHinhRefModule { }

@@ -1,24 +1,22 @@
-import { DanhmucTrocapModel } from './../Models/danh-muc-tro-cap.model';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
-import { TranslateService } from '@ngx-translate/core';
-import { TypesUtilsService } from './../../../../../../core/_base/crud/utils/types-utils.service';
-import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { DanhMucKhacService } from './../services/danh-muc-khac.service';
-import { CommonService } from './../../../services/common.service';
+import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { DanhmuckhacModel } from './../Models/danh-muc-khac.model';
-import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { ReplaySubject } from 'rxjs';
+import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
+import { CommonService } from './../../../services/common.service';
+import { DanhmucTrocapModel } from './../Models/danh-muc-tro-cap.model';
+import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
+import { DanhmuckhacModel } from './../Models/danh-muc-khac.model';
 
 @Component({
 	selector: 'kt-tro-cap-detail',
 	templateUrl: './tro-cap-detail.component.html',
 })
 export class TroCapDetailComponent implements OnInit {
-	item: DanhmucTrocapModel;
-	oldItem: DanhmuckhacModel;
-	itemForm: FormGroup;
+	item: DanhmucTrocapModel = new DanhmucTrocapModel();
+	oldItem: DanhmuckhacModel = new DanhmuckhacModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -30,13 +28,12 @@ export class TroCapDetailComponent implements OnInit {
 	FilterCtrl: string = '';
 	listOpt: any[] = [];
 	listBieumau: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
-
 	FilterCtrl1: string = '';
 	listOpt1: any[] = [];
 	listBieumauCat: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 
 	listLoaiTroCapCha: any[] = [];
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -56,18 +53,18 @@ export class TroCapDetailComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		public commonService: CommonService,
-		private danhmuckhacService: DanhMucKhacService,
+		private apiService: DanhMucKhacService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("LOAI_DD.NAME");
 	}
+
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
-		//list biểu mẫu
+
 		this.commonService.liteBieuMau(3).subscribe(res => {
 			this.listBieumau.next(res.data);
 			this.listOpt = res.data;
@@ -81,7 +78,7 @@ export class TroCapDetailComponent implements OnInit {
 		})
 		this.createForm();
 		if (this.item.Id > 0) {
-			this.danhmuckhacService.getDetailTC(this.item.Id).subscribe(res => {
+			this.apiService.getDetailTC(this.item.Id).subscribe(res => {
 				if (res && res.status == 1) {
 					this.item = res.data;
 					this.loadDM(this.item.Id_LoaiHoSo);
@@ -109,7 +106,8 @@ export class TroCapDetailComponent implements OnInit {
 			Keys_ID: [this.item.Keys_ID]
 		});
 
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
 		this.changeDetectorRefs.detectChanges();
@@ -121,28 +119,30 @@ export class TroCapDetailComponent implements OnInit {
 		return 'Thêm mới loại trợ cấp';
 	}
 	
-	loadDM(Id_LoaiHoSo) {
+	loadDM(Id_LoaiHoSo: number) {
+		if (!this.itemForm) return;
 		this.itemForm.controls['Id_Parent'].setValue(0)
 		this.commonService.liteConstLoaiTroCapCha(Id_LoaiHoSo).subscribe(res => {
 			this.listLoaiTroCapCha = res.data;
-			if (this.item.Id_Parent > 0)
+			if (this.item.Id_Parent != null && this.item.Id_Parent > 0)
 				this.chooseParent(this.item.Id_Parent, true);
 		})
 	}
-	chooseParent(value, isThang = false) {
-		var find = this.listLoaiTroCapCha.find(x => +x.id == +value);
-		if (find) {
-			if (!isThang) {
-				var sothang = 3;
-				this.itemForm.controls['SoThang'].setValue(sothang);
-			}
-			let temp = find.data.TienTroCap ? this.itemForm.controls['SoThang'].value * find.data.TienTroCap : "";
-			this.itemForm.controls['TienTroCap'].setValue(temp);
-		}
-	}
-	/** ACTIONS */
-	prepareCustomer(): DanhmucTrocapModel {
 
+	chooseParent(value: number, isThang: boolean = false) {
+		if (!this.itemForm) return;
+		var find = this.listLoaiTroCapCha.find(x => +x.id == +value);
+		if (!find) return;
+		if (!isThang) {
+			var sothang = 3;
+			this.itemForm.controls['SoThang'].setValue(sothang);
+		}
+		let temp = find.data.TienTroCap ? this.itemForm.controls['SoThang'].value * find.data.TienTroCap : "";
+		this.itemForm.controls['TienTroCap'].setValue(temp);
+	}
+
+	prepare(): DanhmucTrocapModel {
+		if (!this.itemForm) return new DanhmucTrocapModel();
 		const controls = this.itemForm.controls;
 		const _item = new DanhmucTrocapModel();
 		_item.Id_LoaiHoSo = controls['Id_LoaiHoSo'].value;
@@ -156,7 +156,7 @@ export class TroCapDetailComponent implements OnInit {
 		_item.Id_Template_Cat = controls['Id_Template_Cat'].value;
 		_item.SoThangTC = controls['SoThangTC'].value;
 		_item.Id_Parent = controls['Id_Parent'].value;
-		if (_item.Id_Parent > 0)
+		if (_item.Id_Parent != null && _item.Id_Parent > 0)
 			_item.SoThang = controls['SoThang'].value
 		else {
 			_item.TienTroCap = controls['TienTroCap'].value;
@@ -164,46 +164,45 @@ export class TroCapDetailComponent implements OnInit {
 		}
 		return _item;
 	}
-	onSubmit(withBack: boolean = false) {
 
+	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditTroCap = this.prepareCustomer();
+		const EditTroCap = this.prepare();
 		if (this.item.Id > 0) {
 			EditTroCap.Id = this.item.Id;
-			this.UpdateDanhmuc(EditTroCap, withBack);
+			this.Update(EditTroCap, withBack);
 		} else {
-			this.CreateDanhmuc(EditTroCap, withBack);
+			this.Create(EditTroCap, withBack);
 		}
 	}
-	UpdateDanhmuc(_item: DanhmucTrocapModel, withBack: boolean) {
+
+	Update(item: DanhmucTrocapModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.danhmuckhacService.UpdateItemTC(_item).subscribe(res => {
+		this.apiService.updateTC(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -212,23 +211,22 @@ export class TroCapDetailComponent implements OnInit {
 		});
 	}
 
-	CreateDanhmuc(_item: DanhmucTrocapModel, withBack: boolean) {
+	Create(item: DanhmucTrocapModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		//	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.danhmuckhacService.CreateTC(_item).subscribe(res => {
+		this.apiService.createTC(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -238,25 +236,23 @@ export class TroCapDetailComponent implements OnInit {
 			}
 		});
 	}
+
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close();
 	}
 
 	filter() {
-		if (!this.listOpt) {
-			return;
-		}
+		if (!this.listOpt) return;
 		let search = this.FilterCtrl;
 		if (!search) {
 			this.listBieumau.next(this.listOpt.slice());
@@ -265,16 +261,13 @@ export class TroCapDetailComponent implements OnInit {
 			search = search.toLowerCase();
 		}
 		this.listBieumau.next(
-			this.listOpt.filter(ts =>
-				ts.title.toLowerCase().indexOf(search) > -1)
+			this.listOpt.filter(ts => ts.title.toLowerCase().indexOf(search) > -1)
 		);
 		this.changeDetectorRefs.detectChanges();
 	}
 
 	filter1() {
-		if (!this.listOpt1) {
-			return;
-		}
+		if (!this.listOpt1) return;
 		let search = this.FilterCtrl1;
 		if (!search) {
 			this.listBieumauCat.next(this.listOpt1.slice());
@@ -283,8 +276,7 @@ export class TroCapDetailComponent implements OnInit {
 			search = search.toLowerCase();
 		}
 		this.listBieumauCat.next(
-			this.listOpt1.filter(ts =>
-				ts.title.toLowerCase().indexOf(search) > -1)
+			this.listOpt1.filter(ts => ts.title.toLowerCase().indexOf(search) > -1)
 		);
 		this.changeDetectorRefs.detectChanges();
 	}

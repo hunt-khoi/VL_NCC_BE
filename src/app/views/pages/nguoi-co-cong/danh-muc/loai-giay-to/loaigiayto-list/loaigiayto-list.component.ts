@@ -1,23 +1,18 @@
-import { Component, OnInit, OnDestroy, ApplicationRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-// Material
 import { MatPaginator, MatSort, MatDialog, MatMenuTrigger } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-import { loaiGiayToServices } from '../Services/loaigiayto.service';
-import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-// Models
-import { LoaiGiayToEditDialogComponent } from '../loaigiayto-edit/loaigiayto-edit.dialog.component';
-import { loaiGiayToDataSource } from '../Model/data-sources/loaigiayto.datasource';
-import { loaiGiayToModel } from '../Model/loaigiayto.model';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel } from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
 import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
+import { loaiGiayToModel } from '../Model/loaigiayto.model';
+import { loaiGiayToServices } from '../Services/loaigiayto.service';
+import { loaiGiayToDataSource } from '../Model/data-sources/loaigiayto.datasource';
+import { LoaiGiayToEditDialogComponent } from '../loaigiayto-edit/loaigiayto-edit.dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -27,49 +22,46 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 	haveFilter: boolean = false;
-	dataSource: loaiGiayToDataSource;
+	dataSource: loaiGiayToDataSource | undefined;
 	displayedColumns = ['STT', 'Id', 'LoaiGiayTo', 'MoTa', 'Locked', 'Priority', 'actions'];
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
+	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Filter fields
-	curUser: any = {};
 	// Selection
 	selection = new SelectionModel<loaiGiayToModel>(true, []);
 	productsResult: loaiGiayToModel[] = [];
 	_name: string = "";
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
-	list_button: boolean;
-	constructor(public loaiGiayToService1: loaiGiayToServices,
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
+
+	constructor(public apiService: loaiGiayToServices,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
 		private cookieService: CookieService,
-		private tokenStorage: TokenStorage,
 		private translate: TranslateService) {
-    this._name = this.translate.instant("LOAI_GT.NAME");}
+    	this._name = this.translate.instant("LOAI_GT.NAME");
+	}
     
-
-  /** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-		this.tokenStorage.getUserInfo().subscribe(res => {
-			this.curUser = res;
-		})
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
-		if (this.loaiGiayToService1 !== undefined) {
-			this.loaiGiayToService1.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
-		} //mặc định theo priority
+		if (this.apiService !== undefined) {
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
+		}
 
 		//#region ***Filter***
-		this.girdModel.haveFilter = true;
-		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
-		this.girdModel.filterText['LoaiGiayTo'] = "";
-		this.girdModel.filterText['MoTa'] = "";
-		this.girdModel.disableButtonFilter['Locked'] = false;
+		this.gridModel = new TableModel();
+		this.gridModel.haveFilter = true;
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
+		this.gridModel.filterText['LoaiGiayTo'] = "";
+		this.gridModel.filterText['MoTa'] = "";
+		this.gridModel.disableButtonFilter['Locked'] = false;
 
 		let optionsTinhTrang = [
 			{
@@ -81,29 +73,14 @@ export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 				value: 'False',
 			}
 		];
-
-		this.girdModel.filterGroupDataChecked['Locked'] = optionsTinhTrang.map(x => {
+		this.gridModel.filterGroupDataChecked['Locked'] = optionsTinhTrang.map(x => {
 			return {
 				name: x.name,
 				value: x.value,
 				checked: false
 			}
 		});
-		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
-		//this.commonService.getListNhomNguoiDung().subscribe(res => {
-		//	if (res && res.status === 1) {
-		//		this.listIdGroup = res.data;
-		//	};
-		//	this.gridService.filterGroupDataChecked['IdGroup'] = this.listIdGroup.map(x => {
-		//		return {
-		//			id: x.IdGroup,
-		//			name: x.GroupName,
-		//			value: x.IdGroup,
-		//			checked: false
-		//		}
-		//	});
-		//	this.gridService.filterGroupDataCheckedFake = Object.assign({}, this.gridService.filterGroupDataChecked);
-		//});
+		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 		//#endregion ***Filter***
 
 		//#region ***Drag Drop***
@@ -165,53 +142,51 @@ export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 				isShow: true
 			}
 		];
-		this.girdModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.girdModel.selectedColumns = new SelectionModel<any>(true, this.girdModel.availableColumns);
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
-		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.girdModel, this.cookieService);
+		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.gridModel, this.cookieService);
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
 
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
-		this.dataSource = new loaiGiayToDataSource(this.loaiGiayToService1);
+		this.dataSource = new loaiGiayToDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.loaiGiayToService1.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
 			}
 		});
-  	}
-	
+	}
+
 	ngOnDestroy() {
-		this.gridService.Clear();
+		if (this.gridService)
+			this.gridService.Clear();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -224,17 +199,15 @@ export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 	}
 	
 	filterConfiguration(): any {
-		
 		const filter: any = {};
-		if(this.gridService.model.filterText){
+		if (this.gridService && this.gridService.model.filterText){
 			filter.LoaiGiayTo = this.gridService.model.filterText['LoaiGiayTo'];
 			filter.MoTa = this.gridService.model.filterText['MoTa'];
 		}
 		return filter;
   	}
   
-  	/** Delete */
-	DeleteWorkplace(_item: loaiGiayToModel) {
+	Delete(item: loaiGiayToModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
@@ -242,11 +215,9 @@ export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
-			this.loaiGiayToService1.deleteItem(_item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -258,12 +229,12 @@ export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 		});
 	}
 	  
-	lock(_item: any, islock = true) {
+	Lock(item: any, islock = true) {
 		let _message = (islock ? "Khóa" : "Mở khóa") + " loại giấy tờ thành công";
 		let _title;
 		let _description;
 		let _waitDesciption;
-		if(islock){
+		if (islock) {
 			_title = this.translate.instant('OBJECT.LOCK.TITLE', { name: this._name.toLowerCase() });
 			_description = this.translate.instant('OBJECT.LOCK.DESCRIPTION', { name: this._name.toLowerCase() });
 			_waitDesciption = this.translate.instant('OBJECT.LOCK.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
@@ -273,14 +244,11 @@ export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 			_description = this.translate.instant('OBJECT.UNLOCK.DESCRIPTION', { name: this._name.toLowerCase() });
 			_waitDesciption = this.translate.instant('OBJECT.UNLOCK.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		}
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
-			this.loaiGiayToService1.lock(_item.Id, islock).subscribe(res => {
+			this.apiService.lock(item.Id, islock).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_message);
 				}
@@ -292,24 +260,14 @@ export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 		});
 	}
   
- 	AddWorkplace() {
-		const loaigiaytoModel = new loaiGiayToModel();
-		loaigiaytoModel.clear(); // Set all defaults fields
-		this.EditLoaiGiayTo(loaigiaytoModel);
+ 	Add() {
+		const dataModel = new loaiGiayToModel();
+		dataModel.clear(); // Set all defaults fields
+		this.Edit(dataModel);
   	}
   
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-  	}
-  
-  	EditLoaiGiayTo(_item: loaiGiayToModel, allowEdit:boolean=true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+  	Edit(_item: loaiGiayToModel, allowEdit:boolean=true) {
+		let saveMessageTranslateParam = _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, {name:this._name});
 		const dialogRef = this.dialog.open(LoaiGiayToEditDialogComponent, { data: { _item: _item, allowEdit: allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
@@ -321,7 +279,6 @@ export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
  	}
   

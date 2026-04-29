@@ -1,21 +1,19 @@
-import { NoiDungChiDetailComponent } from '../noi-dung-chi-detail/noi-dung-chi-detail.component';
-import { NoiDungChiModel } from '../Models/danh-muc-khac.model';
-import { NoiDungChiService } from '../services/noi-dung-chi.service';
-import { NoDungChiDataSource } from '../Models/data-sources/noi-dung-chi.datasource';
-import { QueryParamsModel } from './../../../../../../core/_base/crud/models/query-models/query-params.model';
+import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatPaginator, MatSort, MatMenuTrigger, MatDialog } from '@angular/material';
+import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { ActivatedRoute } from '@angular/router';
-import { TableModel } from './../../../../../partials/table/table.model';
-import { TableService } from './../../../../../partials/table/table.service';
-import { SelectionModel } from '@angular/cdk/collections';
-import { MatPaginator, MatSort, MatMenuTrigger, MatDialog } from '@angular/material';
-import { TokenStorage } from './../../../../../../core/auth/_services/token-storage.service';
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { NoiDungChiModel } from '../Models/danh-muc-khac.model';
+import { TableService } from './../../../../../partials/table/table.service';
+import { NoiDungChiService } from '../Services/noi-dung-chi.service';
+import { NoDungChiDataSource } from '../Models/data-sources/noi-dung-chi.datasource';
 import { CookieService } from 'ngx-cookie-service';
+import { NoiDungChiDetailComponent } from '../noi-dung-chi-detail/noi-dung-chi-detail.component';
 
 @Component({
 	selector: 'kt-noi-dung-chi-list',
@@ -23,22 +21,20 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class NoiDungChiListComponent implements OnInit {
-
-	dataSource: NoDungChiDataSource;
+	dataSource: NoDungChiDataSource | undefined;
 	haveFilter: boolean = false;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
+	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Filter fields
-	curUser: any = {};
 	// Selection
-	selection = new SelectionModel<NoiDungChiModel>(true, []);
-	productsResult: NoiDungChiModel[] = [];
+	selection = new SelectionModel<any>(true, []);
+	productsResult: any[] = [];
 	_name: string = "";
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
-	list_button: boolean;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		public dialog: MatDialog,
@@ -46,27 +42,22 @@ export class NoiDungChiListComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
 		private cookieService: CookieService,
-		private TokenStorage: TokenStorage,
 		private translate: TranslateService,
-		private noiDungChiServices: NoiDungChiService) {
+		private apiService: NoiDungChiService) {
 			this._name = this.translate.instant("NOIDUNGCHI.NAME");
 	}
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
-		this.TokenStorage.getUserInfo().subscribe(res => {
-			this.curUser = res;
-		})
+		this.gridModel = new TableModel();
+		this.gridModel.haveFilter = true;
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
+		this.gridModel.filterText['NoiDung'] = "";
+		this.gridModel.filterText['GhiChu'] = "";
+		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
-		this.girdModel.haveFilter = true;
-		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
-		this.girdModel.filterText['NoiDung'] = "";
-		this.girdModel.filterText['GhiChu'] = "";
-
-		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
-
-		//#region ***Drag Drop***
 		let availableColumns = [
 			{
 				stt: 1,
@@ -97,52 +88,50 @@ export class NoiDungChiListComponent implements OnInit {
 				isShow: true
 			},
 		];
-		this.girdModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.girdModel.selectedColumns = new SelectionModel<any>(true, this.girdModel.availableColumns);
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
-		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.girdModel, this.cookieService);
+		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.gridModel, this.cookieService);
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
 
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
-		// this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		this.dataSource = new NoDungChiDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-		this.dataSource = new NoDungChiDataSource(this.noiDungChiServices);
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.noiDungChiServices.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
 			}
 		});
-
 	}
 
 	ngOnDestroy() {
-		this.gridService.Clear();
+		if (this.gridService)
+			this.gridService.Clear();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -156,58 +145,41 @@ export class NoiDungChiListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.NoiDung = this.gridService.model.filterText['NoiDung'];
 			filter.GhiChu = this.gridService.model.filterText['GhiChu'];
 		}
 		return filter;
 	}
 
-
-	AddWorkplace() {
+	Add() {
 		let item = new NoiDungChiModel();
 		item.clear();
 		this.Config(item);
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	Config(_item, allowEdit = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+	Config(_item: any, allowEdit = true) {
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(NoiDungChiDetailComponent, { data: { _item: _item, allowEdit: allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			}
-			else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
 
-	/** Delete */
-	delete(_item: any) {
+	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.noiDungChiServices.delete(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.loadDataList();
 					this.layoutUtilsService.showInfo(_deleteMessage);

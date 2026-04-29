@@ -1,20 +1,20 @@
 import { BaseModel } from '../../../../../../core/_base/crud';
 
 export class DanhmucTrocapModel extends BaseModel {
-    Id: number;
-    Id_LoaiHoSo: number;
-    MaTroCap: string;
-    TroCap: number;
-    Id_Template: number;
-	Id_Template_Cat: number;
-    TienTroCap: number;
-    PhuCap: number;
-	TienMuaBao: number;
-    TroCapNuoiDuong: number;
-	Id_Parent: number;
-	SoThang: number;
-	SoThangTC: number;
-    Keys_ID: number;
+    Id: number = 0;
+    Id_LoaiHoSo: number = 0;
+    MaTroCap: string = "";
+    TroCap: number = 0;
+    Id_Template: number = 0;
+	Id_Template_Cat: number = 0;
+    TienTroCap: number | null = null;
+    PhuCap: number | null = null;
+	TienMuaBao: number | null = null;
+    TroCapNuoiDuong: number | null = null;
+	Id_Parent: number | null = null;
+	SoThang: number | null = null;
+	SoThangTC: number | null = null;
+    Keys_ID: number | null = null;
 
     clear() {
         this.Id = 0;

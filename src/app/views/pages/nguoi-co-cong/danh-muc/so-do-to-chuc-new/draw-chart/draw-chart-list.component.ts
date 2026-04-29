@@ -18,11 +18,11 @@ import html2canvas from 'html2canvas';
 
 export class DrawListComponent implements OnInit {
 	// Table fields
-	dataSourceChart: any[];
-	ListItemChart: any[];
+	dataSourceChart: any[] = [];
+	ListItemChart: any[] = [];
 	//lưu lại giá trị drag
-	index_drag: number;
-	list_drag: any[];
+	index_drag: number = 0;
+	list_drag: any[] = [];
 	viewLoading: boolean = false;
 	ID: string = '';
 	_widthpage = 0;
@@ -31,14 +31,12 @@ export class DrawListComponent implements OnInit {
 		private activatedRoute: ActivatedRoute,
 		private translate: TranslateService,
 		public dialog: MatDialog,
-		private _orgChartService: OrgChartService,
+		private apiService: OrgChartService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.activatedRoute.params.subscribe(params => {
-			//  
 			this.ID = '' + params.ID;
 		});
 		this.index_drag = 0;
@@ -47,11 +45,11 @@ export class DrawListComponent implements OnInit {
 		this.getDatasourceChart();
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		const filter: any = {};
 		return filter;
 	}
+
 	getTitle(): string {
 		let result = '';
 		result = this.translate.instant('SO_DO_TO_CHUC.vesodotochuc') + ` (${this.ID})`;
@@ -59,9 +57,9 @@ export class DrawListComponent implements OnInit {
 	}
 
 	/**CREATE BY DU LAM CHART**/
-	dq(data) {
+	dq(data: any) {
 		var _w = 0;
-		data.children.forEach(element => {
+		data.children.forEach((element: any) => {
 			var _cw = 1;
 			if (element.level_jobtitle >= data.level_jobtitle) {
 				element.level_jobtitle = data.level_jobtitle - 1;
@@ -69,7 +67,7 @@ export class DrawListComponent implements OnInit {
 			element.diff = data.level_jobtitle - element.level_jobtitle;
 			//cho bien i chạy khi đủ tổng chiều dài thì gán biến  last child	
 			if (element.children && element.children.length)
-				_cw = this.dq(element);//element.children
+				_cw = this.dq(element); //element.children
 			else {
 				element.width = 1;
 				element.children.width = 1;
@@ -81,18 +79,13 @@ export class DrawListComponent implements OnInit {
 		return _w;
 	}
 	
-	XemLyLich(val: any) {
-
-	}
-	
-	genArr(root, arr, level, startindex) {
-		if (!arr[level]) {
+	genArr(root: any, arr: any[], level: number, startindex: number) {
+		if (!arr[level]) 
 			arr[level] = [];
-		}
 		var _offset = 0;
 		var total_w = 0;
 		var idx = 0;
-		root.forEach(element => {
+		root.forEach((element: any) => {
 			var _cw = null;
 			element.offset = startindex + _offset;
 			if (idx == 0) {
@@ -114,11 +107,13 @@ export class DrawListComponent implements OnInit {
 		});
 		return null;
 	}
-	addFakeCol(arr_chart) {
+
+	addFakeCol(arr_chart: any[]) {
 		for (var i = 0; i < arr_chart.length; i++) {
 			var j = 0;//vị trí mảng chạy
 			var index = 0;//vị trí hiện tại	
-			if (!arr_chart[i]) arr_chart[i] = [];
+			if (!arr_chart[i]) 
+				arr_chart[i] = [];
 			while (j < arr_chart[i].length) {
 				if (arr_chart[i][j].offset > index) {
 					var item_fake = {
@@ -138,15 +133,16 @@ export class DrawListComponent implements OnInit {
 			}
 		}
 	}
-	SortLevelTree(arr_chart) {
-		;
+
+	SortLevelTree(arr_chart: any) {
 		var level_max = arr_chart[0][0].level_jobtitle;
-		var chart2 = [];
+		var chart2: any[] = [];
 		for (var i = 0; i < arr_chart.length; i++) {
 			for (var j = 0; j < arr_chart[i].length; j++) {
 				var el = arr_chart[i][j];
+				if (!el) continue;
 				var elTopLevel = level_max - el.level_jobtitle;
-				// var elLevel=level_max - el.item.level_jobtitle;
+				// var elLevel = level_max - el.item.level_jobtitle;
 				if (!el.diff) el.diff = 1;
 				for (var k = el.diff - 1; k >= 0; k--) {
 					var elLevel = elTopLevel - k;
@@ -177,37 +173,36 @@ export class DrawListComponent implements OnInit {
 							fakeItem.firstchild = el.firstchild;
 							fakeItem.lastchild = el.lastchild;
 						}
-
 						chart2[elLevel].splice(offsetIndex, 0, fakeItem);
 					}
-
 				}
 			}
 		}
 		return chart2;
 	}
+
 	goBack() {
 		window.history.back();
 	}
+
 	getDatasourceChart() {
 		this.viewLoading = true;
-		// this.changeDetectorRefs.detectChanges();
-		this._orgChartService.GetOrganizationalChartById(this.ID).subscribe(res => {
+		this.apiService.GetOrganizationalChartById(this.ID).subscribe(res => {
 			this.viewLoading = false;
-			// this.changeDetectorRefs.detectChanges();
 			this.dataSourceChart = res.data;
 			this.ListItemChart = [];
-			var total_col = this.dq(this.dataSourceChart[0]);
 			this.genArr(this.dataSourceChart, this.ListItemChart, 0, 0);
 			this.ListItemChart = this.SortLevelTree(this.ListItemChart);
 			this.addFakeCol(this.ListItemChart);
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
+
 	onMoved_Staff(item: any, list: any[], parent: any, effect: DropEffect) {
 		const index = list.indexOf(item);
 		list.splice(index, 1);
 	}
+
 	onDrop_Staff(event: DndDropEvent, parent: any, list?: any[]) {
 		if (list) {
 			let index = event.index;
@@ -218,7 +213,7 @@ export class DrawListComponent implements OnInit {
 			let itemMove = new ChartStaffModel();
 			itemMove.id_nv = event.data.ID_NV;
 			itemMove.id_chucdanhmoi = parent.ID;
-			this._orgChartService.handleDropStaff(itemMove).subscribe(res => {
+			this.apiService.handleDropStaff(itemMove).subscribe(res => {
 				;
 				if (res.status == 1) {
 					list.splice(index, 0, event.data);
@@ -234,10 +229,11 @@ export class DrawListComponent implements OnInit {
 		}
 	}
 
-	@ViewChild('scrollOne', { static: true }) scrollOne: ElementRef;
-	@ViewChild('scrollTwo', { static: true }) scrollTwo: ElementRef;
+	@ViewChild('scrollOne', { static: true }) scrollOne: ElementRef | undefined;
+	@ViewChild('scrollTwo', { static: true }) scrollTwo: ElementRef | undefined;
 	GetwidthPage() {
-		var width = document.getElementById('print-drawchart').offsetWidth;
+		var element = document.getElementById('print-drawchart');
+		var width = element ? element.offsetWidth : 0;
 		return width;
 	}
 
@@ -261,36 +257,34 @@ export class DrawListComponent implements OnInit {
 
 	public convetToPDF() {
 		window.scrollTo(0, 0);
-		var convertA4 = false;
 		this.viewLoading = true;
 		var data = document.getElementById('print-drawchart');
+		if (!data) return;
 		html2canvas(data).then(canvas => {
 			// Few necessary setting options
 			var imgWidth = 512;
-			var pageHeight = 295;
 			var imgHeight = canvas.height * imgWidth / canvas.width;
-			var heightLeft = imgHeight;
-			const contentDataURL = canvas.toDataURL('image/png')
-			let pdf;
-			pdf = new jspdf.jsPDF('l', 'mm', [imgHeight, imgWidth]);
+			const contentDataURL = canvas.toDataURL('image/png');
 			var x = 0;
 			var y = 0;
+			let pdf = new jspdf.jsPDF('l', 'mm', [imgHeight, imgWidth]);
 			pdf.addImage(contentDataURL, 'PNG', x, y, imgWidth, imgHeight)
 			pdf.save('so-do-to-chuc.pdf'); // Generated PDF
 		});
 		this.viewLoading = false;
 	}
 
-	@ViewChild('printme', { static: true }) printme: ElementRef;
+	@ViewChild('printme', { static: true }) printme: ElementRef | undefined;
 	printMePls() {
+		if (!this.printme) return;
 		const printme = this.printme.nativeElement as HTMLElement;
 		printme.click();
 	}
 
 	updateScroll(top = false) {
+		if (!this.scrollOne || !this.scrollTwo) return;
 		const scrollOne = this.scrollOne.nativeElement as HTMLElement;
 		const scrollTwo = this.scrollTwo.nativeElement as HTMLElement;
-
 		// do logic and set
 		if (!top) {
 			scrollTwo.scrollLeft = scrollOne.scrollLeft;

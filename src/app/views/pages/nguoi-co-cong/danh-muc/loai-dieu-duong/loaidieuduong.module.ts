@@ -1,16 +1,12 @@
 import { NgModule } from '@angular/core';
-import { CommonModule, } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
-import { TranslateModule } from '@ngx-translate/core';
-
+import { DPSCommonModule } from '../../dps-common.module';
 import { loaiDieuDuongServices } from './Services/loaidieuduong.service';
 import { LoaiDieuDuongComponent } from './loaidieuduong.component';
+import { loaiDieuDuongRefModule } from './loaidieuduong-ref.module';
 import { LoaiDieuDuongListComponent } from './loai-dieu-duong-list/loaidieuduong-list.component';
 import { LoaiDieuDuongEditDialogComponent } from './loai-dieu-duong-edit/loaidieuduong-edit.dialog.component';
-import { DPSCommonModule } from '../../dps-common.module';
-import { loaiDieuDuongRefModule } from './loaidieuduong-ref.module';
+
 const routes: Routes = [
     {
         path: '',
@@ -37,11 +33,9 @@ const routes: Routes = [
 	providers: [
         loaiDieuDuongServices,
     ],
-	entryComponents: [
-		
-    ],
     declarations: [
         LoaiDieuDuongComponent,
     ]
 })
+
 export class LoaiDieuDuongModule { }

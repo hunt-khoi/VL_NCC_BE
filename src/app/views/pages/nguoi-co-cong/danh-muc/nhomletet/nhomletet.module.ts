@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import { nhomletetListComponent } from './nhomletet-list/nhomletet-list.component';
+import { DPSCommonModule } from '../../dps-common.module';
 import { nhomletetComponent } from './nhomletet.component';
 import { nhomletetService } from './Services/nhomletet.service';
 import { nhomletetRefModule } from './nhomletet-ref.module';
-import { DPSCommonModule } from '../../dps-common.module';
+import { nhomletetListComponent } from './nhomletet-list/nhomletet-list.component';
+
 const routes: Routes = [
 	{
 		path: '',
@@ -28,10 +28,9 @@ const routes: Routes = [
 	providers: [
 		nhomletetService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		nhomletetComponent,
 	]
 })
+
 export class nhomletetModule { }

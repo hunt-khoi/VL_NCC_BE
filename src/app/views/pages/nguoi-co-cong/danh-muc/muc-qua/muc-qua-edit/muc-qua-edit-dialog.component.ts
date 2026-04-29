@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { MucQuaService } from './../Services/muc-qua.service';
 import { MucQuaModel } from './../Model/muc-qua.model';
 
@@ -14,16 +14,16 @@ import { MucQuaModel } from './../Model/muc-qua.model';
 })
 
 export class MucQuaEditDialogComponent implements OnInit {
-	item: MucQuaModel;
-	oldItem: MucQuaModel;
-	itemForm: FormGroup;
+	item: MucQuaModel = new MucQuaModel();
+	oldItem: MucQuaModel = new MucQuaModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
 
 	/* Keyboard Shortcut Keys */
@@ -44,23 +44,20 @@ export class MucQuaEditDialogComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		public danhMucService: CommonService,
-		private mucQuaService: MucQuaService,
+		private apiService: MucQuaService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 			this._NAME = this.translate.instant('MUCQUA.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
-
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.mucQuaService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -80,20 +77,14 @@ export class MucQuaEditDialogComponent implements OnInit {
 			MoTa: ['' + this.item.MoTa],
 			Priority: [this.item.Priority],
 		};
+		this.itemForm = this.fb.group(temp);
 
-		if (this.allowEdit) {
-			this.itemForm = this.fb.group(temp);
-
+		if (this.focusInput)
 			this.focusInput.nativeElement.focus();
-		} else {
-			this.itemForm = this.fb.group(temp);
+		if (!this.allowEdit) 
 			this.itemForm.disable();
-			this.focusInput.nativeElement.focus();
-		}
-
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('COMMON.CREATE');
 		if (!this.allowEdit) {
@@ -103,13 +94,12 @@ export class MucQuaEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.Id) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` mức quà`;
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): MucQuaModel {
+	prepare(): MucQuaModel {
+		if (!this.itemForm) return new MucQuaModel();
 		const controls = this.itemForm.controls;
 		const _item = new MucQuaModel();
 		_item.Id = this.item.Id;
@@ -123,41 +113,39 @@ export class MucQuaEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditMucQua = this.prepareCustomer();
-		if (EditMucQua.Id > 0) {
-			this.UpdateMucQua(EditMucQua, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateMucQua(EditMucQua, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
 
-	UpdateMucQua(_item: MucQuaModel, withBack: boolean) {
+	Update(item: MucQuaModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.mucQuaService.UpdateMucQua(_item).subscribe(res => {
+		this.apiService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+					this.dialogRef.close({ item });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -165,22 +153,21 @@ export class MucQuaEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateMucQua(_item: MucQuaModel, withBack: boolean) {
+	Create(item: MucQuaModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.mucQuaService.CreateMucQua(_item).subscribe(res => {
+		this.apiService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -194,12 +181,13 @@ export class MucQuaEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
 	
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

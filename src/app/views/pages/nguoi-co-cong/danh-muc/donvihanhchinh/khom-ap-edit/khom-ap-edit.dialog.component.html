@@ -12,23 +12,17 @@
 		</div>
 		<div class="col-md-{{item.RowID == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
 			<button type="button" mat-raised-button color="accent" [disabled]="disabledBtn"
-				(click)="onSubmit(true)" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				(click)="onSubmit()" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
 				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
-				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
-			</button>
-			<button class="hide-view-sm" type="button" mat-raised-button color="primary" [disabled]="disabledBtn"
-				(click)="onSubmit(false)" *ngIf="!viewLoading" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
-				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
 				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>
 		</div>
 	</div>
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert>
-
 			<div class="form-group kt-form__group row">
 				<div class="col-md-12 kt--margin-bottom-10-mobile">
 					<mat-form-field class="mat-form-field-fluid">
@@ -39,17 +33,6 @@
 							</mat-option>
 						</mat-select>
 						<mat-error>{{'PROVINCE.NAME'|translate : {name:this._name} }}</mat-error>
-					</mat-form-field>
-				</div>
-				<div class="col-md-12 kt--margin-bottom-10-mobile">
-					<mat-form-field class="mat-form-field-fluid">
-						<mat-select formControlName="huyen" placeholder="{{'DISTRICT.NAME' | translate}}" required
-							(selectionChange)="loadHuyenChange(id_district)" [(value)]="id_district">
-							<mat-option value="{{hv.ID_Row}}" *ngFor="let hv of listHuyen">
-								{{hv.District}}
-							</mat-option>
-						</mat-select>
-						<mat-error>{{'DISTRICT.NAME'|translate : {name:this._name} }}</mat-error>
 					</mat-form-field>
 				</div>
 				<div class="col-md-12 kt--margin-bottom-10-mobile">

@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import { chedouudaiListComponent } from './che-do-uu-dai-list/che-do-uu-dai-list.component';
-import { chedouudaiComponent } from './che-do-uu-dai.component';
+import { DPSCommonModule } from '../../dps-common.module';
 import { chedouudaiService } from './Services/che-do-uu-dai.service';
-import { chedouudaiRefModule } from './che-do-uu-dai-ref.module';
-import { DPSCommonModule } from '../../dps-common.module'; 
+import { chedouudaiComponent } from './che-do-uu-dai.component';
+import { chedouudaiListComponent } from './che-do-uu-dai-list/che-do-uu-dai-list.component';
+import { chedouudaiEditDialogComponent } from './che-do-uu-dai-edit/che-do-uu-dai-edit.dialog.component';
+
 const routes: Routes = [
 	{
 		path: '',
@@ -23,15 +23,19 @@ const routes: Routes = [
 	imports: [
 		RouterModule.forChild(routes),
 		DPSCommonModule,
-        chedouudaiRefModule,
 	],
 	providers: [
 		chedouudaiService
 	],
 	entryComponents: [
+		chedouudaiListComponent,
+		chedouudaiEditDialogComponent,
 	],
 	declarations: [
 		chedouudaiComponent,
+		chedouudaiListComponent,
+		chedouudaiEditDialogComponent,
 	]
 })
+
 export class CheDoUuDaiModule { }

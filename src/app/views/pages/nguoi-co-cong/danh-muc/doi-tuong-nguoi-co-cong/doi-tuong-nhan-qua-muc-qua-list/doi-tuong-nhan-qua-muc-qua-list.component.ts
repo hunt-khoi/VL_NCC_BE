@@ -1,17 +1,16 @@
+import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatPaginator, MatSort, MatDialog } from '@angular/material';
+import { SelectionModel } from '@angular/cdk/collections';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { TableService } from './../../../../../partials/table/table.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { DoiTuongNhanQuaModel } from './../Model/doi-tuong-nguoi-co-cong.model';
 import { DoiTuongNguoiCoCongService } from './../Services/doi-tuong-nguoi-co-cong.service';
-import { DoiTuongNguoiCoCongModule } from './../doi-tuong-nguoi-co-cong.module';
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
-import { MatDialog, MatPaginator, MatSort } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
-import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
-import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { DoiTuongNhanQuaDataSource } from '../Model/data-sources/doi-tuong-nhan-qua.datasource';
 import { DoiTuongNhanQuaMucQuaComponent } from '../doi-tuong-nhan-qua-muc-qua/doi-tuong-nhan-qua-muc-qua.component';
 import { UpdateMucQuaDialogComponent } from '../update-muc-qua/update-muc-qua.dialog.component';
@@ -22,11 +21,10 @@ import { CookieService } from 'ngx-cookie-service';
 	templateUrl: './doi-tuong-nhan-qua-muc-qua-list.component.html',
 })
 export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
-
 	// Table fields
-	dataSource: DoiTuongNhanQuaDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: DoiTuongNhanQuaDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
@@ -34,9 +32,9 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 	listNhomLeTet: any[] = [];
 	listNguon: any[] = [];
 	// Selection
-	selection = new SelectionModel<DoiTuongNguoiCoCongModule>(true, []);
-	productsResult: DoiTuongNguoiCoCongModule[] = [];
-	// tslint:disable-next-line:variable-name
+	selection = new SelectionModel<any>(true, []);
+	productsResult: any[] = [];
+
 	_name = '';
 	_STT = '';
 	_DOITUONG = '';
@@ -52,12 +50,13 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 	_UPDATED_DATE = '';
 	_ACTIONS = '';
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
-		public doiTuongNguoiCoCongService: DoiTuongNguoiCoCongService,
+		public apiService: DoiTuongNguoiCoCongService,
 		public CommonService: CommonService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
@@ -81,9 +80,10 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 		this._UPDATED_DATE = this.translate.instant('COMMON.UPDATED_DATE');
 	}
 
-	/** LOAD DATA */
 	async ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		await this.loadNhom();
 		// filter
 		this.gridModel = new TableModel();
@@ -95,7 +95,6 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 		this.gridModel.filterText.MoTa = '';
 		this.gridModel.filterText.Locked = '';
 		this.gridModel.filterText.NhomLoaiDoiTuongNCC = '';
-
 		this.gridModel.filterGroupDataChecked.Locked = [
 			{
 				name: 'Đã khóa',
@@ -108,7 +107,6 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 				checked: false
 			}
 		];
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -153,32 +151,26 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 		for (var i = 0; i < this.listNhomLeTet.length; i++) {
 			for (var j = 0; j < this.listNguon.length; j++) {
 				availableColumns.push(
-					{
-						stt: i + 10,
-						name: 'Nhom' + i + j,
-						displayName: this.listNhomLeTet[i].title + " - " + this.listNguon[j].title,
-						alwaysChecked: false,
-						isShow: true,
-					});
+				{
+					stt: i + 10,
+					name: 'Nhom' + i + j,
+					displayName: this.listNhomLeTet[i].title + " - " + this.listNguon[j].title,
+					alwaysChecked: false,
+					isShow: true,
+				});
 			}
 		}
 		availableColumns.push(
-			{
-				stt: 99,
-				name: 'actions',
-				displayName: this._ACTIONS,
-				alwaysChecked: true,
-				isShow: true,
-			});
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		{
+			stt: 99,
+			name: 'actions',
+			displayName: this._ACTIONS,
+			alwaysChecked: true,
+			isShow: true,
+		});
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -187,39 +179,35 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 			this.cookieService,
 		);
 		this.gridService.cookieName = 'displayedColumns_dtnq_mq'
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_dtnq_mq'));
 		this.LoadFilterGroupData();
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
-		this.dataSource = new DoiTuongNhanQuaDataSource(this.doiTuongNguoiCoCongService);
+		this.dataSource = new DoiTuongNhanQuaDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.doiTuongNguoiCoCongService.lastFilterNQ$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilterNQ$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -230,28 +218,24 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 	async loadNhom() {
 		await this.CommonService.liteNhomLeTet().toPromise().then(res => {
 			this.listNhomLeTet = res.data;
-			//this.changeDetectorRefs.detectChanges();
 		});
-
 		await this.CommonService.liteNguonKinhPhi().toPromise().then(res => {
 			this.listNguon = res.data;
-			//this.changeDetectorRefs.detectChanges();
 		})
 	}
 
-	getvalue(item, id_nhom, id_nguon) {
-		let f = item.Details.find(x => +x.Id_NhomLeTet == +id_nhom && +x.Id_NguonKinhPhi == +id_nguon);
+	getvalue(item: any, id_nhom: number, id_nguon: number) {
+		let f = item.Details.find((x: any) => +x.Id_NhomLeTet == +id_nhom && +x.Id_NguonKinhPhi == +id_nguon);
 		if (f != null)
 			return f.SoTien;
 		return '';
 	}
 
-	/* HÀM LOAD FILTER GROUPDATA
-	*/
 	LoadFilterGroupData() {
 		this.CommonService.liteNhomLoaiDoiTuongNCC().subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
-				this.gridService.model.filterGroupDataChecked.NhomLoaiDoiTuongNCC = res.data.map(x => {
+				this.gridService.model.filterGroupDataChecked.NhomLoaiDoiTuongNCC = res.data.map((x: any) => {
 					return {
 						id: x.id,
 						name: x.title,
@@ -267,6 +251,7 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -283,12 +268,10 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 		if (this.filterStatus && this.filterStatus.length > 0) {
 			filter.status = +this.filterStatus;
 		}
-
 		if (this.filterType && this.filterType.length > 0) {
 			filter.type = +this.filterType;
 		}
-		if (this.gridService.model.filterText) {
-
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 			filter.MaDoiTuong = this.gridService.model.filterText.MaDoiTuong;
 			filter.MoTa = this.gridService.model.filterText.MoTa;
@@ -296,7 +279,6 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 		return filter;
 	}
 
-	/* UI */
 	getItemStatusString(status: boolean = true): string {
 		switch (status) {
 			case true:
@@ -315,30 +297,21 @@ export class DoiTuongNhanQuaMucQuaListComponent implements OnInit {
 		}
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-	updatemuc(_item: DoiTuongNhanQuaModel, allowEdit: boolean = true) {
+	update(_item: DoiTuongNhanQuaModel, allowEdit: boolean = true) {
 		let temp = Object.assign({}, _item);
 		const dialogRef = this.dialog.open(DoiTuongNhanQuaMucQuaComponent, { data: { _item: temp, allowEdit: allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.loadDataList();
 				this.layoutUtilsService.showInfo('Cập nhật mức quà cho đối tượng thành công');
 			}
 		});
 	}
+
 	UpdateMucQua() {
 		const dialogRef = this.dialog.open(UpdateMucQuaDialogComponent, {});
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.loadDataList();
 				this.layoutUtilsService.showInfo('Cập nhật mức quà thành công');
 			}

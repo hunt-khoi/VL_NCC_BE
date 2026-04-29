@@ -34,8 +34,7 @@
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid">
-						<mat-select placeholder="{{'CO_CAU_TO_CHUC.donvihanhchanh' | translate}}"
-									formControlName="idgoc">
+						<mat-select placeholder="{{'CO_CAU_TO_CHUC.donvihanhchanh' | translate}}" formControlName="idgoc">
 							<mat-option [value]="dv.ID_Row" *ngFor="let dv of listDV">
 								{{dv.District?dv.District:dv.Ward}}
 							</mat-option>
@@ -70,8 +69,8 @@
 					<mat-form-field class="mat-form-field-fluid">
 						<mat-select [(value)]="filtercalamvic" placeholder="{{ 'CO_CAU_TO_CHUC.chedo' | translate }}"
 							formControlName="id_ca">
-							<mat-option value="{{clv.ID_Row}}" *ngFor="let clv of listCheDoLamViec;">
-								{{clv.Religion}}
+							<mat-option value="{{val.ID_Row}}" *ngFor="let val of listCheDoLamViec;">
+								{{val.Religion}}
 							</mat-option>
 						</mat-select>
 					</mat-form-field>

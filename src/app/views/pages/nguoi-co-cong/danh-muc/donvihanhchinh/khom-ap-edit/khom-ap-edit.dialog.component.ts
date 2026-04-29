@@ -15,20 +15,18 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 export class KhomApEditDialogComponent implements OnInit {
 	item: any;
 	oldItem: any;
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	listprovinces: any[] = [];
 	listTinh: any[] = [];
-	listHuyen: any[] = [];
 	listXa: any[] = [];
-	id_provinces: string;
-	id_district: string;
+	id_provinces: string = "";
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name: string = "";
 
 	/* Keyboard Shortcut Keys */
@@ -36,11 +34,7 @@ export class KhomApEditDialogComponent implements OnInit {
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
 		if (event.altKey && event.keyCode == 13) { //phím Enter
-			this.onSubmit(true);
-		}
-		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
-			this.onSubmit(false);
+			this.onSubmit();
 		}
 	}
 
@@ -49,36 +43,28 @@ export class KhomApEditDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		private danhMucService: CommonService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private districtService: donvihanhchinhService,
+		private apiService: donvihanhchinhService,
 		private layoutUtilsService: LayoutUtilsService,
 		private tokenStorage: TokenStorage,
 		private translate: TranslateService) {
 		this._name = 'Khóm, ấp';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
+		this.item = this.data._item;
+		if (this.data.allowEdit)
+			this.allowEdit = this.data.allowEdit;
+
+		this.createForm();
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.id_provinces = res.IdTinh;
 			this.loadTinhThanhChange(this.id_provinces);
 		})
-		this.item = this.data._item;
-		if (this.data.allowEdit)
-			this.allowEdit = this.data.allowEdit;
-		this.createForm();
 		this.danhMucService.GetAllProvinces().subscribe(res => {
 			this.listTinh = res.data;
 		});
-		if (this.item.RowID > 0) {
-			this.viewLoading = true;
-			if (this.item.DistrictID)
-				this.loadHuyenChange(this.item.DistrictID);
-		}
-		else {
-			this.viewLoading = false;
-			this.itemForm.controls["huyen"].setValue("");
-		}
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 	}
 
 	createForm() {
@@ -88,23 +74,21 @@ export class KhomApEditDialogComponent implements OnInit {
 			huyen: ['' + this.item.DistrictID, Validators.required],
 			xa: ['' + this.item.WardID, Validators.required],
 		});
-
 		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
-	/** UI */
+
 	getTitle(): string {
 		let result = this.translate.instant('COMMON.CREATE');
 		if (!this.item || !this.item.RowID) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE') + ` - ${this.item.WardName}`;
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): any {
+	prepare(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		_item.RowID = this.item.RowID;
@@ -113,11 +97,11 @@ export class KhomApEditDialogComponent implements OnInit {
 		return _item;
 	}
 
-	onSubmit(withBack: boolean = false) {
+	onSubmit() {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -126,33 +110,23 @@ export class KhomApEditDialogComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-		const updatedistrict = this.prepareCustomer();
-		if (updatedistrict.RowID > 0) {
-			this.Update(updatedistrict, withBack);
+		const update = this.prepare();
+		if (update.RowID > 0) {
+			this.Update(update);
 		} else {
-			this.Create(updatedistrict, withBack);
+			this.Create(update);
 		}
 	}
 
-	Update(_item: any, withBack: boolean) {
+	Update(item: any) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.districtService.UpdateKhomAp(_item).subscribe(res => {
+		this.apiService.UpdateKhomAp(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
-				}
-				else {
-					this.ngOnInit();
-					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
-				}
+				this.dialogRef.close({ item });
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -160,25 +134,14 @@ export class KhomApEditDialogComponent implements OnInit {
 		});
 	}
 
-	Create(_item: any, withBack: boolean) {
+	Create(item: any) {
 		this.loadingAfterSubmit = true;
-		//	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.districtService.CreateKhomAp(_item).subscribe(res => {
+		this.apiService.CreateKhomAp(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
-				}
-				else {
-					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
-					this.ngOnInit();
-				}
+				this.dialogRef.close({ item });
 			}
 			else {
 				this.viewLoading = false;
@@ -188,20 +151,13 @@ export class KhomApEditDialogComponent implements OnInit {
 	}
 
 	loadTinhThanhChange(idtinh: any) {
-		this.danhMucService.GetListDistrictByProvinces(idtinh).subscribe(res => {
-			this.listHuyen = res.data;
-			this.changeDetectorRefs.detectChanges();
-		});
+		// this.danhMucService.GetListDistrictByProvinces(idtinh).subscribe(res => {
+		// 	this.listHuyen = res.data;
+		// 	this.changeDetectorRefs.detectChanges();
+		// });
 	}
 
-	loadHuyenChange(id_district: any) {
-		this.danhMucService.GetListWardByDistrict(id_district).subscribe(res => {
-			this.listXa = res.data;
-			this.changeDetectorRefs.detectChanges();
-		});
-	}
-
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -213,6 +169,7 @@ export class KhomApEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

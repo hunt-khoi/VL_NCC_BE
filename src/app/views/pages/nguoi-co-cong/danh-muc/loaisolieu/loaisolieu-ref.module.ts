@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
-
-import { loaisolieuService } from './Services/loaisolieu.service';
 import { DPSCommonModule } from '../../dps-common.module';
+import { loaisolieuService } from './Services/loaisolieu.service';
 import { loaisolieuEditDialogComponent } from './loaisolieu-edit/loaisolieu-edit.dialog.component';
 import { loaisolieuListComponent } from './loaisolieu-list/loaisolieu-list.component';
 
@@ -24,4 +23,5 @@ import { loaisolieuListComponent } from './loaisolieu-list/loaisolieu-list.compo
 		loaisolieuListComponent,
 	]
 })
+
 export class loaisolieuRefModule { }

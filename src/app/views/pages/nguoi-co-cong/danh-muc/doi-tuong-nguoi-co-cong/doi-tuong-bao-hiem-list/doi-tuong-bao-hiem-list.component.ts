@@ -1,17 +1,16 @@
-import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
-import { TableService } from './../../../../../partials/table/table.service';
+import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatPaginator, MatSort, MatDialog } from '@angular/material';
+import { SelectionModel } from '@angular/cdk/collections';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { DoiTuongBHYTModel } from './../Model/doi-tuong-nguoi-co-cong.model';
 import { DoiTuongNguoiCoCongService } from './../Services/doi-tuong-nguoi-co-cong.service';
-import { DoiTuongNguoiCoCongModule } from './../doi-tuong-nguoi-co-cong.module';
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
-import { MatDialog, MatPaginator, MatSort } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
-import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
-import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { DoiTuongBaoHiemDataSource } from '../Model/data-sources/doi-tuong-bao-hiem.datasource';
 import { DoiTuongBaoHiemEditComponent } from '../doi-tuong-bao-hiem-edit/doi-tuong-bao-hiem-edit.component';
 import { CookieService } from 'ngx-cookie-service';
@@ -24,17 +23,17 @@ import { CookieService } from 'ngx-cookie-service';
 export class DoiTuongBaoHiemListComponent implements OnInit {
 
   	// Table fields
-	dataSource: DoiTuongBaoHiemDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: DoiTuongBaoHiemDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
 	filterType = '';
 	listLoai: any[] = [];
 	// Selection
-	selection = new SelectionModel<DoiTuongNguoiCoCongModule>(true, []);
-	productsResult: DoiTuongNguoiCoCongModule[] = [];
-	// tslint:disable-next-line:variable-name
+	selection = new SelectionModel<any>(true, []);
+	productsResult: any[] = [];
+
 	_name = '';
 	_STT = '';
 	_DOITUONG = '';
@@ -50,13 +49,14 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 	_UPDATED_DATE = '';
 	_ACTIONS = '';
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
-
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 	filtertypes: number = 1;
+
 	constructor(
-		public doiTuongNguoiCoCongService: DoiTuongNguoiCoCongService,
+		public apiService: DoiTuongNguoiCoCongService,
 		public CommonService: CommonService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
@@ -79,9 +79,9 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 		this._UPDATED_DATE = this.translate.instant('COMMON.UPDATED_DATE');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		
 		this.gridModel = new TableModel();
 		this.gridModel.clear();
@@ -92,7 +92,6 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 		this.gridModel.filterText.MoTa = '';
 		this.gridModel.filterText.Locked = '';
 		this.gridModel.filterText.NhomLoaiDoiTuongNCC = '';
-
 		this.gridModel.filterGroupDataChecked.Locked = [
 			{
 				name: 'Đã khóa',
@@ -105,8 +104,6 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 				checked: false
 			}
 		];
-
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -196,15 +193,9 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -213,37 +204,34 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_dtbh'
-		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_dtbh'));
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
+
 		// Init DataSource
-		this.dataSource = new DoiTuongBaoHiemDataSource(this.doiTuongNguoiCoCongService);
+		this.dataSource = new DoiTuongBaoHiemDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.doiTuongNguoiCoCongService.lastFilterBH$.getValue();
-			queryParams.filter['Type'] = this.filtertypes;
-      		// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilterBH$.getValue();
+				queryParams.filter['Type'] = this.filtertypes;
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -252,7 +240,7 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
-
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -260,16 +248,14 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
 			this.paginator.pageSize,
 			this.gridService.model.filterGroupData
-    );
+		);
 		this.dataSource.loadList(queryParams);
 	}
 
 	filterConfiguration(): any {
-
 		const filter: any = {};
 		filter.Type = this.filtertypes;
-		if (this.gridService.model.filterText) {
-
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 			filter.MaDoiTuong = this.gridService.model.filterText.MaDoiTuong;
 			filter.MoTa = this.gridService.model.filterText.MoTa;
@@ -277,7 +263,6 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 		return filter;
 	}
 
-	/* UI */
 	getItemStatusString(status: boolean = true): string {
 		switch (status) {
 			case true:
@@ -296,20 +281,16 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 		}
 	}
 
-	/** Delete */
-	DeleteWorkplace(_item: DoiTuongBHYTModel) {
+	Delete(item: DoiTuongBHYTModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.doiTuongNguoiCoCongService.deleteItemBHYT(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.DeleteBHYT(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -319,22 +300,16 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 			});
 		});
 	}
+
 	AddWorkplace() {
 		const doiTuongBHYTModel = new DoiTuongBHYTModel();
 		doiTuongBHYTModel.clear(); // Set all defaults fields
-		this.Editdoituongbaohiem(doiTuongBHYTModel);
+		this.Edit(doiTuongBHYTModel);
 	}
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
 
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-	Editdoituongbaohiem(_item: DoiTuongBHYTModel, allowEdit: boolean = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+
+	Edit(_item: DoiTuongBHYTModel, allowEdit: boolean = true) {
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		let type = this.filtertypes;
 		const dialogRef = this.dialog.open(DoiTuongBaoHiemEditComponent, { data: { _item, allowEdit, type } });
@@ -345,16 +320,15 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
 
-	Lock(_item: DoiTuongBHYTModel, value: boolean = false) {
-		let _message = _item.Locked ? 'Mở khóa thành công' : 'Khóa thành công';
+	Lock(item: DoiTuongBHYTModel, value: boolean = false) {
+		let _message = item.Locked ? 'Mở khóa thành công' : 'Khóa thành công';
 		let _title;
 		let _description;
 		let _waitDesciption;
-		if (!_item.Locked) {
+		if (!item.Locked) {
 			_title = this.translate.instant('OBJECT.LOCK.TITLE', { name: this._name.toLowerCase() });
 			_description = this.translate.instant('OBJECT.LOCK.DESCRIPTION', { name: this._name.toLowerCase() });
 			_waitDesciption = this.translate.instant('OBJECT.LOCK.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
@@ -366,11 +340,9 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.doiTuongNguoiCoCongService.LockBHYT(_item.Id, value).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.LockBHYT(item.Id, value).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_message);
 				} else {
@@ -380,5 +352,4 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 			});
 		});
 	}
-
 }

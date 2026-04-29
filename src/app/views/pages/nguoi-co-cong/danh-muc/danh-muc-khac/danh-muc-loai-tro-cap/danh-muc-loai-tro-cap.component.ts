@@ -1,20 +1,18 @@
-import { TroCapDetailComponent } from './../tro-cap-detail/tro-cap-detail.component';
-import { HoSoNCCModule } from './../../../ho-so-nguoi-co-cong/ho-so-ncc/ho-so-ncc.module';
-import { QueryParamsModel } from './../../../../../../core/_base/crud/models/query-models/query-params.model';
+import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MatPaginator, MatSort, MatDialog } from '@angular/material';
+import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { CommonService } from './../../../services/common.service';
-import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { DanhMucKhacService } from './../services/danh-muc-khac.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { TableService } from './../../../../../partials/table/table.service';
+import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
-import { MatDialog, MatPaginator, MatSort } from '@angular/material';
-import { DanhMucTroCapDataSource } from './../Models/data-sources/danh-muc-khac.datasource';
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
-import { SelectionModel } from '@angular/cdk/collections';
+import { TableService } from './../../../../../partials/table/table.service';
+import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
 import { DanhmucTrocapModel } from '../Models/danh-muc-tro-cap.model';
+import { DanhMucTroCapDataSource } from '../Models/data-sources/danh-muc-khac.datasource';
+import { TroCapDetailComponent } from './../tro-cap-detail/tro-cap-detail.component';
 import { TroCapImportComponent } from '../tro-cap-import/tro-cap-import.component';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -23,38 +21,35 @@ import { CookieService } from 'ngx-cookie-service';
 	templateUrl: './danh-muc-loai-tro-cap.component.html',
 })
 export class DanhMucLoaiTroCapComponent implements OnInit {
-
 	// Table fields
-	dataSource: DanhMucTroCapDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: DanhMucTroCapDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
-	productsResult: HoSoNCCModule[] = [];
+	productsResult: any[] = [];
 	_name = '';
 	objectId = '';
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 	_user: any = {};
-	list_button: boolean;
 
 	constructor(
-		private router: Router,
-		private actRoute: ActivatedRoute,
 		public objectService: DanhMucKhacService,
 		private cookieService: CookieService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
-		private commonService: CommonService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("TROCAP.NAME"); 
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
 		// filter
 		this.gridModel = new TableModel();
@@ -63,7 +58,6 @@ export class DanhMucLoaiTroCapComponent implements OnInit {
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText.MaTroCap = '';
 		this.gridModel.filterText.TroCap = '';
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -139,15 +133,9 @@ export class DanhMucLoaiTroCapComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -156,39 +144,34 @@ export class DanhMucLoaiTroCapComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_loaitrocap'
-
-		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_loaitrocap'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
+			
 		// Init DataSource
 		this.dataSource = new DanhMucTroCapDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectService.lastFilterTC$.getValue();
-			queryParams.filter.Id_NCC = this.objectId;
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilterTC$.getValue();
+				queryParams.filter.Id_NCC = this.objectId;
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -197,6 +180,7 @@ export class DanhMucLoaiTroCapComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -211,39 +195,27 @@ export class DanhMucLoaiTroCapComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.MaTroCap = this.gridService.model.filterText.MaTroCap;
 			filter.TroCap = this.gridService.model.filterText.TroCap;
 			filter.Id_NCC = this.objectId;
 		}
-
 		return filter;
 	}
 
-
-	AddWorkplace() {
+	Add() {
 		const objectModel = new DanhmucTrocapModel();
 		objectModel.clear()
-		this.Editobject(objectModel);
-	}
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
+		this.Edit(objectModel);
 	}
 
-	Editobject(_item: any, allowEdit: boolean = true) {
+	Edit(_item: any, allowEdit: boolean = true) {
 		_item.Id_NCC = this.objectId;
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(TroCapDetailComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
@@ -253,26 +225,21 @@ export class DanhMucLoaiTroCapComponent implements OnInit {
 	import() {
 		const dialogRef = this.dialog.open(TroCapImportComponent, { width: '80%' });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			this.loadDataList();
 		});
 	}
 
-	delete(_item: any) {
+	delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteTC(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.deleteTC(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}

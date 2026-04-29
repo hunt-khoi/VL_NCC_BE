@@ -1,21 +1,15 @@
-import { Component, ViewChild, ChangeDetectorRef, OnChanges, Input, ApplicationRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectorRef, OnChanges, Input } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog, MatMenuTrigger } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
 import { tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
-//Service
+import { BehaviorSubject, merge } from 'rxjs';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { DM_DonViService } from '../Services/dm-don-vi.service';
-import { SubheaderService } from 'app/core/_base/layout';
-import { LayoutUtilsService, QueryParamsModel, MessageType } from 'app/core/_base/crud';
-//Model
-import { DM_DonViModel, DM_User_DonViModel } from '../Model/dm-don-vi.model';
+import { DM_User_DonViModel } from '../Model/dm-don-vi.model';
 import { DM_NguoiDungDonViDataSource } from '../Model/data-sources/dm-nguoi-dung-don-vi.datasource';
-import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
-import { TableService } from '../../../../../partials/table/table.service';
-import { TableModel } from '../../../../../partials/table';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -23,29 +17,15 @@ import { CookieService } from 'ngx-cookie-service';
 	templateUrl: './dm-nguoi-dung-don-vi-list.component.html',
 })
 
-export class DmNguoiDungDonViListComponent implements OnChanges { //OnInit,
-	
+export class DmNguoiDungDonViListComponent implements OnChanges {
 	@Input() donvi: string = "";
-	//TH1: #filter
-	filterGroupDataChecked: any = {};
-	//
-	filterText: any = {};
-	tmpfilterText: any = {};
-	filterGroupDataCheckedFake: any = {};
-	filterGroupData: any = {};
-	filterGroupArray: any = {};
-
-	haveFilter: boolean = false;
-
 	// Table fields
-	dataSource: DM_NguoiDungDonViDataSource;
+	dataSource: DM_NguoiDungDonViDataSource | undefined;
 	displayedColumns = [];
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
+	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
-
-	// @ViewChild('searchDonVi', { static: true }) searchDonVi: ElementRef;
 	availableColumns = [
 		// {
 		// 	stt: 1,
@@ -121,41 +101,34 @@ export class DmNguoiDungDonViListComponent implements OnChanges { //OnInit,
 
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
+	haveFilter: boolean = false;
 
-	previousIndex: number;
+	previousIndex: number = 0;
 	dataTreeDonVi: any[] = [];
 	//filter group 
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
-	rR = {};
+    gridService: TableService | undefined;
+    gridModel: TableModel | undefined;
 
 	constructor(
 		private dm_donvisService: DM_DonViService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
-		private translate: TranslateService,
-		private subheaderService: SubheaderService,
 		private changeDetect: ChangeDetectorRef,
 		private cookieService: CookieService,
 		private ref: ApplicationRef,
-		private tokenStorage: TokenStorage,
 		private layoutUtilsService: LayoutUtilsService) { }
 
-	/** LOAD DATA */
 	ngOnChanges() {
-		this.tokenStorage.getUserRolesObject().subscribe(t => {
-			this.rR = t;
-		});
 		//#region ***Filter***
-		this.girdModel= new TableModel();
-		this.girdModel.clear();
-		this.girdModel.haveFilter = true;
-		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
-		this.girdModel.filterText['Username'] = "";
-		this.girdModel.filterText['FullName'] = "";
-		this.girdModel.filterText['ChucVu'] = "";
-		this.girdModel.filterText['Email'] = "";
-		this.girdModel.filterText['PhoneNumber'] = "";
+		this.gridModel= new TableModel();
+		this.gridModel.clear();
+		this.gridModel.haveFilter = true;
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
+		this.gridModel.filterText['Username'] = "";
+		this.gridModel.filterText['FullName'] = "";
+		this.gridModel.filterText['ChucVu'] = "";
+		this.gridModel.filterText['Email'] = "";
+		this.gridModel.filterText['PhoneNumber'] = "";
 
 		let optionsTinhTrang = [
 			{
@@ -167,61 +140,53 @@ export class DmNguoiDungDonViListComponent implements OnChanges { //OnInit,
 				value: '1',
 			}
 		];
-		this.girdModel.filterGroupDataChecked['Active'] = optionsTinhTrang.map(x => {
+		this.gridModel.filterGroupDataChecked['Active'] = optionsTinhTrang.map(x => {
 			return {
 				name: x.name,
 				value: x.value,
 				checked: false
 			}
 		});
-		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
+		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 		//#endregion ***Filter***
-		this.girdModel.availableColumns = this.availableColumns.sort((a, b) => a.stt - b.stt);
-		this.girdModel.selectedColumns = new SelectionModel<any>(true, this.girdModel.availableColumns);		
-		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.girdModel, this.cookieService);
+		this.gridModel.availableColumns = this.availableColumns.sort((a, b) => a.stt - b.stt);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);	
 
+		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.gridModel, this.cookieService);
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
 
-		// // If the DM_DonVi changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+        if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page)
+				.pipe(
+					tap(() => {
+						this.loadList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDM_DonVisList(true);
-				})
-			)
-			.subscribe();
-		// // Set title to page breadCrumbs
-		this.subheaderService.setTitle('');
 		// Init DataSource
 		this.dataSource = new DM_NguoiDungDonViDataSource(this.dm_donvisService);
 		let queryParams = new QueryParamsModel({});
 		if (this.donvi) {
-			this.loadDM_DonVisList();
+			this.loadList();
 		}
 		else {
 			// // Read from URL itemId, for restore previous state
-			this.route.queryParams.subscribe(params => {
-				if (params.id) {
+			this.route.queryParams.subscribe(_ => {
+				if (this.dataSource) {
 					queryParams = this.dm_donvisService.lastFilter$.getValue();
+					this.dataSource.loadDM_User_DonVis(queryParams);
 				}
-				// First load
-				this.dataSource.loadDM_User_DonVis(queryParams);
-				setTimeout(x => {
-					this.loadPage();
-				}, 500)
 			});
 			
 		}
 		this.dataSource.entitySubject.subscribe(res => {
-			this.dm_donvisResult = res
-			this.tmpdm_donvisResult = []
+			this.dm_donvisResult = res;
+			this.tmpdm_donvisResult = [];
 			if (this.dm_donvisResult != null) {
 				for (let i = 0; i < this.dm_donvisResult.length; i++) {
 					let tmpElement = new DM_User_DonViModel();
@@ -232,7 +197,8 @@ export class DmNguoiDungDonViListComponent implements OnChanges { //OnInit,
 		});
 	}
 
-	loadDM_DonVisList(holdCurrentPage: boolean = false) {
+	loadList(holdCurrentPage: boolean = false) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -243,51 +209,14 @@ export class DmNguoiDungDonViListComponent implements OnChanges { //OnInit,
 			this.gridService.model.filterGroupData
 		);
 		this.dataSource.loadDM_User_DonVis(queryParams);
-		setTimeout(x => {
-			this.loadPage();
-		}, 500)
 	}
 
-	loadPage() {
-		var arrayData = [];
-		this.dataSource.entitySubject.subscribe(res => arrayData = res);
-		if (arrayData && arrayData.length == 0) {
-			var totalRecord = 0;
-			this.dataSource.paginatorTotal$.subscribe(tt => totalRecord = tt)
-			if (totalRecord > 0) {
-				const queryParams = new QueryParamsModel(
-					this.filterConfiguration(),
-					this.sort.direction,
-					this.sort.active,
-					this.paginator.pageIndex = this.paginator.pageIndex - 1,
-					this.paginator.pageSize,
-					this.gridService.model.filterGroupData
-
-				);
-				this.dataSource.loadDM_User_DonVis(queryParams);
-			}
-			else {
-				const queryParams = new QueryParamsModel(
-					this.filterConfiguration(),
-					this.sort.direction,
-					this.sort.active,
-					this.paginator.pageIndex = 0,
-					this.paginator.pageSize,
-					this.gridService.model.filterGroupData
-
-				);
-				this.dataSource.loadDM_User_DonVis(queryParams);
-			}
-		}
-	}
-
-	/** FILTRATION */
 	filterConfiguration(): any {
 		const filter: any = {};
 		if (this.donvi) {
 			filter.IdDV = this.donvi;
 		}
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.Username = this.gridService.model.filterText['Username'];
 			filter.FullName = this.gridService.model.filterText['FullName'];
 			filter.ChucVu = this.gridService.model.filterText['ChucVu'];
@@ -314,11 +243,6 @@ export class DmNguoiDungDonViListComponent implements OnChanges { //OnInit,
 		}
 	}
 
-	menuChange(e: any, type: 0 | 1 = 0) {
-		this.layoutUtilsService.menuSelectColumns_On_Off();
-	}
-
-	/* UI */
 	getItemStatusString(status: number = 0): string {
 		switch (status) {
 			case 0:

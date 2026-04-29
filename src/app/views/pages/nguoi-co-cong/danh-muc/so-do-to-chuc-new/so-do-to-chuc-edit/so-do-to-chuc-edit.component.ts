@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { MatDialog, MatSelect } from '@angular/material';
-import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,7 +10,6 @@ import { UpdateThongTinChucVuModel } from '../Model/so-do-to-chuc.model';
 import { OrgChartService } from '../Services/so-do-to-chuc.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 
 @Component({
 	selector: 'm-so-do-to-chuc-edit',
@@ -21,13 +19,13 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 
 export class sodotochuceditComponent implements OnInit {
 
-	item: UpdateThongTinChucVuModel;
-	oldItem: UpdateThongTinChucVuModel;
+	item: UpdateThongTinChucVuModel = new UpdateThongTinChucVuModel();
+	oldItem: UpdateThongTinChucVuModel = new UpdateThongTinChucVuModel();
 	selectedTab: number = 0;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loadingControl = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	viewLoading: boolean = false;
 	hasFormErrors: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -49,15 +47,14 @@ export class sodotochuceditComponent implements OnInit {
 	ShowKhiEdit: boolean = false;
 	Show_TenChucVu: boolean = false;
 	isshowtextbox: boolean = false;
-	tenchucdanh: string;
-	tentienganh: string;
+	tenchucdanh: string = "";
 	id_dv: string = '';
 	id_pb: string = '';
 	id_cd: number = 0;
 
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	disabledBtn: boolean = false;
-	public datatree: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	public datatree: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	title: string = '';
 	selectedNode: BehaviorSubject<any> = new BehaviorSubject([]);
 	ID_Struct: string = '';
@@ -81,17 +78,13 @@ export class sodotochuceditComponent implements OnInit {
 
 	constructor(public dialogRef: MatDialogRef<sodotochuceditComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private activatedRoute: ActivatedRoute,
 		private danhMucService: CommonService,
-		private fb: FormBuilder,
-		private router: Router,
-		private NewInfoJobTitleService: OrgChartService,
+		private apiService: OrgChartService,
 		private itemFB: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private translate: TranslateService,
-		private tokenStorage: TokenStorage) {
+		private translate: TranslateService) {
 		this._name = this.translate.instant("SO_DO_TO_CHUC.NAME");
 	}
 
@@ -109,16 +102,14 @@ export class sodotochuceditComponent implements OnInit {
 			var _newmodel = new UpdateThongTinChucVuModel();
 			_newmodel.clear();
 			this.item = _newmodel;
-			this.NewInfoJobTitleService.SelectedNodeChanged(+this.id_cd).subscribe(res => {
+			this.apiService.SelectedNodeChanged(+this.id_cd).subscribe(res => {
 				this.item = res.data;
 				this.oldItem = Object.assign({}, res);
 				this.loadthongtin();
 				this.getTreeValue();
 				this.initLoad();
 				this.itemForm;
-
 				this.GetValueNode({ id: this.item.StructureID });
-
 			});
 			this.viewLoading = true;
 		}
@@ -130,12 +121,11 @@ export class sodotochuceditComponent implements OnInit {
 			this.danhMucService.getCapQuanLy().subscribe(res => {
 				this.listcapquanly = res.data;
 			});
-			this.itemForm.controls["ViTri"].setValue(this.data.vitriMax);
+			if (this.itemForm)
+				this.itemForm.controls["ViTri"].setValue(this.data.vitriMax);
 		}
-		// setTimeout(function () { document.getElementById('id').focus(); }, 100);
 		this.getTreeValue();
 		this.initLoad();
-		// this.loadthongtin();
 		this.changeDetectorRefs.detectChanges();
 	}
 
@@ -182,10 +172,11 @@ export class sodotochuceditComponent implements OnInit {
 	GetValueNode(val: any) {
 		this.ID_Struct = val.id;
 		this.danhMucService.GetListPositionbyStructure(this.ID_Struct).subscribe(res => {
-			if (res.data.length > 0) {
+			if (res.data && res.data.length > 0) {
 				this.danhMucService.GetListJobtitleByStructure(this.id_cd, this.ID_Struct).subscribe(res => {
 					//this.listChucVu = res.data;
-					if (res.data.length > 0) {
+					if (!this.itemForm) return;
+					if (res.data && res.data.length > 0) {
 						this.itemForm.controls['chucVu'].setValue('' + res.data[0].ID);
 					}
 					this.changeDetectorRefs.detectChanges();
@@ -216,6 +207,7 @@ export class sodotochuceditComponent implements OnInit {
 		this.item = Object.assign({}, this.oldItem);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -230,10 +222,10 @@ export class sodotochuceditComponent implements OnInit {
 	};
 
 	onSubmit(withBack: boolean = false) {
+		if (!this.itemForm) return;
 		this.itemForm.controls["StuctItem"].setValue(this.ID_Struct);
 		this.hasFormErrors = false;
 		const controls = this.itemForm.controls;
-		/** check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -242,8 +234,7 @@ export class sodotochuceditComponent implements OnInit {
 			this.selectedTab = 0;
 			return;
 		}
-		let _update = this.PrepareUpdateInfoJobtitle();
-
+		let _update = this.Prepare();
 		if (this.id_cd > 0) {
 			this.Update(_update, withBack);
 		}
@@ -266,13 +257,9 @@ export class sodotochuceditComponent implements OnInit {
 				this.ngOnInit();
 				return;
 			}
-
 			this.layoutUtilsService.showInfo(_saveMessage);
 			if (this.item.ID_ChucDanh != undefined || this.item.ID_ChucDanh == '')
 				this.filterChucDanh = this.item.ID_ChucDanh;
-			// this.danhMucService.GetListNhomChucDanhTheoChucDanh(this.filterChucDanh).subscribe(res => {
-			// 	this.listchucvu = res.data;
-			// });
 			this.ngOnInit();
 			this.changeDetectorRefs.detectChanges();
 		});
@@ -285,23 +272,13 @@ export class sodotochuceditComponent implements OnInit {
 			return result;
 		}
 		this.ShowButton = false;
-
 		result = this.translate.instant('COMMON.UPDATE') + ': ' + this.item.TenChucVu + '';
 		return result;
 	}
 
-	loadPhongBan() {
-		//this.danhMucService.GetListDepartmentbyBranch(this.filterDonVi).subscribe(res => {
-		//	this.listPhongBan = res.data;
-		//	// this.filterPhongBan = this.listPhongBan[0].IDPhongBan;
-		//	this.itemForm.controls["ID_PhongBan"].setValue('' + this.listPhongBan[0].IDPhongBan);
-		//	this.changeDetectorRefs.detectChanges();
-		//	// this.filterPhongBan = '' + this.listPhongBan[0].ID_PhongBan;
-		//});
-	}
-
 	loadChucVuTheoNhomChucDanh() {
 		this.danhMucService.GetListNhomChucDanhTheoChucDanh(this.filterChucDanh).subscribe(res => {
+			if (!this.itemForm) return;
 			this.listchucvu = res.data;
 			if (this.listchucvu && this.listchucvu.length > 0) {
 				this.filterChucVu = this.listchucvu[0].id_row;
@@ -323,15 +300,16 @@ export class sodotochuceditComponent implements OnInit {
 
 	loadTextJobTitle(id: string) {
 		this.danhMucService.GetListOnlyNhomChucDanh(id).subscribe(res => {
-			let tenchucdanh = [];
-			let tentienganh = [];
-			tenchucdanh = res.data[0].tenchucdanh;
-			tentienganh = res.data[0].tentienganh;
-			this.itemForm.controls['TenChucVu'].setValue(tenchucdanh);
+			if (!this.itemForm) return;
+			if (res.data && res.data.length > 0) {
+				let tenchucdanh = res.data[0].tenchucdanh;
+				this.itemForm.controls['TenChucVu'].setValue(tenchucdanh);
+			}
 		});
 	}
 
-	PrepareUpdateInfoJobtitle(): UpdateThongTinChucVuModel {
+	Prepare(): UpdateThongTinChucVuModel {
+		if (!this.itemForm) return new UpdateThongTinChucVuModel();
 		const controls = this.itemForm.controls;
 		const update = new UpdateThongTinChucVuModel();
 		update.TenChucVu = controls['TenChucVu'].value;
@@ -354,23 +332,21 @@ export class sodotochuceditComponent implements OnInit {
 	AddItem(item: UpdateThongTinChucVuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-		this.NewInfoJobTitleService.UpdateThongTinChucVu(item).subscribe(res => {
+		this.apiService.UpdateThongTinChucVu(item).subscribe(res => {
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
-					// document.getElementById('tieude').focus();
-					this.itemForm.controls["StuctItem"].setValue(null);
 					this.getTreeValue();
-					this.itemForm.controls["ViTri"].setValue(item.ViTri + 1);
+					if (this.itemForm) {
+						this.itemForm.controls["StuctItem"].setValue(null);
+						this.itemForm.controls["ViTri"].setValue(item.ViTri + 1);
+					}
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
 					this.changeDetectorRefs.detectChanges();
-
 				}
 			}
 			else {
@@ -380,25 +356,21 @@ export class sodotochuceditComponent implements OnInit {
 		});
 	}
 
-	Update(_item: UpdateThongTinChucVuModel, withBack: boolean) {
+	Update(item: UpdateThongTinChucVuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.NewInfoJobTitleService.UpdateThongTinChucVu(_item).subscribe(res => {
+		this.apiService.UpdateThongTinChucVu(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType,).afterDismissed().subscribe(tt => {
-					});
-					// this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
 				}
 			}
 			else {
@@ -418,7 +390,7 @@ export class sodotochuceditComponent implements OnInit {
 		this.loadingControl.next(true);
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

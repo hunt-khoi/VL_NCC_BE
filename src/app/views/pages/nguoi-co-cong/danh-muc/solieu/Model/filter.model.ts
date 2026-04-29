@@ -1,16 +1,16 @@
 import { BaseModel } from '../../../../../../core/_base/crud';
 
 export class FilterModel extends BaseModel {
-	id_row: number;
-	title: string;
-	color: string;
-	loai: string;
-	operators: string;
-	options: string;
-	value: string;
+	id_row: number = 0;
+	title: string = '';
+	color: string = '';
+	loai: string = '';
+	operators: string = '';
+	options: string = '';
+	value: string = '';
 	details: Array<FilterDetailModel> = [];
-	pheptoan: string;
-	bang: string;
+	pheptoan: string = '';
+	bang: string = '';
 	
 	clear() {
 		this.id_row = 0;
@@ -27,12 +27,13 @@ export class FilterModel extends BaseModel {
 }
 
 export class FilterDetailModel extends BaseModel {
-	id_row: number;
-	id_key: number;
-	operator: string;
-	value: string;
-	title: string;
-	StrTitle: string;
+	id_row: number = 0;
+	id_key: number = 0;
+	operator: string = '';
+	value: string = '';
+	title: string = '';
+	StrTitle: string = '';
+	
 	clear() {
 		this.id_row = 0;
 		this.id_key = 0;

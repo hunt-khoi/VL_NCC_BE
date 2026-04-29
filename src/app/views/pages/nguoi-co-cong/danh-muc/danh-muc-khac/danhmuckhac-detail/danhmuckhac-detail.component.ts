@@ -1,12 +1,11 @@
-import { TranslateService } from '@ngx-translate/core';
-import { TypesUtilsService } from './../../../../../../core/_base/crud/utils/types-utils.service';
-import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { DanhMucKhacService } from './../services/danh-muc-khac.service';
-import { CommonService } from './../../../services/common.service';
+import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
+import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
+import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
+import { CommonService } from './../../../services/common.service';
 import { DanhmuckhacModel } from './../Models/danh-muc-khac.model';
-import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
 import { ChonNhieuBieuMauListComponent, ChonNhieuDoiTuongListComponent } from '../../../components';
 
 @Component({
@@ -15,9 +14,9 @@ import { ChonNhieuBieuMauListComponent, ChonNhieuDoiTuongListComponent } from '.
 })
 
 export class DanhmuckhacDetailComponent implements OnInit {
-	item: DanhmuckhacModel;
-	oldItem: DanhmuckhacModel;
-	itemForm: FormGroup;
+	item: DanhmuckhacModel = new DanhmuckhacModel();
+	oldItem: DanhmuckhacModel = new DanhmuckhacModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -26,7 +25,7 @@ export class DanhmuckhacDetailComponent implements OnInit {
 	isZoomSize: boolean = false;
 	listLoaiGiayTo: any[] = [];
 	listDoiTuong: any[] = [];
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -47,10 +46,9 @@ export class DanhmuckhacDetailComponent implements OnInit {
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
 		private commonService: CommonService,
-		private danhmuckhacService: DanhMucKhacService,
+		private apiService: DanhMucKhacService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("LOAIHOSO.NAME");
 	}
@@ -59,6 +57,7 @@ export class DanhmuckhacDetailComponent implements OnInit {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.commonService.liteLoaiGiayTo().subscribe(res => {
 			if (res && res.status == 1)
 				this.listLoaiGiayTo = res.data;
@@ -68,13 +67,14 @@ export class DanhmuckhacDetailComponent implements OnInit {
 				this.listDoiTuong = res.data;
 		});
 		if (+this.item.Id > 0) {
-			this.danhmuckhacService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				if (res && res.status == 1) {
 					this.item = res.data;
 					if (this.item.Id_LoaiGiayTo)
 						this.chonLoaiGT(this.item.Id_LoaiGiayTo);
 					if (this.item.Id_LoaiGiayTo_CC)
 						this.chonLoaiGT(this.item.Id_LoaiGiayTo_CC, true);
+
 					this.item.GiayTos.forEach(x => {
 						let f = this.listLoaiGiayTo.find(loai => +loai.id == +x.id);
 						if (f) {
@@ -101,7 +101,8 @@ export class DanhmuckhacDetailComponent implements OnInit {
 			Id_DoiTuongNCC: [this.item.Id_DoiTuongNCC == null ? 0 : this.item.Id_DoiTuongNCC],
 		});
 
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput) 
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
@@ -109,12 +110,12 @@ export class DanhmuckhacDetailComponent implements OnInit {
 	getTitle(): string {
 		if (this.item.Id > 0)
 			return this.allowEdit ? 'Cập nhật loại hồ sơ' : 'Chi tiết loại hồ sơ';
-		else
-			return 'Thêm mới loại hồ sơ';
+		return 'Thêm mới loại hồ sơ';
 	}
 	
-	chonLoaiGT(value, isCC = false) {
+	chonLoaiGT(value: string, isCC = false) {
 		this.listLoaiGiayTo.forEach(x => {
+			if (!this.itemForm) return;
 			let llll;
 			if (isCC)
 				llll = this.itemForm.controls['Id_LoaiGiayTo'].value;
@@ -130,8 +131,8 @@ export class DanhmuckhacDetailComponent implements OnInit {
 		}
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): DanhmuckhacModel {
+	prepare(): DanhmuckhacModel {
+		if (!this.itemForm) return new DanhmuckhacModel();
 		const controls = this.itemForm.controls;
 		const _item = new DanhmuckhacModel();
 		_item.Id = this.item.Id;
@@ -156,42 +157,40 @@ export class DanhmuckhacDetailComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditDanhmucKhac = this.prepareCustomer();
-		if (EditDanhmucKhac.Id > 0) {
-			this.UpdateDanhmuc(EditDanhmucKhac, withBack);
+		const Edit = this.prepare();
+		if (Edit.Id > 0) {
+			this.Update(Edit, withBack);
 		} else {
-			this.CreateDanhmuc(EditDanhmucKhac, withBack);
+			this.Create(Edit, withBack);
 		}
 	}
 
-	UpdateDanhmuc(_item: DanhmuckhacModel, withBack: boolean) {
+	Update(item: DanhmuckhacModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.danhmuckhacService.UpdateItem(_item).subscribe(res => {
+		this.apiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -200,22 +199,21 @@ export class DanhmuckhacDetailComponent implements OnInit {
 		});
 	}
 
-	CreateDanhmuc(_item: DanhmuckhacModel, withBack: boolean) {
+	Create(item: DanhmuckhacModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.danhmuckhacService.CreateItem(_item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			}
@@ -229,11 +227,13 @@ export class DanhmuckhacDetailComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
+
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -241,13 +241,13 @@ export class DanhmuckhacDetailComponent implements OnInit {
 		this.dialogRef.close();
 	}
 	
-	change($event, loai) {
+	change($event: any, loai: any) {
 		loai.IsRequired = $event.checked;
 	}
 
-	chonBM(id_dt) {
-		let idx_dt = this.item.DoiTuongs.findIndex(x=> x.Id == id_dt)
-		let selected = this.item.DoiTuongs[idx_dt].BieuMaus.map(x => {
+	chonBM(id_dt: number) {
+		let idx_dt = this.item.DoiTuongs.findIndex((x: any) => x.Id == id_dt)
+		let selected = this.item.DoiTuongs[idx_dt].BieuMaus.map((x: any) => {
 			return { Id: x.Id, BieuMau: x.BieuMau };
 		});
 		const dialogRef = this.dialog.open(ChonNhieuBieuMauListComponent, { data: { selected: selected } });
@@ -255,16 +255,18 @@ export class DanhmuckhacDetailComponent implements OnInit {
 			if (!res) {
 				// this.item.DoiTuongs[idx_dt].BieuMaus = [];
 				return
-			} else
-				this.item.DoiTuongs[idx_dt].BieuMaus = res.Selected;
+			}
+			this.item.DoiTuongs[idx_dt].BieuMaus = res.Selected;
 		});
 	}
-	xoaBM(index, id_dt) {
-		let idx_dt = this.item.DoiTuongs.findIndex(x=> x.Id == id_dt)
+
+	xoaBM(index: number, id_dt: number) {
+		let idx_dt = this.item.DoiTuongs.findIndex((x: any) => x.Id == id_dt)
 		this.item.DoiTuongs[idx_dt].BieuMaus.splice(index, 1);
 	}
+
 	chonDT() {
-		let selected = this.item.DoiTuongs.map(x => {
+		let selected = this.item.DoiTuongs.map((x: any) => {
 			return { Id: x.Id, DoiTuong: x.DoiTuong };
 		});
 		const dialogRef = this.dialog.open(ChonNhieuDoiTuongListComponent, { data: { selected: selected } });
@@ -275,7 +277,8 @@ export class DanhmuckhacDetailComponent implements OnInit {
 				this.item.DoiTuongs = res.nhanVienSelected;
 		});
 	}
-	xoaDT(index) {
+
+	xoaDT(index: number) {
 		this.item.DoiTuongs.splice(index, 1);
 	}
 }
