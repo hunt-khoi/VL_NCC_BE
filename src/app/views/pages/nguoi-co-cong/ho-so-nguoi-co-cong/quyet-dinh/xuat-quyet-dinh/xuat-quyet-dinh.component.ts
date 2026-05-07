@@ -59,7 +59,6 @@ export class XuatQuyetDinhComponent implements OnInit {
 		private tokenStorage: TokenStorage) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.commonService.liteConstLoaiQuyetDinh(true).subscribe(res => {
@@ -269,10 +268,7 @@ export class XuatQuyetDinhComponent implements OnInit {
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -289,7 +285,7 @@ export class XuatQuyetDinhComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();

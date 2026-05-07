@@ -240,7 +240,6 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 		});
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		if (!this.searchInput) return;
 		const filter: any = {};
@@ -262,7 +261,6 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 		return filter;
 	}
 
-	/** ACTIONS */
 	LoadDataList(page: boolean = false) {
 		if (!this.sort || !this.paginator || !this.dataSource) return;
 		this.selection.clear();
@@ -278,9 +276,7 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 
 	//chọn cán bộ
 	selectItems(_item: ChonNhieuNhanVienListModel) {
-		this.dialogRef.close({
-			_item
-		});
+		this.dialogRef.close({ _item });
 	}
 
 	close() {
@@ -329,6 +325,7 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 		const numRows = this.availableColumns.length;
 		return numSelected === numRows;
 	}
+
 	CheckAllColumns() {
 		if (this.IsAllColumnsChecked()) {
 			this.availableColumns.forEach(row => { if (!row.alwaysChecked) this.selectedColumns.deselect(row); });
@@ -344,7 +341,6 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 	}
 
 	goBack(id = 0) {
-
 		if (this.selection.selected.length > 0 && id == 1)
 			this.dialogRef.close({ done: true, nhanVienSelected: this.selected });
 		else

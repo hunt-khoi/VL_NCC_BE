@@ -30,9 +30,6 @@ export class FilterComponent implements OnInit {
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	filterStatus = '';
 	filterCondition = '';
-	// Selection
-	selection = new SelectionModel<FilterModel>(true, []);
-	productsResult: FilterModel[] = [];
 	_name = "";
 
 	gridModel: TableModel | undefined;
@@ -54,7 +51,6 @@ export class FilterComponent implements OnInit {
 		this._name = 'Trích xuất';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
@@ -147,7 +143,7 @@ export class FilterComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();
@@ -162,14 +158,6 @@ export class FilterComponent implements OnInit {
 			if (this.dataSource) {
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}
@@ -232,7 +220,6 @@ export class FilterComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
 

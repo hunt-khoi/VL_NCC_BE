@@ -19,16 +19,11 @@ import { CommonService } from '../../../services/common.service';
 })
 
 export class HolidaysListComponent implements OnInit {
-	
 	// Table fields
 	dataSource: HolidaysDataSource | undefined;
 	displayedColumns = ['STT', 'Title', 'Ngay','GhiChu','UpdatedDate','UpdatedBy', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-
-	// Selection
-	selection = new SelectionModel<HolidaysModel>(true, []);
-	productsResult: HolidaysModel[] = [];
 	_name: string = "";
 	list_button: boolean = false;
 
@@ -40,10 +35,9 @@ export class HolidaysListComponent implements OnInit {
 		this._name = this.translate.instant("NGAYLE.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-				if (this.sort && this.paginator) {
+		if (this.sort && this.paginator) {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
@@ -62,14 +56,6 @@ export class HolidaysListComponent implements OnInit {
 			if (this.dataSource) { 
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}

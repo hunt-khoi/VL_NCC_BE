@@ -1,16 +1,14 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { hdsdService } from '../Services/hdsd.service';
-import { hdsdDataSource } from '../Model/data-sources/hdsd.datasource';
-import { SubheaderService } from '../../../../core/_base/layout';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../core/_base/crud';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
+import { hdsdService } from '../Services/hdsd.service';
+import { hdsdDataSource } from '../Model/data-sources/hdsd.datasource';
 import { HDSDEditDialogComponent } from '../hdsd-edit/hdsd-edit.dialog.component';
 
 @Component({
@@ -25,22 +23,17 @@ export class hdsdListComponent implements OnInit {
 	displayedColumns = ['STT', 'HDSD', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	listchucdanh: any[] = [];
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
-	showTruyCapNhanh: boolean = true;
+
 	_name: string = '';
 	list_button: boolean = false;
-	ver: any={};
-	rR: any={};
+	btnClass: string = "";
+	ver: any = {};
+	rR: any = {};
 	verS: string = "";
 
 	constructor(public apiService: hdsdService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
-		public subheaderService: SubheaderService,
 		private layoutUtilsService: LayoutUtilsService,
 		private tokenStorage: TokenStorage,
 		private changeDetectorRefs: ChangeDetectorRef,
@@ -48,9 +41,10 @@ export class hdsdListComponent implements OnInit {
 			this._name = this.translate.instant('HDSD.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		this.apiService.getVersion().subscribe(res => {
 			this.ver = res.data;
 			this.changeDetectorRefs.detectChanges();
@@ -79,14 +73,6 @@ export class hdsdListComponent implements OnInit {
 			if (this.dataSource) { 
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}
@@ -123,7 +109,7 @@ export class hdsdListComponent implements OnInit {
 		});
 	}
 
-	delete(item: any) {
+	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });

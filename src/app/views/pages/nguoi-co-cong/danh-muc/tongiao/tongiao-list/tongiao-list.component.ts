@@ -24,9 +24,6 @@ export class tongiaoListComponent implements OnInit {
 	displayedColumns = ['Id_row', 'Tentongiao','Priority','NguoiCapNhat','NgayCapNhat', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Selection
-	selection = new SelectionModel<tongiaoModel>(true, []);
-	productsResult: tongiaoModel[] = [];
 	_name: string = '';
 	list_button: boolean = false;
 	btnClass: string = "";
@@ -62,14 +59,6 @@ export class tongiaoListComponent implements OnInit {
 			if (this.dataSource) {
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}

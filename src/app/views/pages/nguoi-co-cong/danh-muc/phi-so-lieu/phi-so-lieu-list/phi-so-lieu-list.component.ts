@@ -27,7 +27,6 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-
 	// Filter fields
 	curUser: any = {};
 	// Selection
@@ -52,7 +51,6 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 	}
     
 
-  /** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
@@ -143,7 +141,7 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();
@@ -156,7 +154,7 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 		let queryParams = new QueryParamsModel({});
 		this.route.queryParams.subscribe(_ => {
 			if (this.dataSource) {
-				let queryParams = this.apiService.lastFilter$.getValue();
+				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
 			}
 		});

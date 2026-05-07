@@ -79,7 +79,6 @@ export class DoiTuongNguoiCoCongListComponent implements OnInit {
 		this._UPDATED_DATE = this.translate.instant('COMMON.UPDATED_DATE');
 	}
 
-
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
@@ -219,7 +218,7 @@ export class DoiTuongNguoiCoCongListComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();

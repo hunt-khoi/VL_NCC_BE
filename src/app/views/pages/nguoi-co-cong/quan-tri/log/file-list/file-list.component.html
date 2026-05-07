@@ -24,7 +24,7 @@
 			<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell" style="flex: 0 0 8%">
 				{{'COMMON.STT'|translate}}
 			</th>
-			<td mat-cell *matCellDef="let dantoc; let i=index" class="mat-column-vinCode stt-cell" style="flex: 0 0 8%">
+			<td mat-cell *matCellDef="let i=index" class="mat-column-vinCode stt-cell" style="flex: 0 0 8%">
 				{{i+1}}
 			</td>
 		</ng-container>
@@ -32,21 +32,21 @@
 			<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode" mat-sort-header style="flex: 0 0 55%">
 				File log
 			</th>
-			<td mat-cell *matCellDef="let dantoc" class="mat-column-vinCode" style="flex: 0 0 55%">
-				<a href="viewer/file-dinh-kem/0?path={{dantoc.path}}">{{dantoc.Name}}</a>
+			<td mat-cell *matCellDef="let item" class="mat-column-vinCode" style="flex: 0 0 55%">
+				<a href="viewer/file-dinh-kem/0?path={{item.path}}">{{item.Name}}</a>
 			</td>
 		</ng-container>
 		<ng-container matColumnDef="actions">
 			<th mat-header-cell *matHeaderCellDef style="width: 100px;">
 				<span translate="COMMON.TACVU"></span>
 			</th>
-			<td mat-cell *matCellDef="let dantoc" class="action-cell" [ngClass]="list_button?'list-button':''">
-				<a href="viewer/file-dinh-kem/0?path={{dantoc.path}}" target="_blank" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
+			<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">
+				<a href="viewer/file-dinh-kem/0?path={{item.path}}" target="_blank" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
 				   matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" type="button">
 					<mat-icon>visibility</mat-icon>
 					<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 				</a>
-				<button (click)="Download(dantoc)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
+				<button (click)="Download(item)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
 						matTooltip="{{ 'COMMON.DOWNLOAD' | translate }}" color="info" type="button">
 					<mat-icon>cloud_download</mat-icon>
 					<span class="button-text">{{ 'COMMON.DOWNLOAD' | translate }}</span>
@@ -67,5 +67,7 @@
 
 <div class="mat-table__bottom" style="margin-top: 1px;">
 	<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-	<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+	<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" 
+		[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+	</mat-paginator>
 </div>

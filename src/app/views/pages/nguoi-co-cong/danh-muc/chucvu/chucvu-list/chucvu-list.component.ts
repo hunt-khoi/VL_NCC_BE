@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
@@ -24,9 +23,7 @@ export class chucvuListComponent implements OnInit {
     displayedColumns = ['STT','Id_row', 'Tenchucdanh', 'Tentienganh', 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
 	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-    // Selection
-    selection = new SelectionModel<chucvuModel>(true, []);
-    productsResult: chucvuModel[] = [];
+
 	filter: any = {};
 	_name = "";
 	list_button: boolean = false;
@@ -63,14 +60,6 @@ export class chucvuListComponent implements OnInit {
 			if (this.dataSource) {
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
     }

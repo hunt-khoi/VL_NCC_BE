@@ -23,8 +23,8 @@ export class DieuKienListComponent implements OnInit, OnChanges {
 	loading$ = this.loadingSubject.asObservable();
 	//==========================
 	loadingControl = new BehaviorSubject<boolean>(false);
-	item: NhapQuyTrinhDuyetModel;
-	oldItem: NhapQuyTrinhDuyetModel;
+	item: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
+	oldItem: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
 	hasFormErrors: boolean = false;
 	//==========================
 	showButton: boolean = false;
@@ -50,8 +50,6 @@ export class DieuKienListComponent implements OnInit, OnChanges {
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef) { }
 
-
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.viewLoading = true;

@@ -80,7 +80,6 @@ export class ChonNhieuDungCuListComponent implements OnInit {
 		});
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		if (!this.searchInput) return;
 		const filter: any = {};
@@ -89,7 +88,6 @@ export class ChonNhieuDungCuListComponent implements OnInit {
 		return filter;
 	}
 
-	/** ACTIONS */
 	LoadDataList(page: boolean = false) {
 		if (!this.sort || !this.paginator || !this.dataSource) return;
 		this.selection.clear();
@@ -105,9 +103,7 @@ export class ChonNhieuDungCuListComponent implements OnInit {
 
 	//chọn cán bộ
 	selectItems(_item: any) {
-		this.dialogRef.close({
-			_item
-		});
+		this.dialogRef.close({ _item });
 	}
 
 	close() {

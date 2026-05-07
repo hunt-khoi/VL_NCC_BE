@@ -23,7 +23,6 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class QuaTrinhHoatDongListComponent implements OnInit {
-
 	// Table fields
 	dataSource: QuaTrinhHoatDongDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
@@ -55,7 +54,6 @@ export class QuaTrinhHoatDongListComponent implements OnInit {
 			this._name = this.translate.instant('QT_HOATDONG.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		var arr = this.router.url.split("/");
@@ -176,10 +174,7 @@ export class QuaTrinhHoatDongListComponent implements OnInit {
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -196,7 +191,7 @@ export class QuaTrinhHoatDongListComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();
@@ -247,7 +242,6 @@ export class QuaTrinhHoatDongListComponent implements OnInit {
 		return filter;
 	}
 
-	/** Delete */
 	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });

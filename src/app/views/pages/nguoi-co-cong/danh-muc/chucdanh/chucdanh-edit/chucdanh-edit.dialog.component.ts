@@ -15,7 +15,6 @@ export class ChucDanhEditDialogComponent implements OnInit {
 	item: ChucDanhModel = new ChucDanhModel();
 	oldItem: ChucDanhModel = new ChucDanhModel();
 	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -104,7 +103,6 @@ export class ChucDanhEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
@@ -112,10 +110,9 @@ export class ChucDanhEditDialogComponent implements OnInit {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
-		const Edit= this.prepare();
+		const Edit = this.prepare();
 		if (Edit.Id_CV > 0) {
 			this.Update(Edit, withBack);
 		} else {
@@ -175,7 +172,6 @@ export class ChucDanhEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
 		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();

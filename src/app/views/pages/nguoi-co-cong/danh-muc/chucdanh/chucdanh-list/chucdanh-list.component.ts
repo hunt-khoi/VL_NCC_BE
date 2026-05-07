@@ -26,9 +26,6 @@ export class ChucDanhListComponent implements OnInit {
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	listDonVi: any[] = [];
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	//=================PageSize Table=====================
 	pageSize: number = 0;
 	_name = "";
@@ -66,14 +63,6 @@ export class ChucDanhListComponent implements OnInit {
 			if (this.dataSource) {
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}

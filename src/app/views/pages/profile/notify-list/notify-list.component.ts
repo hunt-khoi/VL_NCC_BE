@@ -47,7 +47,6 @@ export class NotifyListComponent implements OnInit {
 			this._name = 'Thông báo';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.Capcocau = res.Capcocau;
@@ -155,12 +154,10 @@ export class NotifyListComponent implements OnInit {
 		let _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		let _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		let _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
-		let _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
 		if (!isDelete) {
 			_title = "Đánh dấu tất cả là đã đọc";
 			_description = "Bạn có chắc muốn đánh dấu tất cả là đã đọc";
 			_waitDesciption = "Đang đánh dấu tất cả là đã đọc";
-			_deleteMessage = "Đánh dấu tất của là đã đọc thành công";
 		}
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {

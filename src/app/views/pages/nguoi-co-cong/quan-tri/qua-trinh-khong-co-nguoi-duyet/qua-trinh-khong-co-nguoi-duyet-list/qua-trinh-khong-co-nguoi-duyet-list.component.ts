@@ -49,17 +49,16 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 		private ref: ApplicationRef,
 		private layoutUtilsService: LayoutUtilsService) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.dataService.GetListLoai().subscribe(res => {
-			if (res && res.data) {
+			if (res && res.data) 
 				this.listLoai = res.data;
-			}
 			else
 				this.layoutUtilsService.showError(res.error.message);
 			this.changeDetect.detectChanges();
 		});
+
 		let availableColumns = [
 			{
 				stt: 1,
@@ -142,7 +141,7 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadList();
@@ -181,7 +180,6 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 		this.dataSource.loadData(queryParams);
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		const filter: any = {};
 		filter.Loai = this.selectedLoai;

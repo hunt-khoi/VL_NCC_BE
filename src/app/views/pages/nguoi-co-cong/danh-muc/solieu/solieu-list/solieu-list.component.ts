@@ -30,9 +30,6 @@ export class solieuListComponent implements OnInit {
 
 	filterStatus = '';
 	filterCondition = '';
-	// Selection
-	selection = new SelectionModel<solieuModel>(true, []);
-	productsResult: solieuModel[] = [];
 	_name = "";
 
 	gridModel: TableModel | undefined;
@@ -51,7 +48,6 @@ export class solieuListComponent implements OnInit {
 			this._name = this.translate.instant("SO_LIEU.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
@@ -191,7 +187,7 @@ export class solieuListComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();
@@ -206,14 +202,6 @@ export class solieuListComponent implements OnInit {
 			if (this.dataSource) {
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}

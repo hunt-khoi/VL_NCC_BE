@@ -101,8 +101,6 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef) { }
 
-
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.viewLoading = true;

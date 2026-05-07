@@ -98,7 +98,7 @@ export class ChonVaiTroComponent implements OnInit {
 		// Init DataSource
 		this.dataSource = new ChonVaiTroDataSource(this.commonService);
 		let queryParams = new QueryParamsModel({});
-		this.route.queryParams.subscribe(params => {
+		this.route.queryParams.subscribe(_ => {
 			queryParams.filter.filterCap = this.filterCap;
 			if (this.filterCap == "5")
 				queryParams.filter.filterCapN = this.data.filterCapN;
@@ -120,7 +120,7 @@ export class ChonVaiTroComponent implements OnInit {
 				}
 			}
 			this.tmpitem = []
-			if (this.item != null) {
+			if (this.item != null && this.paginator) {
 				if (this.item.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadVaiTro(true);
 				} else {
@@ -146,7 +146,6 @@ export class ChonVaiTroComponent implements OnInit {
 			this.sort.active,
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
 			this.paginator.pageSize,
-
 		);
 		this.dataSource.LoadData(queryParams);
 	}
@@ -159,7 +158,6 @@ export class ChonVaiTroComponent implements OnInit {
 		this.dialogRef.close(re);
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		const filter: any = {};
 		if (this.DonVi > 0)
@@ -173,14 +171,17 @@ export class ChonVaiTroComponent implements OnInit {
 			filter.emptyRow = this.data.emptyRow
 		return filter;
 	}
+
 	closeDialog(data: any) {
 		this.dialogRef.close(data);
 	}
+
 	select(data: any) {
 		if (this.multi)
 			return;
 		this.dialogRef.close(data);
 	}
+
 	/** SELECTION */
 	isAllSelected() {
 		const numSelected = this.selection.selected.length;

@@ -38,8 +38,8 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 	//==========================
 	itemForm: FormGroup | undefined;
 	loadingControl = new BehaviorSubject<boolean>(false);
-	item: NhapQuyTrinhDuyetModel;
-	oldItem: NhapQuyTrinhDuyetModel;
+	item: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
+	oldItem: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
 	hasFormErrors: boolean = false;
 	//==========================
 	showButton: boolean = false;
@@ -55,7 +55,6 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.loadingSubject.next(true);
@@ -82,8 +81,6 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 		});
 		this.loadDataList();
 	}
-
-	/** ACTIONS */
 
 	//------------Load data-------------------------
 	loadDataList(holdCurrentPage: boolean = true) {

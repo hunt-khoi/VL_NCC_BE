@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
@@ -24,9 +23,6 @@ export class dantocListComponent implements OnInit {
 	displayedColumns = ['Id_row', 'Tendantoc','Priority','NguoiCapNhat','NgayCapNhat', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Selection
-	selection = new SelectionModel<dantocModel>(true, []);
-	productsResult: dantocModel[] = [];
 	_name: string = '';
 	list_button: boolean = false;
 	btnClass: string = "";
@@ -62,14 +58,6 @@ export class dantocListComponent implements OnInit {
 			if (this.dataSource) {
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}
@@ -112,9 +100,8 @@ export class dantocListComponent implements OnInit {
 		this.Update(dantocModels);
 	}
 
-	Update(_item: dantocModel, allowEdit:boolean=true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id_row > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+	Update(_item: dantocModel, allowEdit: boolean = true) {
+		let saveMessageTranslateParam = _item.Id_row > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(dantocEditDialogComponent, { data: { _item, allowEdit} });
 		dialogRef.afterClosed().subscribe(res => {

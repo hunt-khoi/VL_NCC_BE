@@ -40,7 +40,6 @@ export class capquanlyListComponent implements OnInit {
 		this._name = this.translate.instant("CAP_QL.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
@@ -87,7 +86,6 @@ export class capquanlyListComponent implements OnInit {
 		this.dataSource.loadList(queryParams);	
 	}
 
-	/** Delete */
 	Delete(item: capquanlyModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });

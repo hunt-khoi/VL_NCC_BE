@@ -38,7 +38,6 @@ export class ChonNhieuDoiTuongListComponent implements OnInit {
 		}
 	];
 	selectedColumns = new SelectionModel<any>(true, this.availableColumns);
-	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 
@@ -50,8 +49,8 @@ export class ChonNhieuDoiTuongListComponent implements OnInit {
 
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
-
 	disabledBtn: boolean = false;
+
 	constructor(public dialogRef: MatDialogRef<ChonNhieuDoiTuongListComponent>,
 		private service: CommonService,
 		@Inject(MAT_DIALOG_DATA) public data: any,
@@ -90,7 +89,6 @@ export class ChonNhieuDoiTuongListComponent implements OnInit {
 		});
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		if (!this.searchInput) return;
 		const filter: any = {};
@@ -99,7 +97,6 @@ export class ChonNhieuDoiTuongListComponent implements OnInit {
 		return filter;
 	}
 
-	/** ACTIONS */
 	LoadDataList(page: boolean = false) {
 		if (!this.sort || !this.paginator || !this.dataSource) return;
 		this.selection.clear();

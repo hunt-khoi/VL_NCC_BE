@@ -29,7 +29,6 @@ export class ChonNhieuBieuMauListComponent implements OnInit {
 		}
 	];
 	selectedColumns = new SelectionModel<any>(true, this.availableColumns);
-	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 
@@ -79,7 +78,6 @@ export class ChonNhieuBieuMauListComponent implements OnInit {
 		});
 	}
 	
-	/** FILTRATION */
 	filterConfiguration(): any {
 		if (!this.searchInput) return;
 		const filter: any = {};
@@ -88,7 +86,6 @@ export class ChonNhieuBieuMauListComponent implements OnInit {
 		return filter;
 	}
 
-	/** ACTIONS */
 	LoadDataList(page: boolean = false) {
 		if (!this.sort || !this.paginator || !this.dataSource) return;
 		this.selection.clear();
@@ -102,11 +99,8 @@ export class ChonNhieuBieuMauListComponent implements OnInit {
 		this.dataSource.loadList_Emp(queryParams);
 	}
 
-	//chọn 
 	selectItems(_item: ChonNhieuBieuMauListModel) {
-		this.dialogRef.close({
-			_item
-		});
+		this.dialogRef.close({ _item });
 	}
 
 	close() {
@@ -171,7 +165,6 @@ export class ChonNhieuBieuMauListComponent implements OnInit {
 	}
 
 	goBack(id = 0) {
-
 		if (this.selection.selected.length > 0 && id == 1)
 			this.dialogRef.close({ done: true, Selected: this.selected });
 		else

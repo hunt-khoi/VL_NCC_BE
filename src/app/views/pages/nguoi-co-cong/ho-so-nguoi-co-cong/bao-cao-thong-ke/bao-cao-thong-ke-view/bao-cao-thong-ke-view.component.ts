@@ -64,7 +64,6 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 		private tokenStorage: TokenStorage) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		let tmp = moment();
 		let y = tmp.get("year");
@@ -274,10 +273,7 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -294,7 +290,7 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();

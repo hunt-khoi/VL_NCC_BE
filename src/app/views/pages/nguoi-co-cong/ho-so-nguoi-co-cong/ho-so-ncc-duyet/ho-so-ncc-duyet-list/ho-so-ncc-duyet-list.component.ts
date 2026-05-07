@@ -68,7 +68,6 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			this._name = 'Hồ sơ người có công';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.selection = new SelectionModel<any>(true, []);
@@ -326,7 +325,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();

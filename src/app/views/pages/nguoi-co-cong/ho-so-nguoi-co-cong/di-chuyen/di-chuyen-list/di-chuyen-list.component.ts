@@ -59,7 +59,6 @@ export class DiChuyenListComponent implements OnInit {
 		this._name = this.translate.instant('DICHUYEN.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		var arr = this.router.url.split("/");
@@ -194,7 +193,7 @@ export class DiChuyenListComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();

@@ -22,9 +22,6 @@ export class FileListComponent implements OnInit {
 	displayedColumns = ['STT', 'Name', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	folder: string = 'theochucnang';
 	list_button: boolean = false;
 
@@ -34,7 +31,6 @@ export class FileListComponent implements OnInit {
 		private translate: TranslateService) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		if (this.sort && this.paginator) {
@@ -56,14 +52,6 @@ export class FileListComponent implements OnInit {
 			if (this.dataSource) { 
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadListFile(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}

@@ -27,7 +27,7 @@ export class QuanHeGiaDinhListComponent implements OnInit {
 	displayedColumns = ['STT', 'Id', 'QuanHeGiaDinh', 'Priority', 'Locked', 'CreatedBy',
 		'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
 	
-		@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterStatus = '';
