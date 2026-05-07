@@ -321,12 +321,11 @@ export class dungcuchinhhinhListComponent implements OnInit {
     Add() {
         const dataModel = new dungcuchinhhinhModel();
         dataModel.clear(); // Set all defaults fields
-        this.EditDungCu(dataModel);
+        this.Edit(dataModel);
     }
 
-    EditDungCu(_item: dungcuchinhhinhModel, allowEdit: boolean = true, allowUpdateCost: boolean = false) {
+    Edit(_item: dungcuchinhhinhModel, allowEdit: boolean = true, allowUpdateCost: boolean = false) {
         let saveMessageTranslateParam = _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE'; 
-        //thông báo khi thực hiện trong tác vụ
         const _saveMessage = this.translate.instant(saveMessageTranslateParam, {name:this._name});
         const dialogRef = this.dialog.open(dungcuchinhhinhEditDialogComponent, { data: { _item, allowEdit, allowUpdateCost } });
         dialogRef.afterClosed().subscribe(res => {
@@ -337,7 +336,6 @@ export class dungcuchinhhinhListComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_saveMessage);
                 this.loadDataList();
             }
-
         });
     }
 
