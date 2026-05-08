@@ -17,6 +17,16 @@
 		}
 	}
 	@media print { @page { size: A4 landscape; } }
+
+	.dt-overflow {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 250px;
+		word-break: break-word;
+	}
 </style>
 <kt-portlet>
 	<kt-portlet-header [sticky]="true" id="inheader" [title]="'Danh sách người dùng'" 
@@ -126,12 +136,12 @@
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="Email">
-					<th mat-header-cell *matHeaderCellDef>
+					<th mat-header-cell *matHeaderCellDef style="max-width: 80px">
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Email"
 							column_title="Email"></kt-column-filter>
 					</th>
-					<td mat-cell class="m--padding-10 td-padding" *matCellDef="let item">
-						{{item.Email}}
+					<td mat-cell class="m--padding-10 td-padding" *matCellDef="let item" style="max-width: 80px">
+						<div class="dt-overflow" matTooltip="{{item.Email}}">{{item.Email}}</div>
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="PhoneNumber">
@@ -153,11 +163,11 @@
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="Active">
-					<th style="white-space: nowrap;" mat-header-cell *matHeaderCellDef>
+					<th mat-header-cell *matHeaderCellDef style="max-width: 90px">
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Active"
 							column_title="Tình trạng"></kt-column-filter>
 					</th>
-					<td mat-cell [ngClass]="{'m--padding-10': true}" style="white-space: nowrap; text-align: left" *matCellDef="let item">
+					<td mat-cell [ngClass]="{'m--padding-10': true}" style="text-align: left; max-width: 90px" *matCellDef="let item">
 						<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide 
 							{{getItemCssClassByStatus(item.Active)}}">{{getItemStatusString(item.Active)}}</span>
 					</td>

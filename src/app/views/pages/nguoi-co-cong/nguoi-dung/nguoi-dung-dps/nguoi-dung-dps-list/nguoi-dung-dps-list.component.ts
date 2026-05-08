@@ -195,21 +195,21 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 				name: 'Email',
 				displayName: 'Email',
 				alwaysChecked: false,
-				isShow: true
+				isShow: false
 			},
 			{
 				stt: 10,
 				name: 'PhoneNumber',
 				displayName: 'Số điện thoại',
 				alwaysChecked: false,
-				isShow: true
+				isShow: false
 			},
 			{
 				stt: 11,
 				name: 'ExpDate',
 				displayName: 'Ngày hết hạn',
 				alwaysChecked: false,
-				isShow: true
+				isShow: false
 			},
 			{
 				stt: 12,
