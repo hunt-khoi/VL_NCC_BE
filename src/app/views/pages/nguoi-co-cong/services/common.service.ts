@@ -793,9 +793,9 @@ export class CommonService {
 		const url = environment.ApiRoot + '/lite/GetListProvinces';
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	GetListDistrictByProvinces(idTinh: any): Observable<any> {
+	GetListDistrictByProvinces(id_provinces: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = environment.ApiRoot + '/lite/GetListDistrictByProvinces?id_provinces=' + idTinh;
+		const url = environment.ApiRoot + '/lite/GetListDistrictByProvinces?id_provinces=' + id_provinces;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	GetListWardByDistrict(id_district: any): Observable<any> {
@@ -808,9 +808,14 @@ export class CommonService {
 		const url = environment.ApiRoot + '/lite/GetListKhomApByWard?id_ward=' + id_ward;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	GetListWardByProvince(idTinh: any): Observable<any> { //sau sáp nhập
+	GetListWardByProvince(id_provinces: any): Observable<any> { //sau sáp nhập
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = environment.ApiRoot + '/lite/GetListWardByProvince?id_provinces=' + idTinh;
+		const url = environment.ApiRoot + '/lite/GetListWardByProvince?id_provinces=' + id_provinces;
+		return this.http.get<any>(url, { headers: httpHeaders });
+	}
+	GetListKhomApByWard2(id_ward: any): Observable<any> {
+		const httpHeaders = this.httpUtils.getHTTPHeaders();
+		const url = environment.ApiRoot + '/lite/GetListKhomApByWard2?id_ward=' + id_ward;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	//#endregion
@@ -858,9 +863,8 @@ export class CommonService {
 	TreeDonVi(type: number = 0, idParent: number = 0, locked: boolean = false): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		var url = environment.ApiRoot + `/lite/DM_PhongBan_Tree?Id=${idParent}&Locked=${locked}`;
-		if (type == 1) {//đơn vị theo cơ cấu
+		if (type == 1) //đơn vị theo cơ cấu
 			url = environment.ApiRoot + `/lite/DM_PhongBan_Tree_CC?Id=${idParent}&Locked=${locked}`;
-		}
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	TreeDonViByParent(Id: number): Observable<any> {

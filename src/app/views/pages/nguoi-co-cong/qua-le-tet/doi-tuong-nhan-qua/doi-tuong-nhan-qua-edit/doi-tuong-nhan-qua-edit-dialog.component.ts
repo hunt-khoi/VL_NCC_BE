@@ -367,7 +367,7 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 	}
 
 	loadKhomAp() {
-		this.commonService.GetListKhomApByWard(this.filterward).subscribe(res => {
+		this.commonService.GetListKhomApByWard2(this.filterward).subscribe(res => {
 			this.listKhomAp = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});

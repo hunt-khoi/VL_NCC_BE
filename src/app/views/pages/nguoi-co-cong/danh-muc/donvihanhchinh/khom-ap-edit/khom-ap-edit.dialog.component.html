@@ -3,8 +3,7 @@
 		<mat-icon>clear</mat-icon>
 	</button>
 </div>
-<div class="kt-portlet"
-	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+<div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
 	<div class="kt-portlet__head kt-portlet__head__custom">
 		<div class="col-md-{{item.RowID == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
 			 style="margin-top: 20px;">
@@ -26,19 +25,24 @@
 			<div class="form-group kt-form__group row">
 				<div class="col-md-12 kt--margin-bottom-10-mobile">
 					<mat-form-field class="mat-form-field-fluid">
-						<mat-select formControlName="tinh" placeholder="{{'PROVINCE.NAME' | translate}}" [disabled]="true"
+						<mat-select placeholder="{{'PROVINCE.NAME' | translate}}" [disabled]="true"
 							(selectionChange)="loadTinhThanhChange(id_provinces)" required [(value)]="id_provinces">
-							<mat-option value="{{hv.id_row}}" *ngFor="let hv of listTinh">
+							<mat-option [value]="hv.id_row" *ngFor="let hv of listTinh">
 								{{hv.Province}}
 							</mat-option>
 						</mat-select>
-						<mat-error>{{'PROVINCE.NAME'|translate : {name:this._name} }}</mat-error>
 					</mat-form-field>
 				</div>
 				<div class="col-md-12 kt--margin-bottom-10-mobile">
 					<mat-form-field class="mat-form-field-fluid">
 						<mat-select formControlName="xa" placeholder="{{'WARD.NAME' | translate}}" required>
-							<mat-option value="{{hv.ID_Row}}" *ngFor="let hv of listXa">
+							<mat-option>
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'"
+									[noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrlXa"
+									[ngModelOptions]="{standalone: true}" (ngModelChange)="filterXa()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option value="{{hv.ID_Row}}" *ngFor="let hv of filteredListXa | async">
 								{{hv.Ward}}
 							</mat-option>
 						</mat-select>

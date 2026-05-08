@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReplaySubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
@@ -22,14 +23,15 @@ export class KhomApEditDialogComponent implements OnInit {
 	listprovinces: any[] = [];
 	listTinh: any[] = [];
 	listXa: any[] = [];
-	id_provinces: string = "";
+	id_provinces: number = 0;
+	FilterCtrlXa: string = '';
+	filteredListXa: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
 	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	_name: string = "";
 
-	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
@@ -70,8 +72,6 @@ export class KhomApEditDialogComponent implements OnInit {
 	createForm() {
 		this.itemForm = this.fb.group({
 			wardName: [this.item.Title, Validators.required],
-			tinh: ['' + this.id_provinces, Validators.required],
-			huyen: ['' + this.item.DistrictID, Validators.required],
 			xa: ['' + this.item.WardID, Validators.required],
 		});
 		if (!this.allowEdit)
@@ -83,7 +83,7 @@ export class KhomApEditDialogComponent implements OnInit {
 		if (!this.item || !this.item.RowID) {
 			return result;
 		}
-		result = this.translate.instant('COMMON.UPDATE') + ` - ${this.item.WardName}`;
+		result = this.translate.instant('COMMON.UPDATE') + ` - ${this.item.Title}`;
 		return result;
 	}
 
@@ -92,8 +92,8 @@ export class KhomApEditDialogComponent implements OnInit {
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		_item.RowID = this.item.RowID;
-		_item.Title = controls['wardName'].value; // lấy tên biến trong formControlName
-		_item.WardID = controls['xa'].value; // lấy tên biến trong formControlName
+		_item.Title = controls['wardName'].value; 
+		_item.WardID = controls['xa'].value; 
 		return _item;
 	}
 
@@ -151,10 +151,26 @@ export class KhomApEditDialogComponent implements OnInit {
 	}
 
 	loadTinhThanhChange(idtinh: any) {
-		// this.danhMucService.GetListDistrictByProvinces(idtinh).subscribe(res => {
-		// 	this.listHuyen = res.data;
-		// 	this.changeDetectorRefs.detectChanges();
-		// });
+		this.danhMucService.GetListWardByProvince(idtinh).subscribe(res => {
+			this.listXa = res.data;
+			this.filteredListXa.next(this.listXa);
+			this.changeDetectorRefs.detectChanges();
+		});
+	}
+
+	filterXa() {
+		if (!this.listXa) { return; }
+		let search = this.FilterCtrlXa;
+		if (!search) {
+			this.filteredListXa.next(this.listXa.slice());
+			return;
+		} else {
+			search = search.toLowerCase();
+		}
+		this.filteredListXa.next(
+			this.listXa.filter(xa => xa.Ward.toLowerCase().indexOf(search) > -1)
+		);
+		this.changeDetectorRefs.detectChanges();
 	}
 
 	onAlertClose() {

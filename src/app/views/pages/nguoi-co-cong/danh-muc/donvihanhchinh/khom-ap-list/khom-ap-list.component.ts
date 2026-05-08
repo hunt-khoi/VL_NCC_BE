@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { BehaviorSubject, merge, ReplaySubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
@@ -27,20 +27,19 @@ export class KhomApListComponent implements OnInit {
 	displayedColumns = ['RowID','Title', 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-
 	// Filter fields
 	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterward = '';
 	listward: any[] = [];
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
+	FilterCtrlWard: string = '';
+	filteredListWard: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 	_name = '';
 
     gridService: TableService | undefined;
     gridModel: TableModel | undefined;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		public apiService: donvihanhchinhService,
@@ -56,30 +55,24 @@ export class KhomApListComponent implements OnInit {
 		this._name = 'Khóm, ấp';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-		// Load unit list
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		this.danhMucService.GetAllProvinces().subscribe(res => {
 			this.listprovinces = res.data;
-			// this.filterprovinces = this.listprovinces[0].Id_row + '';
-			// this.loadDataList();
 		});
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.filterprovinces = res.IdTinh;
-			// this.loadQuanHuyenChange();
+			this.loadWard();
 		})
 
 		this.gridModel = new TableModel();
 		this.gridModel.clear();
 		this.gridModel.haveFilter = true;
-		this.gridModel.tmpfilterText = Object.assign(
-			{},
-			this.gridModel.filterText
-		);
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText.WardName = '';
 		this.gridModel.filterText.Title = '';
-		this.gridModel.filterText.DistrictName = '';
 
 		const availableColumns = [ 
 			{
@@ -126,11 +119,7 @@ export class KhomApListComponent implements OnInit {
 		];
 
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
-
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -161,14 +150,6 @@ export class KhomApListComponent implements OnInit {
 				this.dataSource.loadListKhomAp(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -191,19 +172,16 @@ export class KhomApListComponent implements OnInit {
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.WardName = this.gridService.model.filterText.WardName;
 			filter.Title = this.gridService.model.filterText.Title;
-			filter.DistrictName = this.gridService.model.filterText.DistrictName?this.gridService.model.filterText.DistrictName:'';
 		}
 		return filter;
 
 	}
 
-	/** Delete */
 	Delete(item: any) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
@@ -242,12 +220,28 @@ export class KhomApListComponent implements OnInit {
 	// ====================Hàm change
 	loadWard() {
 		this.filterward = '';
-		// this.danhMucService.GetListWardByDistrict(this.filterdistrict).subscribe(res => {
-		// 	this.listward = res.data;
-		// 	// this.itemForm.controls['xa'].setValue('');
-		// 	this.changeDetectorRefs.detectChanges();
-		// });
-		// this.loadDataList();
+		this.danhMucService.GetListWardByProvince(this.filterprovinces).subscribe(res => {
+			this.listward = res.data;
+			this.filteredListWard.next(this.listward);
+			// this.itemForm.controls['xa'].setValue('');
+			this.changeDetectorRefs.detectChanges();
+		});
+		this.loadDataList();
+	}
+
+	filterWard() {
+		if (!this.listward) { return; }
+		let search = this.FilterCtrlWard;
+		if (!search) {
+			this.filteredListWard.next(this.listward.slice());
+			return;
+		} else {
+			search = search.toLowerCase();
+		}
+		this.filteredListWard.next(
+			this.listward.filter(xa => xa.Ward.toLowerCase().indexOf(search) > -1)
+		);
+		this.changeDetectorRefs.detectChanges();
 	}
 
 	getHeight(): any {

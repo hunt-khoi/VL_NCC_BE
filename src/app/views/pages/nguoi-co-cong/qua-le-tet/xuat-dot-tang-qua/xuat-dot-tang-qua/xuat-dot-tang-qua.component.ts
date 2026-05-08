@@ -127,7 +127,7 @@ export class xuatDotTangQuaComponent implements OnInit {
 					Ward: res.DonVi,
 					ID_Row: res.ID_Goc
 				}];
-				this.CommonService.GetListKhomApByWard(this.filterWard).subscribe(res => {
+				this.CommonService.GetListKhomApByWard2(this.filterWard).subscribe(res => {
 					this.listAp = res.data;
 					this.changeDetectorRefs.detectChanges();
 				})
@@ -300,7 +300,7 @@ export class xuatDotTangQuaComponent implements OnInit {
 	}
 	loadAp() {
 		let id = this.itemForm.controls.Xa.value;
-		this.CommonService.GetListKhomApByWard(id).subscribe(res => {
+		this.CommonService.GetListKhomApByWard2(id).subscribe(res => {
 			this.listAp = res.data;
 			this.changeDetectorRefs.detectChanges();
 		})

@@ -29,10 +29,6 @@ export class wardListComponent implements OnInit {
 	// Filter fields
 	filterprovinces: number = 0;
 	listprovinces: any[] = [];
-
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	_name = '';
 
     gridService: TableService | undefined;
@@ -42,7 +38,6 @@ export class wardListComponent implements OnInit {
 		public apiService: donvihanhchinhService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
-		private changeDetectorRefs: ChangeDetectorRef,
 		private ref: ApplicationRef,
 		private cookieService: CookieService,
 		private layoutUtilsService: LayoutUtilsService,
@@ -52,14 +47,12 @@ export class wardListComponent implements OnInit {
 		this._name = this.translate.instant('WARD.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.danhMucService.GetAllProvinces().subscribe(res => {
 			this.listprovinces = res.data;
 		});
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.filterprovinces = res.IdTinh;
-			// this.loadQuanHuyenChange();
 		})
 
 		this.gridModel = new TableModel();
@@ -115,7 +108,7 @@ export class wardListComponent implements OnInit {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
 			});
-			merge(this.sort.sortChange, this.paginator.page)
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
 						this.loadDataList();
@@ -130,14 +123,6 @@ export class wardListComponent implements OnInit {
 			if (this.dataSource) {
 				queryParams = this.apiService.lastFilterXa$.getValue();
 				this.dataSource.loadListward(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}
@@ -156,22 +141,10 @@ export class wardListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.filterprovinces > 0) {
-			filter.DistrictID = this.filterprovinces;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.WardName = this.gridService.model.filterText.WardName;
 		}
 		return filter;
-	}
-
-	// ====================Hàm change  
-	loadQuanHuyenChange() {
-		// this.danhMucService.GetListDistrictByProvinces(this.filterprovinces).subscribe(res => {
-		// 	this.listdistrict = res.data;
-		// 	this.itemForm.controls['xa'].setValue('');
-		// 	this.changeDetectorRefs.detectChanges();
-		// });
 	}
 
 	getHeight(): any {
