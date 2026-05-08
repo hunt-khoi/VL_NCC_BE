@@ -13,12 +13,30 @@ export class LoadingOverlayRef {
 
 @Injectable()
 export class LoadingService {
+  private requestCount = 0;
+  private overlayRef: OverlayRef | null = null;
+  private dialogRef: LoadingOverlayRef | null = null;
+
   constructor(private injector: Injector, private overlay: Overlay) { }
 
   open(): LoadingOverlayRef {
-    const overlayRef = this.createOverlay();
-    const dialogRef = new LoadingOverlayRef(overlayRef);
-    return dialogRef;
+    this.requestCount++;
+    if (this.requestCount === 1) {
+      const overlayRef = this.createOverlay();
+      this.overlayRef = overlayRef;
+      this.dialogRef = new LoadingOverlayRef(overlayRef);
+      this.attachDialogContainer(overlayRef, this.dialogRef);
+    }
+    return this.dialogRef!;
+  }
+
+  close(): void {
+    this.requestCount = Math.max(0, this.requestCount - 1);
+    if (this.requestCount === 0 && this.dialogRef) {
+      this.dialogRef.close();
+      this.dialogRef = null;
+      this.overlayRef = null;
+    }
   }
 
   private createOverlay(): OverlayRef {
@@ -29,7 +47,7 @@ export class LoadingService {
       .centerVertically();
     const overlayConfig = new OverlayConfig({
       hasBackdrop: true,
-      scrollStrategy: this.overlay.scrollStrategies.block(),
+      scrollStrategy: this.overlay.scrollStrategies.noop(),
       positionStrategy
     });
     return this.overlay.create(overlayConfig);
