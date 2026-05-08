@@ -26,7 +26,6 @@ export class ChucDanhListComponent implements OnInit {
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	listDonVi: any[] = [];
-	//=================PageSize Table=====================
 	pageSize: number = 0;
 	_name = "";
 	list_button: boolean = false;
@@ -106,8 +105,7 @@ export class ChucDanhListComponent implements OnInit {
 	}
 
 	Edit(_item: ChucDanhModel, allowEdit: boolean = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id_CV > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id_CV > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(ChucDanhEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {

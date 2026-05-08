@@ -14,7 +14,7 @@
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<button (click)="AddWorkplace()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="!apiService.ReadOnlyControl" color="accent" type="button">
+			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="!apiService.ReadOnlyControl" color="accent" type="button">
 				<span translate="COMMON.CREATE"></span>
 			</button>
 			<kt-column-option [gridService]="gridService"></kt-column-option>

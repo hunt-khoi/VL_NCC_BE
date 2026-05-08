@@ -15,26 +15,6 @@
 	</kt-portlet-header>
 
 	<div class="kt-portlet__body">
-		<div class="kt-form">
-			<div class="row align-items-center collapse kt-form__group-actions m--margin-top-20 m--margin-bottom-20"
-				[ngClass]="{'show' : selection.selected.length > 0}">
-				<div class="col-xl-12">
-					<div class="kt-form__group kt-form__group--inline">
-						<div class="kt-form__label kt-form__label-no-wrap">
-							<label class="m--font-bold m--font-danger-">
-								Số lượng đã chọn: {{ selection.selected.length }}
-							</label>
-						</div>
-						<div class="kt-form__control kt-form__group--inline">
-							<button mat-raised-button color="accent" matTooltip="Delete selected products">
-								<mat-icon>delete</mat-icon> Delete All
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<div class="mat-table__wrapper">
 			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="Id_CV" 
 				matSortDirection="asc" matSortDisableClear cdkDropListGroup>

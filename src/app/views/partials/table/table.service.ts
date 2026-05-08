@@ -97,7 +97,6 @@ export class TableService {
 	}
 
 	filterHead(col: any) {
-		console.log('hii', col)
 		if (this.model.filterGroupDataCheckedFake && this.model.filterGroupDataCheckedFake[col]) {
 			for (var elementFake of this.model.filterGroupDataCheckedFake[col]) {
 				let index = this.model.filterGroupDataChecked[col].findIndex((x: any) => x.value == elementFake.value)
