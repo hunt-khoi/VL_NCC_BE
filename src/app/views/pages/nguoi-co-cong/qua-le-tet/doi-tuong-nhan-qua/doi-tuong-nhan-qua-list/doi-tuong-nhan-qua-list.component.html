@@ -55,7 +55,7 @@
 				<button (click)="Import()" mat-menu-item color="primary" matTooltip="Import đối tượng nhận quà" *ngIf="objectService.ReadOnlyControl">
 					<span>Import đối tượng nhận quà</span>
 				</button>
-				<button (click)="AddWorkplace()" mat-menu-item matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" color="accent" type="button">
+				<button (click)="Add()" mat-menu-item matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" color="accent" type="button">
 					<span translate="COMMON.CREATE"></span>
 				</button>
 			</mat-menu>
@@ -70,7 +70,7 @@
 				<button (click)="Import()" mat-raised-button color="primary" matTooltip="Import đối tượng nhận quà" *ngIf="objectService.ReadOnlyControl">
 					<span>Import đối tượng nhận quà</span>
 				</button>
-				<button (click)="AddWorkplace()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" color="accent" type="button">
+				<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" color="accent" type="button">
 					<span translate="COMMON.CREATE"></span>
 				</button>
 			</div>
@@ -82,21 +82,6 @@
 		<div class="kt-form">
 			<div class="kt-form__filtration">
 				<div class="row align-items-center">
-					<div class="col-md-3 kt--margin-bottom-10-mobile" [hidden]="true">
-						<mat-form-field class="mat-form-field-fluid ">
-							<mat-select placeholder="{{ 'PROVINCE.NAME' | translate }}" (selectionChange)="loadGetListDistrictByProvinces(filterprovinces)" [(value)]="filterprovinces" [disabled]="true">
-								<mat-option [value]="provinces.id_row" *ngFor="let provinces of listprovinces;">{{provinces.Province}}</mat-option>
-							</mat-select>
-						</mat-form-field>
-					</div>
-					<div class="col-md-3 kt--margin-bottom-10-mobile" [hidden]="Capcocau!=1">
-						<mat-form-field class="mat-form-field-fluid ">
-							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" (selectionChange)=filterDistrictID(filterdistrict)>
-								<mat-option [value]="0">Tất cả</mat-option>
-								<mat-option [value]="district.ID_Row" *ngFor="let district of listdistrict;">{{district.District}}</mat-option>
-							</mat-select>
-						</mat-form-field>
-					</div>
 					<div class="col-md-3 kt--margin-bottom-10-mobile" [hidden]="Capcocau!=2">
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="{{ 'WARD.NAME' | translate }}" [(value)]="filterward" (selectionChange)=filterWardD(filterward)>
@@ -111,8 +96,7 @@
 							<mat-datepicker-toggle matSuffix [for]="pickerbd_tungay"></mat-datepicker-toggle>
 							<mat-datepicker #pickerbd_tungay></mat-datepicker>
 							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
-							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong>
-							</mat-error>
+							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong></mat-error>
 						</mat-form-field>
 					</div>
 					<div class="col-md-2 kt-margin-bottom-10-mobile">
@@ -121,12 +105,10 @@
 							<mat-datepicker-toggle matSuffix [for]="pickerbd_denngay"></mat-datepicker-toggle>
 							<mat-datepicker #pickerbd_denngay></mat-datepicker>
 							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
-							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong>
-							</mat-error>
+							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong></mat-error>
 						</mat-form-field>
 					</div>
 					<mat-checkbox [(ngModel)]="showDX" *ngIf="Capcocau < 3">Hiện màu dữ liệu đề xuất</mat-checkbox>
-
 				</div>
 			</div>
 		</div>
@@ -143,7 +125,7 @@
 						<kt-column-filter [enable_sort]="!print" [gridService]="gridService" column_name="SoHoSo" column_title="Số hồ sơ"></kt-column-filter>
 					</th>
 					<td mat-cell *matCellDef="let object">
-						<a href="javascript:;" (click)="Editobject(object, false)">{{object.SoHoSo}}</a></td>
+						<a href="javascript:;" (click)="Edit(object, false)">{{object.SoHoSo}}</a></td>
 				</ng-container>
 				<ng-container matColumnDef="HoTen">
 					<th mat-header-cell *matHeaderCellDef>
@@ -160,7 +142,7 @@
 					<td mat-cell *matCellDef="let object">{{object.GioiTinh}}</td>
 				</ng-container>
 				<ng-container matColumnDef="Title">
-					<th mat-header-cell *matHeaderCellDef>Xã</th>
+					<th mat-header-cell *matHeaderCellDef>Phường/xã</th>
 					<td mat-cell *matCellDef="let object">{{object.Title}}</td>
 				</ng-container>
 				<ng-container matColumnDef="KhomAp">
@@ -221,16 +203,19 @@
 					<th mat-header-cell *matHeaderCellDef style="width:160px">
 						<span translate="COMMON.TACVU"></span>
 					</th>
-					<td mat-cell *matCellDef="let object" style="white-space: nowrap;" class="action-cell" [ngClass]="list_button?'list-button':''">
-						<button (click)="Editobject(object, false)"  mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="{{ 'COMMON.DETAIL' | translate }}" *ngIf="objectService.ReadOnlyControl" color="info" type="button">
+					<td mat-cell *matCellDef="let object" style="white-space: nowrap;" class="action-cell" [ngClass]="list_button ? 'list-button' : ''">
+						<button mat-button (click)="Edit(object, false)" [ngClass]="btnClass" *ngIf="objectService.ReadOnlyControl"
+							matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" type="button">
 							<mat-icon>remove_red_eye</mat-icon>
 							<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 						</button>
-						<button (click)="Editobject(object)"  mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="{{ 'COMMON.UPDATE' | translate }}" *ngIf="objectService.ReadOnlyControl && object.AllowEdit" color="primary" type="button">
+						<button mat-button (click)="Edit(object)" [ngClass]="btnClass" *ngIf="objectService.ReadOnlyControl && object.AllowEdit"
+							matTooltip="{{ 'COMMON.UPDATE' | translate }}" color="primary" type="button">
 							<mat-icon>create</mat-icon>
 							<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
 						</button>
-						<button  mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="warn" type="button" (click)="DeleteWorkplace(object)" *ngIf="objectService.ReadOnlyControl && object.AllowEdit" matTooltip="{{ 'COMMON.DELETE' | translate }}">
+						<button mat-button (click)="Delete(object)" [ngClass]="btnClass" *ngIf="objectService.ReadOnlyControl && object.AllowEdit"
+						 	matTooltip="{{ 'COMMON.DELETE' | translate }}" color="warn" type="button">
 							<mat-icon>delete</mat-icon>
 							<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
 						</button>
@@ -239,39 +224,23 @@
 
 				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
 				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" 
-				[ngClass]="{hovered: row.hovered, highlighted: row.highlighted, 'row-notdx': !row.IsDeXuat && showDX, 'row-delete-dx': row.IsDelete && showDX, 'row-giam-dx': row.IsGiam && showDX}" 
-				(mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+					[ngClass]="{hovered: row.hovered, highlighted: row.highlighted, 'row-notdx': !row.IsDeXuat && showDX, 'row-delete-dx': row.IsDelete && showDX, 'row-giam-dx': row.IsGiam && showDX}" 
+					(mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
+				</tr>
 			</table>
-
-			<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
-
+			<div class="mat-table__message" *ngIf="!dataSource.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
 		</div>
-		<!-- start: BOTTOM -->
+
 		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 			<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
-				<mat-chip-list>
-					<ng-container *ngFor="let chip of gridService.model.lstChip">
-						<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
-							{{chip.title}}: {{chip.data}}
-							<mat-icon matChipRemove>cancel</mat-icon>
-						</mat-chip>
-						<ng-container *ngIf="chip.type==1">
-							<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
-								{{chip.title}}: {{item.name}}
-								<mat-icon matChipRemove>cancel</mat-icon>
-							</mat-chip>
-						</ng-container>
-					</ng-container>
-					<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
-						Đặt lại
-					</mat-chip>
-				</mat-chip-list>
+				<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
 			</div>
 			<div class="flt-page" style="width: 50%;">
 				<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" 
+					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+				</mat-paginator>
 			</div>
 		</div>
-		<!-- end: BOTTOM -->
 	</div>
 </kt-portlet>

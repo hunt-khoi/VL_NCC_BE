@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
+import { DoiTuongNhanQuaService } from './Services/doi-tuong-nhan-qua.service';
+import { DoiTuongNhanQuaListComponent } from './doi-tuong-nhan-qua-list/doi-tuong-nhan-qua-list.component';
 import { DoiTuongNhanQuaEditDialogComponent } from './doi-tuong-nhan-qua-edit/doi-tuong-nhan-qua-edit-dialog.component';
 import { DoiTuongNhanQuaImportComponent } from './doi-tuong-nhan-qua-import/doi-tuong-nhan-qua-import.component';
-import { DoiTuongNhanQuaListComponent } from './doi-tuong-nhan-qua-list/doi-tuong-nhan-qua-list.component';
-import { DoiTuongNhanQuaService } from './Services/doi-tuong-nhan-qua.service';
 
 @NgModule({
 	imports: [
@@ -23,8 +23,10 @@ import { DoiTuongNhanQuaService } from './Services/doi-tuong-nhan-qua.service';
 		DoiTuongNhanQuaEditDialogComponent,
 		DoiTuongNhanQuaImportComponent
 	],
-	exports: [DoiTuongNhanQuaListComponent, DoiTuongNhanQuaEditDialogComponent]
+	exports: [
+		DoiTuongNhanQuaListComponent, 
+		DoiTuongNhanQuaEditDialogComponent
+	]
 })
-
 
 export class DoiTuongNhanQuaRefModule { }

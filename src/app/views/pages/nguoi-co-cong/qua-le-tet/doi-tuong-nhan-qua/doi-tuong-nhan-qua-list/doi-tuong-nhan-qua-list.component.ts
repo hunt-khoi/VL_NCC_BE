@@ -9,8 +9,6 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
-import { Moment } from 'moment';
-import * as moment from 'moment';
 import { CommonService } from '../../../services/common.service';
 import { DoiTuongNhanQuaModel } from '../Model/doi-tuong-nhan-qua.model';
 import { DoiTuongNhanQuaService } from '../Services/doi-tuong-nhan-qua.service';
@@ -18,6 +16,8 @@ import { DoiTuongNhanQuaDataSource } from '../Model/data-sources/doi-tuong-nhan-
 import { DoiTuongNhanQuaEditDialogComponent } from '../doi-tuong-nhan-qua-edit/doi-tuong-nhan-qua-edit-dialog.component';
 import { DoiTuongNhanQuaImportComponent } from '../doi-tuong-nhan-qua-import/doi-tuong-nhan-qua-import.component';
 import { CookieService } from 'ngx-cookie-service';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-doi-tuong-nhan-qua-list',
@@ -27,10 +27,9 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class DoiTuongNhanQuaListComponent implements OnInit {
 	// Table fields
-	dataSource: DoiTuongNhanQuaDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: DoiTuongNhanQuaDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
 	filterType = '';
 
@@ -38,24 +37,23 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
 	lstStatus: any[] = [];
-	// tslint:disable-next-line:variable-name
+
 	_name = '';
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
-	filterdistrict: number = 0;
-	listdistrict: any[] = [];
 	filterward: number = 0;
 	listward: any[] = [];
 	thaotac: number = 0;
 	Capcocau: number = 0;
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
-	to: Moment;
-	from: Moment;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	to: Moment = moment();
+	from: Moment = moment();
 	showDX: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		public objectService: DoiTuongNhanQuaService,
@@ -67,12 +65,10 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		private cookieService: CookieService,
 		private commonService: CommonService,
 		private translate: TranslateService,
-		private tokenStorage: TokenStorage,
-		private router: Router) {
+		private tokenStorage: TokenStorage) {
 		this._name = this.translate.instant('DOITUONGNHANQUA.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		let tmp = moment();
 		let y = tmp.get("year");
@@ -80,16 +76,17 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		this.to = moment(new Date(y, 11, 31));
 
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		this.selection = new SelectionModel<any>(true, []);
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 			this.Capcocau = res.Capcocau;
-			this.loadGetListDistrictByProvinces(this.filterprovinces);
 			if (res.Capcocau == 2) {
-				this.filterdistrict = +res.ID_Goc_Cha;
-				this.commonService.GetListWardByDistrict(this.filterdistrict).subscribe(res => {
-					if (res && res.status == 1)
+				this.commonService.GetListWardByProvince(this.filterprovinces).subscribe(res => {
+					if (res && res.status == 1) {
 						this.listward = res.data;
+					}
 				})
 			}
 		})
@@ -110,6 +107,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 		this.commonService.getStatusNCC().subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.lstStatus = res.data;
 				this.gridService.model.filterGroupDataChecked['Status'] = this.lstStatus.map(x => {
@@ -189,13 +187,6 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 				isShow: true,
 			},
 			{
-				stt: 6,
-				name: 'DistrictName',
-				displayName: 'Quận/Huyện',
-				alwaysChecked: false,
-				isShow: true,
-			},
-			{
 				stt: 9,
 				name: 'DoiTuong',
 				displayName: 'Đối tượng',
@@ -252,15 +243,9 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -274,35 +259,34 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_dtnq'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new DoiTuongNhanQuaDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
 
 		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			queryParams.filter.TuNgay = this.from.format("DD/MM/YYYY");
-			queryParams.filter.DenNgay = this.to.format("DD/MM/YYYY");
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilter$.getValue();
+				queryParams.filter.TuNgay = this.from.format("DD/MM/YYYY");
+				queryParams.filter.DenNgay = this.to.format("DD/MM/YYYY");
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -311,6 +295,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -323,12 +308,6 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		this.dataSource.loadList(queryParams);
 	}
 
-
-	filterDistrictID(id: any) {
-		this.filterdistrict = id;
-		this.loadDataList();
-	}
-
 	filterWardD(id: any) {
 		this.filterward = id;
 		this.loadDataList();
@@ -336,49 +315,35 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.from)
+		if (this.from) {
 			filter.TuNgay = this.from.format("DD/MM/YYYY");
-		if (this.to)
+		}
+		if (this.to) {
 			filter.DenNgay = this.to.format("DD/MM/YYYY");
-		if (this.filterdistrict > 0) {
-			filter.DistrictID = +this.filterdistrict;
 		}
 		if (this.filterward) {
 			filter.Id_Xa = +this.filterward;
 		}
-
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DiaChi = this.gridService.model.filterText.DiaChi;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 		}
-
 		return filter;
 	}
 
 
-	loadGetListDistrictByProvinces(idProvince: any) {
-		this.commonService.GetListDistrictByProvinces(idProvince).subscribe(res => {
-			this.listdistrict = res.data;
-			this.changeDetectorRefs.detectChanges();
-		});
-	}
-
-	/** Delete */
-	DeleteWorkplace(_item: DoiTuongNhanQuaModel) {
+	Delete(item: DoiTuongNhanQuaModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -389,36 +354,25 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		});
 	}
 
-	AddWorkplace() {
+	Add() {
 		const objectModel = new DoiTuongNhanQuaModel();
 		objectModel.clear(); // Set all defaults fields
-		this.Editobject(objectModel);
+		this.Edit(objectModel);
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	Editobject(_item: DoiTuongNhanQuaModel, allowEdit: boolean = true) {
+	Edit(_item: DoiTuongNhanQuaModel, allowEdit: boolean = true) {
 		_item.ProvinceID = this.filterprovinces;
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(DoiTuongNhanQuaEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
+
 	/** SELECTION */
 	isAllSelected() {
 		const numSelected = this.selection.selected.length;
@@ -456,6 +410,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 	}
 
 	Export() {
+		if (!this.paginator || !this.sort || !this.gridService) return;
 		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
@@ -488,41 +443,43 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 			this.layoutUtilsService.showError("Xuất danh sách thất bại");
 		});
 	}
+
 	print: boolean = false;
-	printTicket(print_template) {
+	printTicket(print_template: any) {
 		this.print = true;
 		this.changeDetectorRefs.detectChanges();
-
-		let innerContents = document.getElementById(print_template).innerHTML;
-		
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
 		const popupWinindow = window.open();
+		if (!popupWinindow) return;
 		popupWinindow.document.open();
 		popupWinindow.document.write('<html><head><title>'+this._name+'</title></head><body onload="window.print()">' + innerContents + '</html>');
 		popupWinindow.document.write(`<style>
-		@media print {
-			th:last-child,
-			td:last-child,
-			.hiden-print {
-				display: none !important;
+			@media print {
+				th:last-child,
+				td:last-child,
+				.hiden-print {
+					display: none !important;
+				}
+				td {
+					border-bottom: 1px solid #dee2e6;
+					padding: 10px;
+					font-size: 10pt;
+					text-align: left;
+				}
+				th {
+					padding: 10px;
+					font-size: 12pt;
+				}
+				table {
+					width: 100%;
+				}
 			}
-			td{
-				border-bottom: 1px solid #dee2e6;
-				padding: 10px;
-				font-size: 10pt;
-				text-align: left;
-			}
-			th{
-				padding: 10px;
-				font-size: 12pt;
-			}
-			table{
-				width: 100%;
-			}
-		}
 		</style>
-	  `);
+	  	`);
 	  	popupWinindow.document.close();
 		popupWinindow.onafterprint = window.close;
-		  this.print = false;
-	 }
+		this.print = false;
+	}
 }

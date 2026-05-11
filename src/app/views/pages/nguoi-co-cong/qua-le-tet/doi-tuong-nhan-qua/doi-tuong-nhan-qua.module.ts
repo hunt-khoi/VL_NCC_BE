@@ -6,7 +6,6 @@ import { DoiTuongNhanQuaComponent } from './doi-tuong-nhan-qua.component';
 import { DoiTuongNhanQuaRefModule } from './doi-tuong-nhan-qua-ref.module';
 import { DoiTuongNhanQuaListComponent } from './doi-tuong-nhan-qua-list/doi-tuong-nhan-qua-list.component';
 
-
 const routes: Routes = [
 	{
 		path: '',
@@ -24,14 +23,14 @@ const routes: Routes = [
 	imports: [
 		RouterModule.forChild(routes),
 		DPSCommonModule,
-		DoiTuongNhanQuaRefModule,	],
+		DoiTuongNhanQuaRefModule,	
+	],
 	providers: [
 		DoiTuongNhanQuaService
-	],
-	entryComponents: [
 	],
 	declarations: [
 		DoiTuongNhanQuaComponent,
 	],
 })
+
 export class DoiTuongNhanQuaModule { }

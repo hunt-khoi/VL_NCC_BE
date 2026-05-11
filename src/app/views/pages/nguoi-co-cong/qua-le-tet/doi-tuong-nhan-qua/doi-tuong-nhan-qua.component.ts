@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { DoiTuongNhanQuaService } from './Services/doi-tuong-nhan-qua.service';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
+import { DoiTuongNhanQuaService } from './Services/doi-tuong-nhan-qua.service';
 
 @Component({
 	selector: 'kt-doi-tuong-nhan-qua',
@@ -10,7 +10,7 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 })
 
 export class DoiTuongNhanQuaComponent implements OnInit {
-	constructor(public objectService: DoiTuongNhanQuaService,) { }
+	constructor(public objectService: DoiTuongNhanQuaService) { }
 
 	ngOnInit() {
 		if (this.objectService !== undefined) {

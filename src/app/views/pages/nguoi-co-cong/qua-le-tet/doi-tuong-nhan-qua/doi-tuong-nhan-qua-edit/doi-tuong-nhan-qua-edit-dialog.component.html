@@ -24,7 +24,8 @@
 					<mat-form-field class="mat-form-field-fluid">
 						<mat-select disableOptionCentering placeholder="Đối tượng người có công" formControlName="Id_DoiTuongNCC" class="require" required>
 							<mat-option>
-								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrl" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
+									[(ngModel)]="FilterCtrl" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter()">
 								</ngx-mat-select-search>
 							</mat-option>
 							<mat-option value="{{item.id}}" *ngFor="let item of listdoituongncc | async;">{{item.title}}</mat-option>
@@ -49,24 +50,22 @@
 			<div class="row">
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="{{ 'PROVINCE.NAME' | translate }}" formControlName="Province" class="require" (selectionChange)="loadGetListDistrictByProvinces(filterprovinces)" [(value)]="filterprovinces" required [disabled]="true">
+						<mat-select placeholder="{{ 'PROVINCE.NAME' | translate }}" formControlName="Province" class="require" [(value)]="filterprovinces"
+							(selectionChange)="loadGetListWardByProvinces(filterprovinces)" required [disabled]="true">
 							<mat-option [value]="provinces.id_row" *ngFor="let provinces of listprovinces;">{{provinces.Province}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" formControlName="District" class="require" (selectionChange)="loadGetListWardByDistrict(filterdistrict)" [(value)]="filterdistrict" required [disabled]="Capcocau>2 || !allowEdit">
-							<mat-option value="{{district.ID_Row}}" *ngFor="let district of listdistrict;">{{district.District}}</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-6 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="{{ 'WARD.NAME' | translate }}" formControlName="Id_Xa" class="require" [(value)]="filterward" required [disabled]="Capcocau==3 || !allowEdit" (selectionChange)="loadKhomAp()">
-							<mat-option value="{{ward.ID_Row}}" *ngFor="let ward of listward;">{{ward.Ward}}</mat-option>
+						<mat-select placeholder="{{ 'WARD.NAME' | translate }}" formControlName="Id_Xa" class="require" [(value)]="filterward"  
+						 	(selectionChange)="loadKhomAp()" required [disabled]="Capcocau==3 || !allowEdit">
+							<mat-option>
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'"
+									[(ngModel)]="FilterCtrl2" [ngModelOptions]="{standalone: true}" (ngModelChange)="filter2()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option value="{{ward.ID_Row}}" *ngFor="let ward of listwardFiltered | async;">{{ward.Ward}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>

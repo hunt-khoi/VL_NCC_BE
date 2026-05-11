@@ -1,10 +1,8 @@
-// Angular
-import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MatTableDataSource, MatDialogRef } from '@angular/material';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
-import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { LayoutUtilsService } from 'app/core/_base/crud';
 import { DoiTuongNhanQuaService } from '../Services/doi-tuong-nhan-qua.service';
 import { DoiTuongNhanQuaModel } from '../Model/doi-tuong-nhan-qua.model';
 
@@ -14,15 +12,14 @@ import { DoiTuongNhanQuaModel } from '../Model/doi-tuong-nhan-qua.model';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
-
+export class DoiTuongNhanQuaImportComponent implements OnInit {
 	// Public properties
-	DoiTuongNhanQua: DoiTuongNhanQuaModel;
-	itemForm: FormGroup;
+	DoiTuongNhanQua: DoiTuongNhanQuaModel = new DoiTuongNhanQuaModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	lstNCC: DoiTuongNhanQuaModel[] = [];
 	lstNCCError: DoiTuongNhanQuaModel[] = [];
 	dataSource = new MatTableDataSource(this.lstNCC);
@@ -32,8 +29,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
 	_dataImport: any[] = [];
 	HTMLStr = '';
 	isReview = false;
-	displayedColumns: string[] = ['STT', 'SoHoSo', 'HoTen', 'NgaySinh', 'GioiTinh', 'DoiTuong', 'DiaChi', 'KhomAp', 'Title', 'DistrictName', 'NguoiThoCungLietSy', 'QuanHeVoiLietSy', 'actions'];
-	private componentSubscriptions: Subscription;
+	displayedColumns: string[] = ['STT', 'SoHoSo', 'HoTen', 'NgaySinh', 'GioiTinh', 'DoiTuong', 'DiaChi', 'KhomAp', 'Title', 'NguoiThoCungLietSy', 'QuanHeVoiLietSy', 'actions'];
 	newTemplate: boolean = true;
 	isError: boolean = false;
 
@@ -50,12 +46,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
 		this.createForm();
 	}
 
-	ngOnDestroy() {
-		if (this.componentSubscriptions) {
-			this.componentSubscriptions.unsubscribe();
-		}
-	}
-	filter($event) {
+	filter($event: any) {
 		if (!$event.checked)
 			this.dataSource = new MatTableDataSource(this.lstNCC);
 		else {
@@ -70,22 +61,18 @@ export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	isControlInvalid(controlName: string): boolean {
-		const control = this.itemForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
-	}
-
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
-	numberOnly(event): boolean {
+
+	numberOnly(event: any): boolean {
 		const charCode = (event.which) ? event.which : event.keyCode;
 		if (charCode > 31 && (charCode < 48 || charCode > 57)) {
 			return false;
 		}
 		return true;
 	}
+
 	closeDialog() {
 		this.dialogRef.close(this.isChange);
 	}
@@ -94,6 +81,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
 		this.lstNCC = [];
 		this.lstNCCError = [];
 		this.isError = false;
+		if (!this.itemForm)	return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -102,8 +90,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
 		this.viewLoading = true;
 		var data: any = files[0];
 		let mau = 1;
-		if (this.newTemplate)
-			mau = 2;
+		if (this.newTemplate) mau = 2;
 		this.DoiTuongNhanQuaService.importFile(data, mau).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
@@ -118,6 +105,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
 	}
 
 	luuImport() {
+		if (!this.itemForm)	return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -127,8 +115,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
 		var data: any = files[0];
 		data.review = false;
 		let mau = 1;
-		if (this.newTemplate)
-			mau = 2;
+		if (this.newTemplate) mau = 2;
 		this.DoiTuongNhanQuaService.importFile(data, mau).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
@@ -141,11 +128,9 @@ export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
 		});
 	}
 
-
 	DownloadFileMau() {
 		let mau = 1;
-		if (this.newTemplate)
-			mau = 2;
+		if (this.newTemplate) mau = 2;
 		this.DoiTuongNhanQuaService.downloadTemplate(mau).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
