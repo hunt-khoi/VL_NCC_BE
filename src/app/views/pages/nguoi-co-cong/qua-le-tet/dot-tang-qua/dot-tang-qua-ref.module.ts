@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { DPSCommonModule } from '../../dps-common.module';
-import { dottangquaListComponent } from './dot-tang-qua-list/dot-tang-qua-list.component';
 import { dottangquaService } from './Services/dot-tang-qua.service';
 import { dottangquannewEditDialogComponent } from './dot-tang-qua-new-edit/dot-tang-qua-new-edit.dialog.component';
 import { dottangquaEditDialogComponent } from './dot-tang-qua-edit/dot-tang-qua-edit.dialog.component';
 import { SoToTrinhEditDialogComponent } from './so-to-trinh-edit/so-to-trinh-edit.dialog.component';
+import { dottangquaListComponent } from './dot-tang-qua-list/dot-tang-qua-list.component';
 
 @NgModule({
 	imports: [
@@ -29,4 +29,5 @@ import { SoToTrinhEditDialogComponent } from './so-to-trinh-edit/so-to-trinh-edi
 		dottangquaListComponent,
 	]
 })
+
 export class dottangquaRefModule { }

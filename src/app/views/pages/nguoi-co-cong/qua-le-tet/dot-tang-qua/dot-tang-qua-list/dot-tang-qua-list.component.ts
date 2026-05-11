@@ -26,9 +26,9 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class dottangquaListComponent implements OnInit {
 	// Table fields
-	dataSource: dottangquaDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
+	dataSource: dottangquaDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
 	filterStatus = '';
 	filterCondition = '';
@@ -37,16 +37,17 @@ export class dottangquaListComponent implements OnInit {
 	productsResult: dottangquaModel[] = [];
 	_name = "";
 
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
-	visibleGuiDuyet: boolean;
-	vivibleThuHoi: boolean;
-	IsVisible_Duyet: boolean;
-	IsEnable_Duyet: boolean;
-	list_button: boolean;
+	visibleGuiDuyet: boolean = true;
+	vivibleThuHoi: boolean = true;
+	IsVisible_Duyet: boolean = true;
+	IsEnable_Duyet: boolean = true;
 
-	constructor(public dottangquaService1: dottangquaService,
+	constructor(public apiService: dottangquaService,
 		private CommonService: CommonService,
 		public dialog: MatDialog,
 		private cookieService: CookieService,
@@ -57,20 +58,20 @@ export class dottangquaListComponent implements OnInit {
 		this._name = this.translate.instant("DOT_TANG_QUA.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-		if (this.dottangquaService1 !== undefined) {
-			this.dottangquaService1.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
-		} //mặc định theo priority
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
-		this.gridModel = new TableModel();
+		if (this.apiService !== undefined) {
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
+		} 
+
+		this.gridModel = new TableModel()
 		this.gridModel.clear();
 		this.gridModel.haveFilter = true;
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText['DotTangQua'] = "";
 		this.gridModel.filterText['MoTa'] = "";
-
 		this.gridModel.disableButtonFilter['Locked'] = true;
 		this.gridModel.disableButtonFilter['Id_NhomLeTet'] = true;
 
@@ -84,7 +85,6 @@ export class dottangquaListComponent implements OnInit {
 				value: 'False',
 			}
 		];
-
 		this.gridModel.filterGroupDataChecked['Locked'] = optionsTinhTrang.map(x => {
 			return {
 				name: x.name,
@@ -95,7 +95,8 @@ export class dottangquaListComponent implements OnInit {
 
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 		this.CommonService.liteNhomLeTet().subscribe(res => {
-			this.gridService.model.filterGroupDataChecked['Id_NhomLeTet'] = res.data.map(x => {
+			if (!this.gridService) return;
+			this.gridService.model.filterGroupDataChecked['Id_NhomLeTet'] = res.data.map((x: any) => {
 				return {
 					name: x.title,
 					value: x.id,
@@ -104,6 +105,7 @@ export class dottangquaListComponent implements OnInit {
 			});
 			this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
 		})
+
 		let availableColumns = [
 			{
 				stt: 1,
@@ -200,7 +202,6 @@ export class dottangquaListComponent implements OnInit {
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns)
 
-
 		this.gridService = new TableService(
 			this.layoutUtilsService,
 			this.ref,
@@ -213,30 +214,30 @@ export class dottangquaListComponent implements OnInit {
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_dtq'));
 		this.LoadFilterGroupData(); //load group
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
 		// Init DataSource
-		this.dataSource = new dottangquaDataSource(this.dottangquaService1);
+		this.dataSource = new dottangquaDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.dottangquaService1.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult  && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -244,12 +245,11 @@ export class dottangquaListComponent implements OnInit {
 		});
 	}
 
-	/* HÀM LOAD FILTER GROUPDATA
-	*/
 	LoadFilterGroupData() {
 		this.CommonService.liteNhomLeTet().subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
-				this.gridService.model.filterGroupDataChecked.Id_NhomLeTet = res.data.map(x => {
+				this.gridService.model.filterGroupDataChecked.Id_NhomLeTet = res.data.map((x: any) => {
 					return {
 						id: x.id,
 						name: x.title,
@@ -265,6 +265,7 @@ export class dottangquaListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -281,35 +282,28 @@ export class dottangquaListComponent implements OnInit {
 		if (this.filterStatus && this.filterStatus.length > 0) {
 			filter.status = +this.filterStatus;
 		}
-
 		if (this.filterCondition && this.filterCondition.length > 0) {
 			filter.type = +this.filterCondition;
 		}
-
-		if (this.gridService.model.filterText) {
+		if (this.gridService &&  this.gridService.model.filterText) {
 			filter.DotTangQua = this.gridService.model.filterText['DotTangQua'];
 			filter.MoTa = this.gridService.model.filterText['MoTa'];
 			if (this.gridService.model.filterText['Nam'])
 				filter.Nam = this.gridService.model.filterText['Nam'];
 		}
-
 		return filter; //trả về đúng biến filter
 	}
 
-	/** Delete */
-	DeleteWorkplace(_item: dottangquaModel) {
+	Delete(item: dottangquaModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.dottangquaService1.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -322,12 +316,12 @@ export class dottangquaListComponent implements OnInit {
 	}
 
 	//Khóa
-	BlockWorkplace(_item: dottangquaModel) {
+	Block(item: dottangquaModel) {
 		let _description = '';
 		let _waitDesciption = '';
 		let _title = '';
 		let Locked = false;
-		if (_item.Locked == false) {
+		if (!item.Locked) {
 			_description = 'Bạn có chắc chắn muốn khóa đợt tặng quà này không ?';
 			_waitDesciption = 'Đang cập nhật ...';
 			_title = 'Khóa đợt tặng quà';
@@ -346,7 +340,7 @@ export class dottangquaListComponent implements OnInit {
 				this.loadDataList(); //để không biến mất ổ khóa
 				return;
 			}
-			this.dottangquaService1.lock(_item.Id, Locked).subscribe(res => {
+			this.apiService.lock(item.Id, Locked).subscribe(res => {
 				if (res && res.status === 1) {
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -357,25 +351,15 @@ export class dottangquaListComponent implements OnInit {
 				this.loadDataList();
 			});
 		});
-
 	}
 
-	AddWorkplace() {
+	Add() {
 		const dottangquaModels = new dottangquaModel();
 		dottangquaModels.clear(); // Set all defaults fields
-		this.EditNhom(dottangquaModels);
+		this.Edit(dottangquaModels);
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	EditNhom(_item: dottangquaModel, allowEdit: boolean = true) {
+	Edit(_item: dottangquaModel, allowEdit: boolean = true) {
 		//câu thông báo khi thực hiện trong tác vụ
 		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
@@ -384,17 +368,14 @@ export class dottangquaListComponent implements OnInit {
 			dialogRef = this.dialog.open(dottangquannewEditDialogComponent, { data: { _item, allowEdit }, width: '80%' });
 		else
 			dialogRef = this.dialog.open(dottangquaEditDialogComponent, { data: { _item, allowEdit }, width: '80%' });
+		
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				this.loadDataList();
-			}
-			else {
+			this.loadDataList();
+			if (res) 
 				this.layoutUtilsService.showInfo(_saveMessage);
-				this.loadDataList();
-			}
-
 		});
 	}
+
 	Nhanban(_item: dottangquaModel, allowEdit: boolean = true) {
 		//câu thông báo khi thực hiện trong tác vụ
 		let saveMessageTranslateParam = 'OBJECT.EDIT.DUPLICATE';
@@ -402,13 +383,9 @@ export class dottangquaListComponent implements OnInit {
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(dottangquannewEditDialogComponent, { data: { _item, allowEdit, nhanban }, width: '80%' });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				this.loadDataList();
-			}
-			else {
+			this.loadDataList();
+			if (res) 
 				this.layoutUtilsService.showInfo(_saveMessage);
-				this.loadDataList();
-			}
 		});
 	}
 

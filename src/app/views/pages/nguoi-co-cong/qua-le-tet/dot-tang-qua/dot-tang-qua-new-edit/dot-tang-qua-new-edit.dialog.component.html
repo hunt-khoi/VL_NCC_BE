@@ -32,7 +32,7 @@
 	</div>
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert>
 
@@ -52,19 +52,18 @@
 					</mat-form-field>
 				</div>
 				<div class="col-lg-3 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Năm" formControlName="Nam" class="require" required [readonly]="item.Id > 0" />
+					<mat-form-field class="mat-form-field-fluid">
+						<input matInput placeholder="Năm" formControlName="Nam" class="require" required [readonly]="item.Id > 0"/>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-3 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
+					<mat-form-field class="mat-form-field-fluid">
 						<input matInput type="number" placeholder="Thứ tự" formControlName="Priority" />
 					</mat-form-field>
 				</div>
 				<div class="col-lg-9 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<textarea matInput rows="1" placeholder="{{ 'DOT_TANG_QUA.mota' | translate }}"
-							formControlName="MoTa"></textarea>
+					<mat-form-field class="mat-form-field-fluid">
+						<textarea matInput rows="1" placeholder="{{ 'DOT_TANG_QUA.mota' | translate }}" formControlName="MoTa"></textarea>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
@@ -81,11 +80,13 @@
 					<table mat-table style="width: 100%;overflow-y: hidden;" [dataSource]="datasource">
 						<ng-container matColumnDef="select">
 							<th mat-header-cell *matHeaderCellDef class="mat-column-checkbox" style="padding-right: 20px;" hidden>
-								<mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'" [disabled]="thaotac==0">
+								<mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" 
+									[indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'" [disabled]="thaotac==0">
 								</mat-checkbox>
 							</th>
 							<td mat-cell *matCellDef="let row" class="mat-column-checkbox" style="padding-right: 20px;" hidden>
-								<mat-checkbox [(ngModel)]="row.selected" [ngModelOptions]="{standalone: true}" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [color]="'primary'" [disabled]="!allowEdit">
+								<mat-checkbox (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [(ngModel)]="row.selected"
+									[ngModelOptions]="{standalone: true}" (click)="$event.stopPropagation()" [color]="'primary'" [disabled]="!allowEdit">
 								</mat-checkbox>
 							</td>
 						</ng-container>
@@ -112,7 +113,6 @@
 					</table>
 				</div>
 			</div>
-
 		</div>
 	</form>
 </div>

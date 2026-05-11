@@ -1,9 +1,8 @@
 import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormBuilder } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { dottangquaService } from '../Services/dot-tang-qua.service';
 
 @Component({
@@ -23,15 +22,12 @@ export class SoToTrinhEditDialogComponent implements OnInit {
 	constructor(
 		public dialogRef: MatDialogRef<SoToTrinhEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private fb: FormBuilder,
 		private danhMucService: CommonService,
 		private service: dottangquaService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private translate: TranslateService, ) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
@@ -47,14 +43,13 @@ export class SoToTrinhEditDialogComponent implements OnInit {
 		})
 	}
 	
-	/** UI */
 	getTitle(): string {
 		if (!this.allowEdit)
 			return this.translate.instant('DOT_TANG_QUA.detailtotrinh');
 		return this.translate.instant('DOT_TANG_QUA.updatetotrinh');
 	}
 
-	onSubmit(item) {
+	onSubmit(item: any) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
@@ -66,6 +61,7 @@ export class SoToTrinhEditDialogComponent implements OnInit {
 			_item.NgayTT = this.danhMucService.f_convertDate(item.NgayTT);
 		else
 			_item.NgayTT = null;
+
 		this.service.update_Sott(_item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();

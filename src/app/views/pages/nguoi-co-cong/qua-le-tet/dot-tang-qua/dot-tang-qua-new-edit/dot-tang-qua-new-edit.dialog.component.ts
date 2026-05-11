@@ -1,12 +1,12 @@
 import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatSort, MatTableDataSource, MatDialog } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { dottangquaModel, dottangqua_NCCModel } from '../../dot-tang-qua/Model/dot-tang-qua.model';
 import { TranslateService } from '@ngx-translate/core';
-import { dottangquaService } from '../Services/dot-tang-qua.service';
+import { SelectionModel } from '@angular/cdk/collections';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { SelectionModel } from '@angular/cdk/collections';
+import { dottangquaService } from '../Services/dot-tang-qua.service';
+import { dottangquaModel, dottangqua_NCCModel } from '../../dot-tang-qua/Model/dot-tang-qua.model';
 
 @Component({
 	selector: 'm-dot-tang-qua-new-edit-dialog',
@@ -14,20 +14,18 @@ import { SelectionModel } from '@angular/cdk/collections';
 })
 
 export class dottangquannewEditDialogComponent implements OnInit {
-	item: dottangquaModel;
-	oldItem: dottangquaModel
-	itemForm: FormGroup;
+	item: dottangquaModel = new dottangquaModel();
+	oldItem: dottangquaModel = new dottangquaModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
-	filterDonVi: string = '';
 	listNhomLeTet: any[] = [];
 	listNCC: any[] = [];
 	listMucQua: any[] = [];
 	listNguon: any[] = [];
 
 	NCC_MQs: dottangqua_NCCModel[] = [];
-
-	datasource: MatTableDataSource<any>;
+	datasource: MatTableDataSource<any> | undefined;
 	count: number = 0;
 	displayedColumns = ['select', 'STT', 'DoiTuong'];
 
@@ -35,11 +33,10 @@ export class dottangquannewEditDialogComponent implements OnInit {
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-	allowImport: boolean;
+	allowImport: boolean = false;
 	nhanban = false;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	@ViewChild('fileUpload', { static: true }) fileUpload;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
+	@ViewChild('fileUpload', { static: true }) fileUpload: any;
 
 	_name = "";
 	// Selection
@@ -64,26 +61,23 @@ export class dottangquannewEditDialogComponent implements OnInit {
 		public dialog: MatDialog,
 		private fb: FormBuilder,
 		private danhMucService: CommonService,
-		public dottangquaService: dottangquaService,
+		public apiService: dottangquaService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("DOT_TANG_QUA.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit; 
-		
 		if (this.data.nhanban) {
 			this.nhanban = this.data.nhanban;
 		}
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-
-			this.dottangquaService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -92,14 +86,12 @@ export class dottangquannewEditDialogComponent implements OnInit {
 						this.item.Id = 0;
 						this.item.Locked = true;
 					}
-
 					this.createForm();
 				}
 				else
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
-
 		this.loadNhom();
 	}
 
@@ -112,7 +104,7 @@ export class dottangquannewEditDialogComponent implements OnInit {
 		this.danhMucService.liteDoiTuongNhanQua(false, true).subscribe(res => {
 			this.listNCC = res.data;
 			//if (this.item.Id == 0) {
-			this.NCC_MQs = res.data.map(x => { return { Id_DoiTuongNCC: x.id, DoiTuong: x.title, MucQuas: x.data, selected: true }; });
+			this.NCC_MQs = res.data.map((x: any) => { return { Id_DoiTuongNCC: x.id, DoiTuong: x.title, MucQuas: x.data, selected: true }; });
 			//}
 			this.productsResult = this.NCC_MQs;
 			this.datasource = new MatTableDataSource(this.NCC_MQs);
@@ -123,6 +115,7 @@ export class dottangquannewEditDialogComponent implements OnInit {
 			this.listMucQua = res.data;
 			this.changeDetectorRefs.detectChanges();
 		})
+
 		this.danhMucService.liteNguonKinhPhi().subscribe(res => {
 			this.listNguon = res.data;
 			this.listNguon.forEach(x => { this.displayedColumns.push('Nguon' + x.id) });
@@ -138,29 +131,28 @@ export class dottangquannewEditDialogComponent implements OnInit {
 			MoTa: [this.item.MoTa],
 			Locked: [this.item.Locked],
 			Priority: ['' + this.item.Priority],
-
 			NguoiCoCong: [],
 			MucQua: [],
 			fileDinhKems: [this.item.FileDinhKems],
 		});
 
-		this.focusInput.nativeElement.focus();
-
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit) //false thì không cho sửa
 			this.itemForm.disable();
 	}
-	getValue(row, id_nguon) {
+
+	getValue(row: any, id_nguon: number) {
+		if (!this.itemForm) return '';
 		let id_nhomletet = this.itemForm.controls["Id_NhomLeTet"].value;
 		if (id_nhomletet == undefined)
 			return '';
-		let find = row.MucQuas.find(x => +x.Id_NhomLeTet == +id_nhomletet && +x.Id_NguonKinhPhi == +id_nguon);
+		let find = row.MucQuas.find((x: any) => +x.Id_NhomLeTet == +id_nhomletet && +x.Id_NguonKinhPhi == +id_nguon);
 		if (find != null)
 			return this.danhMucService.f_currency_V2(find.SoTien);
-		else
-			return '';
+		return '';
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('DOT_TANG_QUA.ADD');
 		if (this.nhanban) {
@@ -178,8 +170,8 @@ export class dottangquannewEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): any {
+	prepare(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		_item.Id = this.item.Id;
@@ -202,20 +194,19 @@ export class dottangquannewEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditDot = this.prepareCustomer();
+		const EditDot = this.prepare();
 		if (EditDot.Id > 0) {
 			this.UpdateDot(EditDot, withBack);
 		} else {
@@ -226,53 +217,48 @@ export class dottangquannewEditDialogComponent implements OnInit {
 	closeForm() {
 		this.dialogRef.close();
 	}
-	UpdateDot(_item: dottangquaModel, withBack: boolean) {
 
+	UpdateDot(item: dottangquaModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-
 		this.disabledBtn = true;
-		this.dottangquaService.updateDotTangQua(_item).subscribe(res => {
-			/* Server loading imitation. Remove this on real code */
+		this.apiService.update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {  //lưu và đóng, withBack = true
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {  //lưu và đóng, withBack = true
+					this.dialogRef.close({ item });
 				}
 				else { //lưu và thêm mới, withBack = false
 					this.ngOnInit(); //khởi tạo lại dialog
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
-
 	}
 
-	CreateDot(_item: dottangquaModel, withBack: boolean) {
+	CreateDot(item: dottangquaModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.dottangquaService.createDotTangQua(_item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.fileUpload = [];
 					this.ngOnInit();
 				}
@@ -283,7 +269,8 @@ export class dottangquannewEditDialogComponent implements OnInit {
 			}
 		});
 	}
-	onAlertClose($event) {
+
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 

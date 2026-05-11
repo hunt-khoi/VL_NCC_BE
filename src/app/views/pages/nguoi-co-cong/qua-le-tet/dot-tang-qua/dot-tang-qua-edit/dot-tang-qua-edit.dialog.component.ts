@@ -1,12 +1,12 @@
 import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatSort, MatTableDataSource, MatDialog } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { dottangquaModel, dottangqua_NCCModel } from '../../dot-tang-qua/Model/dot-tang-qua.model';
 import { TranslateService } from '@ngx-translate/core';
-import { dottangquaService } from '../Services/dot-tang-qua.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ReplaySubject } from 'rxjs';
+import { dottangquaService } from '../Services/dot-tang-qua.service';
+import { dottangquaModel, dottangqua_NCCModel } from '../../dot-tang-qua/Model/dot-tang-qua.model';
 import { SoToTrinhEditDialogComponent } from '../so-to-trinh-edit/so-to-trinh-edit.dialog.component';
 
 @Component({
@@ -15,12 +15,11 @@ import { SoToTrinhEditDialogComponent } from '../so-to-trinh-edit/so-to-trinh-ed
 })
 
 export class dottangquaEditDialogComponent implements OnInit {
-	item: dottangquaModel;
-	oldItem: dottangquaModel
-	itemForm: FormGroup;
+	item: dottangquaModel = new dottangquaModel();
+	oldItem: dottangquaModel = new dottangquaModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
-	filterDonVi: string = '';
 	listNhomLeTet: any[] = [];
 
 	FilterCtrl: string = '';
@@ -32,7 +31,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 	tempXoa: dottangqua_NCCModel[] = [];
 	tempThem: dottangqua_NCCModel[] = [];
 
-	datasource: MatTableDataSource<any>;
+	datasource: MatTableDataSource<any> | undefined;
 	count: number = 0;
 	details: any[] = [];
 	displayedColumns = ['STT', 'DoiTuong'];
@@ -42,10 +41,9 @@ export class dottangquaEditDialogComponent implements OnInit {
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-	allowImport: boolean;
-	@ViewChild("focusInput", { static: true }) focusInput: ElementRef;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	@ViewChild('fileUpload', { static: true }) fileUpload;
+	allowImport: boolean = false;
+	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
+	@ViewChild('fileUpload', { static: true }) fileUpload: any;
 	_name = "";
 
 	/* Keyboard Shortcut Keys */
@@ -66,34 +64,29 @@ export class dottangquaEditDialogComponent implements OnInit {
 		public dialog: MatDialog,
 		private fb: FormBuilder,
 		public danhMucService: CommonService,
-		public dottangquaService: dottangquaService,
+		public apiService: dottangquaService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("DOT_TANG_QUA.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item; 
 		this.allowEdit = this.data.allowEdit; 
-
 		this.datasource = new MatTableDataSource(this.NCC_MQs);
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-
-			this.dottangquaService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
 					this.item = res.data;
 					this.details = this.item.Details //cho xem
-
 					this.NCC_MQs = this.item.Details //cho sửa
 					this.datasource = new MatTableDataSource(this.NCC_MQs);
 					this.count = this.NCC_MQs.length; //lấy chiều dài mảng chi tiết bna đầu
-
 					this.createForm();
 				}
 				else
@@ -132,20 +125,20 @@ export class dottangquaEditDialogComponent implements OnInit {
 		return input;
 	}
 
-	getValue(row, id_nguon) {
+	getValue(row: any, id_nguon: number) {
+		if (!this.itemForm) return 0;
 		let id_nhomletet = this.itemForm.controls["Id_NhomLeTet"].value;
 		if (id_nhomletet == undefined || row.MucQuas == undefined)
 			return '';
-		let find = row.MucQuas.find(x => x.Id_NguonKinhPhi == id_nguon);
+		let find = row.MucQuas.find((x: any) => x.Id_NguonKinhPhi == id_nguon);
 		if (find != null)
 			return find.SoTien;
-		else
-			return 0;
+		return 0;
 	}
 
-	changeMuc($event, row, id_nguon) {
+	changeMuc($event: any, row: any, id_nguon: number) {
 		// let id_nhom = this.itemForm.controls["Id_NhomLeTet"].value;
-		let find = row.MucQuas.find(x => x.Id_NguonKinhPhi == id_nguon);
+		let find = row.MucQuas.find((x: any) => x.Id_NguonKinhPhi == id_nguon);
 		if (find != null) {
 			if ($event.target.value == "")
 				find.SoTien = null;
@@ -156,10 +149,10 @@ export class dottangquaEditDialogComponent implements OnInit {
 		}
 	}
 
-	updateDe(row) {
+	updateDe(row: any) {
 		let item = Object.assign({}, row);
 		item.Id_DotTangQua = this.item.Id;
-		this.dottangquaService.editDoiTuongs(item).subscribe(res => {
+		this.apiService.editDoiTuongs(item).subscribe(res => {
 			if (res && res.status == 1)
 				this.layoutUtilsService.showInfo("Cập nhật mức quà thành công");
 			else
@@ -183,22 +176,22 @@ export class dottangquaEditDialogComponent implements OnInit {
 			NgayCV: [this.item.NgayCV],
 		});
 
-		this.focusInput.nativeElement.focus();
-
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit) //false thì không cho sửa
 			this.itemForm.disable();
 	}
 
 	//Hai hàm phục vụ hiển thị chưa lưu xuống DB
 	addIntoTable() {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const _item = new dottangqua_NCCModel();
-
 		_item.Id_DotTangQua = this.item.Id;
 		_item.Id_DoiTuongNCC = controls['NguoiCoCong'].value;
 		_item.selected = true;
 		_item.MucQuas = this.listNCC.find(x => +x.id == +_item.Id_DoiTuongNCC).data
-							.filter(x => +x.Id_NhomLeTet == this.item.Id_NhomLeTet);
+							.filter((x: any) => +x.Id_NhomLeTet == this.item.Id_NhomLeTet);
 
 		//kiểm tra trùng Id_NCC trong danh sách
 		if (this.NCC_MQs.find(({ Id_DoiTuongNCC }) => Id_DoiTuongNCC == _item.Id_DoiTuongNCC)) { 
@@ -210,7 +203,6 @@ export class dottangquaEditDialogComponent implements OnInit {
 		this.NCC_MQs.push(_item);
 		this.datasource = new MatTableDataSource(this.NCC_MQs); //để load lại bảng khi datasource thay đổi
 		this.tempThem.push(_item); //cho cập nhật thêm đối tượng
-
 		this.changeDetectorRefs.detectChanges();
 	}
 
@@ -219,18 +211,15 @@ export class dottangquaEditDialogComponent implements OnInit {
 			this.NCC_MQs = []
 			this.datasource = new MatTableDataSource(this.NCC_MQs);
 		}
-
 		let index = this.NCC_MQs.indexOf(item, 0); //tìm item từ vt 0
 		if (index > -1) {
 			this.NCC_MQs.splice(index, 1)
 			this.datasource = new MatTableDataSource(this.NCC_MQs);
 		}
-
 		this.tempXoa.push(item); //cho cập nhật xóa đối tượng
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('DOT_TANG_QUA.ADD');
 		if (!this.item || !this.item.Id) {
@@ -244,8 +233,8 @@ export class dottangquaEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): dottangquaModel {
+	prepare(): dottangquaModel | null {
+		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
 		const _item = new dottangquaModel();
 		_item.Id = this.item.Id;
@@ -276,33 +265,35 @@ export class dottangquaEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
-		const EditDot = this.prepareCustomer();
-		if (EditDot.Id > 0) {
-			this.UpdateDot(EditDot, withBack);
-		} else {
-			this.CreateDot(EditDot, withBack);
+		const EditDot = this.prepare();
+		if (EditDot) {
+			if (EditDot.Id > 0) {
+				this.UpdateDot(EditDot, withBack);
+			} else {
+				this.CreateDot(EditDot, withBack);
+			}
 		}
 	}
 
 	closeForm() {
 		this.dialogRef.close();
 	}
+
 	saveTable() {
 		if (this.NCC_MQs.length < this.count) { //đang xóa một số đối tượng
-			this.tempXoa.forEach(i => this.dottangquaService.deleteDoiTuongs(i.Id).subscribe(res => {
+			this.tempXoa.forEach(i => this.apiService.deleteDoiTuongs(i.Id).subscribe(res => {
 				if (res && res.status == 1)
 					this.ngOnInit(); //khởi tạo lại dialog
 				else
@@ -315,7 +306,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 		}
 
 		if (this.NCC_MQs.length > this.count) { //đang thêm một số đối tượng
-			this.dottangquaService.addDoiTuongs(this.tempThem).subscribe(res => {
+			this.apiService.addDoiTuongs(this.tempThem).subscribe(res => {
 				if (res && res.status == 1)
 					this.ngOnInit(); //khởi tạo lại dialog
 				else
@@ -323,27 +314,25 @@ export class dottangquaEditDialogComponent implements OnInit {
 			});
 		}
 	}
-	UpdateDot(_item: dottangquaModel, withBack: boolean) {
 
+	UpdateDot(item: dottangquaModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-
 		this.disabledBtn = true;
-		this.dottangquaService.updateDotTangQua(_item).subscribe(res => {
+		this.apiService.update(item).subscribe(res => {
 			/* Server loading imitation. Remove this on real code */
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {  //lưu và đóng, withBack = true
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {  //lưu và đóng, withBack = true
+					this.dialogRef.close({ item });
 				}
 				else { //lưu và thêm mới, withBack = false
 					this.ngOnInit(); //khởi tạo lại dialog
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			}
 			else {
@@ -353,24 +342,23 @@ export class dottangquaEditDialogComponent implements OnInit {
 
 	}
 
-	CreateDot(_item: dottangquaModel, withBack: boolean) {
+	CreateDot(item: dottangquaModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		_item.DoiTuongs = this.NCC_MQs;
-		this.dottangquaService.createDotTangQua(_item).subscribe(res => {
+		item.DoiTuongs = this.NCC_MQs;
+		this.apiService.create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.NCC_MQs = [];
 					this.details = [];
 					this.datasource = new MatTableDataSource(this.NCC_MQs);
@@ -385,7 +373,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -410,10 +398,10 @@ export class dottangquaEditDialogComponent implements OnInit {
 		);
 		this.changeDetectorRefs.detectChanges();
 	}
+
 	updateSoTT(allowEdit: boolean = true) {
 		let _item = Object.assign({}, this.item);
 		const dialogRef = this.dialog.open(SoToTrinhEditDialogComponent, { data: { _item, allowEdit } });
-		dialogRef.afterClosed().subscribe(res => {
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
 }
