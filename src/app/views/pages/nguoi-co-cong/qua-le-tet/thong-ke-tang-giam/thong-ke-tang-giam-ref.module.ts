@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-
 import { DPSCommonModule } from '../../dps-common.module';
 import { dottangquaService } from '../dot-tang-qua/Services/dot-tang-qua.service';
 import { thongkeQuaCacNamComponent } from './tk-qua-cac-nam/tk-qua-cac-nam.component';
@@ -39,4 +38,5 @@ import { thongkeGiamQuaNamTheoNhomComponent } from './tk-giam-qua-cac-nam-theo-n
 		thongkeGiamQuaNamTheoNhomComponent
 	]
 })
+
 export class thongkeTangGiamRefModule { }

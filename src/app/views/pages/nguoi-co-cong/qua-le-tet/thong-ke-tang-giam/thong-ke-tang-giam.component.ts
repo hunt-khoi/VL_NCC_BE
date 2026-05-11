@@ -1,9 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { ReplaySubject } from 'rxjs';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { CommonService } from '../../services/common.service';
 import { dottangquaService } from '../dot-tang-qua/Services/dot-tang-qua.service';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'm-thong-ke-tang-giam',
@@ -12,16 +13,17 @@ import * as moment from 'moment';
 })
 
 export class thongkeComponent implements OnInit {
-	nam: number;
-	Capcocau: number;
+	nam: number = 0;
+	Capcocau: number = 0;
 	idXa: number = 0;
 	listXa: any[] = [];
-	idHuyen: number = 0;
-	listHuyen: any[] = [];
+	listXaOpt: any[] = [];
+	listXaFiltered: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
+	FilterCtrlXa: string = '';
 	data: any[] = [];
 	nguons: any[] = [];
 
-	constructor(public dottangquaService1: dottangquaService,
+	constructor(public apiService: dottangquaService,
 		public CommonService: CommonService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilService: LayoutUtilsService,
@@ -31,31 +33,40 @@ export class thongkeComponent implements OnInit {
 		var now = moment();
 		this.nam = now.year();
 		this.tokenStorage.getUserInfo().subscribe(res => {
-				this.Capcocau = res.Capcocau;
-			if (res.Capcocau == 2) {
-				this.idHuyen = +res.ID_Goc_Cha;
-			}
-			if (res.Capcocau == 3) {//xã
-				this.idHuyen = +res.ID_Goc_Cha;
+			this.Capcocau = res.Capcocau;
+			if (res.Capcocau == 3) { //xã
 				this.idXa = +res.ID_Goc;
 				this.listXa = [{
 					Ward: res.DonVi,
 					ID_Row: res.ID_Goc
 				}];
+				this.listXaOpt = this.listXa;
+				this.listXaFiltered.next(this.listXa.slice());
 			}
 		});
-		this.CommonService.GetListDistrictByProvinces(61).subscribe(res => {
-			this.listHuyen = res.data;
-			this.changeDetectorRefs.detectChanges();
-		})
+	}
+
+	filterXa() {
+		if (!this.listXaOpt) return;
+		let search = this.FilterCtrlXa;
+		if (!search) {
+			this.listXaFiltered.next(this.listXaOpt.slice());
+			return;
+		} else {
+			search = search.toLowerCase();
+		}
+		this.listXaFiltered.next(
+			this.listXaOpt.filter(w => w.Ward.toLowerCase().indexOf(search) > -1)
+		);
+		this.changeDetectorRefs.detectChanges();
 	}
 
 	loadData() {
-		if (this.nam <= 0 || this.idHuyen <= 0) {
-			this.layoutUtilService.showError("Vui lòng chọn năm và huyện thống kê");
+		if (this.nam <= 0) {
+			this.layoutUtilService.showError("Vui lòng chọn năm thống kê");
 			return;
 		}
-		this.dottangquaService1.thongKeTangGiam(this.nam, this.idHuyen, this.idXa).subscribe(res => {
+		this.apiService.thongKeTangGiam(this.nam, this.idXa).subscribe(res => {
 			if (res && res.status == 1) {
 				this.data = res.data.data;
 				for (var i = 0; i < this.data.length; i++) {
@@ -71,18 +82,16 @@ export class thongkeComponent implements OnInit {
 				this.layoutUtilService.showError(res.error.message);
 		});
 	}
-	getValue(ncc, Id_NguonKinhPhi) {
-		let find = ncc.SoTiens.find(x => +x.Id_NguonKinhPhi == +Id_NguonKinhPhi);
+
+	getValue(ncc: any, Id_NguonKinhPhi: number) {
+		let find = ncc.SoTiens.find((x: any) => +x.Id_NguonKinhPhi == +Id_NguonKinhPhi);
 		if (find != null)
 			return find.SoTien;
 		return 0;
 	}
-	exportExcel(loai) {
-		if (this.idHuyen == 0) {
-			this.layoutUtilService.showError("Vui lòng chọn huyện thống kê");
-			return;
-		}
-		this.dottangquaService1.exportTKTangGiam(this.nam, this.idHuyen, this.idXa, true, loai).subscribe(res => {
+
+	exportExcel(loai: number) {
+		this.apiService.exportTKTangGiam(this.nam, this.idXa, true, loai).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

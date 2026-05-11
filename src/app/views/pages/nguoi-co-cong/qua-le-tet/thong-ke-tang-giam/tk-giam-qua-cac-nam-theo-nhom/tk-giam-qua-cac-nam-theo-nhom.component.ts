@@ -1,24 +1,11 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-// Material
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-import { dottangquaService } from '../../dot-tang-qua/Services/dot-tang-qua.service';
-
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel} from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
-import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as moment from 'moment'
-
-// import { TableModel, TableService } from '../../../partials/table';
+import { dottangquaService } from '../../dot-tang-qua/Services/dot-tang-qua.service';
+import moment from 'moment'
 
 @Component({
     selector: 'm-tk-giam-qua-cac-nam-theo-nhom',
@@ -27,27 +14,14 @@ import * as moment from 'moment'
 })
 
 export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
-    // Table fields
-    displayedColumns = ['STT', 'HoTen', 'SoHoSo'];
-	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-    //@ViewChild('searchInput') searchInput: ElementRef;
-
     filterStatus = '';
 	filterCondition = '';
     _name = "";
 
-    itemForm: FormGroup;
-
-    dataThongKe: any[]=[];
-
-    list10year: any[]=[];
-
-    listNhomLeTet: any[]=[];
-    
-    gridModel: TableModel;
-    gridService: TableService;
-
+    itemForm: FormGroup | undefined;
+    dataThongKe: any[] = [];
+    list10year: any[] = [];
+    listNhomLeTet: any[] = [];
 
     chartOptions = {
         responsive: true ,   // THIS WILL MAKE THE CHART RESPONSIVE (VISIBLE IN ANY DEVICE).
@@ -58,9 +32,7 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
             }
         }  
     }
-    
     labels =  [2020, 2018, 2019]; //trục x
-    
     // STATIC DATA FOR THE CHART IN JSON FORMAT.
     chartData = [
         {
@@ -68,7 +40,6 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
           data: [50, 30, 42] 
         }
     ];
-    
     // CHART COLOR.
     colors = [
         { 
@@ -78,20 +49,16 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
     viewLoading: boolean = false;
     loadingAfterSubmit:boolean=false;
 
-	constructor(public dottangquaService1: dottangquaService,
+	constructor(public apiService: dottangquaService,
 		private CommonService: CommonService,
         public dialog: MatDialog,
         private fb: FormBuilder,
-        private route: ActivatedRoute,
-        private ref: ApplicationRef,
         private changeDetectorRefs: ChangeDetectorRef,
         private layoutUtilsService: LayoutUtilsService,
-        private translate: TranslateService) 
-    {
+        private translate: TranslateService) {
         this._name = this.translate.instant("Thống kê giảm qua các năm theo nhóm lễ tết");
     }
 
-    /** LOAD DATA */
     ngOnInit() {
         this.createForm()
         this.loadNhom();
@@ -107,12 +74,11 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
     loadData() {
         let queryParams = this.prepareQuery();
         this.viewLoading = true;
-        this.dottangquaService1.thongKeGiam(queryParams).subscribe(res => {
+        this.apiService.thongKeGiam(queryParams).subscribe(res => {
             this.changeDetectorRefs.detectChanges(); //ko có data sẽ ko xuất hiện
             this.viewLoading = false;
-            if(res && res.status == 1) {
+            if (res && res.status == 1) {
                 this.dataThongKe = res.data
-                
                 this.loadChart();
             }
             else 
@@ -129,15 +95,16 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
                 if(this.dataThongKe[i].Nam == val) {
                     data.push(this.dataThongKe[i].SL)
                 }
-                else
+                else {
                     dem = dem + 1
-                if(dem == this.dataThongKe.length)
+                }
+                if (dem == this.dataThongKe.length)
                     data.push(0)
             }
         }
+        if (!this.itemForm) return;
         var tennhom = this.changeIdNhomLeTet(this.itemForm.controls.NhomLeTet.value)
         var item = {label: tennhom, data: data }
-
         this.chartData.push(item);
     }
 
@@ -150,7 +117,8 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
 		return input;
 	}
 
-    prepareQuery(): QueryParamsModel { 
+    prepareQuery(): any { 
+        if (!this.itemForm) return;
         let valGroup = this.itemForm.controls.Nam.value
         const queryParams = new QueryParamsModel(
             this.filterConfiguration(),
@@ -167,7 +135,6 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
             val.push(item)
         }
         filterGroup.Nam = val
-
         this.labels = val; //label cho trục x (Năm)
         return filterGroup; 
     }
@@ -180,7 +147,7 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
 		if (this.filterCondition && this.filterCondition.length > 0) {
             filter.type = +this.filterCondition;
         }
-
+        if (!this.itemForm) return;
         filter.Id_NhomLeTet = this.itemForm.controls.NhomLeTet.value;
         return filter;
     }
@@ -200,5 +167,4 @@ export class thongkeGiamQuaNamTheoNhomComponent implements OnInit {
 		});
         this.itemForm.controls["NhomLeTet"].markAsTouched();
     }
-
 }

@@ -28,9 +28,9 @@ const routes: Routes = [
 	providers: [
 		dottangquaService
 	],
-	entryComponents: [ ],
 	declarations: [
 		thongkeComponent,
 	]
 })
+
 export class thongkeTangGiamModule { }

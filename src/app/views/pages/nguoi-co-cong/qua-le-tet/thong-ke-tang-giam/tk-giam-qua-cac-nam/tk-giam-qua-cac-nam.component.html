@@ -42,13 +42,11 @@
 									<td class="text-center"></td>
 									<td colspan="2"><b>Năm: {{dt.Nam}} - Số lượng: {{dt.SL}} </b></td>
 								</tr>
-								<ng-container *ngFor="let ncc of dt.DanhSach; let i=index">
-									<tr>
-										<td>{{i+1}}</td>
-										<td>{{ncc.HoTen}}</td>
-										<td>{{ncc.SoHoSo}}</td>
-									</tr>
-								</ng-container>
+								<tr *ngFor="let ncc of dt.DanhSach; let i=index">
+									<td>{{i+1}}</td>
+									<td>{{ncc.HoTen}}</td>
+									<td>{{ncc.SoHoSo}}</td>
+								</tr>
 							</ng-container>
 						</ng-container>
 					</table>
@@ -56,17 +54,10 @@
 				<!-- Biểu độ cột -->
 				<div class="col-md-4 kt-margin-bottom-10-mobile">
 					<h5>Biểu đồ cột thể hiện số lượng hồ sơ các nhóm qua các năm</h5>
-					<canvas
-						baseChart
-						[chartType]="'bar'"
-						[datasets]="chartData"
-						[labels]="labels"
-						[options]="chartOptions"
-						[legend]="true"
-						[colors]="colors">
+					<canvas baseChart [chartType]="'bar'" [datasets]="chartData" [labels]="labels" 
+						[options]="chartOptions" [legend]="true" [colors]="colors">
 					</canvas>
 				</div>
-				
 			</div>
 		</div>
 	</form>

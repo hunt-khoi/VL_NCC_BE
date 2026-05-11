@@ -1,22 +1,12 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-// Material
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { BehaviorSubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-
-import { dottangquaService } from '../../dot-tang-qua/Services/dot-tang-qua.service';
-
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel } from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as moment from 'moment'
+import { dottangquaService } from '../../dot-tang-qua/Services/dot-tang-qua.service';
+import moment from 'moment'
 
 @Component({
 	selector: 'm-tk-slnhan-qua-cac-nam-theo-nhom',
@@ -25,28 +15,15 @@ import * as moment from 'moment'
 })
 
 export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
-	// Table fields
-	displayedColumns = ['STT', 'HoTen', 'SoHoSo'];
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	//@ViewChild('searchInput') searchInput: ElementRef;
-
 	filterStatus = '';
 	filterCondition = '';
-	// filter: any = {};
 	_name = "";
 
-	itemForm: FormGroup;
-
+	itemForm: FormGroup | undefined;
 	dataThongKe: any[] = [];
-
 	list10year: any[] = [];
-
 	listNhomLeTet: any[] = [];
 	listYearChoose: any[] = []
-
-	gridModel: TableModel;
-	gridService: TableService;
 
 	chartOptions = {
 		responsive: true,   // THIS WILL MAKE THE CHART RESPONSIVE (VISIBLE IN ANY DEVICE).
@@ -57,9 +34,7 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 			}
 		}
 	}
-
 	labels = ['', '']; //trục x
-
 	// STATIC DATA FOR THE CHART IN JSON FORMAT.
 	chartData = [
 		{
@@ -67,7 +42,6 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 			data: [0, 0, 0]
 		}
 	];
-
 	// CHART COLOR.
 	colors = [
 		{
@@ -76,7 +50,7 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 	]
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
-	queryParams: QueryParamsModel;
+	queryParams: QueryParamsModel | undefined;
 	allowExport = false;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
@@ -85,15 +59,12 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 		private CommonService: CommonService,
 		public dialog: MatDialog,
 		private fb: FormBuilder,
-		private route: ActivatedRoute,
-		private ref: ApplicationRef,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("Thống kê số lượng người nhận qua các năm theo nhóm lễ tết");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.createForm()
 		this.loadNhom();
@@ -108,8 +79,8 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 
 	loadData() {
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -134,26 +105,27 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 	}
 
 	loadChart() {
-		this.chartData = []
-		this.colors = []
-		var data = []
+		this.chartData = [];
+		this.colors = [];
+		var data = [];
 		for (var val of this.labels) { //danh sách năm cố định đã chọn
 			let dem = 0;
 			for (var i = 0; i < this.dataThongKe.length; i++) {
 				if (this.dataThongKe[i].Nam == val) {
 					data.push(this.dataThongKe[i].SL)
 				}
-				else
+				else {
 					dem = dem + 1
+				}
 				if (dem == this.dataThongKe.length)
 					data.push(0)
 			}
 		}
+		if (!this.itemForm) return;
 		var tennhom = this.changeIdNhomLeTet(this.itemForm.controls.NhomLeTet.value)
 		var item = { label: tennhom, data: data }
 		var color = { backgroundColor: 'rgba(255,228,181,0.7)' }
 		this.colors.push(color)
-
 		this.chartData.push(item);
 		this.changeDetectorRefs.detectChanges();
 	}
@@ -168,6 +140,7 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 	}
 
 	exportExcel() {
+		if (!this.queryParams) return;
 		this.dottangquaService1.exportThongKeSL(this.queryParams).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
@@ -187,7 +160,6 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 			'', '', 0, 10,
 			this.filterGroup(this.listYearChoose)
 		);
-
 		return queryParams;
 	}
 
@@ -198,7 +170,6 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 			val.push(item)
 		}
 		filterGroup.Nam = val
-
 		this.labels = val; //label cho trục x (Năm)
 		return filterGroup;
 	}
@@ -211,7 +182,7 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 		if (this.filterCondition && this.filterCondition.length > 0) {
 			filter.type = +this.filterCondition;
 		}
-
+		if (!this.itemForm) return;
 		filter.Id_NhomLeTet = this.itemForm.controls.NhomLeTet.value;
 		return filter;
 	}
@@ -225,7 +196,6 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 			this.list10year.push(n);
 		}
 		this.list10year.sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)); //hiện danh sách checkbox năm tăng dần
-
 		this.itemForm = this.fb.group({
 			Nam: [Validators.required],
 			NhomLeTet: [null, Validators.required],
@@ -235,8 +205,7 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 	}
 
 	//bắt sự kiện check
-	onCheckboxChange(e) {
-
+	onCheckboxChange(e: any) {
 		if (e.checked) {
 			this.listYearChoose.push(e.source.value);
 		}
@@ -248,5 +217,4 @@ export class thongkeSLNhanQuaNamTheoNhomComponent implements OnInit {
 		}
 		this.listYearChoose.sort();
 	}
-
 }

@@ -1,22 +1,10 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-// Material
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-
-import { dottangquaService } from '../../dot-tang-qua/Services/dot-tang-qua.service';
-
-import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel} from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as moment from 'moment'
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { dottangquaService } from '../../dot-tang-qua/Services/dot-tang-qua.service';
+import moment from 'moment'
 
 @Component({
     selector: 'm-tk-giam-qua-cac-nam',
@@ -25,24 +13,13 @@ import * as moment from 'moment'
 })
 
 export class thongkeGiamQuaNamComponent implements OnInit {
-    // Table fields
-    displayedColumns = ['STT', 'HoTen', 'SoHoSo'];
-	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-    //@ViewChild('searchInput') searchInput: ElementRef;
-
     filterStatus = '';
 	filterCondition = '';
     _name = "";
 
-    itemForm: FormGroup;
-
-    dataThongKe: any[]=[];
-    list10year: any[]=[];
-    
-    gridModel: TableModel;
-    gridService: TableService;
-
+    itemForm: FormGroup | undefined;
+    dataThongKe: any[] = [];
+    list10year: any[] = [];
 
     chartOptions = {
         responsive: true ,   // THIS WILL MAKE THE CHART RESPONSIVE (VISIBLE IN ANY DEVICE).
@@ -53,10 +30,8 @@ export class thongkeGiamQuaNamComponent implements OnInit {
             }
         }  
     }
-
     //dữ liệu chart data mẫu  
     labels =  ['2020', '2019']; //trục x
-    
     // STATIC DATA FOR THE CHART IN JSON FORMAT.
     chartData = [
         {
@@ -68,7 +43,6 @@ export class thongkeGiamQuaNamComponent implements OnInit {
           data: [65, 47]
         }
     ];
-    
     // CHART COLOR.
     colors = [
         { 
@@ -82,20 +56,15 @@ export class thongkeGiamQuaNamComponent implements OnInit {
     viewLoading: boolean = false;
     loadingAfterSubmit:boolean=false;
 
-	constructor(public dottangquaService1: dottangquaService,
-		private CommonService: CommonService,
+	constructor(public apiService: dottangquaService,
         public dialog: MatDialog,
         private fb: FormBuilder,
-        private route: ActivatedRoute,
-        private ref: ApplicationRef,
         private changeDetectorRefs: ChangeDetectorRef,
         private layoutUtilsService: LayoutUtilsService,
-        private translate: TranslateService) 
-    {
+        private translate: TranslateService) {
         this._name = this.translate.instant("Thống kê giảm qua các năm");
     }
 
-    /** LOAD DATA */
     ngOnInit() {
         this.createForm()
     }
@@ -103,12 +72,11 @@ export class thongkeGiamQuaNamComponent implements OnInit {
     loadData() {
         let queryParams = this.prepareQuery();
         this.viewLoading = true;
-        this.dottangquaService1.thongKeGiam(queryParams).subscribe(res => {
+        this.apiService.thongKeGiam(queryParams).subscribe(res => {
             this.changeDetectorRefs.detectChanges(); //ko có data sẽ ko xuất hiện
             this.viewLoading = false;
-            if(res && res.status == 1) {
+            if (res && res.status == 1) {
                 this.dataThongKe = res.data
-                
                 this.loadChart(); //load biểu đồ
             }
             else 
@@ -117,35 +85,35 @@ export class thongkeGiamQuaNamComponent implements OnInit {
     }
 
     loadChart() {
-        this.chartData = []
+        this.chartData = [];
         for (var i = 0; i < this.dataThongKe.length; i++) {
-            var data = []
+            var data = [];
             for (var val of this.labels) { //danh sách năm cố định đã chọn
                 let dem = 0;
                 for (var j = 0; j < this.dataThongKe[i].ThongKe.length; j++) {
-                    if(this.dataThongKe[i].ThongKe[j].Nam == val) {
-                        data.push(this.dataThongKe[i].ThongKe[j].SL)
+                    if (this.dataThongKe[i].ThongKe[j].Nam == val) {
+                        data.push(this.dataThongKe[i].ThongKe[j].SL);
                     }
-                    else
-                        dem = dem + 1
-                    if(dem == this.dataThongKe[i].ThongKe.length)
-                        data.push(0)
+                    else {
+                        dem = dem + 1;
+                    }
+                    if (dem == this.dataThongKe[i].ThongKe.length)
+                        data.push(0);
                 }
             }
             var item = {label: this.dataThongKe[i].NhomLeTet, data: data }
-
             this.chartData.push(item);
 		}
     }
 
-    prepareQuery(): QueryParamsModel { 
+    prepareQuery(): any { 
+        if (!this.itemForm) return;
         let valGroup = this.itemForm.controls.Nam.value
         const queryParams = new QueryParamsModel(
-            this.filterConfiguration(),
+            this.filter(),
             '', '', 0, 10,
             this.filterGroup(valGroup)
         );
-
         return queryParams;
     }
 
@@ -156,12 +124,11 @@ export class thongkeGiamQuaNamComponent implements OnInit {
             val.push(item)
         }
         filterGroup.Nam = val
-
         this.labels = val; //label cho trục x (Năm)
         return filterGroup; 
     }
 
-    filterConfiguration(): any {
+    filter(): any {
         const filter: any = {};
         if (this.filterStatus && this.filterStatus.length > 0) {
 			filter.status = +this.filterStatus;

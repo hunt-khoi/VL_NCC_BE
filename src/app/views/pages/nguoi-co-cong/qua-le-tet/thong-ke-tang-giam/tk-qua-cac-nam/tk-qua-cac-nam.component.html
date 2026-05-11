@@ -2,9 +2,7 @@
 	<kt-portlet-header [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
 		<ng-container ktPortletTitle>
 			<div class="kt-form__filtration">
-				<h3 class="kt-portlet__head-title">
-					<span>{{this._name}}</span>
-				</h3>
+				<h3 class="kt-portlet__head-title">{{this._name}}</h3>
 			</div>
 		</ng-container>
 	</kt-portlet-header>
@@ -31,7 +29,8 @@
 				</div>
 				<div class="col-md-4 kt-margin-bottom-10-mobile">
 					<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>&nbsp;
-					<!--<button mat-raised-button color="primary" matTooltip="Xuất danh sách" *ngIf="allowExport==true" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>In</button>-->&nbsp;
+					<!--<button mat-raised-button color="primary" matTooltip="Xuất danh sách" *ngIf="allowExport==true" [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'}, 
+					th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>In</button>-->&nbsp;
 					<button (click)="exportExcel()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport==true">Export</button>
 				</div>
 			</div>
@@ -48,24 +47,30 @@
 						</tr>
 						<ng-container *ngFor="let items of dataThongKe">
 							<tr>
-								<td *ngIf="itemForm.controls.TangGiam.value == 'desc'" colspan="5"><b>	Đợt: {{items.NhomLeTet}} ({{items.NguonKinhPhi}})</b></td>
-								<td *ngIf="itemForm.controls.TangGiam.value != 'desc'" colspan="3"><b>	Đợt: {{items.NhomLeTet}} ({{items.NguonKinhPhi}})</b></td>
+								<td *ngIf="itemForm.controls.TangGiam.value == 'desc'" colspan="5">
+									<b>	Đợt: {{items.NhomLeTet}} ({{items.NguonKinhPhi}})</b>
+								</td>
+								<td *ngIf="itemForm.controls.TangGiam.value != 'desc'" colspan="3">
+									<b>	Đợt: {{items.NhomLeTet}} ({{items.NguonKinhPhi}})</b>
+								</td>
 							</tr>
 							<ng-container *ngFor="let dt of items.ThongKe">
 								<tr>
 									<td class="text-center"></td>
-									<td *ngIf="itemForm.controls.TangGiam.value == 'desc'" colspan="4"><b>Năm: {{dt.Nam}} - Số lượng: {{dt.SL}} </b></td>
-									<td *ngIf="itemForm.controls.TangGiam.value != 'desc'" colspan="2"><b>Năm: {{dt.Nam}} - Số lượng: {{dt.SL}} </b></td>
+									<td *ngIf="itemForm.controls.TangGiam.value == 'desc'" colspan="4">
+										<b>Năm: {{dt.Nam}} - Số lượng: {{dt.SL}} </b>
+									</td>
+									<td *ngIf="itemForm.controls.TangGiam.value != 'desc'" colspan="2">
+										<b>Năm: {{dt.Nam}} - Số lượng: {{dt.SL}} </b>
+									</td>
 								</tr>
-								<ng-container *ngFor="let ncc of dt.DanhSach; let i=index">
-									<tr>
-										<td class="text-center">{{i+1}}</td>
-										<td>{{ncc.HoTen}}</td>
-										<td>{{ncc.SoHoSo}}</td>
-										<td *ngIf="itemForm.controls.TangGiam.value == 'desc'">{{ncc.strLyDo}}</td>
-										<td *ngIf="itemForm.controls.TangGiam.value == 'desc'">{{ncc.GhiChuGiam}}</td>
-									</tr>
-								</ng-container>
+								<tr *ngFor="let ncc of dt.DanhSach; let i=index">
+									<td class="text-center">{{i+1}}</td>
+									<td>{{ncc.HoTen}}</td>
+									<td>{{ncc.SoHoSo}}</td>
+									<td *ngIf="itemForm.controls.TangGiam.value == 'desc'">{{ncc.strLyDo}}</td>
+									<td *ngIf="itemForm.controls.TangGiam.value == 'desc'">{{ncc.GhiChuGiam}}</td>
+								</tr>
 							</ng-container>
 						</ng-container>
 					</table>
@@ -73,13 +78,8 @@
 				<!-- Biểu độ cột -->
 				<div class="col-lg-4 kt-margin-bottom-10-mobile" hidden>
 					<h5>Biểu đồ cột thể hiện số lượng hồ sơ các nhóm qua các năm</h5>
-					<canvas baseChart
-							[chartType]="'bar'"
-							[datasets]="chartData"
-							[labels]="labels"
-							[options]="chartOptions"
-							[legend]="true"
-							[colors]="colors">
+					<canvas baseChart [chartType]="'bar'" [datasets]="chartData" [labels]="labels"
+						[options]="chartOptions" [legend]="true" [colors]="colors">
 					</canvas>
 				</div>
 

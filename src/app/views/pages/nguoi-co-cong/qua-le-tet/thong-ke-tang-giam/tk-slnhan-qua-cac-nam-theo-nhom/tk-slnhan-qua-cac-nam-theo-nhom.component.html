@@ -2,9 +2,7 @@
 	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
 		<ng-container ktPortletTitle>
 			<div class="kt-form__filtration">
-				<h3 class="kt-portlet__head-title">
-					<span>{{_name}}</span>
-				</h3>
+				<h3 class="kt-portlet__head-title">{{_name}}</h3>
 			</div>
 		</ng-container>
 	</kt-portlet-header>
@@ -32,7 +30,8 @@
 				</div>
 				<div class="col-md-4 kt-margin-bottom-10-mobile">
 					<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>&nbsp;
-					<button mat-raised-button color="primary" matTooltip="Xuất danh sách" *ngIf="allowExport==true" printTitle={{_name}} [printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6','text-align':'left'}}" printSectionId="print-section" ngxPrint>In</button>&nbsp;
+					<button mat-raised-button color="primary" matTooltip="Xuất danh sách" *ngIf="allowExport==true" printTitle={{_name}} 
+						[printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6','text-align':'left'}}" printSectionId="print-section" ngxPrint>In</button>&nbsp;
 					<button (click)="exportExcel()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport==true">Export</button>
 				</div>
 			</div>
@@ -46,28 +45,20 @@
 							<th class="text-center">Năm</th>
 							<th class="text-center">Số lượng</th>
 						</tr>
-						<ng-container *ngFor="let items of dataThongKe, let i=index">
-							<tr>
-								<td class="text-center">{{i+1}}</td>
-								<td>{{items.Nam}}</td>
-								<td>{{items.SL}}</td>
-							</tr>
-						</ng-container>
+						<tr *ngFor="let items of dataThongKe, let i=index">
+							<td class="text-center">{{i+1}}</td>
+							<td>{{items.Nam}}</td>
+							<td>{{items.SL}}</td>
+						</tr>
 					</table>
 				</div>
 				<!-- Biểu độ cột -->
 				<div class="col-md-4 kt-margin-bottom-10-mobile">
 					<h5>Biểu đồ cột thể hiện số lượng người nhận theo nhóm qua các năm</h5>
-					<canvas baseChart
-							[chartType]="'bar'"
-							[datasets]="chartData"
-							[labels]="labels"
-							[options]="chartOptions"
-							[legend]="true"
-							[colors]="colors">
+					<canvas baseChart [chartType]="'bar'" [datasets]="chartData" [labels]="labels"
+						[options]="chartOptions" [legend]="true" [colors]="colors">
 					</canvas>
 				</div>
-
 			</div>
 		</div>
 	</form>

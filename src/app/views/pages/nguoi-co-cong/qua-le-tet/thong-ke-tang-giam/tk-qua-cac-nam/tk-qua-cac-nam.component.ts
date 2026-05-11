@@ -1,26 +1,14 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-// Material
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { MatDialog } from '@angular/material';
+import { BehaviorSubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-
-import { dottangquaService } from '../../dot-tang-qua/Services/dot-tang-qua.service';
-
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel } from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
-import { ValueConverter } from '@angular/compiler/src/render3/view/template';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as moment from 'moment';
-import { push } from 'object-path';
+import { dottangquaService } from '../../dot-tang-qua/Services/dot-tang-qua.service';
+import moment from 'moment';
 
-// import { TableModel, TableService } from '../../../partials/table';
 @Component({
 	selector: 'm-tk-qua-cac-nam',
 	templateUrl: './tk-qua-cac-nam.component.html',
@@ -28,24 +16,13 @@ import { push } from 'object-path';
 })
 
 export class thongkeQuaCacNamComponent implements OnInit {
-	// Table fields
-	displayedColumns = ['STT', 'HoTen', 'SoHoSo'];
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	//@ViewChild('searchInput') searchInput: ElementRef;
-
 	filterStatus = '';
 	filterCondition = '';
 	_name = "";
 
-	itemForm: FormGroup;
-
+	itemForm: FormGroup | undefined;
 	dataThongKe: any[] = [];
 	list10year: any[] = [];
-
-	gridModel: TableModel;
-	gridService: TableService;
-
 	listYearChoose: any[] = []
 
 	chartOptions = {
@@ -57,10 +34,8 @@ export class thongkeQuaCacNamComponent implements OnInit {
 			}
 		}
 	}
-
 	//dữ liệu chart data mẫu  
 	labels = ['', '']; //trục x
-
 	// STATIC DATA FOR THE CHART IN JSON FORMAT.
 	chartData = [
 		{
@@ -72,7 +47,6 @@ export class thongkeQuaCacNamComponent implements OnInit {
 			data: [0, 0]
 		}
 	];
-
 	// CHART COLOR.
 	colors = [
 		{
@@ -88,32 +62,29 @@ export class thongkeQuaCacNamComponent implements OnInit {
 
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
-	queryParams: QueryParamsModel;
+	queryParams: QueryParamsModel | undefined;
 	allowExport = false;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
-	constructor(public dottangquaService1: dottangquaService,
-		private CommonService: CommonService,
+	constructor(public apiService: dottangquaService,
 		public dialog: MatDialog,
 		private fb: FormBuilder,
-		private route: ActivatedRoute,
-		private ref: ApplicationRef,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("Thống kê qua các năm");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
-		this.createForm()
+		this.createForm();
+		this.loadData();
 	}
 
 	loadData() {
 		this.queryParams = this.prepareQuery();
 		this.viewLoading = true;
-
+		if (!this.itemForm) return;
 		if (this.itemForm.controls.TangGiam.value == "desc")
 			this.listGiam();
 		else
@@ -122,7 +93,8 @@ export class thongkeQuaCacNamComponent implements OnInit {
 
 	listGiam() {
 		this.loadingSubject.next(true);
-		this.dottangquaService1.thongKeGiam(this.queryParams).subscribe(res => {
+		if (!this.queryParams) return;
+		this.apiService.thongKeGiam(this.queryParams).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.changeDetectorRefs.detectChanges(); //ko có data sẽ ko xuất hiện
 			this.viewLoading = false;
@@ -138,7 +110,8 @@ export class thongkeQuaCacNamComponent implements OnInit {
 
 	listTang() {
 		this.loadingSubject.next(true);
-		this.dottangquaService1.thongKeTang(this.queryParams).subscribe(res => {
+		if (!this.queryParams) return;
+		this.apiService.thongKeTang(this.queryParams).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.changeDetectorRefs.detectChanges(); //ko có data sẽ ko xuất hiện
 			this.viewLoading = false;
@@ -163,8 +136,9 @@ export class thongkeQuaCacNamComponent implements OnInit {
 					if (this.dataThongKe[i].ThongKe[j].Nam == val) {
 						data.push(this.dataThongKe[i].ThongKe[j].SL)
 					}
-					else
+					else {
 						dem = dem + 1
+					}
 					if (dem == this.dataThongKe[i].ThongKe.length)
 						data.push(0)
 				}
@@ -182,17 +156,17 @@ export class thongkeQuaCacNamComponent implements OnInit {
 		return this.bgColor[index];
 	}
 
-
 	exportExcel() {
+		if (!this.itemForm) return;
 		if (this.itemForm.controls.TangGiam.value == "desc")
 			this.xuatGiam();
 		else
 			this.xuatTang();
-
 	}
 
 	xuatGiam() {
-		this.dottangquaService1.exportDSGiam(this.queryParams).subscribe(res => {
+		if (!this.queryParams) return;
+		this.apiService.exportDSGiam(this.queryParams).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');
@@ -206,7 +180,8 @@ export class thongkeQuaCacNamComponent implements OnInit {
 	}
 
 	xuatTang() {
-		this.dottangquaService1.exportDSTang(this.queryParams).subscribe(res => {
+		if (!this.queryParams) return;
+		this.apiService.exportDSTang(this.queryParams).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');
@@ -225,7 +200,6 @@ export class thongkeQuaCacNamComponent implements OnInit {
 			'', '', 0, 10,
 			this.filterGroup(this.listYearChoose)
 		);
-
 		return queryParams;
 	}
 
@@ -236,7 +210,6 @@ export class thongkeQuaCacNamComponent implements OnInit {
 			val.push(item)
 		}
 		filterGroup.Nam = val
-
 		this.labels = val; //label cho trục x (Năm)
 		return filterGroup;
 	}
@@ -267,7 +240,7 @@ export class thongkeQuaCacNamComponent implements OnInit {
 	}
 
 	//bắt sự kiện check
-	onCheckboxChange(e) {
+	onCheckboxChange(e: any) {
 		if (e.checked) {
 			this.listYearChoose.push(e.source.value);
 		}

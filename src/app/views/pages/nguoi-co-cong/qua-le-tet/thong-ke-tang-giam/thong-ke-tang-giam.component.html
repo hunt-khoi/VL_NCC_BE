@@ -23,7 +23,7 @@
 	<mat-tab-group>
 		<mat-tab label="Thống kê tăng giảm">
 			<ng-template matTabContent>
-				<div class="kt-portlet__body">
+				<div class="kt-portlet__body" style="padding-top: 0px;">
 					<div class="form-group kt-form__group row">
 						<div class="col-md-1 kt-margin-bottom-10-mobile">
 							<mat-form-field class="mat-form-field-fluid">
@@ -31,22 +31,18 @@
 							</mat-form-field>
 						</div>
 						<div class="col-md-2 kt-margin-bottom-10-mobile">
-							<mat-form-field class="mat-form-field-fluid ">
-								<mat-select [(ngModel)]="idHuyen" placeholder="Chọn huyện thống kê" (selectionChange)="loadData()" [disabled]="Capcocau>1">
-									<mat-option [value]="0" disabled>--Chọn huyện thống kê--</mat-option>
-									<mat-option *ngFor="let opt of listHuyen;" [value]="opt.ID_Row">{{opt.District}}</mat-option>
-								</mat-select>
-							</mat-form-field>
-						</div>
-						<div class="col-md-2 kt-margin-bottom-10-mobile">
 							<mat-form-field class="mat-form-field-fluid " *ngIf="Capcocau ==3">
 								<mat-select placeholder="Chọn xã thống kê" [(ngModel)]="idXa" disabled>
-									<mat-option [value]="0" disabled>--Chọn xã thống kê--</mat-option>
-									<mat-option [value]="item.ID_Row" *ngFor="let item of listXa">{{item.Ward}}</mat-option>
+								<mat-option>
+									<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'"
+										[(ngModel)]="FilterCtrlXa" [ngModelOptions]="{standalone: true}" (ngModelChange)="filterXa()">
+									</ngx-mat-select-search>
+								</mat-option>
+								<mat-option [value]="item.ID_Row" *ngFor="let item of listXaFiltered | async">{{item.Ward}}</mat-option>
 								</mat-select>
 							</mat-form-field>
 						</div>
-						<div class="col-md-7 kt-margin-bottom-10-mobile text-right">
+						<div class="col-md-9 kt-margin-bottom-10-mobile text-right">
 							<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>&nbsp;
 							<button mat-raised-button color="info" matTooltip="Xuất danh sách" [matMenuTriggerFor]="menu">Export</button>&nbsp;
 							<mat-menu #menu="matMenu">
@@ -72,16 +68,19 @@
 									<td style="width: 36px; text-align: center;"><strong>Năm sinh</strong></td>
 									<td style="width: 53px; text-align: center;"><strong>Ấp</strong></td>
 									<td style="width: 54px; text-align: center;"><strong>Xã</strong></td>
-									<td style="width: 69px; text-align: center;"><strong>Huyện</strong></td>
 									<td style="width: 164px; text-align: center;"><strong>Đối tượng</strong></td>
 									<td style="width: 36px; text-align: center;"><strong>Năm</strong></td>
 									<td style="width: 36px; text-align: center;"><strong>Dịp lễ</strong></td>
-									<td style="width: 54px; text-align: center;" *ngFor="let ng of nguons"><strong>{{ng.NguonKinhPhi}}</strong></td>
+									<td style="width: 54px; text-align: center;" *ngFor="let ng of nguons">
+										<strong>{{ng.NguonKinhPhi}}</strong>
+									</td>
 									<td style="width: 96px; text-align: center;"><strong>Họ Tên Liệt Sĩ</strong></td>
 									<td style="width: 56px; text-align: center;"><strong>Quan hệ với Liệt sĩ</strong></td>
 									<td style="width: 52px; text-align: center;"><strong>Ghi chú</strong></td>
 								</tr>
-								<ng-container *ngIf="data.length==0"><tr><td colspan="14" class="text-center">Không có dữ liệu</td></tr></ng-container>
+								<tr *ngIf="data.length==0">
+									<td colspan="13" class="text-center">Không có dữ liệu</td>
+								</tr>
 								<ng-container *ngFor="let g of data">
 									<tr>
 										<td class="d-revert" style="text-align: center; display: none;">
@@ -90,12 +89,11 @@
 												<mat-icon *ngIf="g.expanded">remove</mat-icon>
 											</button>
 										</td>
-										<td style="width: 261px; " colspan="5">
+										<td style="width: 261px;" colspan="5">
 											<strong>{{g.Title}}</strong>
 										</td>
-										<td style="width: 54px; text-align: center; "><strong>{{g.SL}}</strong></td>
-										<td style="width: 69px; text-align: center; "><strong>đối tượng</strong></td>
-										<td style="width: 164px;"></td>
+										<td style="width: 54px; text-align: center;"><strong>{{g.SL}}</strong></td>
+										<td style="width: 164px; text-align: center;"><strong>đối tượng</strong></td>
 										<td style="width: 36px;"></td>
 										<td style="width: 54px;"></td>
 										<td style="width: 57px;" *ngFor="let ng of nguons"></td>
@@ -117,8 +115,7 @@
 											<td style="width: 191px;" colspan="3"><strong>{{xa.Title}}</strong></td>
 											<td style="width: 53px;"></td>
 											<td style="width: 54px; text-align: center;"><strong>{{xa.SL}}</strong></td>
-											<td style="width: 69px; text-align: center;"><strong>đối tượng</strong></td>
-											<td style="width: 164px;"></td>
+											<td style="width: 164px; text-align: center;"><strong>đối tượng</strong></td>
 											<td style="width: 36px;"></td>
 											<td style="width: 54px;"></td>
 											<td style="width: 57px;" *ngFor="let ng of nguons"></td>
@@ -135,11 +132,14 @@
 												<td style="width: 36px;">{{ncc.NamSinh}}</td>
 												<td style="width: 53px; text-align: center;">{{ncc.KhomAp}}</td>
 												<td style="width: 54px; text-align: center;">{{ncc.Title}}</td>
-												<td style="width: 69px; text-align: center;">{{ncc.DistrictName}}</td>
-												<td style="width: 164px; text-align: center;"><div class="dt-overflow" title="{{ncc.DoiTuong}}">{{ncc.DoiTuong}}</div></td>
+												<td style="width: 164px; text-align: center;">
+													<div class="dt-overflow" title="{{ncc.DoiTuong}}">{{ncc.DoiTuong}}</div>
+												</td>
 												<td style="width: 36px; text-align: center;">{{ncc.Nam}}</td>
 												<td style="width: 54px; text-align: center;">{{ncc.NhomLeTet}}</td>
-												<td style="width: 57px; text-align: right;" *ngFor="let ng of nguons">{{getValue(ncc, ng.Id_NguonKinhPhi)|mask:'separator':CommonService.thousandSeparator}}</td>
+												<td style="width: 57px; text-align: right;" *ngFor="let ng of nguons">
+													{{getValue(ncc, ng.Id_NguonKinhPhi)|mask:'separator':CommonService.thousandSeparator}}
+												</td>
 												<td style="width: 96px;">{{ncc.NguoiThoCungLietSy}}</td>
 												<td style="width: 56px;">{{ncc.QHGiaDinh}}</td>
 												<td style="width: 52px; text-align: center;">{{ncc.GhiChuGiam}}</td>
