@@ -1,8 +1,7 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { QueryParamsModel, HttpUtilsService } from '../../../../../../core/_base/crud';
 import { environment } from '../../../../../../../environments/environment';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/bao-cao-tinh-hinh';
@@ -10,17 +9,10 @@ const API_PRODUCTS_URL = environment.ApiRoot + '/bao-cao-tinh-hinh';
 @Injectable()
 export class BaoCaoTinhHinhService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
 
-	ReadOnlyControl: boolean;
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) { }
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-
-	// READ
 	getItem(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_PRODUCTS_URL}/get?id=${itemId}`;
@@ -36,5 +28,4 @@ export class BaoCaoTinhHinhService {
 			observe: 'response'
 		});
 	}
-	
 }

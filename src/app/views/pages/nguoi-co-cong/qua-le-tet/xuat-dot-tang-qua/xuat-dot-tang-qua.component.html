@@ -28,7 +28,7 @@
 		</ng-container>
 	</kt-portlet-header>
 
-	<kt-portlet-body>
+	<kt-portlet-body style="padding-top: 0px;">
 		<form class="kt-form" [formGroup]="itemForm">
 			<div class="form-group kt-form__group row">
 				<div class="col-md-2 kt-margin-bottom-20-mobile">
@@ -65,6 +65,7 @@
 									[(ngModel)]="FilterCtrlXa" [ngModelOptions]="{standalone: true}" (ngModelChange)="filterXa()">
 								</ngx-mat-select-search>
 							</mat-option>
+							<mat-option [value]="0" disabled>--Chọn xã thống kê--</mat-option>
 							<mat-option [value]="item.ID_Row" *ngFor="let item of listXaFiltered | async">{{item.Ward}}</mat-option>
 						</mat-select>
 					</mat-form-field>
@@ -77,7 +78,7 @@
 						</mat-select>
 					</mat-form-field>
 				</div>
-				<div class="col-lg-2 kt--margin-bottom-20-mobile">
+				<div class="col-lg-2 kt--margin-bottom-20-mobile" style="padding-top: 12px;">
 					<mat-checkbox formControlName="LocTrung">{{ 'QUA_TET.loctrung' | translate }}</mat-checkbox>
 				</div>
 			</div>

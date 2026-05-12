@@ -1,13 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-// Material
 import { MatDialog } from '@angular/material';
-import { merge, BehaviorSubject } from 'rxjs';
-//Service
+import { DomSanitizer } from '@angular/platform-browser';
+import { BehaviorSubject } from 'rxjs';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
-import { DomSanitizer } from '@angular/platform-browser';
 import { BaoCaoTinhHinhService } from './Services/bao-cao-tinh-hinh.service';
 
 @Component({
@@ -28,19 +24,16 @@ export class BaoCaoTinhHinhComponent implements OnInit {
 
 	constructor(
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
-		private translate: TranslateService,
 		private changeDetect: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private service: BaoCaoTinhHinhService,
 		private commonService: CommonService,
 		private sanitized: DomSanitizer) { }
 		
-	transform(value) {
+	transform(value: any) {
 		return this.sanitized.bypassSecurityTrustHtml(value);
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.commonService.liteDotQua(true).subscribe(res => {
 			if (res && res.status == 1)

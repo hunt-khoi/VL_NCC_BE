@@ -3,10 +3,10 @@ import { MatDialog } from '@angular/material';
 import { FormBuilder, FormGroup, } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
-import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-import { xuatDotTangQuaService } from '../../xuat-dot-tang-qua/Services/xuat-dot-tang-qua.service';
+import { CommonService } from '../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../core/_base/crud';
+import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
+import { xuatDotTangQuaService } from './Services/xuat-dot-tang-qua.service';
 
 @Component({
 	selector: 'm-xuat-dot-tang-qua',
