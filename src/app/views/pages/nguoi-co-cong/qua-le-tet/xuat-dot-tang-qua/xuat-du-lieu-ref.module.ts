@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-
 import { DPSCommonModule } from '../../dps-common.module';
 import { xuatDotTangQuaService } from './Services/xuat-dot-tang-qua.service';
 import { xuatDotTangQuaComponent } from './xuat-dot-tang-qua/xuat-dot-tang-qua.component';
@@ -22,4 +21,5 @@ import { xuatDotTangQuaComponent } from './xuat-dot-tang-qua/xuat-dot-tang-qua.c
 		xuatDotTangQuaComponent,
 	]
 })
+
 export class xuatDuLieuRefModule { }

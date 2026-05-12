@@ -1,16 +1,12 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { FormBuilder, FormGroup, } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-import { xuatDotTangQuaService } from '../../xuat-dot-tang-qua/Services/xuat-dot-tang-qua.service';
+import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel } from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
-import { FormBuilder, FormGroup, } from '@angular/forms';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
+import { xuatDotTangQuaService } from '../../xuat-dot-tang-qua/Services/xuat-dot-tang-qua.service';
 
 @Component({
 	selector: 'm-xuat-dot-tang-qua',
@@ -19,89 +15,35 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 })
 
 export class xuatDotTangQuaComponent implements OnInit {
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-
-	filterStatus = '';
-	filterCondition = '';
 	_name = "";
-
-	itemForm: FormGroup;
-
+	itemForm: FormGroup | undefined;
 	dataThongKe: any[] = [];
-	list10year: any[] = [];
+	lstNguon: any[] = [];
+	listTinh: any[] = [];
+	listXa: any[] = [];
+	listXaOpt: any[] = [];
+	listXaFiltered: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
+	FilterCtrlXa: string = '';
+	listAp: any[] = [];
 
-	gridModel: TableModel;
-	gridService: TableService;
-
-	listYearChoose: any[] = []
-
-	lstNguon: any[] = []
-	listTinh: any[] = []
-	listHuyen: any[] = []
-	listXa: any[] = []
-	listAp: any[] = []
-
-	Nam: number;
+	Nam: number = 0;
 	thongKe: number = 0;
 	listDotQua: any[] = []
-
-	filterprovinces: number
+	filterprovinces: number = 0;
 	display: boolean = false;
 
-	chartOptions = {
-		responsive: true,   // THIS WILL MAKE THE CHART RESPONSIVE (VISIBLE IN ANY DEVICE).
-		plugins: {
-			labels: {
-				//render 'label', 'value', 'percentage', 'image' or custom function, default is 'percentage'
-				render: function () { return ''; },
-			}
-		}
-	}
-
-	//dữ liệu chart data mẫu  
-	labels = ['', '']; //trục x
-
-	// STATIC DATA FOR THE CHART IN JSON FORMAT.
-	chartData = [
-		{
-			label: '',
-			data: [0, 0]
-		},
-		{
-			label: '',
-			data: [0, 0]
-		}
-	];
-
-	// CHART COLOR.
-	colors = [
-		{
-			backgroundColor: 'rgba(0,0,0,0)'
-		},
-		{
-			backgroundColor: 'rgba(0,0,0,0)'
-		}
-	]
-
-	//4 màu cho tối đa 4 nhóm
-	bgColor = ['rgba(30,169,224,0.8)', 'rgba(77,83,96,0.2)', 'rgba(255,228,181,0.4)', 'rgba(100,149,237,0.5)']
-
 	viewLoading: boolean = false;
-	queryParams: QueryParamsModel;
+	queryParams: QueryParamsModel | undefined;
 	allowExport = false;
-	Capcocau: number;
-	filterdistrict: number = 0;
+	Capcocau: number = 0;
 	filterWard: number = 0;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
-	constructor(public xuatDotTangQuaService: xuatDotTangQuaService,
+	constructor(public apiService: xuatDotTangQuaService,
 		private CommonService: CommonService,
 		public dialog: MatDialog,
 		private fb: FormBuilder,
-		private route: ActivatedRoute,
-		private ref: ApplicationRef,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private tokenStorage: TokenStorage,
@@ -109,7 +51,6 @@ export class xuatDotTangQuaComponent implements OnInit {
 		this._name = this.translate.instant('QUA_TET.xuatds');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.CommonService.liteDotQua(true).subscribe(res => {
 			this.listDotQua = res.data;
@@ -118,10 +59,8 @@ export class xuatDotTangQuaComponent implements OnInit {
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 			this.Capcocau = res.Capcocau;
-			this.loadHuyen();
 			if (res.Capcocau == 3) {//xã
 				this.thongKe = 2;
-				this.filterdistrict = +res.ID_Goc_Cha;
 				this.filterWard = +res.ID_Goc;
 				this.listXa = [{
 					Ward: res.DonVi,
@@ -132,18 +71,9 @@ export class xuatDotTangQuaComponent implements OnInit {
 					this.changeDetectorRefs.detectChanges();
 				})
 			}
-			if (res.Capcocau == 2) {
-				this.thongKe = 1;
-				this.filterdistrict = +res.ID_Goc_Cha;
-				this.CommonService.GetListWardByDistrict(this.filterdistrict).subscribe(res => {
-					if (res && res.status == 1)
-						this.listXa = res.data;
-				})
-			}
 			this.createForm();
 			this.changeDetectorRefs.detectChanges();
 		})
-
 		this.createForm();
 		this.loadList();
 	}
@@ -153,21 +83,19 @@ export class xuatDotTangQuaComponent implements OnInit {
 			DotTangQua: [0],
 			thongKe: ['' + this.thongKe],
 			Tinh: [this.filterprovinces],
-			Huyen: [this.filterdistrict],
 			Xa: [this.filterWard],
 			Ap: [0],
 			LocTrung: [0]
 		});
 	}
 
-	loadData(loai: boolean = false) {
+	loadData() {
 		this.queryParams = this.prepareQuery();
-		if (this.queryParams == null)
-			return;
+		if (!this.queryParams) return;
 		this.viewLoading = true;
 		this.display = false;
 		this.loadingSubject.next(true);
-		this.xuatDotTangQuaService.thongKeTheoDotTangQua(this.queryParams).subscribe(res => {
+		this.apiService.thongKeTheoDotTangQua(this.queryParams).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.viewLoading = false;
 			this.display = true;
@@ -184,10 +112,9 @@ export class xuatDotTangQuaComponent implements OnInit {
 
 	xuatDanhSach() {
 		this.queryParams = this.prepareQuery();
-		if (this.queryParams == null)
-			return;
+		if (!this.queryParams) return;
 		this.loadingSubject.next(true);
-		this.xuatDotTangQuaService.exportDSDotQua(this.queryParams).subscribe(res => {
+		this.apiService.exportDSDotQua(this.queryParams).subscribe(res => {
 			this.loadingSubject.next(false);
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
@@ -203,68 +130,46 @@ export class xuatDotTangQuaComponent implements OnInit {
 		});
 	}
 
-	changeLoai($event) {
+	changeLoai($event: any) {
 		this.thongKe = +$event.value;
+		this.dataThongKe = [];
+		this.display = false;
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	prepareQuery(): QueryParamsModel {
-		let filter = this.filterConfiguration();
-		if (filter == null)
-			return null;
-		const queryParams = new QueryParamsModel(
-			filter,
-			'', '', 0, 10,
-		);
-
+	prepareQuery(): any {
+		let filter = this.filter();
+		if (!filter) return null;
+		const queryParams = new QueryParamsModel(filter, '', '', 0, 10);
 		return queryParams;
 	}
 
-	filterConfiguration(): any {
-		const filter: any = {};
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-			filter.type = +this.filterCondition;
-		}
-
+	filter(): any {
+		if (!this.itemForm) return null;
 		if (this.itemForm.controls.DotTangQua.value == 0) {
 			this.layoutUtilsService.showError("Hãy chọn đợt tặng quà muốn thống kê");
 			return null;
 		}
-		else
-			filter.Id_Dot = this.itemForm.controls.DotTangQua.value;
-
+		const filter: any = {};
+		filter.Id_Dot = this.itemForm.controls.DotTangQua.value;
 		filter.Id_Tinh = this.filterprovinces;
 		
-		if (this.thongKe != 1 && this.thongKe != 2 && this.thongKe != 0 && this.thongKe != 3) {
+		if (this.thongKe != 0 && this.thongKe != 2 && this.thongKe != 3) {
 			this.layoutUtilsService.showError("Hãy chọn loại thống kê")
 			return null;
 		}
 
-		if (this.thongKe == 1) {
-			if (this.itemForm.controls.Huyen.value != 0)
-				filter.Id_Huyen = this.itemForm.controls.Huyen.value;
-			else {
-				this.layoutUtilsService.showError("Hãy chọn huyện muốn thống kê")
-				return null;
-			}
-		}
-
 		if (this.thongKe == 2) {
-			if (this.itemForm.controls.Xa.value != 0) {
-				filter.Id_Huyen = this.itemForm.controls.Huyen.value;
+			if (this.itemForm.controls.Xa.value != 0)
 				filter.Id_Xa = this.itemForm.controls.Xa.value;
-			}
 			else {
 				this.layoutUtilsService.showError("Hãy chọn xã muốn thống kê")
 				return null;
 			}
 		}
+
 		if (this.thongKe == 3) {
 			if (this.itemForm.controls.Ap.value != 0) {
-				filter.Id_Huyen = this.itemForm.controls.Huyen.value;
 				filter.Id_Xa = this.itemForm.controls.Xa.value;
 				filter.Id_Ap = this.itemForm.controls.Ap.value;
 			}
@@ -273,32 +178,43 @@ export class xuatDotTangQuaComponent implements OnInit {
 				return null;
 			}
 		}
-
 		filter.Trung = this.itemForm.controls.LocTrung.value ? "1" : "0" 
-
 		return filter;
 	}
 
 	loadList() {
-		this.loadHuyen()
+		this.loadXa()
 		this.createForm()
 	}
 
-	loadHuyen() {
-		this.CommonService.GetListDistrictByProvinces(61).subscribe(res => {
-			this.listHuyen = res.data;
+	loadXa() {
+		if (!this.itemForm) return;
+		let id = this.itemForm.controls.Tinh.value
+		this.CommonService.GetListWardByProvince(id).subscribe(res => {
+			this.listXa = res.data;
+			this.listXaOpt = res.data;
+			this.listXaFiltered.next(res.data ? res.data.slice() : []);
 			this.changeDetectorRefs.detectChanges();
 		})
 	}
 
-	loadXa() {
-		let idhuyen = this.itemForm.controls.Huyen.value
-		this.CommonService.GetListWardByDistrict(idhuyen).subscribe(res => {
-			this.listXa = res.data;
-			this.changeDetectorRefs.detectChanges();
-		})
+	filterXa() {
+		if (!this.listXaOpt) return;
+		let search = this.FilterCtrlXa;
+		if (!search) {
+			this.listXaFiltered.next(this.listXaOpt.slice());
+			return;
+		} else {
+			search = search.toLowerCase();
+		}
+		this.listXaFiltered.next(
+			this.listXaOpt.filter(w => w.Ward.toLowerCase().indexOf(search) > -1)
+		);
+		this.changeDetectorRefs.detectChanges();
 	}
+
 	loadAp() {
+		if (!this.itemForm) return;
 		let id = this.itemForm.controls.Xa.value;
 		this.CommonService.GetListKhomApByWard2(id).subscribe(res => {
 			this.listAp = res.data;

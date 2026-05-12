@@ -6,8 +6,10 @@
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<button class="show-view-sm" (click)="loadData()" *ngIf="allowExport==false" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>
-			<button class="show-view-sm" *ngIf="allowExport==true" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary" >
+			<button class="show-view-sm" (click)="loadData()" *ngIf="!allowExport" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">
+				{{ 'COMMON.XEMTK' | translate }}
+			</button>
+			<button class="show-view-sm" *ngIf="allowExport==true" mat-raised-button  [matMenuTriggerFor]="chucnang" color="primary">
 				{{ 'COMMON.CHUCNANG' | translate }}
 			</button>
 			<mat-menu #chucnang="matMenu">
@@ -42,8 +44,7 @@
 				<div class="col-md-2 kt-margin-bottom-10-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select placeholder="Loại thống kê" formControlName="thongKe" (selectionChange)="changeLoai($event)">
-							<mat-option *ngIf="Capcocau == 1" value="0">Thống kê theo tỉnh</mat-option>
-							<mat-option value="1" *ngIf="Capcocau <=2">Thống kê theo huyện</mat-option>
+							<mat-option value="0" *ngIf="Capcocau == 1">Thống kê theo tỉnh</mat-option>
 							<mat-option value="2" *ngIf="Capcocau <=3">Thống kê theo xã</mat-option>
 							<mat-option value="3">Thống kê theo ấp</mat-option>
 						</mat-select>
@@ -51,24 +52,20 @@
 				</div>
 				<div class="col-md-2 kt-margin-bottom-10-mobile" [hidden]="true">
 					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select [value]="filterprovinces" (selectionChange)="loadHuyen()" formControlName="Tinh" [disabled]="true">
+						<mat-select [value]="filterprovinces" (selectionChange)="loadXa()" formControlName="Tinh" [disabled]="true">
 							<mat-option [value]="list.id_row" *ngFor="let list of listTinh">{{list.Province}}</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
-				<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau <=2 && (thongKe==1 || thongKe==2|| thongKe==3)">
-					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select formControlName="Huyen" placeholder="Chọn huyện thống kê" [(value)]="filterdistrict" (selectionChange)="loadXa()" [disabled]="Capcocau == 2" >
-							<mat-option [value]="0" disabled>--Chọn huyện thống kê--</mat-option>
-							<mat-option *ngFor="let opt of listHuyen;" [value]="opt.ID_Row">{{opt.District}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 				<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau <=3 && (thongKe==2 || thongKe==3)">
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select placeholder="Chọn xã thống kê" [(value)]="filterWard" formControlName="Xa" (selectionChange)="loadAp()" [disabled]="Capcocau == 3">
-							<mat-option [value]="0" disabled>--Chọn xã thống kê--</mat-option>
-							<mat-option [value]="item.ID_Row" *ngFor="let item of listXa">{{item.Ward}}</mat-option>
+							<mat-option>
+								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'"
+									[(ngModel)]="FilterCtrlXa" [ngModelOptions]="{standalone: true}" (ngModelChange)="filterXa()">
+								</ngx-mat-select-search>
+							</mat-option>
+							<mat-option [value]="item.ID_Row" *ngFor="let item of listXaFiltered | async">{{item.Ward}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
@@ -117,4 +114,3 @@
 		</div>
 	</kt-portlet-body>
 </kt-portlet>
-

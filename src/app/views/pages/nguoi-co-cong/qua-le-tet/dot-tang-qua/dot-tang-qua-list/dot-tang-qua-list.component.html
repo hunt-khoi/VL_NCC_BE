@@ -8,7 +8,7 @@
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<button (click)="AddWorkplace()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="itemService1.ReadOnlyControl" color="accent" type="button">
+			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="apiService.ReadOnlyControl" color="accent" type="button">
 				<span translate="COMMON.CREATE"></span>
 			</button>
 
@@ -22,14 +22,14 @@
 				style="width: 100%;" matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" cdkDropListGroup>
 				<ng-container matColumnDef="STT">
 					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode">STT</th>
-					<td mat-cell class="stt-cell" *matCellDef="let item; let i=index">{{i + 1}}</td>
+					<td mat-cell class="stt-cell" *matCellDef="let i=index">{{i + 1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="DotTangQua">
 					<th mat-header-cell *matHeaderCellDef style="flex: 0 0 25%;white-space: nowrap;">
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="DotTangQua" column_title="Đợt tặng quà lễ tết"></kt-column-filter>
 					</th>
 					<td mat-cell *matCellDef="let item" style="flex: 0 0 25%">
-						<a href="javascript:;" (click)="EditNhom(item, false)">{{item.DotTangQua}}</a>
+						<a href="javascript:;" (click)="Edit(item, false)">{{item.DotTangQua}}</a>
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="MoTa">

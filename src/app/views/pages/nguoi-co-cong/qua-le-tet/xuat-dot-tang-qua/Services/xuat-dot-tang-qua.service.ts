@@ -1,28 +1,18 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { QueryParamsModel, HttpUtilsService } from '../../../../../../core/_base/crud';
 import { environment } from '../../../../../../../environments/environment';
 
 const API_TK = environment.ApiRoot + '/tk-chi-tra';
-// const API_district = environment.ApiRoot + '/district';
-// const API_ward = environment.ApiRoot + '/dm_wards';
 
 @Injectable()
 export class xuatDotTangQuaService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
 
-	ReadOnlyControl: boolean;
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) { }
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-
-	//API Export 
 	exportDSDotQua(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders()
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
@@ -36,7 +26,6 @@ export class xuatDotTangQuaService {
 	}
 
 	thongKeTheoDotTangQua(queryParams: QueryParamsModel): Observable<any> {
-
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
 		const url = `${API_TK}/tk-theo-dot-tang-qua`;
@@ -45,26 +34,4 @@ export class xuatDotTangQuaService {
 			params: httpParams
 		});
 	}
-
-	//role: 5, nv huyện ko có role này => ko load dc list huyện (lỗi 403)
-	// findDataDistrict(queryParams: QueryParamsModel): Observable<QueryResultsModel> {	
-	// 	const httpHeaders = this.httpUtils.getHTTPHeaders();
-	// 	const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-	// 	const url = API_district + '/ListAll';
-	// 	return this.http.get<QueryResultsModel>(url, {
-	// 		headers: httpHeaders,
-	// 		params: httpParams
-	// 	});
-	// }
-
-	// findDataWard(queryParams: QueryParamsModel): Observable<QueryResultsModel> {		
-	// 	const httpHeaders = this.httpUtils.getHTTPHeaders();
-	// 	const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-	// 	const url = API_ward + '/ListAll';
-	// 	return this.http.get<QueryResultsModel>(url, {
-	// 		headers: httpHeaders,
-	// 		params: httpParams
-	// 	});
-	// }
-	
 }
