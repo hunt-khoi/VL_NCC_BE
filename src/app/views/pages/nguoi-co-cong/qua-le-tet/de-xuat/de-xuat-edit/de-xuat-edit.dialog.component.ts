@@ -1,14 +1,14 @@
 import { Component, OnInit, Inject, HostListener, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { DeXuatModel, DeXuat_NCCModel } from '../../de-xuat/Model/de-xuat.model';
 import { TranslateService } from '@ngx-translate/core';
-import { DeXuatService } from '../Services/de-xuat.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { DeXuatService } from '../Services/de-xuat.service';
+import { DeXuatModel } from '../../de-xuat/Model/de-xuat.model';
+import { DoiTuongNhanQuaModel } from '../../doi-tuong-nhan-qua/Model/doi-tuong-nhan-qua.model';
 import { DeXuatImportDialogComponent } from '../de-xuat-import/de-xuat-import.dialog.component';
 import { DoiTuongNhanQuaEditDialogComponent } from '../../doi-tuong-nhan-qua/doi-tuong-nhan-qua-edit/doi-tuong-nhan-qua-edit-dialog.component';
-import { DoiTuongNhanQuaModel } from '../../doi-tuong-nhan-qua/Model/doi-tuong-nhan-qua.model';
 
 @Component({
 	selector: 'm-de-xuat-edit-dialog',
@@ -17,9 +17,9 @@ import { DoiTuongNhanQuaModel } from '../../doi-tuong-nhan-qua/Model/doi-tuong-n
 
 export class DeXuatEditDialogComponent implements OnInit {
 
-	item: DeXuatModel;
-	oldItem: DeXuatModel
-	itemForm: FormGroup;
+	item: DeXuatModel = new DeXuatModel();
+	oldItem: DeXuatModel = new DeXuatModel();
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -28,8 +28,8 @@ export class DeXuatEditDialogComponent implements OnInit {
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-	allowImport: boolean;
-	visibleTangGiam: boolean;
+	allowImport: boolean = false;
+	visibleTangGiam: boolean = false;
 	treeNguoiNhan_Goc: any[] = [];
 	treeNguoiNhan: any[] = [];
 	treeNguoiNhanView: any[] = [];
@@ -58,14 +58,13 @@ export class DeXuatEditDialogComponent implements OnInit {
 		public dialog: MatDialog,
 		private fb: FormBuilder,
 		private danhMucService: CommonService,
-		public DeXuatService: DeXuatService,
+		public apiService: DeXuatService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = 'Đề xuất';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit; //true: nhập hoặc sửa đề xuất
@@ -77,16 +76,16 @@ export class DeXuatEditDialogComponent implements OnInit {
 		if (this.item.Id > 0) { //đang sửa hoặc xem đề xuất đã nhập
 			this.getDetail();
 		}
-
-		if (this.addDeXuat && this.item.Id_DotTangQua > 0) //đang nhập đề xuất mới
+		if (this.addDeXuat && this.item.Id_DotTangQua > 0) { //đang nhập đề xuất mới
 			this.getNguoiNhan(this.item.Id_DotTangQua)
+		}
 	}
 
 
 	getDetail() {
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.DeXuatService.getItem(this.item.Id, true).subscribe(res => {
+		this.apiService.getItem(this.item.Id, true).subscribe(res => {
 			this.viewLoading = false;
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
@@ -117,13 +116,14 @@ export class DeXuatEditDialogComponent implements OnInit {
 
 	filterText() {
 		let text = this.Filter.toLowerCase();
-		this.treeNguoiNhan = this.treeNguoiNhan_Goc.map(x => {
-			let data = x.data.map(xx => {
-				let dt = xx.DoiTuongs.map(xxx => {
+		this.treeNguoiNhan = this.treeNguoiNhan_Goc.map((x: any) => {
+			let data = x.data.map((xx: any) => {
+				let dt = xx.DoiTuongs.map((xxx: any) => {
 					return {
 						DoiTuong: xxx.DoiTuong,
 						Id_DoituongNCC: xxx.Id_DoituongNCC,
-						NCCs: xxx.NCCs.filter(y => y.SoHoSo.toLowerCase().includes(text) || y.HoTen.toLowerCase().includes(text) || y.DiaChi.toLowerCase().includes(text) || y.NguoiThoCungLietSy.toLowerCase().includes(text))
+						NCCs: xxx.NCCs.filter((y: any) => y.SoHoSo.toLowerCase().includes(text) || y.HoTen.toLowerCase().includes(text) 
+						|| y.DiaChi.toLowerCase().includes(text) || y.NguoiThoCungLietSy.toLowerCase().includes(text))
 					}
 				})
 				return {
@@ -131,7 +131,6 @@ export class DeXuatEditDialogComponent implements OnInit {
 					DoiTuongs: dt
 				};
 			});
-
 			return {
 				Id_NguonKinhPhi: x.Id_NguonKinhPhi,
 				NguonKinhPhi: x.NguonKinhPhi,
@@ -146,43 +145,43 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.TongTien = 0;
 		this.tongMuc = [];
 		this.tongSL = [];
-		for (let i = 0; i < this.treeNguoiNhan_Goc.length; i++) {
-			let DanhSach = this.treeNguoiNhan_Goc[i].data;
-			let tongMuc = [];
-			let tongSL = [];
-			for (let c1 of DanhSach) {
+		for (const goc of this.treeNguoiNhan_Goc) {
+			const tempTongMuc: any[] = [];
+			const tempTongSL: number[] = [];
+			for (const c1 of goc.data) {
 				let s = 0;
 				let c = 0;
-				for (let c2 of c1.DoiTuongs) {
-					for (let c3 of c2.NCCs) {
-						if (this.allowEdit) {
-							if (this.item.Id == 0) { //TH chưa nhập đề xuất IsTang chưa có
-								if (c3.IsTang && c3.Id_DeXuat == this.item.Id)
-									c3.IsTang = true;
-							}
-							if ((c3.Checked && !c3.IsGiam) || c3.IsTang) { 
-								let tien = this.danhMucService.stringToInt(c3.SoTien);
-								s += tien;
-								c++;
-							}
-						} else { //xem đề xuất
-							if ((this.selected_tab == 0 && c3.Checked && !c3.IsGiam)
-								|| (this.selected_tab == 1 && c3.IsTang)
-								|| (this.selected_tab == 2 && c3.IsGiam)) {
-								let tien = this.danhMucService.stringToInt(c3.SoTien);
-								s += tien;
-								c++;
-							}
+				for (const c2 of c1.DoiTuongs) {
+					for (const c3 of c2.NCCs) {
+						// sửa ----------------------
+						//chưa nhập đề xuất IsTang chưa có
+						if (this.allowEdit && this.item.Id === 0 && c3.IsTang && c3.Id_DeXuat === this.item.Id) {
+							c3.IsTang = true;
 						}
+
+						//tăng, ko giảm
+						const isHopLeKhiSua = this.allowEdit && ((c3.Checked && !c3.IsGiam) || c3.IsTang);
+
+						//xem ----------------------
+						const isHopLeKhiXem = !this.allowEdit && (
+							(this.selected_tab === 0 && c3.Checked && !c3.IsGiam) ||
+							(this.selected_tab === 1 && c3.IsTang) ||
+							(this.selected_tab === 2 && c3.IsGiam)
+						); //xem đề xuất
+
+						if (!isHopLeKhiSua && !isHopLeKhiXem) continue;
+						const tien = this.danhMucService.stringToInt(c3.SoTien);
+						s += tien;
+						c++;
 					}
 				}
-				tongMuc.push(this.danhMucService.f_currency_V2('' + s));
-				tongSL.push(c);
+				tempTongMuc.push(this.danhMucService.f_currency_V2('' + s));
+				tempTongSL.push(c);
 				this.TongSo += c;
 				this.TongTien += s;
 			}
-			this.tongMuc.push(tongMuc);
-			this.tongSL.push(tongSL);
+			this.tongMuc.push(tempTongMuc);
+			this.tongSL.push(tempTongSL);
 		}
 	}
 
@@ -196,10 +195,10 @@ export class DeXuatEditDialogComponent implements OnInit {
 		});
 	}
 
-	getNguoiNhan(id) { //id: Id đợt tặng quà
+	getNguoiNhan(id: number) { //id: Id đợt tặng quà
 		this.viewLoading = true;
 		this.tongMuc = []
-		this.DeXuatService.getNguoiNhanByDot(id).subscribe(res => {
+		this.apiService.getNguoiNhanByDot(id).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.treeNguoiNhan_Goc = res.data;
@@ -213,6 +212,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 	}
 
 	loadImport() {
+		if (!this.itemForm) return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -221,7 +221,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.viewLoading = true;
 		var data: any = files[0];
 		data.Id_DotTangQua = this.itemForm.controls["DotTangQua"].value;
-		this.DeXuatService.importFile(data).subscribe(res => {
+		this.apiService.import(data).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.treeNguoiNhan_Goc = res.data;
@@ -238,15 +238,14 @@ export class DeXuatEditDialogComponent implements OnInit {
 			DotTangQua: [this.item.Id_DotTangQua, Validators.required],
 			file: []
 		});
+
 		if (!this.allowEdit)
 			this.itemForm.disable();
-
 		if (this.data.Id_Dot !== null)
 			this.itemForm.disable();
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this.translate.instant('DE_XUAT.ADD');
 		if (!this.item || !this.item.Id) {
@@ -260,29 +259,39 @@ export class DeXuatEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareDeXuat(): DeXuatModel {
+	prepareDeXuat(): DeXuatModel | null {
+		if (!this.itemForm) return null;
+
 		const controls = this.itemForm.controls;
 		const _item = new DeXuatModel();
 		_item.Id = this.item.Id;
 		_item.Id_DotTangQua = controls['DotTangQua'].value;
 		_item.NCCs = [];
 		_item.DoiTuongGiam = [];
-		for (var i = 0; i < this.treeNguoiNhan_Goc.length; i++) {
-			for (var k = 0; k < this.treeNguoiNhan_Goc[i].data.length; k++) {
-				let temp = this.treeNguoiNhan_Goc[i].data[k];
-				for (var j = 0; j < temp.DoiTuongs.length; j++)
-					temp.DoiTuongs[j].NCCs.forEach(x => {
-						if (this.visibleTangGiam) {
-							if (x.IsTang || (!x.IsTang && !x.IsGiam && !x.IsNew)) //dữ liệu kế thừa + tăng
-								_item.NCCs.push(x);
-							if (x.IsGiam)
-								_item.DoiTuongGiam.push(x);
-						} else {
-							if (x.Checked)
-								_item.NCCs.push(x); //đợt gốc chỉ thêm ncc được check
+		for (const goc of this.treeNguoiNhan_Goc) {
+			for (const temp of goc.data) {
+				for (const doiTuong of temp.DoiTuongs) {
+					for (const ncc of doiTuong.NCCs) {
+
+						// Nếu không visibleTangGiam: Đợt gốc chỉ thêm ncc được check
+						if (!this.visibleTangGiam) {
+							if (ncc.Checked) _item.NCCs.push(ncc);
+							continue;
 						}
-					});
+
+						// Xử lý khi visibleTangGiam = true
+						// Dữ liệu kế thừa + tăng: Rút gọn logic (A || (!A && !B && !C)) thành (A || (!B && !C))
+						// x.IsTang || (!x.IsTang && !x.IsGiam && !x.IsNew)
+						if (ncc.IsTang || (!ncc.IsGiam && !ncc.IsNew)) {
+							_item.NCCs.push(ncc);
+						}
+
+						// Dữ liệu giảm
+						if (ncc.IsGiam) {
+							_item.DoiTuongGiam.push(ncc);
+						}
+					}
+				}
 			}
 		}
 		return _item;
@@ -291,8 +300,8 @@ export class DeXuatEditDialogComponent implements OnInit {
 	onSubmit() {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -302,6 +311,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 		}
 
 		const EditDot = this.prepareDeXuat();
+		if (!EditDot) return;
 		if (!this.visibleTangGiam) { //thêm, sửa đợt gốc
 			if (EditDot.Id > 0) {
 				this.UpdateDot(EditDot);
@@ -322,13 +332,11 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.DeXuatService.Clone(_item).subscribe(res => {
+		this.apiService.Clone(_item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.dialogRef.close({
-					_item
-				});
+				this.dialogRef.close({ _item });
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -340,13 +348,11 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.DeXuatService.updateDotTangQua(_item).subscribe(res => {
+		this.apiService.update(_item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.dialogRef.close({
-					_item
-				});
+				this.dialogRef.close({ _item });
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -358,13 +364,11 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.DeXuatService.createDotTangQua(_item).subscribe(res => {
+		this.apiService.create(_item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.dialogRef.close({
-					_item
-				});
+				this.dialogRef.close({ _item });
 			}
 			else {
 				this.viewLoading = false;
@@ -374,7 +378,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 	}
 
 	//chọn/ko chọn ở đợt gốc
-	chon(ncc, index_nguon, index_muc) {
+	chon(ncc: any, index_nguon: number, index_muc: number) {
 		let value = this.danhMucService.stringToInt(ncc.SoTien);
 		if (!ncc.Checked)
 			value = value * -1
@@ -383,13 +387,13 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.tongSL[index_nguon][index_muc] = this.tongSL[index_nguon][index_muc] + (!ncc.Checked ? -1 : 1);
 	}
 
-	updateLyDo(item){
+	updateLyDo(item: any){
 		if (item.DisabledGiam || this.item.Id == 0 || !item.IsGiam || item.LyDo == undefined)
 			return;
 		let temp = { Id: this.item.Id, IdGiam: item.Id, LyDo: item.LyDo, GhiChuGiam: item.GhiChuGiam }
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.DeXuatService.UpdateGiam(temp).subscribe(res => {
+		this.apiService.UpdateGiam(temp).subscribe(res => {
 			this.viewLoading = false;
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
@@ -402,11 +406,10 @@ export class DeXuatEditDialogComponent implements OnInit {
 		})
 	}
 
-	baoGiam($event, item) {
+	baoGiam($event: any, item: any) {
 		let mess_giamtc = this.translate.instant('DE_XUAT.baogiamtc');
 		let mess_huygiamtc = this.translate.instant('DE_XUAT.huybaogiamtc');
-		if (item.DisabledGiam)
-			return;
+		if (item.DisabledGiam) return;
 		if (item.LyDo == undefined || item.LyDo == null) {
 			item.LyDo = 0; //gán mặc định
 		}
@@ -423,7 +426,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 			let temp = { Id: this.item.Id, DoiTuongGiam: [item] }
 			this.viewLoading = true;
 			this.disabledBtn = true;
-			this.DeXuatService.BaoGiam(temp).subscribe(res => {
+			this.apiService.BaoGiam(temp).subscribe(res => {
 				this.viewLoading = false;
 				this.disabledBtn = false;
 				this.changeDetectorRefs.detectChanges();
@@ -437,7 +440,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 		} else {//hủy báo giảm
 			this.viewLoading = true;
 			this.disabledBtn = true;
-			this.DeXuatService.HuyBaoGiam(item.Id).subscribe(res => {
+			this.apiService.HuyBaoGiam(item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.disabledBtn = false;
 				this.changeDetectorRefs.detectChanges();
@@ -452,34 +455,27 @@ export class DeXuatEditDialogComponent implements OnInit {
 	}
 
 	//báo giảm/hủy báo giảm khi nhập đề xuất
-	baoGiam0(item, check) {
-		//báo giảm/hủy báo giảm nhiều nguồn
-		for (var j = 0; j < this.treeNguoiNhan.length; j++) {
-			let ng = this.treeNguoiNhan[j];
-			for (var i = 0; i < ng.data.length; i++) {
-				let muc = ng.data[i];
-				if (+muc.MucQua > 0) {
-					let find = muc.DoiTuongs.findIndex(x => +item.Id_DoiTuongNCC == +x.Id_DoituongNCC);
-					if (find >= 0) {
-						let ncc = muc.DoiTuongs[find].NCCs.find(x => +item.Id_NCC == x.Id_NCC);
-						if (ncc) {
-							ncc.IsGiam = check;
-							if (check) {
-								ncc.LyDo = item.LyDo;
-								ncc.GhiChuGiam = item.GhiChuGiam;
-							} else {
-								ncc.LyDo = null;
-								ncc.GhiChuGiam = null;
-							}
-						}
-					}
-				}
+	baoGiam0(item: any, check: boolean) {
+		for (const ng of this.treeNguoiNhan) {
+			for (const muc of ng.data) {
+				// Bỏ qua nếu mức quà <= 0
+				if (+muc.MucQua <= 0) continue;
+
+				const doiTuong = muc.DoiTuongs.find((x: any) => +item.Id_DoiTuongNCC === +x.Id_DoituongNCC);
+				if (!doiTuong) continue;
+
+				const ncc = doiTuong.NCCs.find((x: any) => +item.Id_NCC === +x.Id_NCC);
+				if (!ncc) continue;
+
+				ncc.IsGiam = check;
+				ncc.LyDo = check ? item.LyDo : null;
+				ncc.GhiChuGiam = check ? item.GhiChuGiam : null;
 			}
 		}
 		this.tinhTongMuc();
 	}
 
-	huybaotang(ncc, index_nguon, index_muc) {
+	huybaotang(ncc: any, index_nguon: number, index_muc: number) {
 		// let mess_huytangtc = this.translate.instant('DE_XUAT.huybaotangtc');
 		// if (!ncc.IsTang) {
 		// 	let value = this.danhMucService.stringToInt(ncc.SoTien);
@@ -490,7 +486,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 		// }
 		// this.viewLoading = true;
 		// this.disabledBtn = true;
-		// this.DeXuatService.HuyBaoTang(ncc.Id).subscribe(res => {
+		// this.apiService.HuyBaoTang(ncc.Id).subscribe(res => {
 		// 	this.viewLoading = false;
 		// 	this.disabledBtn = false;
 		// 	this.changeDetectorRefs.detectChanges();
@@ -505,7 +501,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 		// })
 	}
 
-	baoTang($event, item) {
+	baoTang($event: any, item: any) {
 		let mess_tangtc = this.translate.instant('DE_XUAT.baotangtc');
 		let mess_huytangtc = this.translate.instant('DE_XUAT.huybaotangtc');
 		if (this.item.Id == 0) { //nhập đề xuất
@@ -522,14 +518,14 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.disabledBtn = true;
 		if ($event.checked) { //báo tăng
 			// let _item = { Id_NCC: item.Id_NCC, Id: this.item.Id, Id_NguonKinhPhi: item.Id_NguonKinhPhi }
-			this.DeXuatService.BaoTang(this.item.Id, this.lstDTTang).subscribe(res => {
+			this.apiService.BaoTang(this.item.Id, this.lstDTTang).subscribe(res => {
 				this.viewLoading = false;
 				this.disabledBtn = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
 					// item.IsTang = true;
 					// item.Id = res.data[0].Id; //id detail
-					res.data.forEach(x => {
+					res.data.forEach((x: any) => {
 						let find = this.lstDTTang.find(y => +y.Id_NCC == +x.Id_NCC && +y.Id_NguonKinhPhi == +x.Id_NguonKinhPhi);
 						if (find) {
 							find.IsTang = true;
@@ -546,7 +542,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 			var lst = this.findncc(item.Id_DoiTuongNCC, item.Id_NCC);
 			var ids: any[] = [];
 			lst.forEach(x => ids.push(x.Id));
-			this.DeXuatService.HuyBaoTang(ids).subscribe(res => {
+			this.apiService.HuyBaoTang(ids).subscribe(res => {
 				this.viewLoading = false;
 				this.disabledBtn = false;
 				this.changeDetectorRefs.detectChanges();
@@ -563,41 +559,40 @@ export class DeXuatEditDialogComponent implements OnInit {
 	}
 
 	//báo tăng/hủy báo tăng khi nhập đề xuất
-	baoTang0(item, check) {
+	baoTang0(item: any, check: boolean) {
 		//báo tăng/hủy báo tăng nhiều nguồn
-		for (var j = 0; j < this.treeNguoiNhan.length; j++) {
-			let ng = this.treeNguoiNhan[j];
-			for (var i = 0; i < ng.data.length; i++) {
-				let muc = ng.data[i];
-				if (+muc.MucQua > 0) {
-					let find = muc.DoiTuongs.findIndex(x => +item.Id_DoiTuongNCC == +x.Id_DoituongNCC);
-					if (find >= 0) {
-						let ncc = muc.DoiTuongs[find].NCCs.find(x => +item.Id_NCC == x.Id_NCC);
-						if (ncc) {
-							ncc.IsTang = check;
-							ncc.IsNew = true;
-						}
-					}
-				}
+		for (const ng of this.treeNguoiNhan) {
+			for (const muc of ng.data) {
+				// Bỏ qua nếu mức quà <= 0
+				if (+muc.MucQua <= 0) continue;
+
+				const doiTuong = muc.DoiTuongs.find((x: any) => +item.Id_DoiTuongNCC === +x.Id_DoituongNCC);
+				if (!doiTuong) continue;
+
+				const ncc = doiTuong.NCCs.find((x: any) => +item.Id_NCC === +x.Id_NCC);
+				if (!ncc) continue;
+
+				ncc.IsTang = check;
+				ncc.IsNew = true;
 			}
 		}
 		this.tinhTongMuc();
 	}
 
-	findncc(Id_DoiTuongNCC, Id_NCC) {
-		let nccs: any[] = [];
-		for (var j = 0; j < this.treeNguoiNhan.length; j++) {
-			let ng = this.treeNguoiNhan[j];
-			for (var i = 0; i < ng.data.length; i++) {
-				let muc = ng.data[i];
-				if (+muc.MucQua > 0) {
-					let find = muc.DoiTuongs.findIndex(x => +Id_DoiTuongNCC == +x.Id_DoituongNCC);
-					if (find > -1) {
-						let ncc = muc.DoiTuongs[find].NCCs.find(x => +Id_NCC == x.Id_NCC);
-						if (ncc) 
-							nccs.push(ncc);
-					}
-				}
+	findncc(Id_DoiTuongNCC: number, Id_NCC: number) {
+		const nccs: any[] = [];
+		for (const ng of this.treeNguoiNhan) {
+			for (const muc of ng.data) {
+				// Bỏ qua nếu mức quà <= 0
+				if (+muc.MucQua <= 0) continue;
+
+				const doiTuong = muc.DoiTuongs.find((x: any) => +Id_DoiTuongNCC === +x.Id_DoituongNCC);
+				if (!doiTuong) continue;
+
+				// Tìm NCC
+				const ncc = doiTuong.NCCs.find((x: any) => +Id_NCC === +x.Id_NCC);
+				if (ncc) 
+					nccs.push(ncc);
 			}
 		}
 		return nccs;
@@ -605,6 +600,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 
 	//#region Import chi tiết đợt tặng quà
 	import() {
+		if (!this.itemForm) return;
 		let id = this.itemForm.controls["DotTangQua"].value;
 		if (!id) {
 			this.layoutUtilsService.showError("Vui lòng chọn đợt tặng quà");
@@ -622,12 +618,13 @@ export class DeXuatEditDialogComponent implements OnInit {
 	}
 
 	downFile() {
+		if (!this.itemForm) return;
 		let id = this.itemForm.controls["DotTangQua"].value;
 		if (!id) {
 			this.layoutUtilsService.showError("Vui lòng chọn đợt tặng quà");
 			return;
 		}
-		this.DeXuatService.downloadTemplate(id).subscribe(res => {
+		this.apiService.downloadTemplate(id).subscribe(res => {
 			var headers = res.headers;
 			let filename = headers.get('x-filename');
 			let type = headers.get('content-type')
@@ -641,7 +638,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 	}
 	//#endregion
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -649,7 +646,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	changed_tab($event) {
+	changed_tab($event: any) {
 		this.selected_tab = $event;
 		this.tinhTongMuc();
 	}
@@ -679,41 +676,38 @@ export class DeXuatEditDialogComponent implements OnInit {
 		const dialogRef = this.dialog.open(DoiTuongNhanQuaEditDialogComponent, { data: { IsReturn: true, allowEdit: true, _item: _item } });
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
-			for (var j = 0; j < this.treeNguoiNhan.length; j++) {
-				let ng = this.treeNguoiNhan[j];
-				for (var i = 0; i < ng.data.length; i++) {
-					let muc = ng.data[i];
-					if (+muc.MucQua > 0) {
-						let find = muc.DoiTuongs.findIndex(x => +res.Id_DoiTuongNCC == +x.Id_DoituongNCC);
-						if (find >= 0) {
-							let temp = Object.assign({}, res);
-							temp.Id_NCC = res.Id;
-							temp.Id = 0;
-							temp.Id_DeXuat = 0;
-							temp.Id_NguonKinhPhi = ng.Id_NguonKinhPhi;
-							temp.SoTien = this.danhMucService.f_currency_V2('' + muc.MucQua);
-							if (baoTang) {
-								// this.baoTang({ checked: true }, temp);
-								this.lstDTTang.push(temp);
-							}
-							else {
-								temp.Checked = true; //tự check khi thêm đt ở đợt gốc
-							}
-							muc.DoiTuongs[find].NCCs.push(temp);
-							muc.DoiTuongs[find].NCCs.sort(function (a, b) {
-								var nameA = a.HoTen
-								var nameB = b.HoTen
-								if (nameA < nameB) 
-									return -1;
-								if (nameA > nameB)
-									return 1;
-								return 0; // name trùng nhau
-							});
-						}
+
+			for (const ng of this.treeNguoiNhan) {
+				for (const muc of ng.data) {
+					// Bỏ qua nếu mức quà <= 0
+					if (+muc.MucQua <= 0) continue;
+					const doiTuong = muc.DoiTuongs.find((x: any) => +res.Id_DoiTuongNCC === +x.Id_DoituongNCC);
+					if (!doiTuong) continue;
+
+					// Clone object bằng Spread Operator (ngắn gọn hơn Object.assign)
+					const temp = {
+						...res,
+						Id_NCC: res.Id,
+						Id: 0,
+						Id_DeXuat: 0,
+						Id_NguonKinhPhi: ng.Id_NguonKinhPhi,
+						SoTien: this.danhMucService.f_currency_V2('' + muc.MucQua)
+					};
+
+					if (baoTang) {
+						this.lstDTTang.push(temp);
+					} else {
+						temp.Checked = true; // tự check khi thêm đt ở đợt gốc
 					}
+					// Thêm temp vào mảng NCCs và sắp xếp lại
+					doiTuong.NCCs.push(temp);
+					doiTuong.NCCs.sort((a: any, b: any) => {
+						if (a.HoTen < b.HoTen) return -1;
+						if (a.HoTen > b.HoTen) return 1;
+						return 0;
+					});
 				}
 			}
-
 			if (baoTang && this.lstDTTang.length > 0) {
 				this.baoTang({ checked: true }, this.lstDTTang[0]);
 			}
@@ -721,7 +715,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 	}
 
 	export() {
-		this.DeXuatService.exportExcelDeXuat(this.item.Id).subscribe(res => {
+		this.apiService.exportExcelDeXuat(this.item.Id).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

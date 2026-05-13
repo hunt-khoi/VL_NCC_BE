@@ -1,6 +1,5 @@
 <div class="btn-close-container">
-    <button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn"
-        title="Đóng">
+    <button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn" title="Đóng">
         <mat-icon>clear</mat-icon>
     </button>
 </div>
@@ -21,21 +20,15 @@
             <div class="row">
                 <div class="col-md-6 row form-group">
                     <div class="col-3">Họ tên:</div>
-                    <div class="col-9 font-weight-bold">
-                        {{dataNhanqua.HoTen}}
-                    </div>
+                    <div class="col-9 font-weight-bold">{{dataNhanqua.HoTen}}</div>
                 </div>
                 <div class="col-md-6 row form-group">
                     <div class="col-3">Số hồ sơ:</div>
-                    <div class="col-9 font-weight-bold">
-                        {{dataNhanqua.SoHoSo}}
-                    </div>
+                    <div class="col-9 font-weight-bold">{{dataNhanqua.SoHoSo}}</div>
                 </div>
                 <div class="col-md-6 row form-group">
                     <div class="col-3">Mức quà:</div>
-                    <div class="col-9 font-weight-bold">
-                        {{dataNhanqua.SoTien}}
-                    </div>
+                    <div class="col-9 font-weight-bold">{{dataNhanqua.SoTien}}</div>
                 </div>
             </div>
             <div class="row">
@@ -47,14 +40,12 @@
                 <div class="col-md-6 row form-group">
                     <div class="col-4">Thời gian nhận:</div>
                     <div class="col-8 font-weight-bold">
-                       {{ThoiGianNhan | date:'dd/MM/yyyy HH:mm'}}
+                       {{ThoiGianNhan | date: 'dd/MM/yyyy HH:mm'}}
                     </div>
                 </div>
                 <div class="col-md-6 row form-group">
                     <div class="col-3">Số phiếu chi:</div>
-                    <div class="col-9 font-weight-bold">
-                       {{sophieuchi}}
-                    </div>
+                    <div class="col-9 font-weight-bold">{{sophieuchi}}</div>
                 </div>
             </div>
         </div>

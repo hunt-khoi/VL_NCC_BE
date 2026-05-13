@@ -13,17 +13,13 @@
 				style="width: 100%;" matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
 				<ng-container matColumnDef="STT">
 					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode">STT</th>
-					<td mat-cell class="stt-cell" *matCellDef="let item; let i=index">
-						{{i+1}}
-					</td>
+					<td mat-cell class="stt-cell" *matCellDef="let i=index">{{i+1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="DotTangQua">
 					<th mat-header-cell *matHeaderCellDef style="flex: 0 0 25%">
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="DotTangQua" column_title="Đợt nhập niên hạn"></kt-column-filter>
 					</th>
-					<td mat-cell *matCellDef="let dottangqua" style="flex: 0 0 25%">
-						{{dottangqua.DotTangQua}}
-					</td>
+					<td mat-cell *matCellDef="let item" style="flex: 0 0 25%">{{item.DotTangQua}}</td>
 				</ng-container>
 				<ng-container matColumnDef="Nam">
 					<th mat-header-cell *matHeaderCellDef style="justify-content: center" mat-sort-header>Năm</th>
@@ -58,54 +54,30 @@
 					<th mat-header-cell *matHeaderCellDef style="width: 100px;">
 						<span translate="COMMON.TACVU"></span>
 					</th>
-					<td mat-cell *matCellDef="let dottang" style="white-space: nowrap; text-align:left">
-						<button (click)="AddWorkplace(dottang.Id)" mat-raised-button matTooltip="Nhập đề xuất" color="primary" *ngIf="this.Capcocau == 3">
-						Nhập
+					<td mat-cell *matCellDef="let item" style="white-space: nowrap; text-align: left">
+						<button mat-raised-button (click)="Add(item.Id)" *ngIf="this.Capcocau == 3"
+							matTooltip="Nhập đề xuất" color="primary" type="button">
+							Nhập
 						</button>
 					</td>
 				</ng-container>
-	
 				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
 				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
 			</table>
-	
-			<div class="mat-table__message" *ngIf="!dataSource.hasItems">
-				<span translate="COMMON.NO_RECORD_FOUND"></span>
-			</div>
+
+			<div class="mat-table__message" *ngIf="!dataSource.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
 		</div>
 	
-		<!-- start: BOTTOM -->
 		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 			<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
-				<mat-chip-list>
-					<ng-container *ngFor="let chip of gridService.model.lstChip">
-						<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
-							{{chip.title}}: {{chip.data}}
-							<mat-icon matChipRemove>cancel</mat-icon>
-						</mat-chip>
-						<ng-container *ngIf="chip.type==1">
-							<mat-chip *ngFor="let item of chip.data" removable="true"
-									  (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
-								{{chip.title}}: {{item.name}}
-								<mat-icon matChipRemove>cancel</mat-icon>
-							</mat-chip>
-						</ng-container>
-					</ng-container>
-					<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll"
-							  (click)="gridService.Clear()">
-						Đặt lại
-					</mat-chip>
-				</mat-chip-list>
+				<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
 			</div>
-	
 			<div class="flt-page" style="width: 50%;">
 				<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
 				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"
-					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+				</mat-paginator>
 			</div>
 		</div>
-		<!-- end: BOTTOM -->
 	</kt-portlet-body>
-
 </kt-portlet>
-

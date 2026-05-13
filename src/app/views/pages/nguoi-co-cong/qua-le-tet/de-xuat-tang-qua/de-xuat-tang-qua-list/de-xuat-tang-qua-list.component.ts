@@ -2,21 +2,18 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, 
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
-// RXJS
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-import { DeXuatTangQuaDataSource } from '../Model/data-sources/de-xuat-tang-qua.datasource';
-import { DotTangQuaModel } from '../Model/de-xuat-tang-qua.model';
-import { DeXuatTangQuaService } from '../Services/de-xuat-tang-qua.service';
-import { CommonService } from '../../../services/common.service';
+import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from '../../../../../partials/table';
 import { TableService } from '../../../../../partials/table/table.service';
-import { DeXuatEditDialogComponent } from '../../de-xuat/de-xuat-edit/de-xuat-edit.dialog.component';
+import { DotTangQuaModel } from '../Model/de-xuat-tang-qua.model';
 import { DeXuatModel } from '../../de-xuat/Model/de-xuat.model';
-import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
+import { DeXuatTangQuaService } from '../Services/de-xuat-tang-qua.service';
+import { DeXuatTangQuaDataSource } from '../Model/data-sources/de-xuat-tang-qua.datasource';
+import { DeXuatEditDialogComponent } from '../../de-xuat/de-xuat-edit/de-xuat-edit.dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -27,12 +24,12 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class DeXuatTQListComponent implements OnInit, OnChanges {
 	// Table fields
-	dataSource: DeXuatTangQuaDataSource;
+	dataSource: DeXuatTangQuaDataSource | undefined;
 	@Input() donvi: any;
-	@Input() nam: number;
+	@Input() nam: number = 0;
 	@Input() dot: number = 0;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 
 	filterStatus = '';
 	filterCondition = '';
@@ -43,17 +40,18 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 	_name = "";
 	Capcocau = 3;
 
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
-	visibleGuiDuyet: boolean;
-	vivibleThuHoi: boolean;
-	IsVisible_Duyet: boolean;
-	IsEnable_Duyet: boolean;
+	visibleGuiDuyet: boolean = false;
+	vivibleThuHoi: boolean = false;
+	IsVisible_Duyet: boolean = false;
+	IsEnable_Duyet: boolean = false;
 	requiredImportFirst: boolean = false;
 
-	constructor(public DeXuatService1: DeXuatTangQuaService,
-		private CommonService: CommonService,
+	constructor(public apiService: DeXuatTangQuaService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private ref: ApplicationRef,
@@ -64,7 +62,6 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 		this._name = "Đợt tặng quà cần đề xuất";
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.Capcocau = res.Capcocau;
@@ -137,48 +134,48 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns)
 
-
 		this.gridService = new TableService(this.layoutUtilsService, this.ref, this.gridModel, this.cookieService);
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
 		// Init DataSource
-		this.dataSource = new DeXuatTangQuaDataSource(this.DeXuatService1);
+		this.dataSource = new DeXuatTangQuaDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.DeXuatService1.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
 			}
 		});
 	}
+
 	ngOnChanges() {
 		if (this.dataSource)
 			this.loadDataList();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -191,46 +188,38 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.nam)
+		if (this.nam) {
 			filter.Nam = this.nam;
-		if (this.dot > 0)
+		}
+		if (this.dot > 0) {
 			filter.Id_DotTangQua = this.dot;
-
+		}
 		if (this.filterStatus && this.filterStatus.length > 0) {
 			filter.status = +this.filterStatus;
 		}
 		if (this.filterCondition && this.filterCondition.length > 0) {
 			filter.type = +this.filterCondition;
 		}
-
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DotTangQua = this.gridService.model.filterText['DotTangQua'];
 		}
-
 		return filter; 
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-		if (!queryParams.filter) {
-			return;
-		}
-	}
 
-	AddWorkplace(Id_Dot) {
+	Add(Id_Dot: number) {
 		const DeXuatModels = new DeXuatModel();
 		DeXuatModels.clear(); // Set all defaults fields
 		DeXuatModels.Id_DotTangQua = Id_Dot
-		this.EditNhom(DeXuatModels);
+		this.Edit(DeXuatModels);
 	}
 
-	EditNhom(_item: DeXuatModel) {
+	Edit(_item: DeXuatModel) {
 		let addDeXuat = true;
 		let allowEdit = true;
 		const _saveMessage = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: 'đề xuất' });
-		const dialogRef = this.dialog.open(DeXuatEditDialogComponent, { data: { _item, allowEdit, addDeXuat }, 
-			width:'80%', disableClose: true });
+		const dialogRef = this.dialog.open(DeXuatEditDialogComponent, 
+			{ data: { _item, allowEdit, addDeXuat }, width:'80%', disableClose: true });
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) {
 				this.loadDataList();
@@ -254,5 +243,4 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 			return tmp_height + 'px';
 		}
 	}
-
 }

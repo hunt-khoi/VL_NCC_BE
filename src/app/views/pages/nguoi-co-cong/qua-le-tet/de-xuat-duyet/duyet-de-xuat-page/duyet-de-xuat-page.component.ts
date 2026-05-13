@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, Chan
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 
@@ -14,18 +14,18 @@ import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 
 export class DuyetDeXuatPageComponent implements OnInit {
 	item: any = {};
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors = false;
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
 	isZoomSize: boolean = false;
 	require = '';
-	id = 0;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	id: number = 0;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
-	tongMuc = [];
-	tongSL = [];
+	tongMuc: any[] = [];
+	tongSL: any[] = [];
 	selected_tab: number = 0;
 	TongSo: number = 0;
 	TongTien: number = 0;
@@ -36,17 +36,15 @@ export class DuyetDeXuatPageComponent implements OnInit {
 		public commonService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private actRoute: ActivatedRoute,
 		private route: Router,
 		private translate: TranslateService) {
 		this._NAME = 'Đề xuất tặng quà';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.actRoute.paramMap.subscribe(params => {
-			this.id = +params.get('id');
+			this.id = +(params.get('id') || 0);
 		});
 		this.item.Id = this.id;
 		this.item.IsVisible_Duyet = true;
@@ -70,52 +68,50 @@ export class DuyetDeXuatPageComponent implements OnInit {
 	tinhTongMuc() {
 		this.TongSo = 0;
 		this.TongTien = 0;
-		this.tongMuc = []
-		this.tongSL = []
-		for (let i = 0; i < this.item.Details.length; i++) {
-			let DanhSach = this.item.Details[i].data;
-			let tongMuc = [];
-			let tongSL = [];
-			for (let c1 of DanhSach) {
+		this.tongMuc = [];
+		this.tongSL = [];
+		for (const detail of this.item.Details) {
+			const tempTongMuc: any[] = [];
+			const tempTongSL: any[] = [];
+			for (const c1 of detail.data) {
 				let s = 0;
 				let c = 0;
-				for (let c2 of c1.DoiTuongs) {
-					for (let c3 of c2.NCCs) {
-						if ((this.selected_tab == 0 && c3.Checked && !c3.IsGiam)
-							|| (this.selected_tab == 1 && c3.IsTang)
-							|| (this.selected_tab == 2 && c3.IsGiam)) {
-							let tien = this.commonService.stringToInt(c3.SoTien)
-							s += tien;
-							c++;
-						}
+				for (const c2 of c1.DoiTuongs) {
+					for (const c3 of c2.NCCs) {
+						const isHopLe = (this.selected_tab === 0 && c3.Checked && !c3.IsGiam)
+									|| (this.selected_tab === 1 && c3.IsTang)
+									|| (this.selected_tab === 2 && c3.IsGiam);
+
+						if (!isHopLe) continue;
+						s += this.commonService.stringToInt(c3.SoTien);
+						c++;
 					}
 				}
-				tongMuc.push(this.commonService.f_currency_V2('' + s));
-				tongSL.push(c);
+				tempTongMuc.push(this.commonService.f_currency_V2('' + s));
+				tempTongSL.push(c);
 				this.TongSo += c;
 				this.TongTien += s;
 			}
-			this.tongMuc.push(tongMuc);
-			this.tongSL.push(tongSL);
+			this.tongMuc.push(tempTongMuc);
+			this.tongSL.push(tempTongSL);
 		}
 	}
+
 	createForm() {
 		const temp: any = {
 			note: [''],
 			FileDinhKem: [''],
 		};
-
 		this.itemForm = this.fb.group(temp);
 	}
 
-	/** UI */
 	getTitle(): string {
 		let result = this._NAME;
 		return result;
 	}
 
-	/** ACTIONS */
 	prepareData(): any {
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		let Id: number;
@@ -132,13 +128,12 @@ export class DuyetDeXuatPageComponent implements OnInit {
 	onSubmit(value: boolean) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -180,21 +175,22 @@ export class DuyetDeXuatPageComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
+		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.route.navigateByUrl('/duyet-de-xuat');
 	}
-	changed_tab($event) {
+
+	changed_tab($event: any) {
 		this.selected_tab = $event;
 		this.tinhTongMuc();
 	}
-	checkDisplay(ncc) {
+
+	checkDisplay(ncc: any) {
 		if (this.selected_tab == 0)
 			return ncc.Checked && !ncc.IsGiam;
 		if (this.selected_tab == 1)

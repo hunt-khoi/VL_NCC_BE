@@ -1,11 +1,11 @@
-import { ActivatedRoute, Router } from '@angular/router';
-import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
+import { Router } from '@angular/router';
 import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, HostListener } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSort, MatTableDataSource } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
+import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 
 @Component({
 	selector: 'm-de-xuat-duyet-dialog',
@@ -14,30 +14,17 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 export class DeXuatDuyetDialogComponent implements OnInit {
 	item: any;
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	isDuyet: boolean = true;
 	isReturn: boolean = false;
-	filterDonVi: string = '';
-	listNhomLeTet: any[] = [];
-	listNCC: any[] = [];
-	listMucQua: any[] = [];
 	guiduyet = false;
-	NCC_MQs: any[] = [];
-	datasource: MatTableDataSource<any>;
-
-	details: any[] = [];
-	displayedColumns = ['STT', 'Id_NCC', 'HoTen', 'DiaChi', 'SoTien', 'DoiTuong', 'MucQua'];
-	displayedColumns1 = ['STT', 'NguoiCoCong', 'MucQua', 'action'];
-
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
 	allowDetail: boolean = false;
 	isZoomSize: boolean = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_name = "";
 	isShowNhacnho = false;
 
@@ -59,16 +46,14 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		private router: Router,
 		private CommonService: CommonService,
-		public DeXuatService: DeXuatDuyetService,
+		public apiService: DeXuatDuyetService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
-		private ActivatedRoute: ActivatedRoute,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("DE_XUAT.NAME");
 		this.isShowNhacnho = this.CommonService.IsShowNhacnhoduyet(this.router.url);
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item; 
 		if (this.data.isDuyet != undefined)
@@ -78,7 +63,7 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 		this.createForm();
 		if (!this.isReturn && this.item.Id > 0) {
 			this.viewLoading = true;
-			this.DeXuatService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -106,7 +91,6 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 			this.focusInput.nativeElement.focus();
 	}
 
-	/** UI */
 	getTitle(): string {
 		if (this.isReturn)
 			return "Trả đề xuất cho xã";
@@ -116,8 +100,8 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
 	prepareCustomer(): any {
+		if (!this.itemForm)	return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		_item.Id = this.item.Id;
@@ -140,7 +124,6 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 	onSubmit(duyet: boolean) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-
 		const DuyetDot = this.prepareCustomer();
 		this.DuyetDotTangQua(DuyetDot, duyet)
 	}
@@ -148,26 +131,24 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 	traLai() {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
+		if (!this.itemForm)	return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
 
 		const _item = this.prepareCustomer();
-		this.DeXuatService.traLai(_item.Id, _item.note).subscribe(res => {
+		this.apiService.traLai(_item.Id, _item.note).subscribe(res => {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo("Trả đề xuất cho xã thành công");
 				this.dialogRef.close(true);
-			}
-			else {
+			} else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
@@ -177,11 +158,11 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	DuyetDotTangQua(_item: any, value: boolean) {
-		_item.value = value;
+	DuyetDotTangQua(item: any, value: boolean) {
+		item.value = value;
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-		this.DeXuatService.duyetDotTangQua(_item).subscribe(res => {
+		this.apiService.duyetDotTangQua(item).subscribe(res => {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -190,19 +171,13 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 					_messageType = this.translate.instant('OBJECT.KHONGDUYET.MESSAGE', { name: this._name });
 				this.layoutUtilsService.showInfo(_messageType);
 				this.dialogRef.close(true);
-			}
-			else {
+			} else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
 
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
-
 	close() {
 		this.dialogRef.close();
 	}
-
 }

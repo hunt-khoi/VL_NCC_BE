@@ -1,6 +1,6 @@
-import { Component, OnInit, Injectable, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { QueryParamsModel, LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { MatDialog } from '@angular/material';
 import { ReviewExportComponent } from '../../../components';
@@ -17,10 +17,10 @@ export class DeXuatDonViComponent implements OnInit {
 	donvi: any;
 	dataTreeDonVi: any[] = [];
 	lstDotTangQua: any[] = [];
-	CapCoCau: number;
-	idParent: number;
+	CapCoCau: number = 0;
+	idParent: number = 0;
 	dot: number = 0;
-	nam: number;
+	nam: number = 0;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
@@ -28,7 +28,7 @@ export class DeXuatDonViComponent implements OnInit {
 		private changeDetect: ChangeDetectorRef,
 		private commonService: CommonService,
 		private tokenStorage: TokenStorage,
-		private DeXuatService1: DeXuatService,
+		private apiService: DeXuatService,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService) { }
 
@@ -43,6 +43,7 @@ export class DeXuatDonViComponent implements OnInit {
 		//this.nam = moment().get('year');
 		this.changeNam();
 	}
+
 	changeNam() {
 		this.dot = 0;
 		this.commonService.liteDotQua(true, this.nam).subscribe(res => {
@@ -50,21 +51,22 @@ export class DeXuatDonViComponent implements OnInit {
 				this.lstDotTangQua = res.data;
 		})
 	}
+
 	GetTreeDonVi() {
 		this.loadingSubject.next(true);
 		this.dataTreeDonVi = [];
 		this.commonService.GetTreeDonViHC(0, this.idParent).subscribe(res => {
 			this.loadingSubject.next(false);
-			let tree = [];
+			let tree: any[] = [];
 			if (res.data) {
 				let i = 0;
-				res.data.forEach(element => {
+				res.data.forEach((element: any) => {
 					let item = element;
 					if (i == 0) {
 						item.anCss = {
 							collapse: true,
 							lastChild: false,
-							state: 0,//trạng thái luôn luôn mở node này, 0 -> open, -1 -> close
+							state: 0, //trạng thái luôn luôn mở node này, 0 -> open, -1 -> close
 							checked: false,
 							parentChk: '',
 							active: true
@@ -74,13 +76,12 @@ export class DeXuatDonViComponent implements OnInit {
 						item.anCss = {
 							collapse: true,
 							lastChild: false,
-							state: 0,//trạng thái luôn luôn mở node này, 0 -> open, -1 -> close
+							state: 0, //trạng thái luôn luôn mở node này, 0 -> open, -1 -> close
 							checked: false,
 							parentChk: '',
 
 						}
 					}
-
 					tree.push(item);
 					i++;
 				});
@@ -89,40 +90,46 @@ export class DeXuatDonViComponent implements OnInit {
 			this.changeDetect.detectChanges();
 		});
 	}
-	treeDonViChanged(item) {
-		if (item) {
+
+	treeDonViChanged(item: any) {
+		if (item) 
 			this.donvi = item.data;
-		}
 	}
+
 	checkAllowExport() {
 		return this.dot == 0 || this.donvi.Type != 'H';
 	}
+
 	In(mau = 1) {
-		this.DeXuatService1.previewDeXuatDot(this.dot, this.donvi.ID_Goc, mau).subscribe(res => {
-			if (res && res.status == 1) {
-				let dialogRef;
-				if (mau > 1)
-					dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data, width: '1000px' });
-				else
-					dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
-				dialogRef.afterClosed().subscribe(res => {
-					if (!res) {
-					} else {
-						this.DeXuatService1.exportDeXuatDot(this.dot, this.donvi.ID_Goc, mau, mau > 1, res.loai).subscribe(response => {
-							const headers = response.headers;
-							const filename = headers.get('x-filename');
-							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
-							const fileURL = URL.createObjectURL(blob);
-							const link = document.createElement('a');
-							link.href = fileURL;
-							link.download = filename;
-							link.click();
-						});
-					}
-				})
-			} else
+		this.apiService.previewDeXuatDot(this.dot, this.donvi.ID_Goc, mau).subscribe(res => {
+			if (res.status == 0) {
 				this.layoutUtilsService.showError(res.error.message);
+				return;
+			}
+
+			let dialogRef;
+			if (mau > 1)
+				dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data, width: '1000px' });
+			else
+				dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
+
+			dialogRef.afterClosed().subscribe(res => {
+				if (!res) return;
+
+				this.apiService.exportDeXuatDot(this.dot, this.donvi.ID_Goc, mau, mau > 1, res.loai).subscribe(response => {
+					if (response && response.body) {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type: type || undefined });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename || '';
+						link.click();
+					}
+				});
+			})
 		})
 	}
 
@@ -137,13 +144,13 @@ export class DeXuatDonViComponent implements OnInit {
 	// }
 
 	// InQD() {
-	// 	this.DeXuatService1.previewQD(this.dot, this.donvi.ID_Goc).subscribe(res => {
+	// 	this.apiService.previewQD(this.dot, this.donvi.ID_Goc).subscribe(res => {
 	// 		if (res && res.status == 1) {
 	// 			let dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 	// 			dialogRef.afterClosed().subscribe(res => {
 	// 				if (!res) {
 	// 				} else {
-	// 					this.DeXuatService1.exportQD(this.dot, this.donvi.ID_Goc, res.loai).subscribe(response => {
+	// 					this.apiService.exportQD(this.dot, this.donvi.ID_Goc, res.loai).subscribe(response => {
 	// 						const headers = response.headers;
 	// 						const filename = headers.get('x-filename');
 	// 						const type = headers.get('content-type');

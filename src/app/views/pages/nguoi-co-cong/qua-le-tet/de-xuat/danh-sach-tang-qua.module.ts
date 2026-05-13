@@ -2,14 +2,15 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
 import { DeXuatRefModule } from './de-xuat-ref.module';
-import { DoiTuongNhanQuaRefModule } from '../doi-tuong-nhan-qua/doi-tuong-nhan-qua-ref.module';
 import { PhatQuaService } from './Services/phat-qua.service';
+import { DoiTuongNhanQuaRefModule } from '../doi-tuong-nhan-qua/doi-tuong-nhan-qua-ref.module';
 import { DanhSachTangQuaComponent } from './danh-sach-tang-qua/danh-sach-tang-qua.component';
 import { DeXuatListComponent } from './de-xuat-list/de-xuat-list.component';
 import { DeXuatImportDialogComponent } from './de-xuat-import/de-xuat-import.dialog.component';
-import { dottangquaDuyetDialogComponent } from './dot-tang-qua-duyet/dot-tang-qua-duyet.dialog.component';
-import { dottangquaImportDialogComponent } from './dot-tang-qua-import/dot-tang-qua-import.dialog.component';
 import { TangQuaDialogComponent } from './tang-qua-dialog/tang-qua-dialog.component';
+import { DeXuatDuyetDialogComponent } from './dot-tang-qua-duyet/dot-tang-qua-duyet.dialog.component';
+import { dottangquaImportDialogComponent } from './dot-tang-qua-import/dot-tang-qua-import.dialog.component';
+
 
 const routes: Routes = [
 	{ path: '', component: DanhSachTangQuaComponent }
@@ -28,7 +29,7 @@ const routes: Routes = [
 	entryComponents: [
 		DeXuatListComponent,
 		DeXuatImportDialogComponent,
-		dottangquaDuyetDialogComponent,
+		DeXuatDuyetDialogComponent,
 		dottangquaImportDialogComponent,
 		TangQuaDialogComponent,
 	],
@@ -36,9 +37,10 @@ const routes: Routes = [
 		DanhSachTangQuaComponent,
 		DeXuatListComponent,
 		DeXuatImportDialogComponent,
-		dottangquaDuyetDialogComponent,
+		DeXuatDuyetDialogComponent,
 		dottangquaImportDialogComponent,
 		TangQuaDialogComponent,
 	],
 })
+
 export class DanhSachTangQuaModule { }

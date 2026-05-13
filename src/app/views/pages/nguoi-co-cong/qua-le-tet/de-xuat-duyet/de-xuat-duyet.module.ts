@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import { DeXuatDuyetListComponent } from './de-xuat-duyet-list/de-xuat-duyet-list.component';
-import { DeXuatDuyetComponent } from './de-xuat-duyet.component';
-import { DeXuatDuyetService } from './Services/de-xuat-duyet.service';
-import { DeXuatDuyetRefModule } from './de-xuat-duyet-ref.module';
 import { DPSCommonModule } from '../../dps-common.module';
+import { DeXuatDuyetRefModule } from './de-xuat-duyet-ref.module';
+import { DeXuatDuyetService } from './Services/de-xuat-duyet.service';
+import { DeXuatDuyetComponent } from './de-xuat-duyet.component';
+import { DeXuatDuyetListComponent } from './de-xuat-duyet-list/de-xuat-duyet-list.component';
 import { DuyetDeXuatPageComponent } from './duyet-de-xuat-page/duyet-de-xuat-page.component';
 import { DeXuatTongHopDialogComponent } from './de-xuat-tong-hop/de-xuat-tong-hop.dialog.component';
+
 const routes: Routes = [
 	{
 		path: '',
@@ -43,4 +43,5 @@ const routes: Routes = [
 		DeXuatTongHopDialogComponent
 	]
 })
+
 export class DeXuatDuyetModule { }

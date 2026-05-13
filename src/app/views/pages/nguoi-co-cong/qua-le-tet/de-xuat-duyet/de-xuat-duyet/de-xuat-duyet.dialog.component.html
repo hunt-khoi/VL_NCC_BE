@@ -15,14 +15,16 @@
 			 style="margin-top: 10px; text-align: right;">
 			<!-- *ngIf="allowEdit" -->
 			<ng-container *ngIf="!isReturn">
-				<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)" [disabled]="!item.IsEnable_Duyet ||disabledBtn"
-					matTooltip="{{ 'COMMON.DUYET' | translate }}">{{ 'COMMON.DUYET' | translate }}
+				<button mat-raised-button (click)="onSubmit(true)" color="primary" type="button" 
+					matTooltip="{{ 'COMMON.DUYET' | translate }}" [disabled]="!item.IsEnable_Duyet ||disabledBtn">
+					{{ 'COMMON.DUYET' | translate }}
 				</button>
-				<button type="button" mat-raised-button color="warn" (click)="onSubmit(false)" [disabled]="!item.IsEnable_Duyet ||disabledBtn"
-					matTooltip="{{ 'COMMON.KODUYET' | translate }}">{{ 'COMMON.KODUYET' | translate }}
+				<button mat-raised-button (click)="onSubmit(false)" color="warn" type="button" 
+					matTooltip="{{ 'COMMON.KODUYET' | translate }}"  [disabled]="!item.IsEnable_Duyet ||disabledBtn">
+					{{ 'COMMON.KODUYET' | translate }}
 				</button>
 			</ng-container>
-			<button type="button" mat-raised-button color="warn" (click)="traLai()" matTooltip="Trả lại" *ngIf="isReturn">
+			<button mat-raised-button (click)="traLai()" *ngIf="isReturn" matTooltip="Trả lại" color="warn" type="button">
 				Trả lại
 			</button>
 		</div>
@@ -59,7 +61,8 @@
 				<div class=" {{userId != item.NguoiDuyetDon?'col-lg-7':'col-lg-12'}}  m--margin-bottom-20-mobile">
 					Đang trong quá trình duyệt của: <b>{{item.CurrentChecker}}</b><br />
 					<ng-container *ngIf="item.Deadline">
-						Thời hạn <b *ngIf="item.Deadline.IsTre" style="color:red;">{{item.Deadline.Ngay}}</b> <b *ngIf="!item.Deadline.IsTre">{{item.Deadline.Ngay}}</b>
+						Thời hạn <b *ngIf="item.Deadline.IsTre" style="color:red;">{{item.Deadline.Ngay}}</b> 
+						<b *ngIf="!item.Deadline.IsTre">{{item.Deadline.Ngay}}</b>
 					</ng-container>
 				</div>
 				<div class="col-lg-5 m--margin-bottom-20-mobile" *ngIf="userId != item.NguoiDuyetDon && isShowNhacnho">

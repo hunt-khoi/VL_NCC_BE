@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-import { DeXuatComponent } from './de-xuat.component';
-import { DeXuatService } from './Services/de-xuat.service';
 import { DPSCommonModule } from '../../dps-common.module';
+import { DeXuatService } from './Services/de-xuat.service';
+import { DeXuatComponent } from './de-xuat.component';
 import { DeXuatDonViComponent } from './de-xuat-don-vi/de-xuat-don-vi.component';
+import { DeXuatRefModule } from './de-xuat-ref.module';
 
 const routes: Routes = [
 	{
@@ -27,6 +27,7 @@ const routes: Routes = [
 	imports: [
 		RouterModule.forChild(routes),
 		DPSCommonModule,
+		DeXuatRefModule,
 	],
 	providers: [
 		DeXuatService,
@@ -36,4 +37,5 @@ const routes: Routes = [
 		DeXuatDonViComponent,
 	]
 })
+
 export class DeXuatModule { }

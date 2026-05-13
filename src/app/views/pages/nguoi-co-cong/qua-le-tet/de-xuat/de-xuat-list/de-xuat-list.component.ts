@@ -26,13 +26,13 @@ import { CookieService } from 'ngx-cookie-service';
 
 export class DeXuatListComponent implements OnInit, OnChanges {
 	// Table fields
-	dataSource: DeXuatDataSource;
+	dataSource: DeXuatDataSource | undefined;
 	@Input() donvi: any;
-	@Input() nam: number;
+	@Input() nam: number = 0;
 	@Input() dot: number = 0;
 	@Input() cap: number = 0;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 
 	filterStatus = '';
 	filterCondition = '';
@@ -42,17 +42,18 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 	lstStatus: any[] = [];
 	_name = "";
 
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
-	visibleGuiDuyet: boolean;
-	vivibleThuHoi: boolean;
-	IsVisible_Duyet: boolean;
-	IsEnable_Duyet: boolean;
+	visibleGuiDuyet: boolean = false;
+	vivibleThuHoi: boolean = false;
+	IsVisible_Duyet: boolean = false;
+	IsEnable_Duyet: boolean = false;
 	requiredImportFirst: boolean = false;
-	list_button: boolean;
 
-	constructor(public DeXuatService1: DeXuatService,
+	constructor(public apiService: DeXuatService,
 		public CommonService: CommonService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
@@ -63,12 +64,13 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		this._name = this.translate.instant("DE_XUAT.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-		if (this.DeXuatService1 !== undefined) {
-			this.DeXuatService1.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
-		} //mặc định theo priority
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
+		if (this.apiService !== undefined) {
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
+		}
 
 		this.gridModel = new TableModel();
 		this.gridModel.clear();
@@ -76,25 +78,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
 		this.gridModel.filterText['DotTangQua'] = "";
 		this.gridModel.filterText['MoTa'] = "";
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
-		this.CommonService.getStatusDotTangQua().subscribe(res => {
-			if (res && res.status == 1) {
-				this.lstStatus = res.data;
-				if (this.filterStatus)
-					this.lstStatus = this.lstStatus.filter(x => x.id == +this.filterStatus);
-				if (this.cap == 1) 
-					this.lstStatus = this.lstStatus.filter(x => x.id != 0); //ko bao gồm trạng thái nháp
-				this.gridService.model.filterGroupDataChecked['Status'] = this.lstStatus.map(x => {
-					return {
-						name: x.title,
-						value: x.id,
-						checked: false
-					}
-				});
-				this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
-			}
-		})
 
 		let availableColumns = [
 			{
@@ -213,7 +197,6 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns)
 
-
 		this.gridService = new TableService(
 			this.layoutUtilsService,
 			this.ref,
@@ -221,57 +204,55 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_dxl'
-
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_dxl'));
 		this.LoadFilterGroupData(); //load group
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
 		// Init DataSource
-		this.dataSource = new DeXuatDataSource(this.DeXuatService1);
+		this.dataSource = new DeXuatDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.DeXuatService1.lastFilter$.getValue();
-			if (this.nam)
-				queryParams.filter.Nam = this.nam;
-			if (this.dot > 0)
-				queryParams.filter.Id_DotTangQua = this.dot;
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				if (this.nam)
+					queryParams.filter.Nam = this.nam;
+				if (this.dot > 0)
+					queryParams.filter.Id_DotTangQua = this.dot;
+				this.dataSource.loadList(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
 			}
 		});
 	}
+
 	ngOnChanges() {
 		if (this.dataSource)
 			this.loadDataList();
 	}
 
-	/* HÀM LOAD FILTER GROUPDATA
-	*/
 	LoadFilterGroupData() {
 		this.CommonService.liteNhomLeTet().subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
-				this.gridService.model.filterGroupDataChecked.Id_NhomLeTet = res.data.map(x => {
+				this.gridService.model.filterGroupDataChecked.Id_NhomLeTet = res.data.map((x: any) => {
 					return {
 						id: x.id,
 						name: x.title,
@@ -284,9 +265,30 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 			}
 			this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
 		});
+
+		this.CommonService.getStatusDotTangQua().subscribe(res => {
+			if (!this.gridService) return;
+			if (res && res.status == 1) {
+				this.lstStatus = res.data;
+				if (this.filterStatus)
+					this.lstStatus = this.lstStatus.filter(x => x.id == +this.filterStatus);
+				if (this.cap == 1) 
+					this.lstStatus = this.lstStatus.filter(x => x.id != 0); //ko bao gồm trạng thái nháp
+				
+				this.gridService.model.filterGroupDataChecked['Status'] = this.lstStatus.map(x => {
+					return {
+						name: x.title,
+						value: x.id,
+						checked: false
+					}
+				});
+				this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
+			}
+		})
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -310,7 +312,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		if (this.filterCondition && this.filterCondition.length > 0) {
 			filter.type = +this.filterCondition;
 		}
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.DotTangQua = this.gridService.model.filterText['DotTangQua'];
 			filter.MoTa = this.gridService.model.filterText['MoTa'];
 		}
@@ -320,24 +322,19 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 			if (this.donvi.Type == 'X')
 				filter.Id_Xa = this.donvi.ID_Goc;
 		}
-
 		return filter; //trả về đúng biến filter
 	}
 
-	/** Delete */
-	DeleteWorkplace(_item: DeXuatModel) {
+	Delete(item: DeXuatModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.DeXuatService1.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -349,19 +346,16 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		});
 	}
 
-	GuiDuyet(_item: DeXuatModel) {
+	GuiDuyet(item: DeXuatModel) {
 		const _title = this.translate.instant('OBJECT.GUIDUYET.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.GUIDUYET.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.GUIDUYET.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.GUIDUYET.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.DeXuatService1.guiDuyet(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.guiDuyet(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -372,19 +366,16 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		});
 	}
 
-	ThuHoi(_item: DeXuatModel) {
+	ThuHoi(item: DeXuatModel) {
 		const _title = this.translate.instant('OBJECT.THUHOI.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.THUHOI.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.THUHOI.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.THUHOI.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.DeXuatService1.thuHoi(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.thuHoi(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.loadDataList();
 					this.layoutUtilsService.showInfo(_deleteMessage);
@@ -395,26 +386,17 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		});
 	}
 
-	AddWorkplace() {
+	Add() {
 		const DeXuatModels = new DeXuatModel();
 		DeXuatModels.clear(); // Set all defaults fields
-		this.EditNhom(DeXuatModels, true, true);
+		this.Edit(DeXuatModels, true, true);
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	EditNhom(_item: DeXuatModel, allowEdit: boolean = true, addDeXuat: boolean = false) {
+	Edit(_item: DeXuatModel, allowEdit: boolean = true, addDeXuat: boolean = false) {
 		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
-		const dialogRef = this.dialog.open(DeXuatEditDialogComponent, { data: { _item, allowEdit, addDeXuat }, 
-			width: "80%", disableClose: true });
+		const dialogRef = this.dialog.open(DeXuatEditDialogComponent, 
+			{ data: { _item, allowEdit, addDeXuat }, width: "80%", disableClose: true });
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) {
 				this.loadDataList();
@@ -426,43 +408,45 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		});
 	}
 
-	getStatusString(status) {
+	getStatusString(status: number) {
 		var f = this.lstStatus.find(x => x.id == status);
 		if (!f)
 			return "";
 		return f.data.color;
 	}
 
-	In(id, mau = 1) {
-		this.DeXuatService1.previewDeXuat(id, mau).subscribe(res => {
+	In(id: number, mau = 1) {
+		this.apiService.previewDeXuat(id, mau).subscribe(res => {
 			if (res && res.status == 1) {
 				let dialogRef;
 				if (mau > 1)
 					dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data, width: '1000px' });
 				else
 					dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
+
 				dialogRef.afterClosed().subscribe(res => {
-					if (!res) {
-					} else {
-						this.DeXuatService1.exportDeXuat(id, mau, mau > 1, res.loai).subscribe(response => {
+					if (!res) return;
+					this.apiService.exportDeXuat(id, mau, mau > 1, res.loai).subscribe(response => {
+						if (response && response.body) {
 							const headers = response.headers;
 							const filename = headers.get('x-filename');
 							const type = headers.get('content-type');
-							const blob = new Blob([response.body], { type });
+							const blob = new Blob([response.body], { type: type || undefined });
 							const fileURL = URL.createObjectURL(blob);
 							const link = document.createElement('a');
 							link.href = fileURL;
-							link.download = filename;
+							link.download = filename || '';
 							link.click();
-						})
-					}
+						}
+					})
 				});
 			} else
 				this.layoutUtilsService.showError(res.error.message);
 		})
 	}
-	export(item) {
-		this.DeXuatService1.exportExcelDeXuat(item.Id).subscribe(res => {
+
+	export(item: any) {
+		this.apiService.exportExcelDeXuat(item.Id).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

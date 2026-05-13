@@ -1,9 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation, HostListener } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, Inject, ViewEncapsulation, HostListener } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { merge, BehaviorSubject } from 'rxjs';
-//Service
+import { BehaviorSubject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
@@ -42,25 +40,22 @@ export class DeXuatTongHopDialogComponent implements OnInit {
 		public dialogRef: MatDialogRef<DeXuatTongHopDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
 		private translate: TranslateService,
-		private changeDetect: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		public commonService: CommonService,
-		private DeXuatService1: DeXuatDuyetService,
+		private apiService: DeXuatDuyetService,
 		private sanitized: DomSanitizer) {
 		this._name = this.translate.instant("DE_XUAT.NAME");
 	}
 
-	transform(value) {
+	transform(value: any) {
 		return this.sanitized.bypassSecurityTrustHtml(value);
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
-		this.DeXuatService1.tongHopDeXuatDot(this.data.data).subscribe(res => {
+		this.apiService.tongHopDeXuatDot(this.data.data).subscribe(res => {
 			if (res && res.status == 1) {
 				this.treeNguoiNhan = res.data;
 				this.tinhTongMuc();
@@ -72,42 +67,42 @@ export class DeXuatTongHopDialogComponent implements OnInit {
 	tinhTongMuc() {
 		this.tongMuc = [];
 		this.tongSL = [];
-		for (let ng of this.treeNguoiNhan) {
-			let tongMuc = [];
-			let tongSL = [];
-			for (let c1 of ng.Details) {
+		for (const ng of this.treeNguoiNhan) {
+			const tempTongMuc: any[] = [];
+			const tempTongSL: any[] = [];
+			for (const c1 of ng.Details) {
 				let s = 0;
 				let c = 0;
-				for (let c2 of c1.DoiTuongs) {
-					for (let c3 of c2.NCCs) {
-						if ((this.selected_tab == 0 && c3.Checked && !c3.IsGiam)
-							|| (this.selected_tab == 1 && c3.IsTang)
-							|| (this.selected_tab == 2 && c3.IsGiam)) {
-							let tien = this.commonService.stringToInt(c3.SoTien);
-							s += tien;
-							c++;
-						}
+				for (const c2 of c1.DoiTuongs) {
+					for (const c3 of c2.NCCs) {
+						const isHopLe = (this.selected_tab === 0 && c3.Checked && !c3.IsGiam)
+									|| (this.selected_tab === 1 && c3.IsTang)
+									|| (this.selected_tab === 2 && c3.IsGiam);
+
+						if (!isHopLe) continue;
+						s += this.commonService.stringToInt(c3.SoTien);
+						c++;
 					}
 				}
-				tongMuc.push(this.commonService.f_currency_V2('' + s));
-				tongSL.push(c);
+				tempTongMuc.push(this.commonService.f_currency_V2('' + s));
+				tempTongSL.push(c);
 			}
-			this.tongMuc.push(tongMuc);
-			this.tongSL.push(tongSL);
+			this.tongMuc.push(tempTongMuc);
+			this.tongSL.push(tempTongSL);
 		}
 	}
 
-	sumSL(j, count) {
+	sumSL(j: number, count: number) {
 		let s = 0;
-		for(let i=0; i<count; i++) {
+		for (let i=0; i<count; i++) {
 			s += this.tongSL[j][i]
 		}
 		return s;
 	}
 
-	sumTien(j, count) {
+	sumTien(j: number, count: number) {
 		let s = 0;
-		for(let i=0; i<count; i++) {
+		for (let i=0; i<count; i++) {
 			s += this.commonService.stringToInt(this.tongMuc[j][i])
 		}
 		return this.commonService.f_currency_V2('' + s);
@@ -124,13 +119,11 @@ export class DeXuatTongHopDialogComponent implements OnInit {
 		const _description = this.translate.instant('OBJECT.DUYET.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DUYET.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DUYET.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.DeXuatService1.Duyets(data).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.Duyets(data).subscribe(res => {
 				if (res && res.status === 1) {
 					let str = " " + res.data.success + "/" + res.data.total;
 					this.layoutUtilsService.showInfo(_deleteMessage + str);
@@ -146,7 +139,7 @@ export class DeXuatTongHopDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 	
-	changed_tab($event) {
+	changed_tab($event: any) {
 		this.selected_tab = $event;
 		this.tinhTongMuc();
 	}

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
-import { DeXuatTangQuaService } from './Services/de-xuat-tang-qua.service';
 import { DPSCommonModule } from '../../dps-common.module';
+import { DeXuatTangQuaService } from './Services/de-xuat-tang-qua.service';
 
 @NgModule({
 	imports: [
@@ -9,8 +9,6 @@ import { DPSCommonModule } from '../../dps-common.module';
 	providers: [
 		DeXuatTangQuaService
 	],
-	entryComponents: [],
-	declarations: [],
-	exports:[]
 })
+
 export class DeXuatTQRefModule { }

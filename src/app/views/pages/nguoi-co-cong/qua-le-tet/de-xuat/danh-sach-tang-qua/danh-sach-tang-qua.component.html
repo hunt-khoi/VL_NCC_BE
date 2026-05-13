@@ -61,36 +61,38 @@
 										<td class="d-revert" style="width: 17px; text-align: center;"></td>
 										<td colspan="9"><b><i>{{dt.DoiTuong}}</i></b></td>
 									</tr>
-									<ng-container *ngFor="let ncc of dt.NCCs; let i=index">
-										<tr>
-											<td class="d-revert" style="width: 17px; text-align: center;"></td>
-											<td>{{i+1}}</td>
-											<td>{{ncc.HoTen}}</td>
-											<td>{{ncc.SoHoSo}}</td>
-											<td>{{ncc.DiaChi}}</td>
-											<td>{{ncc.NguoiThoCungLietSy}}</td>
-											<td>{{ncc.QuanHeVoiLietSy}}</td>
-											<td class="text-right">{{ncc.SoTien}}</td>
-											<td>
-												<ng-container *ngIf="( ncc.Received);else nhanqua">
-													{{ncc.NguoiNhan}}
-												</ng-container>
-												<ng-template #nhanqua>
-													<button class="btn btn-primary btn-sm" (click)="Nhanqua(ncc)">Phát quà</button>
-												</ng-template>
-											</td>
-											<td>{{ncc.ThoiGianNhan |date:'dd/MM/yyyy HH:mm'}}</td>
-										</tr>
+									<tr *ngFor="let ncc of dt.NCCs; let i=index">
+										<td class="d-revert" style="width: 17px; text-align: center;"></td>
+										<td>{{i+1}}</td>
+										<td>{{ncc.HoTen}}</td>
+										<td>{{ncc.SoHoSo}}</td>
+										<td>{{ncc.DiaChi}}</td>
+										<td>{{ncc.NguoiThoCungLietSy}}</td>
+										<td>{{ncc.QuanHeVoiLietSy}}</td>
+										<td class="text-right">{{ncc.SoTien}}</td>
+										<td>
+											<ng-container *ngIf="( ncc.Received); else nhanqua">
+												{{ncc.NguoiNhan}}
+											</ng-container>
+											<ng-template #nhanqua>
+												<button class="btn btn-primary btn-sm" (click)="Nhanqua(ncc)">Phát quà</button>
+											</ng-template>
+										</td>
+										<td>{{ncc.ThoiGianNhan |date:'dd/MM/yyyy HH:mm'}}</td>
+									</tr>
 									</ng-container>
-								</ng-container>
 							</ng-container>
 						</ng-container>
 					</ng-container>
 					<tr style=" color: red;">
 						<td colspan="4"><b>Tổng số</b></td>
 						<td>Số lượng: <b>{{TongSo}}</b></td>
-						<td class="text-right"><b matTooltip="Tiền trợ cấp">{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
-						<td class="text-right"><b matTooltip="Tiền đã phát">{{TongPhat | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+						<td class="text-right">
+							<b matTooltip="Tiền trợ cấp">{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b>
+						</td>
+						<td class="text-right">
+							<b matTooltip="Tiền đã phát">{{TongPhat | mask: 'separator':danhMucService.thousandSeparator}}</b>
+						</td>
 						<td></td>
 						<td></td>
 					</tr>

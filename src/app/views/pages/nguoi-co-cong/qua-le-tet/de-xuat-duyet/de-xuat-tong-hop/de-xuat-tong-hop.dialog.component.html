@@ -23,9 +23,8 @@
 		<div class="col-md-{{isZoomSize ? '9' : '7'}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
 			<h3 class="kt-portlet__head-title">Tổng hợp đề xuất</h3>
 		</div>
-		<div class="col-md-{{isZoomSize ? '3' : '5'}} kt-margin-bottom-10-mobile"
-			style="margin-top: 10px; text-align: right;">
-			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="duyets()" *ngIf="allowEdit">
+		<div class="col-md-{{isZoomSize ? '3' : '5'}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+			<button mat-raised-button (click)="duyets()" *ngIf="allowEdit" style="padding: 0px 20px;" type="button" color="primary">
 				Duyệt
 			</button>
 		</div>
@@ -69,7 +68,9 @@
 								</tr>
 								<ng-container *ngFor="let muc of ng.Details; let i=index">
 									<tr class="row_muc">
-										<td colspan="5"><b>Mức {{muc.MucQua | mask: 'separator':commonService.thousandSeparator}} vnđ</b></td>
+										<td colspan="5">
+											<b>Mức {{muc.MucQua | mask: 'separator':commonService.thousandSeparator}} vnđ</b>
+										</td>
 										<td>Số lượng:<b>{{tongSL[j][i]}}</b></td>
 										<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
 										<td></td>
@@ -102,5 +103,4 @@
 			</div>
 		</form>
 	</kt-portlet-body>
-	
 </div>

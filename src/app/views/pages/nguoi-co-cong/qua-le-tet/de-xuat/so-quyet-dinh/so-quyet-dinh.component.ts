@@ -1,10 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { merge, BehaviorSubject } from 'rxjs';
-//Model
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { merge, BehaviorSubject } from 'rxjs';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { DeXuatService } from '../Services/de-xuat.service';
@@ -21,7 +18,7 @@ export class SoQuyetDinhComponent implements OnInit {
     viewLoading: boolean = false;
     isZoomSize: boolean = false;
     disabledBtn: boolean = false;
-    itemForm: FormGroup;
+    itemForm: FormGroup | undefined;
     item: any = {};
 
     constructor(
@@ -29,17 +26,14 @@ export class SoQuyetDinhComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data: any,
         private fb: FormBuilder,
         public dialog: MatDialog,
-        private route: ActivatedRoute,
-        private translate: TranslateService,
         private changeDetect: ChangeDetectorRef,
         private layoutUtilsService: LayoutUtilsService,
         private commonService: CommonService,
-        private deXuatService: DeXuatService) { }
+        private apiService: DeXuatService) { }
 
-    /** LOAD DATA */
     ngOnInit() {
         this.createForm();
-        this.deXuatService.detailHuyen(this.data.Id_DotTangQua, this.data.Id_Huyen).subscribe(res => {
+        this.apiService.detailHuyen(this.data.Id_DotTangQua, this.data.Id_Huyen).subscribe(res => {
             if (res && res.status == 1) {
                 this.item = res.data;
                 this.createForm();
@@ -56,7 +50,6 @@ export class SoQuyetDinhComponent implements OnInit {
             SoTT: [this.item.SoTT],
             NgayTT: [this.item.NgayTT]
         });
-
         this.changeDetect.detectChanges();
     }
 
@@ -65,6 +58,7 @@ export class SoQuyetDinhComponent implements OnInit {
     }
 
     onSubmit(withBack: boolean = false) {
+        if (!this.itemForm) return;
         const controls = this.itemForm.controls;
         let _item: any = {};
         _item.Id = this.item.Id;
@@ -79,21 +73,19 @@ export class SoQuyetDinhComponent implements OnInit {
             _item.NgayCV = this.commonService.f_convertDate(controls.NgayCV.value);
         if (controls.NgayTT.value !== '')
             _item.NgayTT = this.commonService.f_convertDate(controls.NgayTT.value);
-        if (this.item.Id == null) {
-            this.deXuatService.createHuyen(_item).subscribe(res => {
+
+        if (!this.item.Id) {
+            this.apiService.createHuyen(_item).subscribe(res => {
                 this.disabledBtn = false;
                 this.changeDetect.detectChanges();
                 if (res && res.status === 1) {
-                    if (withBack == true) {  //lưu và đóng, withBack = true
-                        this.dialogRef.close({
-                            _item
-                        });
+                    if (withBack) { 
+                        this.dialogRef.close({ _item });
                     }
-                    else { //lưu và thêm mới, withBack = false
-                        this.ngOnInit(); //khởi tạo lại dialog
+                    else { 
+                        this.ngOnInit(); 
                         const _messageType = "Cập nhật số quyết định thành công";
-                        this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => {
-                        });
+                        this.layoutUtilsService.showInfo(_messageType);
                     }
                 }
                 else {
@@ -101,20 +93,17 @@ export class SoQuyetDinhComponent implements OnInit {
                 }
             });
         } else {
-            this.deXuatService.updateHuyen(_item).subscribe(res => {
+            this.apiService.updateHuyen(_item).subscribe(res => {
                 this.disabledBtn = false;
                 this.changeDetect.detectChanges();
                 if (res && res.status === 1) {
-                    if (withBack == true) {  //lưu và đóng, withBack = true
-                        this.dialogRef.close({
-                            _item
-                        });
+                    if (withBack) { 
+                        this.dialogRef.close({ _item });
                     }
-                    else { //lưu và thêm mới, withBack = false
-                        this.ngOnInit(); //khởi tạo lại dialog
+                    else { 
+                        this.ngOnInit(); 
                         const _messageType = "Cập nhật số quyết định thành công";
-                        this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => {
-                        });
+                        this.layoutUtilsService.showInfo(_messageType);
                     }
                 }
                 else {

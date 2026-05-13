@@ -9,35 +9,27 @@ const API_PRODUCTS_URL = environment.ApiRoot + '/phat-qua';
 
 @Injectable()
 export class PhatQuaService {
-
   lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-  lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-  lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-  lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-  data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+  ReadOnlyControl: boolean = false;
 
-  ReadOnlyControl: boolean;
-  constructor(private http: HttpClient,
-    private httpUtils: HttpUtilsService) { }
+  constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-  // READ
-  ListNhanQua(id,queryParams): Observable<any> {
+  ListNhanQua(id: number, queryParams: any): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
     const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
     return this.http.get<any>(API_PRODUCTS_URL + '/' + id, { 
       headers: httpHeaders,
-      params: httpParams });
+      params: httpParams 
+    });
   }
 
-  Get_NextGift(id): Observable<any> {
+  Get_NextGift(id: number): Observable<any> {
     const httpHeaders = this.httpUtils.getHTTPHeaders();
-    return this.http.get<any>(API_PRODUCTS_URL + '/Get_NextGift?id_suggest_detail=' + id, { 
-      headers: httpHeaders });
-  }
-  Create(data): Observable<any> {
-    const httpHeaders = this.httpUtils.getHTTPHeaders();
-    return this.http.post<any>(API_PRODUCTS_URL, data ,{ 
-      headers: httpHeaders });
+    return this.http.get<any>(API_PRODUCTS_URL + '/Get_NextGift?id_suggest_detail=' + id, { headers: httpHeaders });
   }
 
+  Create(data: any): Observable<any> {
+    const httpHeaders = this.httpUtils.getHTTPHeaders();
+    return this.http.post<any>(API_PRODUCTS_URL, data , { headers: httpHeaders });
+  }
 }

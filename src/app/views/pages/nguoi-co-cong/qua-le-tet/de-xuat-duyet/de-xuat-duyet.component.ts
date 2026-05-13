@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { DeXuatService } from '../de-xuat/Services/de-xuat.service';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
+import { DeXuatService } from '../de-xuat/Services/de-xuat.service';
 
 @Component({
 	selector: 'm-de-xuat-duyet',
@@ -9,11 +9,11 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DeXuatDuyetComponent implements OnInit {
-	constructor(private DeXuatService1: DeXuatService) { }
+	constructor(private apiService: DeXuatService) { }
 
 	ngOnInit() {
-		if (this.DeXuatService1 !== undefined) {
-			this.DeXuatService1.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Deadline_Duyet', 0, 10));
-		} //mặc định theo priority
+		if (this.apiService !== undefined) {
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Deadline_Duyet', 0, 10));
+		} 
 	}
 }

@@ -1,7 +1,5 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
-import { DotTangQuaModel, DeXuat_NCCModel } from '../Model/de-xuat-tang-qua.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { environment } from '../../../../../../../environments/environment';
@@ -11,25 +9,20 @@ const API_PRODUCTS_URL = environment.ApiRoot + '/de-xuat-dot-tang';
 @Injectable()
 export class DeXuatTangQuaService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
 	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	data_import: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	ReadOnlyControl: boolean = false;
 
-	ReadOnlyControl: boolean;
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) { }
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-
-	// READ
 	getAllItems(): Observable<any> {
-
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(API_PRODUCTS_URL + '?more=true', { headers: httpHeaders });
 	}
 
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
-
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
 		const url = API_PRODUCTS_URL;
@@ -45,8 +38,7 @@ export class DeXuatTangQuaService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	// CREATE =>  POST: add a new oduct to the server
-	createDeXuat(item): Observable<any> {
+	create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL, item, { headers: httpHeaders });
 	}
