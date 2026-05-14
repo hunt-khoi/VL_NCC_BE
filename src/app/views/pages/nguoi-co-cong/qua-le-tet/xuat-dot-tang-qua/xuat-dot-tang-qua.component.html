@@ -50,13 +50,6 @@
 						</mat-select>
 					</mat-form-field>
 				</div>
-				<div class="col-md-2 kt-margin-bottom-10-mobile" [hidden]="true">
-					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select [value]="filterprovinces" (selectionChange)="loadXa()" formControlName="Tinh" [disabled]="true">
-							<mat-option [value]="list.id_row" *ngFor="let list of listTinh">{{list.Province}}</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
 				<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau <=3 && (thongKe==2 || thongKe==3)">
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select placeholder="Chọn xã thống kê" [(value)]="filterWard" formControlName="Xa" (selectionChange)="loadAp()" [disabled]="Capcocau == 3">

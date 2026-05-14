@@ -1,54 +1,12 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material';
+import { BehaviorSubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
-import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { TableModel } from '../../../../../partials/table';
-import { TableService } from '../../../../../partials/table/table.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as moment from 'moment';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-
-export const data: any = {
-	Nam: [
-		{
-			id: 2020,
-			title: 'Năm 2020',
-		}, {
-			id: 2019,
-			title: 'Năm 2019',
-		}, {
-			id: 2018,
-			title: 'Năm 2018',
-		},
-		{
-			id: 2017,
-			title: 'Năm 2017'
-		}, {
-			id: 2016,
-			title: 'Năm 2016',
-		}, {
-			id: 2015,
-			title: 'Năm 2015',
-		}, {
-			id: 2014,
-			title: 'Năm 2014',
-		}, {
-			id: 2013,
-			title: 'Năm 2013',
-		}, {
-			id: 2012,
-			title: 'Năm 2012',
-		}, {
-			id: 2011,
-			title: 'Năm 2011',
-		}
-	]
-};
+import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.service';
 
 @Component({
 	selector: 'm-tk-theo-doi-tuong',
@@ -57,84 +15,27 @@ export const data: any = {
 })
 
 export class thongKeTheoDoiTuongComponent implements OnInit {
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	//@ViewChild('searchInput') searchInput: ElementRef;
-
-	filterStatus = '';
-	filterCondition = '';
 	_name = "";
-
-	itemForm: FormGroup;
+	itemForm: FormGroup | undefined;
 
 	dataThongKe1: any[] = [];
-	dataThongKe2: any[] = [];
-	list10year: any[] = [];
-
-	gridModel: TableModel;
-	gridService: TableService;
-
-	listYearChoose: any[] = []
-
 	listTinh: any[] = []
 	listHuyen: any[] = []
 
-	thongKe: number = 0;//tk theo huyện
+	thongKe: number = 0;
 	display: boolean = false;
-	filterprovinces: number;
-	filterDistrict: number;
-
-	chartOptions = {
-        responsive: true ,   // THIS WILL MAKE THE CHART RESPONSIVE (VISIBLE IN ANY DEVICE).
-        plugins: {
-            labels: {
-                //render 'label', 'value', 'percentage', 'image' or custom function, default is 'percentage'
-                render: function () { return ''; },
-            }
-        }  
-    }
-
-	//dữ liệu chart data mẫu  
-	labels = ['', '']; //trục x
-
-	// STATIC DATA FOR THE CHART IN JSON FORMAT.
-	chartData = [
-		{
-			label: '',
-			data: [0, 0]
-		},
-		{
-			label: '',
-			data: [0, 0]
-		}
-	];
-
-	// CHART COLOR.
-	colors = [
-		{
-			backgroundColor: 'rgba(0,0,0,0)'
-		},
-		{
-			backgroundColor: 'rgba(0,0,0,0)'
-		}
-	]
-
-	//4 màu cho tối đa 4 nhóm
-	bgColor = ['rgba(30,169,224,0.8)', 'rgba(77,83,96,0.2)', 'rgba(255,228,181,0.4)', 'rgba(100,149,237,0.5)']
-
+	filterprovinces: number = 0;
 	viewLoading: boolean = false;
-	queryParams: QueryParamsModel;
+	queryParams: QueryParamsModel = new QueryParamsModel({});
 	allowExport1 = false;
-	allowExport2 = false;
-	Capcocau: number;
+	Capcocau: number = 0;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-	constructor(public tracuuHoSoService: tracuuHoSoService,
+
+	constructor(public apiService: tracuuHoSoService,
 		private CommonService: CommonService,
 		public dialog: MatDialog,
 		private fb: FormBuilder,
-		private route: ActivatedRoute,
-		private ref: ApplicationRef,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private tokenStorage: TokenStorage,
@@ -142,32 +43,25 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 		this._name = this.translate.instant("Thống kê chi trả theo xã/huyện từng đối tượng");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.Capcocau = res.Capcocau;
-			if (this.Capcocau == 2)
-				this.filterDistrict = +res.ID_Goc_Cha
+			this.filterprovinces = res.IdTinh;
+			this.createForm();
+			if (res.Capcocau != 3) {
+				this.loadHuyen();
+			}
 		})
 		this.CommonService.GetAllProvinces().subscribe(res => {
 			this.listTinh = res.data
 		})
-		this.createForm()
-		this.loadHuyen();
 	}
-	changeLoai($event) {
-		this.thongKe = +$event.value;
-		this.changeDetectorRefs.detectChanges();
-	}
+
 	loadData(loai: boolean = false) {
 		this.queryParams = this.prepareQuery(loai);
 		this.viewLoading = true;
 		this.display = false;
-		if (loai == true) {
-			this.tracuuTheoHuyen()
-		}
-		else
-			this.tracuuTheoXa()
+		this.tracuu();
 	}
 
 	loadHuyen() {
@@ -182,9 +76,9 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 		return filter
 	}
 
-	tracuuTheoHuyen() {
+	tracuu() {
 		this.loadingSubject.next(true);
-		this.tracuuHoSoService.thongKeTheoDoiTuong(this.queryParams).subscribe(res => {
+		this.apiService.thongKeTheoDoiTuong(this.queryParams).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.viewLoading = false;
 			this.display = true;
@@ -194,29 +88,13 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 			}
 			else
 				this.layoutUtilsService.showError(res.error.message);
-			this.changeDetectorRefs.detectChanges(); //ko có data sẽ ko xuất hiện
-		})
-	}
-
-	tracuuTheoXa() {
-		this.loadingSubject.next(true);
-		this.tracuuHoSoService.thongKeTheoDoiTuong(this.queryParams).subscribe(res => {
-			this.loadingSubject.next(false);
-			this.viewLoading = false;
-			this.display = true;
-			if (res && res.status == 1) {
-				this.dataThongKe2 = res.data
-				this.allowExport2 = true;
-			}
-			else
-				this.layoutUtilsService.showError(res.error.message);
-			this.changeDetectorRefs.detectChanges(); //ko có data sẽ ko xuất hiện
+			this.changeDetectorRefs.detectChanges();
 		})
 	}
 
 	xuatDanhSach() {
 		this.loadingSubject.next(true);
-		this.tracuuHoSoService.exportTKDoiTuong(this.queryParams).subscribe(res => {
+		this.apiService.exportTKDoiTuong(this.queryParams).subscribe(res => {
 			this.loadingSubject.next(false);
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
@@ -237,81 +115,24 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 			this.filterConfiguration(loai),
 			'', '', 0, 10,
 		);
-
 		return queryParams;
 	}
 
-	filterGroup(values: any[]): any {
-		let filterGroup: any = [];
-		let val = []
-		for (let item of values) {
-			val.push(item)
-		}
-		filterGroup.Nam = val
-
-		this.labels = val; //label cho trục x (Năm)
-		return filterGroup;
-	}
-
 	filterConfiguration(loai: boolean): any {
+		if (!this.itemForm) return;
 		const filter: any = {};
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-
-		if (this.filterCondition && this.filterCondition.length > 0) {
-			filter.type = +this.filterCondition;
-		}
-
-		if (loai == true)
-			filter.Id_Tinh = this.itemForm.controls.Tinh.value //tra cứu theo huyện
+		if (loai)
+			filter.Id_Tinh = this.itemForm.controls.Tinh.value;
 		else
-			filter.Id_Huyen = this.itemForm.controls.Huyen.value //tra cứu theo xa
-
-		filter.Nam = this.itemForm.controls.Nam.value
-
+			filter.Id_Huyen = this.itemForm.controls.Huyen.value;
+		filter.Nam = this.itemForm.controls.Nam.value;
 		return filter;
 	}
 
 	createForm() {
-		// this.list10year = data.Nam;
-		// this.list10year.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)); //hiện danh sách checkbox năm tăng dần
 		this.thongKe = 0;
-		if (this.Capcocau == 2) {
-			this.thongKe = 1;
-		}
-
-		let now = moment();
 		this.itemForm = this.fb.group({
-			Nam: [now.get('year')],
-			thongKe: ['' + this.thongKe],
-			Tinh: [61],
-			Huyen: [this.filterDistrict],
+			Tinh: ['' + this.filterprovinces],
 		});
-	}
-
-	//bắt sự kiện check
-	onCheckboxChange(e) {
-		if (e.checked) {
-			this.listYearChoose.push(e.source.value);
-		}
-		else {
-			let index = this.listYearChoose.indexOf(e.source.value, 0);
-			if (index > -1) {
-				this.listYearChoose.splice(index, 1);
-			}
-		}
-		this.listYearChoose.sort();
-	}
-
-	get10YearLast() {
-		var n: number = 10;
-		let now = new Date();
-		var year = now.getFullYear();
-		while (n > 0) {
-			this.list10year.push(year);
-			year = year - 1;
-			n = n - 1;
-		}
 	}
 }

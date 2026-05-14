@@ -639,7 +639,7 @@ export const locale = {
 			loctrung: 'Lọc trùng tên người nhận quà',
 			xuatds: 'Xuất danh sách theo đợt tặng quà',
 			tkphanbo: 'Thống kê phân bổ số lượng',
-			tkdoituong: 'Thống kê chi trả theo xã/huyện từng đối tượng',
+			tkdoituong: 'Thống kê chi trả theo đối tượng',
 			tkmucqua: 'Thống kê chi trả theo mức quà',
 			tktonghop: 'Thống kê chi trả tổng hợp',
 			quyetdinhhuyen: 'In quyết định duyệt đề xuất tặng quà'
