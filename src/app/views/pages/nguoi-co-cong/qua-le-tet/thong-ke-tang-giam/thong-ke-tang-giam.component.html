@@ -66,8 +66,8 @@
 									<td style="width: 63px; text-align: center;"><strong>Số hồ sơ</strong></td>
 									<td style="width: 92px; text-align: center;"><strong>Họ Tên Người Nhận Quà</strong></td>
 									<td style="width: 36px; text-align: center;"><strong>Năm sinh</strong></td>
-									<td style="width: 53px; text-align: center;"><strong>Ấp</strong></td>
-									<td style="width: 54px; text-align: center;"><strong>Xã</strong></td>
+									<td style="width: 53px; text-align: center;"><strong>Khóm ấp</strong></td>
+									<td style="width: 54px; text-align: center;"><strong>Phường xã</strong></td>
 									<td style="width: 164px; text-align: center;"><strong>Đối tượng</strong></td>
 									<td style="width: 36px; text-align: center;"><strong>Năm</strong></td>
 									<td style="width: 36px; text-align: center;"><strong>Dịp lễ</strong></td>
@@ -89,11 +89,13 @@
 												<mat-icon *ngIf="g.expanded">remove</mat-icon>
 											</button>
 										</td>
-										<td style="width: 261px;" colspan="5">
+										<td style="width: 261px;" colspan="4">
 											<strong>{{g.Title}}</strong>
 										</td>
-										<td style="width: 54px; text-align: center;"><strong>{{g.SL}}</strong></td>
-										<td style="width: 164px; text-align: center;"><strong>đối tượng</strong></td>
+										<td style="width: 54px; text-align: center;" colspan="2">
+											<strong>{{g.SL|mask:'separator':CommonService.thousandSeparator}} đối tượng</strong>
+										</td>
+										<td style="width: 164px;"></td>
 										<td style="width: 36px;"></td>
 										<td style="width: 54px;"></td>
 										<td style="width: 57px;" *ngFor="let ng of nguons"></td>
@@ -109,13 +111,14 @@
 													<mat-icon *ngIf="xa.expanded">remove</mat-icon>
 												</button>
 											</td>
-											<td style="width: 17px; text-align: center; ">
+											<td style="width: 17px; text-align: center;">
 												<strong>{{i+1}}</strong>
 											</td>
 											<td style="width: 191px;" colspan="3"><strong>{{xa.Title}}</strong></td>
-											<td style="width: 53px;"></td>
-											<td style="width: 54px; text-align: center;"><strong>{{xa.SL}}</strong></td>
-											<td style="width: 164px; text-align: center;"><strong>đối tượng</strong></td>
+											<td style="width: 54px; text-align: center;" colspan="2">
+												<strong>{{xa.SL|mask:'separator':CommonService.thousandSeparator}} đối tượng</strong>
+											</td>
+											<td style="width: 164px;"></td>
 											<td style="width: 36px;"></td>
 											<td style="width: 54px;"></td>
 											<td style="width: 57px;" *ngFor="let ng of nguons"></td>
@@ -132,8 +135,8 @@
 												<td style="width: 36px;">{{ncc.NamSinh}}</td>
 												<td style="width: 53px; text-align: center;">{{ncc.KhomAp}}</td>
 												<td style="width: 54px; text-align: center;">{{ncc.Title}}</td>
-												<td style="width: 164px; text-align: center;">
-													<div class="dt-overflow" title="{{ncc.DoiTuong}}">{{ncc.DoiTuong}}</div>
+												<td style="width: 164px; text-align: left;">
+													<div class="dt-overflow" matTooltip="{{ncc.DoiTuong}}">{{ncc.DoiTuong}}</div>
 												</td>
 												<td style="width: 36px; text-align: center;">{{ncc.Nam}}</td>
 												<td style="width: 54px; text-align: center;">{{ncc.NhomLeTet}}</td>
