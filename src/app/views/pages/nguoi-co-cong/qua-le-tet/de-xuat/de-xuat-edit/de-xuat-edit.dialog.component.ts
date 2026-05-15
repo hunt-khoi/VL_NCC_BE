@@ -39,6 +39,8 @@ export class DeXuatEditDialogComponent implements OnInit {
 	TongTien: number = 0;
 	tongMuc: any[] = [];
 	tongSL: any[] = [];
+	tongSLNguon: number[] = [];
+	tongTienNguon: number[] = [];
 	addDeXuat = false;
 
 	lydos: any[] = []
@@ -145,9 +147,13 @@ export class DeXuatEditDialogComponent implements OnInit {
 		this.TongTien = 0;
 		this.tongMuc = [];
 		this.tongSL = [];
+		this.tongSLNguon = [];
+		this.tongTienNguon = [];
 		for (const goc of this.treeNguoiNhan_Goc) {
 			const tempTongMuc: any[] = [];
 			const tempTongSL: number[] = [];
+			let nguonSL = 0;
+			let nguonTien = 0;
 			for (const c1 of goc.data) {
 				let s = 0;
 				let c = 0;
@@ -179,9 +185,13 @@ export class DeXuatEditDialogComponent implements OnInit {
 				tempTongSL.push(c);
 				this.TongSo += c;
 				this.TongTien += s;
+				nguonSL += c;
+				nguonTien += s;
 			}
 			this.tongMuc.push(tempTongMuc);
 			this.tongSL.push(tempTongSL);
+			this.tongSLNguon.push(nguonSL);
+			this.tongTienNguon.push(nguonTien);
 		}
 	}
 

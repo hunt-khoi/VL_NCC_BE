@@ -115,7 +115,10 @@
 							</tr>
 							<ng-container *ngFor="let ng of treeNguoiNhan; let j=index">
 								<tr class="row_nguon">
-									<td colspan="8">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+								<td colspan="5">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+								<td>Số lượng: <b>{{tongSLNguon[j]}}</b></td>
+								<td class="text-right"><b>{{tongTienNguon[j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+								<td></td>
 								</tr>
 								<ng-container *ngFor="let muc of ng.data; let i=index">
 									<tr class="row_muc">
@@ -172,7 +175,10 @@
 							</tr>
 							<ng-container *ngFor="let ng of treeNguoiNhan; let j=index">
 								<tr class="row_nguon">
-									<td colspan="8">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+								<td colspan="5">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+								<td>Số lượng: <b>{{tongSLNguon[j]}}</b></td>
+								<td class="text-right"><b>{{tongTienNguon[j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+								<td></td>
 								</tr>
 								<ng-container *ngFor="let muc of ng.data; let i=index">
 									<tr class="row_muc">
@@ -236,8 +242,8 @@
 								</tr>
 								<ng-container *ngFor="let ng of treeNguoiNhan; let j=index">
 									<tr class="row_nguon">
-										<td colspan="9">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
-									</tr>
+									<td colspan="9">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+								</tr>
 									<ng-container *ngFor="let muc of ng.data;  let i=index">
 										<tr class="row_muc">
 											<td colspan="5"><b>Mức {{muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
