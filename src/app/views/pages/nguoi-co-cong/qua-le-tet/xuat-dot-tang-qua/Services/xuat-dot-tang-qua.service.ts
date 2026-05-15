@@ -16,7 +16,7 @@ export class xuatDotTangQuaService {
 	exportDSDotQua(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders()
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = `${API_TK}/export-ds-tang-qua`;
+		const url = `${API_TK}/export-theo-dot-tang-qua`;
 		return this.http.get(url, {
 			headers: httpHeaders,
 			params: httpParams,
