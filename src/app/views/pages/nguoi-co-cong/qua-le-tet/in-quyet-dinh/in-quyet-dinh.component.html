@@ -14,7 +14,7 @@
 				</button>
 				<button type="button" mat-menu-item color="primary" (click)="view()">{{ 'COMMON.DETAIL' | translate }}</button>
 				<ng-container *ngIf="strHtml">
-					<button type="button" mat-menu-item color="primary" (click)="in()">{{ 'COMMON.TAIVE' | translate }}</button>
+					<button type="button" mat-menu-item color="info" (click)="in()">{{ 'COMMON.TAIVE' | translate }}</button>
 					<button type="button" mat-menu-item color="primary" printSectionId="print-section" ngxPrint> In</button>
 				</ng-container>
 			</mat-menu>
@@ -48,13 +48,18 @@
 			</div>
 			<div class="col-md-3">
 				<mat-form-field class="mat-form-field-fluid ">
-					<mat-select [(ngModel)]="idHuyen" placeholder="Chọn huyện" [disabled]="Capcocau>=2">
-						<mat-option [value]="0" disabled>--Chọn huyện--</mat-option>
-						<mat-option *ngFor="let opt of listHuyen;" [value]="opt.ID_Row">{{opt.District}}</mat-option>
+					<mat-select [(ngModel)]="idHuyen" placeholder="Phường xã" [disabled]="Capcocau>=2">
+					<mat-option>
+						<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'"
+							[(ngModel)]="FilterCtrlXa" [ngModelOptions]="{standalone: true}" (ngModelChange)="filterXa()">
+						</ngx-mat-select-search>
+					</mat-option>
+					<mat-option [value]="0" disabled>--Chọn phường xã--</mat-option>
+					<mat-option *ngFor="let opt of listXaFiltered | async" [value]="opt.ID_Row">{{opt.Ward}}</mat-option>
 					</mat-select>
 				</mat-form-field>
 			</div>
-			<div class="col-md-3">
+			<div class="col-md-2">
 				<mat-form-field class="mat-form-field-fluid ">
 					<mat-select [(ngModel)]="idLoaiMau" placeholder="Chọn mẫu in">
 						<mat-option [value]="0" disabled>--Chọn mẫu in--</mat-option>

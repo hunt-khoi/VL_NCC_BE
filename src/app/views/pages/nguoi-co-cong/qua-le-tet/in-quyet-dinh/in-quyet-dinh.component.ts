@@ -1,14 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material';
-import { merge, BehaviorSubject } from 'rxjs';
-//Service
+import { DomSanitizer } from '@angular/platform-browser';
+import { merge, BehaviorSubject, ReplaySubject } from 'rxjs';
+import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
-import { DomSanitizer } from '@angular/platform-browser';
 import { InQuyetDinhService } from './Services/in-quyet-dinh.service';
-import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
 
 @Component({
 	selector: 'kt-in-quyet-dinh',
@@ -20,22 +17,21 @@ export class InQuyetDinhComponent implements OnInit {
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
-	isZoomSize: boolean = false;
 	disabledBtn: boolean = false;
 
-	Capcocau: number;
+	Capcocau: number = 0;
 	IdDotTangQua: number = 0;
 	lstDot: any[] = [];
 
 	idHuyen: number = 0;
 	idLoaiMau: number = 0;
-	listHuyen: any[] = [];
+	listXa: any[] = [];
+	listXaFiltered: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
+	FilterCtrlXa: string = '';
 	strHtml: any;
 	
 	constructor(
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
-		private translate: TranslateService,
 		private changeDetect: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private service: InQuyetDinhService,
@@ -43,19 +39,19 @@ export class InQuyetDinhComponent implements OnInit {
 		private sanitized: DomSanitizer,
 		private tokenStorage: TokenStorage) { }
 		
-	transform(value) {
+	transform(value: any) {
 		return this.sanitized.bypassSecurityTrustHtml(value);
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.Capcocau = res.Capcocau;
-			if (res.Capcocau == 2) {
-				this.idHuyen = +res.ID_Goc_Cha;
+			if (res.Capcocau == 3) {
+				this.idHuyen = +res.ID_Goc;
 			}
-			this.commonService.GetListDistrictByProvinces(res.IdTinh).subscribe(res => {
-				this.listHuyen = res.data;
+			this.commonService.GetListWardByProvince(res.IdTinh).subscribe(res => {
+				this.listXa = res.data;
+				this.listXaFiltered.next(res.data ? res.data.slice() : []);
 				this.changeDetect.detectChanges();
 			})
 		})
@@ -63,6 +59,21 @@ export class InQuyetDinhComponent implements OnInit {
 			if (res && res.status == 1)
 				this.lstDot = res.data;
 		})
+	}
+
+	filterXa() {
+		if (!this.listXa) return;
+		let search = this.FilterCtrlXa;
+		if (!search) {
+			this.listXaFiltered.next(this.listXa.slice());
+			return;
+		} else {
+			search = search.toLowerCase();
+		}
+		this.listXaFiltered.next(
+			this.listXa.filter(w => w.Ward.toLowerCase().indexOf(search) > -1)
+		);
+		this.changeDetect.detectChanges();
 	}
 
 	view() {
@@ -90,7 +101,7 @@ export class InQuyetDinhComponent implements OnInit {
 		})
 	}
 
-	in(loai) {
+	in(loai: number) {
 		if (this.idLoaiMau <= 0) {
 			this.layoutUtilsService.showError("Vui lòng chọn loại mẫu in");
 			return;

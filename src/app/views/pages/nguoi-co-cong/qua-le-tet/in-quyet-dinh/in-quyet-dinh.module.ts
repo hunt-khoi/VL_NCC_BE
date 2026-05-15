@@ -25,10 +25,9 @@ const routes: Routes = [
 	providers: [
 		InQuyetDinhService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		InQuyetDinhComponent,
 	]
 })
+
 export class InQuyetDinhModule { }
