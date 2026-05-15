@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material';
 import { ReviewExportComponent } from '../../../components';
 import { CommonService } from '../../../services/common.service';
 import { DeXuatService } from '../Services/de-xuat.service';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-de-xuat-don-vi',
@@ -20,7 +21,7 @@ export class DeXuatDonViComponent implements OnInit {
 	CapCoCau: number = 0;
 	idParent: number = 0;
 	dot: number = 0;
-	nam: number = 0;
+	nam: number;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
@@ -40,7 +41,6 @@ export class DeXuatDonViComponent implements OnInit {
 				this.idParent = res.ID_Goc_Cha;
 		})
 		this.GetTreeDonVi();
-		//this.nam = moment().get('year');
 		this.changeNam();
 	}
 
@@ -97,7 +97,10 @@ export class DeXuatDonViComponent implements OnInit {
 	}
 
 	checkAllowExport() {
-		return this.dot == 0 || this.donvi.Type != 'H';
+		// Cũ: Nếu chọn "Tất cả" đợt hoặc đơn vị không phải cấp Huyện thì nút print bị ẩn.
+		// return this.dot == 0 || this.donvi.Type != 'H';
+		// Cũ: Nếu chọn "Tất cả" đợt hoặc đơn vị không phải cấp Xã thì nút print bị ẩn.
+		return this.dot == 0 || this.donvi.Type != 'X';
 	}
 
 	In(mau = 1) {

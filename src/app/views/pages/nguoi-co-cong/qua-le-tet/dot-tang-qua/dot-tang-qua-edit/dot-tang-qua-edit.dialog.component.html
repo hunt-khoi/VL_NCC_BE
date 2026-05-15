@@ -92,10 +92,12 @@
 			</div>
 			<div class="row">
 				<div class="col-lg-12 m--margin-bottom-20-mobile">
-					<button type="button" mat-raised-button color="primary" (click)="updateSoTT()" matTooltip="{{ 'DOT_TANG_QUA.updatetotrinh' | translate }}" *ngIf="allowEdit">
+					<button type="button" mat-raised-button color="primary" (click)="updateSoTT()" 
+						matTooltip="{{ 'DOT_TANG_QUA.updatetotrinh' | translate }}" *ngIf="allowEdit">
 						{{ 'DOT_TANG_QUA.updatetotrinh' | translate }}
 					</button>
-					<button type="button" mat-raised-button color="primary" (click)="updateSoTT(false)" matTooltip="{{ 'DOT_TANG_QUA.viewtotrinh' | translate }}" *ngIf="!allowEdit">
+					<button type="button" mat-raised-button color="primary" (click)="updateSoTT(false)" 
+						matTooltip="{{ 'DOT_TANG_QUA.viewtotrinh' | translate }}" *ngIf="!allowEdit">
 						{{ 'DOT_TANG_QUA.viewtotrinh' | translate }}
 					</button>
 					<br />

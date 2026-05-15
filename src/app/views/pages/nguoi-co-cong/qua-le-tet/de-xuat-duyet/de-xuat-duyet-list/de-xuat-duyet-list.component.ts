@@ -37,7 +37,7 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 	// Table fields
 	dataSource: DeXuatDuyetDataSource | undefined;
 	@Input() donvi: any;
-	@Input() nam: number;
+	@Input() nam: number = moment().get('year');
 	@Input() dot: number = 0;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
@@ -80,7 +80,6 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		private cookieService: CookieService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private translate: TranslateService) {
-			this.nam = moment().get("year");
 			this._name = this.translate.instant("DE_XUAT.NAME");
 			this.route.queryParams.subscribe(params => {
 				this.idCommentShowDialog = +params['showcmt'];

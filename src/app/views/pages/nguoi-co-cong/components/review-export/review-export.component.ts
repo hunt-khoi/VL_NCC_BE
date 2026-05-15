@@ -1,11 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
-import { CommonService } from '../../services/common.service';
-import { LayoutUtilsService } from '../../../../../core/_base/crud';
-import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
 	selector: 'kt-review-export',
