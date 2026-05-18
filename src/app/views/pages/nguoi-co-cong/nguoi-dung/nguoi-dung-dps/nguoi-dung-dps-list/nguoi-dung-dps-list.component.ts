@@ -270,7 +270,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
-						this.loadDataList();
+						this.loadDataList(true);
 					})
 				).subscribe();
 		}

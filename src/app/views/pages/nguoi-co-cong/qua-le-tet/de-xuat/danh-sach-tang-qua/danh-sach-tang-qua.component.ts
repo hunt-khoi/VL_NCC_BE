@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -16,6 +16,9 @@ import { TangQuaDialogComponent } from './../tang-qua-dialog/tang-qua-dialog.com
 
 export class DanhSachTangQuaComponent implements OnInit {
 
+	@ViewChild('tableWrapper', { static: false }) tableWrapper: ElementRef;
+	@ViewChild('tableHead', { static: false }) tableHead: ElementRef;
+
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
@@ -26,6 +29,8 @@ export class DanhSachTangQuaComponent implements OnInit {
 	_name = "";
 	tongMuc: any[] = [];
 	tienDaPhat: any[] = [];
+	tongNguon: any[] = [];
+	tienDaPhatNguon: any[] = [];
 	ID_qua_tang = 0;
 	DanhSach: any[] = [];
 	TongSo: number = 0;
@@ -67,8 +72,19 @@ export class DanhSachTangQuaComponent implements OnInit {
 				this.DanhSach = res.data;
 				this.tinhTongMuc();
 				this.changeDetectorRefs.detectChanges();
-			} else
+				setTimeout(() => {
+					if (this.tableWrapper && this.tableHead) {
+						const h = this.tableHead.nativeElement.offsetHeight;
+						this.tableWrapper.nativeElement.style.setProperty('--thead-height', h + 'px');
+						const nguonRow = this.tableWrapper.nativeElement.querySelector('.row_nguon');
+						if (nguonRow) {
+							this.tableWrapper.nativeElement.style.setProperty('--nguon-height', nguonRow.offsetHeight + 'px');
+						}
+					}
+				});
+			} else {
 				this.layoutUtilsService.showError(res.error.message);
+			}
 		});
 	}
 
@@ -79,10 +95,14 @@ export class DanhSachTangQuaComponent implements OnInit {
 		this.TongTien = 0;
 		this.TongPhat = 0;
 		this.tienDaPhat = [];
+		this.tongNguon = [];
+		this.tienDaPhatNguon = [];
 		for (let i = 0; i < this.DanhSach.length; i++) {
 			let DanhSach = this.DanhSach[i].data;
 			let tongMuc = [];
 			let tienDaPhat = [];
+			let sNguon = 0;
+			let tienphatNguon = 0;
 			for (let c1 of DanhSach) {
 				let s = 0;
 				let c = 0;
@@ -102,10 +122,35 @@ export class DanhSachTangQuaComponent implements OnInit {
 				this.TongSo += c;
 				this.TongTien += s;
 				this.TongPhat += tienphat;
+				sNguon += s;
+				tienphatNguon += tienphat;
 			}
 			this.tongMuc.push(tongMuc);
 			this.tienDaPhat.push(tienDaPhat);
+			this.tongNguon.push(this.danhMucService.f_currency_V2('' + sNguon));
+			this.tienDaPhatNguon.push(this.danhMucService.f_currency_V2('' + tienphatNguon));
 		}
+	}
+
+	trackByIndex(index: number): number {
+		return index;
+	}
+
+	parseViDate(dateStr: string): Date | null {
+		if (!dateStr) return null;
+		try {
+			// Format: "dd/MM/yyyy H:mm:ss SA/CH"
+			const parts = dateStr.trim().split(' ');
+			if (parts.length < 2) return null;
+			const [day, month, year] = parts[0].split('/');
+			const timeParts = parts[1].split(':');
+			let hours = parseInt(timeParts[0], 10);
+			const minutes = parseInt(timeParts[1], 10);
+			const suffix = parts[2] ? parts[2].toUpperCase() : '';
+			if (suffix === 'CH' && hours < 12) hours += 12;
+			if (suffix === 'SA' && hours === 12) hours = 0;
+			return new Date(+year, +month - 1, +day, hours, minutes);
+		} catch { return null; }
 	}
 
 	Nhanqua(ncc: any) {

@@ -78,13 +78,13 @@
 	<div class="form-group kt-form__group row">
 		<div class="col-md-3 kt-margin-bottom-10-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<mat-select [(ngModel)]="IdDotTangQua" placeholder="Đợt tặng quà" (selectionChange)="display=false">
+				<mat-select [(ngModel)]="IdDotTangQua" placeholder="Đợt tặng quà" (selectionChange)="display">
 					<mat-option [value]="0" disabled>--Chọn đợt tặng quà--</mat-option>
 					<mat-option [value]="opt.id" *ngFor="let opt of lstDot">{{opt.title}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 		</div>
-		<div class="col-md-3 kt-margin-bottom-10-mobile" style="padding-top: 12px;" *ngIf="display">
+		<div class="col-md-3 kt-margin-bottom-10-mobile" style="padding-top: 12px;" *ngIf="display && Capcocau == 1">
 			<mat-checkbox [(ngModel)]="hideEmptyRows" (change)="onToggleHideEmpty()">Ẩn dòng không có dữ liệu</mat-checkbox>
 		</div>
 	</div>

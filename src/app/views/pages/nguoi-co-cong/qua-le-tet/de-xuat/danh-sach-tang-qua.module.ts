@@ -5,7 +5,6 @@ import { DeXuatRefModule } from './de-xuat-ref.module';
 import { PhatQuaService } from './Services/phat-qua.service';
 import { DoiTuongNhanQuaRefModule } from '../doi-tuong-nhan-qua/doi-tuong-nhan-qua-ref.module';
 import { DanhSachTangQuaComponent } from './danh-sach-tang-qua/danh-sach-tang-qua.component';
-import { DeXuatListComponent } from './de-xuat-list/de-xuat-list.component';
 import { DeXuatImportDialogComponent } from './de-xuat-import/de-xuat-import.dialog.component';
 import { TangQuaDialogComponent } from './tang-qua-dialog/tang-qua-dialog.component';
 import { DeXuatDuyetDialogComponent } from './dot-tang-qua-duyet/dot-tang-qua-duyet.dialog.component';
@@ -27,7 +26,6 @@ const routes: Routes = [
 		PhatQuaService,
 	],
 	entryComponents: [
-		DeXuatListComponent,
 		DeXuatImportDialogComponent,
 		DeXuatDuyetDialogComponent,
 		dottangquaImportDialogComponent,
@@ -35,7 +33,6 @@ const routes: Routes = [
 	],
 	declarations: [
 		DanhSachTangQuaComponent,
-		DeXuatListComponent,
 		DeXuatImportDialogComponent,
 		DeXuatDuyetDialogComponent,
 		dottangquaImportDialogComponent,

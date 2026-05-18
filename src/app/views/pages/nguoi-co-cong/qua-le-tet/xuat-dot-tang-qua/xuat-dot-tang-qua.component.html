@@ -51,7 +51,7 @@
 					</mat-form-field>
 				</div>
 				<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau <=3 && (thongKe==2 || thongKe==3)">
-					<mat-form-field class="mat-form-field-fluid ">
+					<mat-form-field class="mat-form-field-fluid">
 						<mat-select placeholder="Chọn xã thống kê" [(value)]="filterWard" formControlName="Xa" (selectionChange)="loadAp()" [disabled]="Capcocau == 3">
 							<mat-option>
 								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'"
@@ -64,8 +64,8 @@
 					</mat-form-field>
 				</div>
 				<div class="col-md-2 kt-margin-bottom-10-mobile" *ngIf="Capcocau <=3 && thongKe==3">
-					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="Chọn ấp thống kê" formControlName="Ap">
+					<mat-form-field class="mat-form-field-fluid">
+						<mat-select placeholder="Chọn ấp thống kê" formControlName="Ap" (selectionChange)="display = false">
 							<mat-option [value]="0" disabled>--Chọn ấp thống kê--</mat-option>
 							<mat-option [value]="item.id" *ngFor="let item of listAp">{{item.title}}</mat-option>
 						</mat-select>
