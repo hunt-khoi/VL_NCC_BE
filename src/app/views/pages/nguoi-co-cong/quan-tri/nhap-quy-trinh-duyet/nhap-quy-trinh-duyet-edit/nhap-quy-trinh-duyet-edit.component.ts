@@ -194,12 +194,13 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 					this.changeDetectorRefs.detectChanges();
 				});
 				this.commonService.Get_CoCauToChuc().subscribe(res => {
+					if (!this.itemForm) return;
 					if (res.data && res.data.length > 0) {
 						this.datatree.next(res.data);
 						if (this.item.StructureID > 0) {
 							this.ID_Struct = '' + this.item.StructureID;
 						} else {
-							this.ID_Struct = '' + res.data[0].RowID;
+							this.ID_Struct = '' + res.data[0].id;
 						}
 						this.itemForm.controls['drp'].setValue(this.ID_Struct);
 						this.loadListChucVu();
@@ -428,9 +429,11 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			return;
 		}
 		let edited = this.prepare();
-		this.CreateQuyTrinhDuyet(edited, withBack);
+		if (edited)
+			this.CreateQuyTrinhDuyet(edited, withBack);
 	}
-	prepare(): NhapQuyTrinhDuyetModel {
+	prepare(): NhapQuyTrinhDuyetModel | null {
+		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
 		const _item = new NhapQuyTrinhDuyetModel();
 		_item.ID_QuyTrinh = this.item.ID_QuyTrinh;
@@ -484,7 +487,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 				this.showTab2 = false;
 				this.selectedTab = 1;
 				this.loadDataList();
-				// if (this.showvitri == true) {
+				// if (this.showvitri) {
 				// 	// const _refreshUrl = `StaffProfile/Systems/ApprovalProcess/chinh-sua/${idqt}/${tenqt}`;
 				// 	// this.routesPage.navigateByUrl(_refreshUrl);
 				// 	this.loadPopupDanhSach(idqt, tenqt);

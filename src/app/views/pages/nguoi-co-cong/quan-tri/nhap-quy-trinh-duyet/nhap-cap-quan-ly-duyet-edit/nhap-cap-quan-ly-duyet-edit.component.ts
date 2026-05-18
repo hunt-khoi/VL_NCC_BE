@@ -35,8 +35,8 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	//==========================
 	itemForm: FormGroup | undefined;
 	loadingControl = new BehaviorSubject<boolean>(false);
-	item: NhapCapQuanLyDuyetModel;
-	oldItem: NhapCapQuanLyDuyetModel;
+	item: NhapCapQuanLyDuyetModel = new NhapCapQuanLyDuyetModel();
+	oldItem: NhapCapQuanLyDuyetModel = new NhapCapQuanLyDuyetModel();
 	hasFormErrors: boolean = false;
 	//==========================
 	showCapQuanLyMax: boolean = false;
@@ -100,7 +100,6 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.viewLoading = true;
 		this.title = "Chọn cơ cấu tổ chức";
@@ -153,7 +152,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 				if (+this.item.StructureID > 0) {
 					this.ID_Struct = '' + this.item.StructureID;
 				} else {
-					this.ID_Struct = '' + res.data[0].RowID;
+					this.ID_Struct = '' + res.data[0].id; //RowID
 				}
 				this.loadListChucVu();
 				this.loadPermission();
@@ -541,11 +540,11 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			return;
 		}
 		let edited = this.prepare();
-		this.CreateCapQuanLy(edited, withBack);
-		return;
-
+		if (edited)
+			this.CreateCapQuanLy(edited, withBack);
 	}
-	prepare(): NhapCapQuanLyDuyetModel {
+	prepare(): NhapCapQuanLyDuyetModel | null {
+		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
 		const _item = new NhapCapQuanLyDuyetModel();
 		_item.clear();
