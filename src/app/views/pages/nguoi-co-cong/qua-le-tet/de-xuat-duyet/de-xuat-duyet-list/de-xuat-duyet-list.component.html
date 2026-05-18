@@ -60,10 +60,10 @@
 										Không duyệt
 									</button>
 								</ng-container>
-								<button mat-raised-button color="primary" (click)="duyets(true,true)" *ngIf="selectedTab==1"
+								<!-- <button mat-raised-button color="primary" (click)="duyets(true, true)" *ngIf="selectedTab==1"
 									matTooltip="Duyệt đề xuất được chọn" class="mat-button-mt-4">
 									Tổng hợp và duyệt
-								</button>
+								</button> -->
 							</div>
 						</div>
 					</div>
@@ -155,9 +155,10 @@
 						<td mat-cell *matCellDef="let item" style="justify-content: center; white-space: nowrap;">
 							<span *ngIf="selectedTab==0 || UserInfo.Capcocau!=1">{{item.Xa}}</span>
 							<ng-container *ngIf="selectedTab!=0 && UserInfo.Capcocau==1">
-								<a href="javascript:;" (click)="showCanDuyet(item)">
+								<!-- <a href="javascript:;" (click)="showCanDuyet(item)">
 									<b title="Tổng số xã">{{item.Xa.sl}}</b> | <b style="color:green;" title="Số xã đã gửi">{{item.Xa.da_gui}}</b> | <b style="color:red;" title="Số xã cần duyệt">{{item.Xa.can_duyet}}</b>
-								</a>
+								</a> -->
+								{{item.Xa.Title}}
 							</ng-container>
 						</td>
 					</ng-container>
@@ -264,12 +265,12 @@
 									<span class="button-text">Nhắc nhở xã</span>
 								</button>
 								<ng-container *ngIf="item.Id == 0 && UserInfo.Capcocau==1">
-									<button mat-button (click)="detailTongHop({dv:item.DistrictID, ids:item.ids})" [ngClass]="btnClass" 
+									<button mat-button (click)="detailTongHop({dv:item.Xa.RowID, ids:item.ids})" [ngClass]="btnClass" 
 										*ngIf="item.IsVisible_Duyet" [disabled]="item.IsEnable_Duyet" matTooltip="Duyệt" color="primary" type="button">
 										<mat-icon>done_outline</mat-icon>
 										<span class="button-text">Duyệt</span>
 									</button>
-									<button mat-button (click)="detailTongHop({dv:item.DistrictID, ids:item.ids},false)" [ngClass]="btnClass"
+									<button mat-button (click)="detailTongHop({dv:item.Xa.RowID, ids:item.ids}, false)" [ngClass]="btnClass"
 										matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" type="button">
 										<mat-icon>visibility</mat-icon>
 										<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
@@ -287,7 +288,7 @@
 								</button>
 							</ng-container>
 							<ng-container *ngIf="IsEnable_Duyet">
-								<button mat-button (click)="detail(item)" [ngClass]="btnClass" 
+								<button mat-button (click)="detail(item)" [ngClass]="btnClass"
 									matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" type="button">
 									<mat-icon>visibility</mat-icon>
 									<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>

@@ -72,7 +72,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 	ngOnInit() {
 		let tmp = moment();
 		let y = tmp.get("year");
-		this.from = moment(new Date(y, 0, 1));
+		this.from = moment(new Date(y-1, 0, 1));
 		this.to = moment(new Date(y, 11, 31));
 
 		this.list_button = CommonService.list_button();
@@ -182,7 +182,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 			{
 				stt: 7,
 				name: 'Title',
-				displayName: 'Phường/Xã ',
+				displayName: 'Phường/xã ',
 				alwaysChecked: false,
 				isShow: true,
 			},

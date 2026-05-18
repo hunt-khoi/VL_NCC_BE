@@ -12,8 +12,7 @@
 		max-width: 300px;
 	}
 	@media print {
-		th:last-child,
-		td:last-child {
+		th:last-child, td:last-child {
 			display: none;
 		}
 	}
@@ -46,31 +45,31 @@
 				Chức năng
 			</button>
 			<mat-menu #chucnang="matMenu">
-				<button mat-menu-item color="info" matTooltip="In" (click)="printTicket('print-section')">
-					<span>In</span>
+				<button mat-menu-item color="info" matTooltip="In" (click)="printTicket('print-section')" *ngIf="dataSource.hasItems">
+					In
 				</button>
-				<button (click)="Export()" mat-menu-item color="info" matTooltip="Export">
-					<span>Export</span>
+				<button (click)="Export()" mat-menu-item color="info" matTooltip="Export đối tượng nhận quà" *ngIf="dataSource.hasItems">
+					Export
 				</button>
 				<button (click)="Import()" mat-menu-item color="primary" matTooltip="Import đối tượng nhận quà" *ngIf="objectService.ReadOnlyControl">
-					<span>Import đối tượng nhận quà</span>
+					Import
 				</button>
-				<button (click)="Add()" mat-menu-item matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" color="accent" type="button">
+				<button (click)="Add()" mat-menu-item color="accent" matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" type="button">
 					<span translate="COMMON.CREATE"></span>
 				</button>
 			</mat-menu>
 			<!-- view nhỏ hơn 768 bị ẩn -->
 			<div class="hide-view-sm" style="display: contents;">
-				<button mat-raised-button color="info" matTooltip="In" (click)="printTicket('print-section')">
-					<span>In</span>
+				<button mat-raised-button color="info" matTooltip="In" (click)="printTicket('print-section')" *ngIf="dataSource.hasItems">
+					In
 				</button>
-				<button (click)="Export()" mat-raised-button color="info" matTooltip="Export">
-					<span>Export</span>
+				<button (click)="Export()" mat-raised-button color="info" matTooltip="Export đối tượng nhận quà" *ngIf="dataSource.hasItems">
+					Export
 				</button>
 				<button (click)="Import()" mat-raised-button color="primary" matTooltip="Import đối tượng nhận quà" *ngIf="objectService.ReadOnlyControl">
-					<span>Import đối tượng nhận quà</span>
+					Import
 				</button>
-				<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" color="accent" type="button">
+				<button (click)="Add()" mat-raised-button color="accent" matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" type="button">
 					<span translate="COMMON.CREATE"></span>
 				</button>
 			</div>
@@ -92,7 +91,7 @@
 					</div>
 					<div class="col-md-2 kt-margin-bottom-10-mobile">
 						<mat-form-field class="mat-form-field-fluid">
-							<input matInput [matDatepicker]="pickerbd_tungay" placeholder="Từ ngày" [(ngModel)]="from" [max]="to" (dateChange)="loadDataList()">
+							<input matInput [matDatepicker]="pickerbd_tungay" placeholder="Tạo từ ngày" [(ngModel)]="from" [max]="to" (dateChange)="loadDataList()">
 							<mat-datepicker-toggle matSuffix [for]="pickerbd_tungay"></mat-datepicker-toggle>
 							<mat-datepicker #pickerbd_tungay></mat-datepicker>
 							<mat-hint>Định dạng dd/mm/yyyy</mat-hint>
@@ -155,10 +154,10 @@
 					</th>
 					<td mat-cell *matCellDef="let object">{{object.DiaChi}}</td>
 				</ng-container>
-				<ng-container matColumnDef="DistrictName">
+				<!-- <ng-container matColumnDef="DistrictName">
 					<th mat-header-cell *matHeaderCellDef>Huyện</th>
 					<td mat-cell *matCellDef="let object">{{object.DistrictName}}</td>
-				</ng-container>
+				</ng-container> -->
 				<ng-container matColumnDef="NguoiThoCungLietSy">
 					<th mat-header-cell *matHeaderCellDef>Họ tên liệt sỹ</th>
 					<td mat-cell *matCellDef="let object">{{object.NguoiThoCungLietSy}}</td>

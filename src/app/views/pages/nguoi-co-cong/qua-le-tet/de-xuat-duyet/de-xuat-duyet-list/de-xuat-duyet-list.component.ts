@@ -491,63 +491,60 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		}
 	}
 
-	showCanDuyet(item: any) {
-		let html = `<table style="width:100%" class="table-bordered table-sm">
-		<tr>
-			<th class="stt-cell">STT</th>
-			<th class="text-center">Xã</th>
-			<th class="text-center">SL tăng</th>
-			<th class="text-center">SL giảm</th>
-			<th class="text-center">Tổng số</th>
-			<th class="text-center">Đã gửi</th>
-			<th class="text-center">Đã duyệt</th>
-		</tr>`;
-		let arr: any[] = item.Xa.list;
-		arr.forEach(function (x, index) {
-			html += `<tr style="` + (x.IsEnable_Duyet ? "color:red" : "") + `">
-						<td class="text-center">${index + 1}</td>
-						<td>${x.Title}</td>
-						<td class="text-center">${x.SLTang}</td>
-						<td class="text-center">${x.SLGiam}</td>
-						<td class="text-center">${x.TongSo}</td>
-						<td class="text-center">${x.SentDate}</td>
-						<td class="text-center">${x.NgayDuyet}</td>
-					</tr>`	;
-		})
-		html += `</table>`;
-		let data = { html: html, title: 'Danh sách xã thuộc huyện' }
-		const dialogRef = this.dialog.open(DisplayHtmlContentComponent, { data: data });
-		dialogRef.afterClosed().subscribe(res => { })
-	}
+	// showCanDuyet(item: any) {
+	// 	let html = `<table style="width:100%" class="table-bordered table-sm">
+	// 	<tr>
+	// 		<th class="stt-cell">STT</th>
+	// 		<th class="text-center">Xã</th>
+	// 		<th class="text-center">SL tăng</th>
+	// 		<th class="text-center">SL giảm</th>
+	// 		<th class="text-center">Tổng số</th>
+	// 		<th class="text-center">Đã gửi</th>
+	// 		<th class="text-center">Đã duyệt</th>
+	// 	</tr>`;
+	// 	let arr: any[] = item.Xa.list;
+	// 	arr.forEach(function (x, index) {
+	// 		html += `<tr style="` + (x.IsEnable_Duyet ? "color:red" : "") + `">
+	// 					<td class="text-center">${index + 1}</td>
+	// 					<td>${x.Title}</td>
+	// 					<td class="text-center">${x.SLTang}</td>
+	// 					<td class="text-center">${x.SLGiam}</td>
+	// 					<td class="text-center">${x.TongSo}</td>
+	// 					<td class="text-center">${x.SentDate}</td>
+	// 					<td class="text-center">${x.NgayDuyet}</td>
+	// 				</tr>`	;
+	// 	})
+	// 	html += `</table>`;
+	// 	let data = { html: html, title: 'Danh sách xã thuộc huyện' }
+	// 	const dialogRef = this.dialog.open(DisplayHtmlContentComponent, { data: data });
+	// 	dialogRef.afterClosed().subscribe(res => { })
+	// }
 
 	detailTongHop(data: any, allowEdit: boolean = true) {
 		data.dot = this.dot;
 		const dialogRef = this.dialog.open(DeXuatTongHopDialogComponent, { data: { data, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (res) {
-				this.loadDataList();
-			}
+			if (res) this.loadDataList();
 		})
 	}
 
 	duyets(duyet = true, isTongHop: boolean = false) {
 		let lst = this.selection.selected.filter(x => !x.IsEnable_Duyet).map(x => x.Id);
-		if (lst.length == 0)
-			return;
-		if (isTongHop) {
-			let data = { dv: this.UserInfo.ID_Goc_Cha, ids: lst };
-			if (this.UserInfo.Capcocau == 1) {//tỉnh
-				lst = [];
-				for (var i = 0; i < this.selection.selected.length; i++) {
-					let x = this.selection.selected[i];
-					if (!x.IsEnable_Duyet)
-						lst = lst.concat(x.ids);
-				}
-				data = { dv: 0, ids: lst };
-			}
-			this.detailTongHop(data);
-			return;
-		}
+		if (lst.length == 0) return;
+		// if (isTongHop) {
+		// 	let data = { dv: this.UserInfo.ID_Goc_Cha, ids: lst };
+		// 	if (this.UserInfo.Capcocau == 1) { //tỉnh
+		// 		lst = [];
+		// 		for (var i = 0; i < this.selection.selected.length; i++) {
+		// 			let x = this.selection.selected[i];
+		// 			if (!x.IsEnable_Duyet)
+		// 				lst = lst.concat(x.ids);
+		// 		}
+		// 		data = { dv: 0, ids: lst }; 
+		// 	}
+		// 	this.detailTongHop(data);
+		// 	return;
+		// }
 		var data = {
 			ids: lst,
 			value: duyet
