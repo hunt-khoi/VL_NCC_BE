@@ -1,4 +1,6 @@
-import { Component, OnInit, Inject, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, HostListener, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,9 +15,10 @@ import { DoiTuongNhanQuaEditDialogComponent } from '../../doi-tuong-nhan-qua/doi
 @Component({
 	selector: 'm-de-xuat-edit-dialog',
 	templateUrl: './de-xuat-edit.dialog.component.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DeXuatEditDialogComponent implements OnInit {
+export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 
 	item: DeXuatModel = new DeXuatModel();
 	oldItem: DeXuatModel = new DeXuatModel();
@@ -46,6 +49,12 @@ export class DeXuatEditDialogComponent implements OnInit {
 	lydos: any[] = []
 	Filter: string = "";
 	selected_tab: number = 0;
+	private filterSubject$ = new Subject<string>();
+	private destroy$ = new Subject<void>();
+	treeNguoiNhanNhan_TG: any[] = [];
+	treeNguoiNhanTang_TG: any[] = [];
+	flatRowsNhan: any[] = [];
+	flatRowsTang: any[] = [];
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
@@ -81,8 +90,17 @@ export class DeXuatEditDialogComponent implements OnInit {
 		if (this.addDeXuat && this.item.Id_DotTangQua > 0) { //đang nhập đề xuất mới
 			this.getNguoiNhan(this.item.Id_DotTangQua)
 		}
+		this.filterSubject$.pipe(
+			debounceTime(300),
+			distinctUntilChanged(),
+			takeUntil(this.destroy$)
+		).subscribe(() => this.filterText());
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
 	getDetail() {
 		this.viewLoading = true;
@@ -102,6 +120,8 @@ export class DeXuatEditDialogComponent implements OnInit {
 				this.treeNguoiNhan_Goc = res.data.Details;
 				this.treeNguoiNhan = this.treeNguoiNhan_Goc;
 				this.tinhTongMuc();
+				this.buildViewTree();
+				this.buildTangGiamTrees();
 				this.createForm();
 			}
 			else
@@ -113,6 +133,9 @@ export class DeXuatEditDialogComponent implements OnInit {
 	clearFilter(evt: MouseEvent,) {
 		this.Filter = '';
 		this.treeNguoiNhan = this.treeNguoiNhan_Goc;
+		this.buildViewTree();
+		this.buildTangGiamTrees();
+		this.changeDetectorRefs.detectChanges();
 		evt.stopPropagation();
 	}
 
@@ -139,6 +162,9 @@ export class DeXuatEditDialogComponent implements OnInit {
 				data: data
 			}
 		});
+		this.buildViewTree();
+		this.buildTangGiamTrees();
+		this.changeDetectorRefs.detectChanges();
 	}
 
 	lstNCC: any[]=[]
@@ -198,6 +224,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 	loadNhom() {
 		this.danhMucService.liteLyDoGiam().subscribe(res => {
 			this.lydos = res.data;
+			this.changeDetectorRefs.detectChanges();
 		});
 		this.danhMucService.liteDotQua(true).subscribe(res => {
 			this.listDotTangQua = res.data;
@@ -207,7 +234,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 
 	getNguoiNhan(id: number) { //id: Id đợt tặng quà
 		this.viewLoading = true;
-		this.tongMuc = []
+		this.tongMuc = [];
 		this.apiService.getNguoiNhanByDot(id).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
@@ -215,9 +242,12 @@ export class DeXuatEditDialogComponent implements OnInit {
 				this.treeNguoiNhan = this.treeNguoiNhan_Goc;
 				this.visibleTangGiam = !res.Visible; //Visible=isgoc=true => visibleTangGiam=false: ko hiện tăng giảm
 				this.tinhTongMuc();
+				this.buildViewTree();
+				this.buildTangGiamTrees();
 			}
 			else
 				this.layoutUtilsService.showError(res.error.message);
+			this.changeDetectorRefs.detectChanges();
 		});
 	}
 
@@ -237,8 +267,9 @@ export class DeXuatEditDialogComponent implements OnInit {
 				this.treeNguoiNhan_Goc = res.data;
 				this.treeNguoiNhan = this.treeNguoiNhan_Goc;
 			}
-			else
+			else {
 				this.layoutUtilsService.showError(res.error.message);
+			}
 		});
 
 	}
@@ -543,6 +574,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 						}
 					})
 					this.tinhTongMuc();
+					this.buildTangGiamTrees();
 					this.layoutUtilsService.showInfo(mess_tangtc).afterDismissed();
 				} else {
 					this.layoutUtilsService.showError(res.error.message);
@@ -587,6 +619,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 			}
 		}
 		this.tinhTongMuc();
+		this.buildTangGiamTrees();
 	}
 
 	findncc(Id_DoiTuongNCC: number, Id_NCC: number) {
@@ -659,6 +692,84 @@ export class DeXuatEditDialogComponent implements OnInit {
 	changed_tab($event: any) {
 		this.selected_tab = $event;
 		this.tinhTongMuc();
+		this.buildViewTree();
+	}
+
+	buildViewTree() {
+		const filterNCCs = (nccs: any[]) => {
+			if (this.selected_tab === 0) return nccs.filter(ncc => ncc.Checked && !ncc.IsGiam);
+			if (this.selected_tab === 1) return nccs.filter(ncc => ncc.IsTang);
+			if (this.selected_tab === 2) return nccs.filter(ncc => ncc.IsGiam);
+			return nccs;
+		};
+		this.treeNguoiNhanView = this.treeNguoiNhan.map((ng: any) => ({
+			...ng,
+			data: ng.data.map((muc: any) => ({
+				...muc,
+				DoiTuongs: muc.DoiTuongs.map((dt: any) => ({
+					...dt,
+					NCCs: filterNCCs(dt.NCCs)
+				}))
+			}))
+		}));
+	}
+
+	buildTangGiamTrees() {
+		const buildTree = (filterFn: (nccs: any[]) => any[]) =>
+			this.treeNguoiNhan.map((ng: any) => ({
+				...ng,
+				data: ng.data.map((muc: any) => ({
+					...muc,
+					DoiTuongs: muc.DoiTuongs.map((dt: any) => ({
+						...dt,
+						NCCs: filterFn(dt.NCCs)
+					}))
+				}))
+			}));
+		this.treeNguoiNhanNhan_TG = buildTree(nccs => nccs.filter((ncc: any) =>
+			ncc.Checked && !(ncc.IsTang && ncc.Id_DeXuat === this.item.Id)));
+		this.treeNguoiNhanTang_TG = buildTree(nccs => nccs.filter((ncc: any) =>
+			!ncc.Checked || (ncc.IsTang && ncc.Id_DeXuat === this.item.Id)));
+		this.buildFlatRows();
+	}
+
+	buildFlatRows() {
+		const flatten = (tree: any[]) => {
+			const rows: any[] = [];
+			tree.forEach((ng: any, j: number) => {
+				rows.push({ type: 'nguon', ng, j });
+				ng.data.forEach((muc: any, i: number) => {
+					rows.push({ type: 'muc', muc, j, i });
+					muc.DoiTuongs.forEach((dt: any) => {
+						rows.push({ type: 'dt', dt });
+						dt.NCCs.forEach((ncc: any) => rows.push({ type: 'ncc', ncc, j, i }));
+					});
+				});
+			});
+			return rows;
+		};
+		this.flatRowsNhan = flatten(this.treeNguoiNhanNhan_TG);
+		this.flatRowsTang = flatten(this.treeNguoiNhanTang_TG);
+	}
+
+	trackByFlatRow(index: number, row: any): any {
+		if (row.type === 'ncc') return 'ncc_' + (row.ncc.Id_NCC != null ? row.ncc.Id_NCC : index);
+		if (row.type === 'nguon') return 'nguon_' + row.j;
+		if (row.type === 'muc') return 'muc_' + row.j + '_' + row.i;
+		if (row.type === 'dt') return 'dt_' + row.dt.Id;
+		return index;
+	}
+
+	onFilterInput() {
+		this.filterSubject$.next(this.Filter);
+	}
+
+	trackByIndex(index: number): number {
+		return index;
+	}
+
+	trackByNCC(index: number, ncc: any): any {
+		return ncc.Id_NCC != null ? ncc.Id_NCC : index;
 	}
 
 	checkDisplay(ncc: any) {
@@ -721,6 +832,7 @@ export class DeXuatEditDialogComponent implements OnInit {
 			if (baoTang && this.lstDTTang.length > 0) {
 				this.baoTang({ checked: true }, this.lstDTTang[0]);
 			}
+			this.changeDetectorRefs.detectChanges();
 		});
 	}
 
