@@ -26,6 +26,8 @@ export class DuyetDeXuatPageComponent implements OnInit {
 	_NAME = '';
 	tongMuc: any[] = [];
 	tongSL: any[] = [];
+	tongNguon: any[] = [];
+	tongSLNguon: any[] = [];
 	selected_tab: number = 0;
 	TongSo: number = 0;
 	TongTien: number = 0;
@@ -70,9 +72,13 @@ export class DuyetDeXuatPageComponent implements OnInit {
 		this.TongTien = 0;
 		this.tongMuc = [];
 		this.tongSL = [];
+		this.tongNguon = [];
+		this.tongSLNguon = [];
 		for (const detail of this.item.Details) {
 			const tempTongMuc: any[] = [];
 			const tempTongSL: any[] = [];
+			let sNguon = 0;
+			let cNguon = 0;
 			for (const c1 of detail.data) {
 				let s = 0;
 				let c = 0;
@@ -91,9 +97,13 @@ export class DuyetDeXuatPageComponent implements OnInit {
 				tempTongSL.push(c);
 				this.TongSo += c;
 				this.TongTien += s;
+				sNguon += s;
+				cNguon += c;
 			}
 			this.tongMuc.push(tempTongMuc);
 			this.tongSL.push(tempTongSL);
+			this.tongNguon.push(this.commonService.f_currency_V2('' + sNguon));
+			this.tongSLNguon.push(cNguon);
 		}
 	}
 

@@ -94,20 +94,26 @@
 									<mat-tab label="{{ 'DE_XUAT.danhsachtang' | translate }}"></mat-tab>
 									<mat-tab label="{{ 'DE_XUAT.danhsachgiam' | translate }}"></mat-tab>
 								</mat-tab-group>
-								<div class="table-responsive">
+								<div class="table-responsive" style="max-height:500px; overflow-y:auto;">
 									<table class="table-bordered table-sm " style="width:100%;">
-										<tr>
-											<th class="text-center" style="white-space: nowrap;">Họ tên</th>
-											<th class="text-center" style="white-space: nowrap;">Số hồ sơ</th>
-											<th class="text-center" style="white-space: nowrap;">Cư trú</th>
-											<th class="text-center" style="white-space: nowrap;">Họ tên liệt sỹ</th>
-											<th class="text-center" style="white-space: nowrap;">Quan hệ với liệt sỹ</th>
-											<th class="text-center" style="white-space: nowrap;">Số tiền</th>
-											<th class="text-center" style="white-space: nowrap;">Ghi chú</th>
-										</tr>
+										<thead>
+											<tr>
+												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Họ tên</th>
+												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Số hồ sơ</th>
+												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Cư trú</th>
+												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Họ tên liệt sỹ</th>
+												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Quan hệ với liệt sỹ</th>
+												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Số tiền</th>
+												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Ghi chú</th>
+											</tr>
+										</thead>
+										<tbody>
 										<ng-container *ngFor="let ng of item.Details;let j=index;">
 											<tr class="row_nguon">
-												<td colspan="7">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+												<td colspan="4">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+												<td>Số lượng:<b>{{tongSLNguon[j]}}</b></td>
+												<td class="text-right"><b>{{tongNguon[j]}}</b></td>
+												<td></td>
 											</tr>
 											<ng-container *ngFor="let muc of ng.data; let i=index">
 												<tr class="row_muc">
@@ -136,7 +142,9 @@
 												</ng-container>
 											</ng-container>
 										</ng-container>
-										<tr style=" color: red;">
+										</tbody>
+										<tfoot>
+										<tr style="color: red; position: sticky; bottom: 0; z-index: 1; background-color: #fff;">
 											<td colspan="4"><b>Tổng số</b></td>
 											<td>Số lượng:<b>{{TongSo}}</b></td>
 											<td class="text-right">
@@ -144,6 +152,7 @@
 											</td>
 											<td></td>
 										</tr>
+										</tfoot>
 									</table>
 								</div>
 							</div>
