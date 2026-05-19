@@ -102,59 +102,99 @@
 						<mat-tab label="{{ 'DE_XUAT.danhsachtang' | translate }}"></mat-tab>
 						<mat-tab label="{{ 'DE_XUAT.danhsachgiam' | translate }}"></mat-tab>
 					</mat-tab-group>
-					<div class="table-responsive">
-						<table class="table-bordered table-sm" style="width:100%;">
-							<tr>
-								<th class="text-center">STT</th>
-								<th class="text-center">Họ tên</th>
-								<th class="text-center">Số hồ sơ</th>
-								<th class="text-center">Cư trú</th>
-								<th class="text-center">Họ tên liệt sỹ</th>
-								<th class="text-center">Quan hệ với liệt sỹ</th>
-								<th class="text-center">Số tiền</th>
-								<th class="text-center">Ghi chú</th>
-							</tr>
-							<ng-container *ngFor="let ng of treeNguoiNhanView; let j=index; trackBy: trackByIndex">
-								<tr class="row_nguon">
-								<td colspan="5">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
-								<td>Số lượng: <b>{{tongSLNguon[j]}}</b></td>
-								<td class="text-right"><b>{{tongTienNguon[j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
-								<td></td>
+					<!-- header cố định -->
+					<ng-container *ngIf="flatRowsView.length > 0">
+						<table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-bottom:0;">
+							<colgroup>
+								<col style="width:45px">
+								<col>
+								<col style="width:90px">
+								<col>
+								<col>
+								<col>
+								<col style="width:80px">
+								<col style="width:120px">
+							</colgroup>
+							<thead>
+								<tr>
+									<th class="text-center">STT</th>
+									<th class="text-center">Họ tên</th>
+									<th class="text-center">Số hồ sơ</th>
+									<th class="text-center">Cư trú</th>
+									<th class="text-center">Họ tên liệt sỹ</th>
+									<th class="text-center">Quan hệ với liệt sỹ</th>
+									<th class="text-center">Số tiền</th>
+									<th class="text-center">Ghi chú</th>
 								</tr>
-								<ng-container *ngFor="let muc of ng.data; let i=index; trackBy: trackByIndex">
-									<tr class="row_muc">
-										<td colspan="5">
-											<b>Mức {{muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b>
-										</td>
-										<td>Số lượng: <b>{{tongSL[j][i]}}</b></td>
-										<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
-										<td></td>
+							</thead>
+						</table>
+						<!-- virtual scroll body -->
+						<cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsView, 55)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
+							<table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
+								<colgroup>
+									<col style="width:45px">
+									<col>
+									<col style="width:90px">
+									<col>
+									<col>
+									<col>
+									<col style="width:80px">
+									<col style="width:120px">
+								</colgroup>
+								<tbody>
+									<tr *cdkVirtualFor="let row of flatRowsView; trackBy: trackByFlatRow"
+										[ngSwitch]="row.type"
+										[ngClass]="{'row_nguon': row.type==='nguon', 'row_muc': row.type==='muc', 'row_tang': row.type==='ncc' && row.ncc.IsTang}">
+										<ng-container *ngSwitchCase="'nguon'">
+											<td colspan="5">Nguồn kinh phí: <b>{{row.ng.NguonKinhPhi}}</b></td>
+											<td>Số lượng: <b>{{tongSLNguon[row.j]}}</b></td>
+											<td class="text-right"><b>{{tongTienNguon[row.j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+											<td></td>
+										</ng-container>
+										<ng-container *ngSwitchCase="'muc'">
+											<td colspan="5"><b>Mức {{row.muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
+											<td>Số lượng: <b>{{tongSL[row.j][row.i]}}</b></td>
+											<td class="text-right"><b>{{tongMuc[row.j][row.i]}}</b></td>
+											<td></td>
+										</ng-container>
+										<ng-container *ngSwitchCase="'dt'">
+											<td class="text-center"></td>
+											<td colspan="7"><b><i>{{row.dt.DoiTuong}}</i></b></td>
+										</ng-container>
+										<ng-container *ngSwitchCase="'ncc'">
+											<td class="text-center">{{row.k + 1}}</td>
+											<td>{{row.ncc.HoTen}}</td>
+											<td>{{row.ncc.SoHoSo}}</td>
+											<td>{{row.ncc.DiaChi}}</td>
+											<td>{{row.ncc.NguoiThoCungLietSy}}</td>
+											<td>{{row.ncc.QuanHeVoiLietSy}}</td>
+											<td class="text-right">{{row.ncc.SoTien}}</td>
+											<td>{{row.ncc.IsGiam ? row.ncc.GhiChuGiam : row.ncc.GhiChuTang}}</td>
+										</ng-container>
 									</tr>
-									<ng-container *ngFor="let dt of muc.DoiTuongs; trackBy: trackByIndex">
-										<tr>
-											<td colspan="8"><b><i>{{dt.DoiTuong}}</i></b></td>
-										</tr>
-										<tr [ngClass]="{'row_tang': ncc.IsTang}" *ngFor="let ncc of dt.NCCs; let k=index; trackBy: trackByNCC">
-											<td>{{k + 1}}</td>
-											<td>{{ncc.HoTen}}</td>
-											<td>{{ncc.SoHoSo}}</td>
-											<td>{{ncc.DiaChi}}</td>
-											<td>{{ncc.NguoiThoCungLietSy}}</td>
-											<td>{{ncc.QuanHeVoiLietSy}}</td>
-											<td class="text-right">{{ncc.SoTien}}</td>
-											<td>{{ncc.IsGiam ? ncc.GhiChuGiam: ncc.GhiChuTang}}</td>
-										</tr>
-									</ng-container>
-								</ng-container>
-							</ng-container>
-							<tr style=" color: red;">
+								</tbody>
+							</table>
+						</cdk-virtual-scroll-viewport>
+						<!-- footer tổng số -->
+						<table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-top:0;">
+							<colgroup>
+								<col style="width:45px">
+								<col>
+								<col style="width:90px">
+								<col>
+								<col>
+								<col>
+								<col style="width:80px">
+								<col style="width:120px">
+							</colgroup>
+							<tr style="color: red;">
 								<td colspan="5"><b>Tổng số</b></td>
 								<td>Số lượng: <b>{{TongSo}}</b></td>
 								<td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
 								<td></td>
 							</tr>
 						</table>
-					</div>
+					</ng-container>
 				</div>
 			</div>
 
@@ -256,7 +296,7 @@
 							</thead>
 						</table>
 						<!-- virtual scroll body -->
-						<cdk-virtual-scroll-viewport itemSize="35" style="height:48vh; overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
+						<cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsNhan, 48)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
 							<table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
 								<colgroup>
 									<col style="width:45px">
@@ -377,7 +417,7 @@
 							</thead>
 						</table>
 						<!-- virtual scroll body -->
-						<cdk-virtual-scroll-viewport itemSize="35" style="height:50vh; overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
+						<cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsTang, 50)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
 							<table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
 								<colgroup>
 									<col>

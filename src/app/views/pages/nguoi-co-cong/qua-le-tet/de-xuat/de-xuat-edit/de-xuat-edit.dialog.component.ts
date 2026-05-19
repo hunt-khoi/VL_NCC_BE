@@ -55,6 +55,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	treeNguoiNhanTang_TG: any[] = [];
 	flatRowsNhan: any[] = [];
 	flatRowsTang: any[] = [];
+	flatRowsView: any[] = [];
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
@@ -712,6 +713,22 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 				}))
 			}))
 		}));
+		this.buildFlatRowsView();
+	}
+
+	buildFlatRowsView() {
+		const rows: any[] = [];
+		this.treeNguoiNhanView.forEach((ng: any, j: number) => {
+			rows.push({ type: 'nguon', ng, j });
+			ng.data.forEach((muc: any, i: number) => {
+				rows.push({ type: 'muc', muc, j, i });
+				muc.DoiTuongs.forEach((dt: any) => {
+					rows.push({ type: 'dt', dt });
+					dt.NCCs.forEach((ncc: any, k: number) => rows.push({ type: 'ncc', ncc, j, i, k }));
+				});
+			});
+		});
+		this.flatRowsView = rows;
 	}
 
 	buildTangGiamTrees() {
@@ -770,6 +787,12 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 
 	trackByNCC(index: number, ncc: any): any {
 		return ncc.Id_NCC != null ? ncc.Id_NCC : index;
+	}
+
+	viewportH(rows: any[], maxVh: number): string {
+		const contentH = rows.length * 35;
+		const maxH = Math.round(window.innerHeight * maxVh / 100);
+		return Math.min(contentH, maxH) + 'px';
 	}
 
 	checkDisplay(ncc: any) {
