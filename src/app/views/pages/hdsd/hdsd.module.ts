@@ -1,19 +1,19 @@
-import { hdsdService } from './Services/hdsd.service';
+import { HDSDService } from './Services/hdsd.service';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../nguoi-co-cong/dps-common.module';
-import { hdsdComponent } from './hdsd.component';
-import { hdsdListComponent } from './hdsd-list/hdsd-list.component';
+import { HDSDComponent } from './hdsd.component';
+import { HDSDListComponent } from './hdsd-list/hdsd-list.component';
 import { HDSDEditDialogComponent } from './hdsd-edit/hdsd-edit.dialog.component';
 
 const routes: Routes = [
 	{
 		path: '',
-		component: hdsdComponent,
+		component: HDSDComponent,
 		children: [
 			{
 				path: '',
-				component: hdsdListComponent,
+				component: HDSDListComponent,
 			}
 		]
 	}
@@ -25,15 +25,16 @@ const routes: Routes = [
 		DPSCommonModule
 	],
 	providers: [
-		hdsdService
+		HDSDService
 	],
 	entryComponents: [
 		HDSDEditDialogComponent
 	],
 	declarations: [
-		hdsdComponent,
-		hdsdListComponent,
+		HDSDComponent,
+		HDSDListComponent,
 		HDSDEditDialogComponent
 	]
 })
-export class hdsdModule { }
+
+export class HDSDModule { }

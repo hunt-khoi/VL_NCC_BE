@@ -43,8 +43,8 @@ export class DashboardComponent implements OnInit {
 	@ViewChild('scrollView', { static: false }) scrollView: ElementRef | undefined;
 	@HostListener('scroll', ['$event'])
 
-	images: any; 
-    responsiveOptions;
+	images: any;
+	responsiveOptions: any;
 	data_thongke: any;
 	currentIndex: number = 0;
 
@@ -53,11 +53,11 @@ export class DashboardComponent implements OnInit {
 		private commonService: CommonService,
 		private signalRService: SignalRService,
 		private changeDetectorRefs: ChangeDetectorRef) {
-			this.responsiveOptions = [{
-				breakpoint: '1024px',
-				numVisible: 1,
-				numScroll: 3
-			}];
+		this.responsiveOptions = [{
+			breakpoint: '1024px',
+			numVisible: 1,
+			numScroll: 3
+		}];
 	}
 
 	ngOnInit(): void {
@@ -75,14 +75,14 @@ export class DashboardComponent implements OnInit {
 				while (i < size) {
 					let temp: any;
 					let index = i + 3; //i+4
-					if (index > size) { 
+					if (index > size) {
 						temp = res.data.slice(i);
 						temp = temp.concat(res.data.slice(0, index - size));
 					}
 					else {
-						temp = res.data.slice(i, i+4);
+						temp = res.data.slice(i, i + 4);
 					}
-					i = i+1;
+					i = i + 1;
 					this.data_thongke.push(temp);
 				}
 				this.currentIndex = 0;
@@ -110,12 +110,11 @@ export class DashboardComponent implements OnInit {
 	}
 
 	scrollViewHandler() {
-		if (this.scrollView && this.scrollView.nativeElement.scrollTop > 0) {
+		if (this.scrollView && this.scrollView.nativeElement.scrollTop > 0)
 			this.scrollTop = true;
-		}
-		else {
+		else
 			this.scrollTop = false;
-		}
+
 		if (this.isStopScroll || !this.scrollView) return;
 		let total = this.scrollView.nativeElement.scrollHeight - this.scrollView.nativeElement.offsetHeight;
 		try {
@@ -136,12 +135,10 @@ export class DashboardComponent implements OnInit {
 		this.queryFB.filter.lastID = "";
 		this.commonService.LastestFeedbackDasboard(this.queryFB).subscribe(res => {
 			if (res.status == 1) {
-				if (more) {
+				if (more)
 					this.lastestFeedback = this.lastestFeedback.concat(res.data);
-				}
-				else {
+				else
 					this.lastestFeedback = res.data;
-				}
 				this.pageTotalFB = res.page.TotalCount;
 				this.changeDetectorRefs.detectChanges();
 			}
@@ -181,13 +178,13 @@ export class DashboardComponent implements OnInit {
 
 	timer: any;
 	scrollDiv(elementToScroll: HTMLElement, event: any, depl: number) {
-		if (elementToScroll.scrollLeft + depl == elementToScroll.scrollLeft) 
+		if (elementToScroll.scrollLeft + depl == elementToScroll.scrollLeft)
 			elementToScroll.scrollLeft -= depl;
-		else 
+		else
 			elementToScroll.scrollLeft += depl;
 
 		this.timer = Number(setTimeout(() => {
 			this.scrollDiv(elementToScroll, event, depl)
 		}, 100));
-	} 
+	}
 }

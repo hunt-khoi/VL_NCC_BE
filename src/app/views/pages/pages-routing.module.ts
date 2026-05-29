@@ -21,7 +21,7 @@ const routes: Routes = [
 			},
 			{
 				path: 'hdsd',
-				loadChildren: () => import('../../views/pages/hdsd/hdsd.module').then(m => m.hdsdModule)
+				loadChildren: () => import('../../views/pages/hdsd/hdsd.module').then(m => m.HDSDModule)
 			},
 			//#region danh mục
 			// {
@@ -409,61 +409,61 @@ const routes: Routes = [
 			// 	path: 'tang-giam-trang-cap',
 			// 	canActivate: [PermissionUrl],
 			// 	loadChildren: () => import('../../views/pages/nguoi-co-cong/nien-han-dung-cu/thong-ke-dc-tang-giam/thong-ke-dc-tang-giam.module').then(m => m.thongkeTangGiamModule),
-		  	// },
+			// },
 			// {
 			// 	path: 'tinh-hinh-trang-cap', 
 			// 	canActivate: [PermissionUrl],
 			// 	loadChildren: () => import('../../views/pages/nguoi-co-cong/nien-han-dung-cu/tinh-hinh-trang-cap/tinh-hinh-trang-cap.module').then(m => m.TinhHinhTrangCapModule),
-		  	// },
+			// },
 			//#endregion
 			//#region Đền ơn đáp nghĩa
-		// 	{
-		// 		path: 'dt-ho-tro-quy',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('./nguoi-co-cong/quy-den-on-dap-nghia/dt-ho-tro-quy/dt-ho-tro-quy.module').then(m => m.DTHoTroModule)
-		// 	},
-		// 	{
-		// 		path: 'quan-ly-quy',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/quan-ly-quy/quan-ly-quy.module').then(m => m.QuanLyQuyModule)
-		// 	},
-		// 	{
-		// 		path: 'dv-dong-gop',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/dv-dong-gop/dv-dong-gop.module').then(m => m.DVDongGopModule)
-		// 	},
-		// 	{
-		// 		path: 'lap-ds-ho-tro',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/ho-tro/ho-tro.module').then(m => m.HoTroModule)
-		// 	},
-		// 	{
-		// 		path: 'duyet-ds-ho-tro',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/ho-tro-duyet/ho-tro-duyet.module').then(m => m.HoTroDTuyetModule),
-		// 		data: { IsEnable_Duyet: false }
-		//    },
-		//    {
-		// 		path: 'ds-ho-tro-da-duyet',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/ho-tro-duyet/ho-tro-duyet.module').then(m => m.HoTroDTuyetModule),
-		// 		data: { IsEnable_Duyet: true }
-		//    },
-		// 	{
-		// 		path: 'ke-hoach-van-dong',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/ke-hoach-van-dong/ke-hoach-van-dong.module').then(m => m.KeHoachVanDongModule)
-		// 	},
-		// 	{
-		// 		path: 'bao-cao-van-dong',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/bao-cao-van-dong/bao-cao-van-dong.module').then(m => m.BaoCaoVanDongModule)
-		// 	},
-		// 	{
-		// 		path: 'bao-cao-thu-chi',
-		// 		canActivate: [PermissionUrl],
-		// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/bao-cao-thu-chi/bao-cao-thu-chi.module').then(m => m.BaoCaoThuChiModule)
-		// 	},
+			// 	{
+			// 		path: 'dt-ho-tro-quy',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('./nguoi-co-cong/quy-den-on-dap-nghia/dt-ho-tro-quy/dt-ho-tro-quy.module').then(m => m.DTHoTroModule)
+			// 	},
+			// 	{
+			// 		path: 'quan-ly-quy',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/quan-ly-quy/quan-ly-quy.module').then(m => m.QuanLyQuyModule)
+			// 	},
+			// 	{
+			// 		path: 'dv-dong-gop',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/dv-dong-gop/dv-dong-gop.module').then(m => m.DVDongGopModule)
+			// 	},
+			// 	{
+			// 		path: 'lap-ds-ho-tro',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/ho-tro/ho-tro.module').then(m => m.HoTroModule)
+			// 	},
+			// 	{
+			// 		path: 'duyet-ds-ho-tro',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/ho-tro-duyet/ho-tro-duyet.module').then(m => m.HoTroDTuyetModule),
+			// 		data: { IsEnable_Duyet: false }
+			//    },
+			//    {
+			// 		path: 'ds-ho-tro-da-duyet',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/ho-tro-duyet/ho-tro-duyet.module').then(m => m.HoTroDTuyetModule),
+			// 		data: { IsEnable_Duyet: true }
+			//    },
+			// 	{
+			// 		path: 'ke-hoach-van-dong',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/ke-hoach-van-dong/ke-hoach-van-dong.module').then(m => m.KeHoachVanDongModule)
+			// 	},
+			// 	{
+			// 		path: 'bao-cao-van-dong',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/bao-cao-van-dong/bao-cao-van-dong.module').then(m => m.BaoCaoVanDongModule)
+			// 	},
+			// 	{
+			// 		path: 'bao-cao-thu-chi',
+			// 		canActivate: [PermissionUrl],
+			// 		loadChildren: () => import('../../views/pages/nguoi-co-cong/quy-den-on-dap-nghia/bao-cao-thu-chi/bao-cao-thu-chi.module').then(m => m.BaoCaoThuChiModule)
+			// 	},
 			//#endregion 
 			//#region Quản lý hỗ trợ nhà ở
 			// {
@@ -487,7 +487,7 @@ const routes: Routes = [
 			// 	path: 'thong-ke-ho-tro',
 			// 	canActivate: [PermissionUrl],
 			// 	loadChildren: () => import('../../views/pages/nguoi-co-cong/ho-tro-nha-o/thong-ke-ho-tro/thong-ke-ho-tro.module').then(m => m.ThongKeHoTroModule),
-		   	// },
+			// },
 			// {
 			//  	path: 'thong-ke-kinh-phi',
 			//  	canActivate: [PermissionUrl],
@@ -497,7 +497,7 @@ const routes: Routes = [
 			// 	path: 'xuat-da-ho-tro',
 			// 	canActivate: [PermissionUrl],
 			// 	loadChildren: () => import('../../views/pages/nguoi-co-cong/ho-tro-nha-o/xuat-da-ho-tro/xuat-da-ho-tro.module').then(m => m.XuatDaHoTroModule),
-		   	// },
+			// },
 			//#endregion
 			//#region Bảo hiểm y tế
 			// {
@@ -526,17 +526,17 @@ const routes: Routes = [
 			// 	path: 'ds-huong-bao-hiem',
 			// 	canActivate: [PermissionUrl],
 			// 	loadChildren: () => import('../../views/pages/nguoi-co-cong/bao-hiem-y-te/danh-sach-huong-bh/danh-sach-huong-bh.module').then(m => m.DSHuongBaoHiemModule),
-		  	// },
+			// },
 			// {
 			// 	path: 'tinh-hinh-mua-bh',
 			// 	canActivate: [PermissionUrl],
 			// 	loadChildren: () => import('../../views/pages/nguoi-co-cong/bao-hiem-y-te/tinh-hinh-mua-bao-hiem/tinh-hinh-mua-bao-hiem.module').then(m => m.TinhHinhBaoHiemModule),
-		  	// },
+			// },
 			// {
 			// 	path: 'bc-so-luong-bao-hiem',
 			// 	canActivate: [PermissionUrl],
 			// 	loadChildren: () => import('../../views/pages/nguoi-co-cong/bao-hiem-y-te/so-luong-tong-hop/so-luong-tong-hop.module').then(m => m.SoLuongTongHopModule),
-		  	// },
+			// },
 			//#endregion
 			{
 				path: 'error/403',

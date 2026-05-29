@@ -24,7 +24,7 @@ const DEMO_PARAMS = {
 })
 export class LoginComponent implements OnInit, OnDestroy {
 	@ViewChild(ReCaptchaComponent, { static: false }) recaptcha: ReCaptchaComponent | undefined;
-	loginForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	loading = false;
 	isLoggedIn$: Observable<boolean> | undefined;
 	errors: any = [];
@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
 	async ngOnInit() {
 		this.dialog.closeAll();
-		this.initLoginForm();
+		this.inititemForm();
 		this.constants = this.layoutConfigService.getConfig('constants');
 		await this.commonService.getConfig(["NUM_CAPCHA"]).toPromise().then(res => {
 			if (res && res.status == 1)
@@ -86,12 +86,12 @@ export class LoginComponent implements OnInit, OnDestroy {
 		this.loading = false;
 	}
 
-	initLoginForm() {
-		this.loginForm = this.fb.group({
+	inititemForm() {
+		this.itemForm = this.fb.group({
 			username: [DEMO_PARAMS.EMAIL, Validators.compose([
 				Validators.required,
 				Validators.minLength(3),
-				Validators.maxLength(320) 
+				Validators.maxLength(320)
 			])],
 			password: [DEMO_PARAMS.PASSWORD, Validators.compose([
 				Validators.required,
@@ -103,8 +103,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
 	submit() {
 		this.authNoticeService.setNotice("");
-		if (!this.loginForm) return;
-		const controls = this.loginForm.controls;
+		const controls = this.itemForm.controls;
 		this.error_txt = {
 			username: '',
 			password: ''
@@ -128,8 +127,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 		if (objectPath.get(controls, 'password.errors.maxlength.requiredLength')) {
 			this.error_txt.password = this.translate.instant('AUTH.VALIDATION.MAX_LENGTH_FIELD', { name: this.translate.instant('AUTH.INPUT.PASSWORD') }) + " 320 ký tự";
 		}
-		/** check form */
-		if (this.loginForm.invalid) {
+		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
@@ -168,14 +166,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 				this.loading = false;
 				this.cdr.detectChanges();
 			});
-	}
-
-	isControlHasError(controlName: string, validationType: string): boolean {
-		if (!this.loginForm) return false;
-		const control = this.loginForm.controls[controlName];
-		if (!control) return false;
-		const result = control.hasError(validationType) && (control.dirty || control.touched);
-		return result;
 	}
 
 	public handleCorrectCaptcha(captchaResponse: string): void {

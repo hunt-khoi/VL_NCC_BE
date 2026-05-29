@@ -7,7 +7,7 @@ import { HttpUtilsService, QueryParamsModel, QueryResultsModel } from '../../../
 const API_PRODUCTS_URL = environment.ApiRoot + '/hdsd';
 
 @Injectable()
-export class hdsdService {
+export class HDSDService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 	ReadOnlyControl: boolean = false;
 
@@ -22,7 +22,7 @@ export class hdsdService {
 			params: httpParams
 		});
 	}
-	
+
 	getVersion(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<QueryResultsModel>(environment.ApiRoot + "/lite/get-version", {
@@ -35,7 +35,7 @@ export class hdsdService {
 		const url = `${API_PRODUCTS_URL}/${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	
+
 	CreateItem(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL, item, { headers: httpHeaders });

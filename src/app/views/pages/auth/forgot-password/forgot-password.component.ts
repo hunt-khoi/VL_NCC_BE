@@ -14,7 +14,7 @@ import objectPath from 'object-path';
 	encapsulation: ViewEncapsulation.None
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
-	forgotPasswordForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	loading = false;
 	errors: any = [];
 	constants: any;
@@ -44,19 +44,18 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 	}
 
 	initRegistrationForm() {
-		this.forgotPasswordForm = this.fb.group({
+		this.itemForm = this.fb.group({
 			username: ['', Validators.compose([
 				Validators.required,
 				//Validators.email,
 				Validators.minLength(3),
-				Validators.maxLength(320) 
+				Validators.maxLength(320)
 			])]
 		});
 	}
 
 	submit() {
-		if (!this.forgotPasswordForm) return;
-		const controls = this.forgotPasswordForm.controls;
+		const controls = this.itemForm.controls;
 		this.error_txt = {
 			username: '',
 			password: ''
@@ -65,7 +64,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 			this.error_txt.username = this.translate.instant('AUTH.VALIDATION.REQUIRED', { name: this.translate.instant('AUTH.INPUT.USERNAME') });
 		}
 		if (objectPath.get(controls, 'username.errors.minlength.requiredLength')) {
-			this.error_txt.username = this.translate.instant('AUTH.VALIDATION.MIN_LENGTH_FIELD', { name: this.translate.instant('AUTH.INPUT.USERNAME') })+ " 3 ký tự";
+			this.error_txt.username = this.translate.instant('AUTH.VALIDATION.MIN_LENGTH_FIELD', { name: this.translate.instant('AUTH.INPUT.USERNAME') }) + " 3 ký tự";
 		}
 		if (objectPath.get(controls, 'username.errors.maxlength.requiredLength')) {
 			this.error_txt.username = this.translate.instant('AUTH.VALIDATION.MAX_LENGTH_FIELD', { name: this.translate.instant('AUTH.INPUT.USERNAME') }) + " 320 ký tự";
@@ -74,28 +73,27 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 			this.error_txt.password = this.translate.instant('AUTH.VALIDATION.REQUIRED', { name: this.translate.instant('AUTH.INPUT.PASSWORD') });
 		}
 		if (objectPath.get(controls, 'password.errors.minlength.requiredLength')) {
-			this.error_txt.password = this.translate.instant('AUTH.VALIDATION.MIN_LENGTH_FIELD', { name: this.translate.instant('AUTH.INPUT.PASSWORD') })+ " 3 ký tự";
+			this.error_txt.password = this.translate.instant('AUTH.VALIDATION.MIN_LENGTH_FIELD', { name: this.translate.instant('AUTH.INPUT.PASSWORD') }) + " 3 ký tự";
 		}
 		if (objectPath.get(controls, 'password.errors.maxlength.requiredLength')) {
 			this.error_txt.password = this.translate.instant('AUTH.VALIDATION.MAX_LENGTH_FIELD', { name: this.translate.instant('AUTH.INPUT.PASSWORD') }) + " 320 ký tự";
 		}
-		/** check form */
-		if (this.forgotPasswordForm.invalid) {
+		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
 			return;
 		}
-		this.loading = true;
 
+		this.loading = true;
 		const usname = controls.username.value;
 		this.authService.requestPassword(usname).pipe(
-			tap(response => {
-				if (response && response.status==1) {
+			tap(res => {
+				if (res && res.status == 1) {
 					this.authNoticeService.setNotice(this.translate.instant('AUTH.FORGOT.SUCCESS'), 'success');
 					this.router.navigateByUrl('/auth/login');
 				} else {
-					this.authNoticeService.setNotice(this.translate.instant('AUTH.VALIDATION.ERROR_MESSAGE', {error: response.error.message}), 'danger');
+					this.authNoticeService.setNotice(this.translate.instant('AUTH.VALIDATION.ERROR_MESSAGE', { error: res.error.message }), 'danger');
 				}
 			}),
 			takeUntil(this.unsubscribe),
@@ -104,13 +102,5 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 				this.cdr.markForCheck();
 			})
 		).subscribe();
-	}
-
-	isControlHasError(controlName: string, validationType: string): boolean {
-		if (!this.forgotPasswordForm) return false;
-		const control = this.forgotPasswordForm.controls[controlName];
-		if (!control) return false;
-		const result = control.hasError(validationType) && (control.dirty || control.touched);
-		return result;
 	}
 }

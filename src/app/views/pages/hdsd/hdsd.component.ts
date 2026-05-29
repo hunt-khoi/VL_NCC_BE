@@ -5,8 +5,8 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 	templateUrl: './hdsd.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class hdsdComponent implements OnInit {
-	constructor() {}
+export class HDSDComponent implements OnInit {
+	constructor() { }
 
-	ngOnInit() {}
+	ngOnInit() { }
 }

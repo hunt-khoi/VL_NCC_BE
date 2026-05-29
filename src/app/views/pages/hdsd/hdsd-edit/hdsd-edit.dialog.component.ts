@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
 import { LayoutUtilsService } from 'app/core/_base/crud/utils/layout-utils.service';
-import { hdsdService } from '../Services/hdsd.service';
+import { HDSDService } from '../Services/hdsd.service';
 
 @Component({
 	selector: 'kt-hdsd-edit',
@@ -13,7 +13,7 @@ import { hdsdService } from '../Services/hdsd.service';
 })
 export class HDSDEditDialogComponent implements OnInit {
 	item: any;
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -32,7 +32,7 @@ export class HDSDEditDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		public dialog: MatDialog,
 		public commonService: CommonService,
-		private hdsdService1: hdsdService,
+		private apiService: HDSDService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private translate: TranslateService) {
@@ -43,9 +43,10 @@ export class HDSDEditDialogComponent implements OnInit {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+
 		this.createForm();
 		if (+this.item.Id > 0) {
-			this.hdsdService1.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).subscribe(res => {
 				if (res && res.status == 1) {
 					this.item = res.data;
 					this.Id = this.item.Id;
@@ -63,7 +64,7 @@ export class HDSDEditDialogComponent implements OnInit {
 			fileDinhKem: [null]
 		};
 		this.itemForm = this.fb.group(temp);
-		if (this.focusInput) 
+		if (this.focusInput)
 			this.focusInput.nativeElement.focus();
 		if (!this.allowEdit)
 			this.itemForm.disable();
@@ -77,13 +78,10 @@ export class HDSDEditDialogComponent implements OnInit {
 			else
 				return 'Chi tiết hướng dẫn';
 		}
-		else
-			return 'Thêm mới hướng dẫn';
+		return 'Thêm mới hướng dẫn';
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): any {
-		if (!this.itemForm) return;
+	prepare(): any {
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -99,9 +97,7 @@ export class HDSDEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -109,10 +105,10 @@ export class HDSDEditDialogComponent implements OnInit {
 			this.hasFormErrors = true;
 			return;
 		}
-		const data = this.prepareCustomer();
-		if (data.Id > 0) 
+		const data = this.prepare();
+		if (data.Id > 0)
 			this.Update(data);
-		else 
+		else
 			this.Create(data, withBack);
 	}
 
@@ -120,15 +116,14 @@ export class HDSDEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.hdsdService1.UpdateItem(item).subscribe(res => {
+		this.apiService.UpdateItem(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.dialogRef.close({
-					item
-				});
+				this.dialogRef.close({ item });
 			}
 			else {
+				this.viewLoading = false;
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
@@ -136,16 +131,14 @@ export class HDSDEditDialogComponent implements OnInit {
 
 	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
-		//	this.viewLoading = true;
+		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.hdsdService1.CreateItem(item).subscribe(res => {
+		this.apiService.CreateItem(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.change = true;

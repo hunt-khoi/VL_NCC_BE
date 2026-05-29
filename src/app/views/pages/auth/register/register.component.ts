@@ -1,12 +1,12 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { finalize, takeUntil, tap } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { finalize, takeUntil, tap } from 'rxjs/operators';
 import { AppState } from '../../../../core/reducers';
 import { AuthNoticeService, AuthService, Register, User } from '../../../../core/auth/';
-import { Subject } from 'rxjs';
 import { ConfirmPasswordValidator } from './confirm-password.validator';
 
 @Component({
@@ -15,7 +15,7 @@ import { ConfirmPasswordValidator } from './confirm-password.validator';
 	encapsulation: ViewEncapsulation.None
 })
 export class RegisterComponent implements OnInit, OnDestroy {
-	registerForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	loading = false;
 	errors: any = [];
 	private unsubscribe: Subject<any>;
@@ -32,7 +32,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		this.initRegisterForm();
+		this.inititemForm();
 	}
 
 	ngOnDestroy(): void {
@@ -41,8 +41,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
 		this.loading = false;
 	}
 
-	initRegisterForm() {
-		this.registerForm = this.fb.group({
+	inititemForm() {
+		this.itemForm = this.fb.group({
 			fullname: ['', Validators.compose([
 				Validators.required,
 				Validators.minLength(3),
@@ -77,9 +77,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
 	}
 
 	submit() {
-		if (!this.registerForm) return;
-		const controls = this.registerForm.controls;
-		if (this.registerForm.invalid) {
+		const controls = this.itemForm.controls;
+		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
@@ -101,7 +100,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 		this.auth.register(_user).pipe(
 			tap(user => {
 				if (user) {
-					this.store.dispatch(new Register({authToken: user.accessToken}));
+					this.store.dispatch(new Register({ authToken: user.accessToken }));
 					// pass notice message to the login page
 					this.authNoticeService.setNotice(this.translate.instant('AUTH.REGISTER.SUCCESS'), 'success');
 					this.router.navigateByUrl('/auth/login');
@@ -115,13 +114,5 @@ export class RegisterComponent implements OnInit, OnDestroy {
 				this.cdr.markForCheck();
 			})
 		).subscribe();
-	}
-
-	isControlHasError(controlName: string, validationType: string): boolean {
-		if (!this.registerForm) return false;
-		const control = this.registerForm.controls[controlName];
-		if (!control) return false;
-		const result = control.hasError(validationType) && (control.dirty || control.touched);
-		return result;
 	}
 }

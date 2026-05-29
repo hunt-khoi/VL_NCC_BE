@@ -7,8 +7,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../core/_base/crud';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
-import { hdsdService } from '../Services/hdsd.service';
-import { hdsdDataSource } from '../Model/data-sources/hdsd.datasource';
+import { HDSDService } from '../Services/hdsd.service';
+import { HDSDDataSource } from '../Model/data-sources/hdsd.datasource';
 import { HDSDEditDialogComponent } from '../hdsd-edit/hdsd-edit.dialog.component';
 
 @Component({
@@ -17,9 +17,9 @@ import { HDSDEditDialogComponent } from '../hdsd-edit/hdsd-edit.dialog.component
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class hdsdListComponent implements OnInit {
+export class HDSDListComponent implements OnInit {
 	// Table fields
-	dataSource: hdsdDataSource | undefined;
+	dataSource: HDSDDataSource | undefined;
 	displayedColumns = ['STT', 'HDSD', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
@@ -31,14 +31,14 @@ export class hdsdListComponent implements OnInit {
 	rR: any = {};
 	verS: string = "";
 
-	constructor(public apiService: hdsdService,
+	constructor(public apiService: HDSDService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
 		private tokenStorage: TokenStorage,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private translate: TranslateService) {
-			this._name = this.translate.instant('HDSD.NAME');
+		this._name = this.translate.instant('HDSD.NAME');
 	}
 
 	ngOnInit() {
@@ -67,10 +67,10 @@ export class hdsdListComponent implements OnInit {
 		}
 
 		// Init DataSource
-		this.dataSource = new hdsdDataSource(this.apiService);
+		this.dataSource = new HDSDDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
 		this.route.queryParams.subscribe(_ => {
-			if (this.dataSource) { 
+			if (this.dataSource) {
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
 			}
@@ -85,7 +85,7 @@ export class hdsdListComponent implements OnInit {
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
 			this.paginator.pageSize
 		);
-		this.dataSource.loadList(queryParams);	
+		this.dataSource.loadList(queryParams);
 	}
 
 	Download(object: any) {

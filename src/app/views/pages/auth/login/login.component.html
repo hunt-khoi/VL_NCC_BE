@@ -1,9 +1,10 @@
-<!--begin::Body-->
-<div class="kt-login__body" [ngStyle]="{'background-image': 'url(' + constants.background + ')','background-size':'cover'}">
+<div class="kt-login__body"
+    [ngStyle]="{'background-image': 'url(' + constants.background + ')','background-size':'cover'}">
     <div class="row view-login">
         <div class="col-sm-12 col-md-4 cover-left-info">
             <div class="logo-dv">
-                <img src="./assets/images/donvi2.png" alt="{{constants.title}}" title="{{constants.title}}" style="max-height: 250px;width: 100%;"/>
+                <img src="./assets/images/donvi2.png" alt="{{constants.title}}" title="{{constants.title}}"
+                    style="max-height: 250px;width: 100%;" />
                 <!--<img src="./assets/images/logo.png" alt="Hệ thống CSDL Sở Lao động - Thương bình và Xã hội" title="Hệ thống CSDL Sở Lao động - Thương bình và Xã hội" style="max-height: 100px;">
                 <h3 style="color: white;font-size: 40px;"><span style="font-size: 35px;color:#00923f">Hệ thống CSDL</span> Sở Lao động - Thương binh và Xã hội</h3>-->
             </div>
@@ -13,7 +14,7 @@
                         <img src="./assets/images/phone.png" alt="Hỗ trợ" title="Hỗ trợ" />
                     </div>
                     <div class="i-text">
-                        <div><b>Hỗ trợ</b></div>
+                        <b>Hỗ trợ</b>
                         <div>Điện thoại: <b>{{constants.phone}}</b></div>
                         <div>Email: <b>{{constants.email}}</b></div>
                     </div>
@@ -27,7 +28,6 @@
             </div>
         </div>
         <div class="col-sm-12 col-md-4">
-            <!--begin::Signin-->
             <div class="cover-form-login">
                 <div class="kt-login__form dl-login-form">
                     <!-- <div class="login-logo">
@@ -38,32 +38,39 @@
                         <div class="text-danger"></div>
                     </div>
                     <kt-auth-notice></kt-auth-notice>
-                    <form class="kt-form" [formGroup]="loginForm">
+                    <form class="kt-form" [formGroup]="itemForm">
                         <div class="form-group">
-                            <input type="text" style="background: url(./assets/images/user.png) left 8px center no-repeat #fff;" 
-                                placeholder="{{ 'AUTH.INPUT.USERNAME' | translate }}" formControlName="username" autocomplete="off"/>
+                            <input type="text"
+                                style="background: url(./assets/images/user.png) left 8px center no-repeat #fff;"
+                                placeholder="{{ 'AUTH.INPUT.USERNAME' | translate }}" formControlName="username"
+                                autocomplete="off" />
                             <div class="error-message" *ngIf="error_txt.username">{{error_txt.username}}</div>
                         </div>
                         <div class="form-group">
-                            <input type="password" style="background: url(./assets/images/lock.png) left 8px center no-repeat #fff;"
-                                placeholder="{{ 'AUTH.INPUT.PASSWORD' | translate }}" formControlName="password" autocomplete="off"/>
+                            <input type="password"
+                                style="background: url(./assets/images/lock.png) left 8px center no-repeat #fff;"
+                                placeholder="{{ 'AUTH.INPUT.PASSWORD' | translate }}" formControlName="password"
+                                autocomplete="off" />
                             <div class="error-message" *ngIf="error_txt.password">{{error_txt.password}}</div>
                         </div>
                         <div class="form-group" *ngIf="showCaptcha">
-                            <re-captcha #recaptcha (captchaResponse)="handleCorrectCaptcha($event)" size="normal" language="vi" [site_key]="YOUR_SITE_KEY"></re-captcha>
+                            <re-captcha #recaptcha (captchaResponse)="handleCorrectCaptcha($event)" size="normal"
+                                language="vi" [site_key]="YOUR_SITE_KEY"></re-captcha>
                         </div>
-                        <!--begin::Action-->
                         <div>
-                            <a href="javascript:;" style="color: black;" routerLink="/auth/forgot-password" class="kt-link kt-login__link-forgot">
+                            <a href="javascript:;" style="color: black;" routerLink="/auth/forgot-password"
+                                class="kt-link kt-login__link-forgot">
                                 {{ 'AUTH.GENERAL.FORGOT_BUTTON' | translate }}
                             </a>
                         </div>
                         <br>
                         <div>
-                            <button (click)="submit()" [ngClass]="{'kt-spinner kt-spinner--right kt-spinner--md kt-spinner--light': loading}" id="kt_login_signin_submit" 
-                                class="btn btn-primary btn-elevate btn-login">{{ 'AUTH.LOGIN.BUTTON' | translate }}</button>
+                            <button (click)="submit()"
+                                [ngClass]="{'kt-spinner kt-spinner--right kt-spinner--md kt-spinner--light': loading}"
+                                id="kt_login_signin_submit" class="btn btn-primary btn-elevate btn-login">
+                                {{ 'AUTH.LOGIN.BUTTON' | translate }}
+                            </button>
                         </div>
-                        <!--end::Action-->
                     </form>
                 </div>
             </div>
