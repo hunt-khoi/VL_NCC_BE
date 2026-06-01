@@ -1,4 +1,4 @@
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { HoSoNhaOService } from '../Services/ho-so-nha-o.service';
 import { CommonService } from '../../../services/common.service';

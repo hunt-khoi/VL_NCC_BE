@@ -1,9 +1,10 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
-import { MatDialog, MatSelect } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSelect } from '@angular/material/select';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { chucvuEditDialogComponent } from '../../chucvu/chucvu-edit/chucvu-edit.dialog.component';
 import { chucvuModel } from '../../chucvu/Model/chucvu.model';
 import { UpdateThongTinChucVuModel } from '../Model/so-do-to-chuc.model';

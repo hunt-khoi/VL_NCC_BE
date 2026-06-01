@@ -40,7 +40,7 @@ export class DashboardComponent implements OnInit {
 	pageTotalFB: number = 0;
 	isStopScroll: boolean = false;
 	scrollTop: boolean = false;
-	@ViewChild('scrollView', { static: false }) scrollView: ElementRef | undefined;
+	@ViewChild('scrollView') scrollView: ElementRef | undefined;
 	@HostListener('scroll', ['$event'])
 
 	images: any;

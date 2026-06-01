@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewEncapsulation, HostListener } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';

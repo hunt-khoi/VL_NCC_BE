@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { DM_DonViService } from '../Services/dm-don-vi.service';

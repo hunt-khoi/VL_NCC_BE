@@ -1,4 +1,4 @@
-import { MAT_DATE_FORMATS } from "@angular/material";
+import { MAT_DATE_FORMATS } from "@angular/material/core";
 import { Directive } from '@angular/core';
 import { MY_FORMATS } from "../datepicker";
 

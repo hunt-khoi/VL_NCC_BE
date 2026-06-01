@@ -1,5 +1,7 @@
 import { BieuMauService } from '../Services/bieu-mau.service';
-import { MatDialogRef, MatPaginator, MatTableDataSource, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { Component, OnInit, Inject, Input, ViewChild } from '@angular/core';
 import { BieuMauQuaService } from '../Services/bieu-mau-qua.service';
 

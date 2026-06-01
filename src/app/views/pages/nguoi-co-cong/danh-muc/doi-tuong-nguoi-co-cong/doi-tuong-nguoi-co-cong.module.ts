@@ -1,7 +1,7 @@
 import { DoiTuongNguoiCoCongService } from './Services/doi-tuong-nguoi-co-cong.service';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DPSCommonModule } from '../../dps-common.module';
 import { DoiTuongNguoiCoCongRefModule } from './doi-tuong-nguoi-co-cong-ref.module';
 import { DoiTuongNguoiCoCongComponent } from './doi-tuong-nguoi-co-cong.component';

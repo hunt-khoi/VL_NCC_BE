@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, OnChanges, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, HostListener } from '@angular/core';
 import { CommonService } from '../../../../pages/nguoi-co-cong/services/common.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -51,7 +51,7 @@ export class NotificationComponent implements OnInit, OnChanges {
 	UserID: number;
 	isStopScroll: boolean = false;
 
-	@ViewChild('scrollViewTB', { static: false }) scrollViewTB: ElementRef;
+	@ViewChild('scrollViewTB') scrollViewTB: ElementRef;
 	@HostListener('scroll', ['$event'])
 	scrollViewHandler(event, item) {
 		if (this.isStopScroll) return;

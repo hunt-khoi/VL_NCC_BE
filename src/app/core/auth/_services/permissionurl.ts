@@ -3,7 +3,7 @@ import { Router, RouterStateSnapshot, ActivatedRouteSnapshot, CanActivate, CanAc
 import { Injectable } from '@angular/core';
 import { TokenStorage } from './token-storage.service';
 import { UserProfileService } from './user-profile.service';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class PermissionUrl implements CanActivate, CanActivateChild, CanLoad {

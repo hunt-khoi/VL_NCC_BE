@@ -1,5 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, SecurityContext, AfterViewInit } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { CommonService } from '../services/common.service';
 import { LayoutUtilsService } from '../../../../core/_base/crud';
@@ -16,7 +16,7 @@ export class FileViewerComponent implements OnInit, AfterViewInit {
 	IdRow: number = 0;
 	src: any;
 	Url: any;
-	@ViewChild('iframeRef', { static: false }) iframeRef!: ElementRef;
+	@ViewChild('iframeRef') iframeRef!: ElementRef;
 	private checkIFrameSubscription: Subscription | null = null;
 
 	constructor(

@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { BehaviorSubject, fromEvent, merge } from 'rxjs';
 // Services
 import { ThongKeKinhPhiService } from '../thong-ke-kinh-phi/Services/thong-ke-kinh-phi.service';

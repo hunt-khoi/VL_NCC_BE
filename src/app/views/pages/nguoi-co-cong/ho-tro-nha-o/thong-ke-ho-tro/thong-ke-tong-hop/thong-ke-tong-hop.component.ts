@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 // RXJS
 import { BehaviorSubject, fromEvent, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';

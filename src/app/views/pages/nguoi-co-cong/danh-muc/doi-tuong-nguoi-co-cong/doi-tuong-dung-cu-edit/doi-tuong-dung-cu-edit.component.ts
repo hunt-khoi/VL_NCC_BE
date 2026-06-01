@@ -1,7 +1,7 @@
 import { DoiTuongNguoiCoCongService } from '../Services/doi-tuong-nguoi-co-cong.service';
 import { DoiTuongDCCHModel } from '../Model/doi-tuong-nguoi-co-cong.model';
 import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';

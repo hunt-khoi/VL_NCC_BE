@@ -2,7 +2,9 @@ import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, 
 import { ActivatedRoute } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { TranslateService } from '@ngx-translate/core';
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { tap } from 'rxjs/operators';
 import { merge, ReplaySubject } from 'rxjs';

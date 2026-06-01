@@ -1,7 +1,7 @@
 // Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 // Service
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';

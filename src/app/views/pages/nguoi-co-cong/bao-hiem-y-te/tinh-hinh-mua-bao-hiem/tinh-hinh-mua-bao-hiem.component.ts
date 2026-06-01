@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { MatDatepicker } from '@angular/material';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { DomSanitizer } from '@angular/platform-browser';
 import { merge, BehaviorSubject } from 'rxjs';
 //Service

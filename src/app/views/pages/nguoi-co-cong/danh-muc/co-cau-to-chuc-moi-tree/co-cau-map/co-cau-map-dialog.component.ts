@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { cocautochucMoiTreeService } from '../Services/co-cau-to-chuc-moi-tree.service';

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { ReCaptchaComponent } from 'angular2-recaptcha';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthNoticeService, AuthService } from '../../../../core/auth';
 import { LayoutConfigService } from '../../../../core/_base/layout';
@@ -23,7 +23,7 @@ const DEMO_PARAMS = {
 	encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent implements OnInit, OnDestroy {
-	@ViewChild(ReCaptchaComponent, { static: false }) recaptcha: ReCaptchaComponent | undefined;
+	@ViewChild(ReCaptchaComponent) recaptcha: ReCaptchaComponent | undefined;
 	itemForm: FormGroup = new FormGroup({});
 	loading = false;
 	isLoggedIn$: Observable<boolean> | undefined;

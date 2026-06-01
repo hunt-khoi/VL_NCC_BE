@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../../../../../environments/environment';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
 import { VaiTroComponent } from '../vai-tro/vai-tro.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { GlobalVariable } from '../../../../pages/global';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
 

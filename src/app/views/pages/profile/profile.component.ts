@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angula
 import { Observable } from 'rxjs';
 import moment from 'moment';
 import { CommonService } from '../nguoi-co-cong/services/common.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'app/core/auth';
 import { VaiTroComponent } from 'app/views/partials/layout';
 

@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@
 import { BehaviorSubject } from 'rxjs';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ReviewExportComponent } from '../../../components';
 import { CommonService } from '../../../services/common.service';
 import { NienHanService } from '../Services/nien-han.service';

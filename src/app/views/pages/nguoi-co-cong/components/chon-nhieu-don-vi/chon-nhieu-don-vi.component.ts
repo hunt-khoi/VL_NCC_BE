@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
 import { CommonService } from '../../services/common.service';

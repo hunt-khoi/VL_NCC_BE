@@ -5,7 +5,7 @@ import { DPSCommonModule } from '../../dps-common.module';
 import { HoSoNhaOComponent } from './ho-so-nha-o.component';
 import { HoSoNhaORefModule } from './ho-so-nha-o-ref.module';
 import { HoSoNhaOListComponent } from './ho-so-nha-o-list/ho-so-nha-o-list.component';
-import { MatListModule } from '@angular/material';
+import { MatListModule } from '@angular/material/list';
 
 const routes: Routes = [
 	{

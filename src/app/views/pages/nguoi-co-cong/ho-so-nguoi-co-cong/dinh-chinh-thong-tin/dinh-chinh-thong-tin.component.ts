@@ -1,7 +1,9 @@
 
 import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatPaginator, MatSort, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { QueryParamsModel } from './../../../../../core/_base/crud/models/query-models/query-params.model';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';

@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, EventEmitter, ViewEncapsulation, OnChanges } from '@angular/core';
 import { LayoutUtilsService } from 'app/core/_base/crud';
 import { CommonService } from '../../services/common.service';
-import { MatTableDataSource } from '@angular/material';
+import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
 import { saveAs } from 'file-saver';
 

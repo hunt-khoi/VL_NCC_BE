@@ -1,6 +1,6 @@
 
 import { TranslateService } from '@ngx-translate/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';

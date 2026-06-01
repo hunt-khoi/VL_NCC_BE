@@ -1,5 +1,5 @@
 import { LayoutUtilsService } from 'app/core/_base/crud';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject } from '@angular/core';
 import { PhatQuaModel } from './../Model/phat-qua.model';
 import { PhatQuaService } from './../Services/phat-qua.service';

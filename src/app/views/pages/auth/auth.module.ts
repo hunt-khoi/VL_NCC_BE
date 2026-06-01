@@ -5,7 +5,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 // Material
-import { MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatInputModule } from '@angular/material';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 // Translate
 import { TranslateModule } from '@ngx-translate/core';
 // CRUD
@@ -83,7 +86,7 @@ const routes: Routes = [
 })
 
 export class AuthModule {
-	static forRoot(): ModuleWithProviders {
+	static forRoot(): ModuleWithProviders<AuthModule> {
 		return {
 			ngModule: AuthModule,
 			providers: [

@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ComponentRef } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { MatDatepicker } from '@angular/material';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { TranslateService } from '@ngx-translate/core';
 import moment from 'moment';
 import { Moment } from 'moment';

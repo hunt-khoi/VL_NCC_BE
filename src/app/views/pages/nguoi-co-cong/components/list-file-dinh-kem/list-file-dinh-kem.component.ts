@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatTableDataSource } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { CommonService } from '../../services/common.service';
 import { saveAs } from 'file-saver';

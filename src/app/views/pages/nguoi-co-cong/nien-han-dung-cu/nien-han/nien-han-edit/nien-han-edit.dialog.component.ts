@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, HostListener, ChangeDetectorRef } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NienHanModel } from '../../nien-han/Model/nien-han.model';
 import { TranslateService } from '@ngx-translate/core';

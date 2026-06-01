@@ -1,4 +1,4 @@
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { ThongKeKinhPhiService } from '../Services/thong-ke-kinh-phi.service';
 import { QueryParamsModel } from 'app/core/_base/crud';

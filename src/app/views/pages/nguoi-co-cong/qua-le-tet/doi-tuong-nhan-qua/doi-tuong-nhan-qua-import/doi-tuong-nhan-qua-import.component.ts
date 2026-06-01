@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { MatDialog, MatTableDataSource, MatDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { LayoutUtilsService } from 'app/core/_base/crud';
 import { DoiTuongNhanQuaService } from '../Services/doi-tuong-nhan-qua.service';

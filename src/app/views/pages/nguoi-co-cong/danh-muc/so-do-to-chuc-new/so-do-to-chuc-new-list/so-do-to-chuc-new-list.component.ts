@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, Injectable } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { ArrayDataSource } from '@angular/cdk/collections';
 import { BehaviorSubject } from 'rxjs';
-import { MatDialog} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { OrgChartModel } from '../Model/so-do-to-chuc.model';
 import { OrgChartService } from '../Services/so-do-to-chuc.service';
@@ -29,6 +29,7 @@ export class TodoItemFlatNode {
 	children: any;
 }
 
+@Injectable()
 export class ChecklistDatabase {
 	dataChange = new BehaviorSubject<TodoItemNode[]>([]);
 

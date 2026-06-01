@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { DropEffect, DndDropEvent } from 'ngx-drag-drop';
 import { OrgChartService } from '../Services/so-do-to-chuc.service';
 import { ChartStaffModel } from '../Model/so-do-to-chuc.model';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import * as jspdf from 'jspdf';
 import html2canvas from 'html2canvas';

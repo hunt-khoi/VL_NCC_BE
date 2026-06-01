@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Location } from '@angular/common';
@@ -16,8 +16,8 @@ import { TangQuaDialogComponent } from './../tang-qua-dialog/tang-qua-dialog.com
 
 export class DanhSachTangQuaComponent implements OnInit {
 
-	@ViewChild('tableWrapper', { static: false }) tableWrapper: ElementRef;
-	@ViewChild('tableHead', { static: false }) tableHead: ElementRef;
+	@ViewChild('tableWrapper') tableWrapper: ElementRef;
+	@ViewChild('tableHead') tableHead: ElementRef;
 
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();

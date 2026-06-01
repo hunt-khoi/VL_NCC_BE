@@ -1,7 +1,7 @@
 
 import { Router, RouterStateSnapshot, ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
 
 @Injectable()
