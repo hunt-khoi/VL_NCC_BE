@@ -1,0 +1,128 @@
+<ng-container *ngIf="item">
+	<lib-dynamic-component *ngIf="item.IsStatic" [childComponentType]="childComponentType" [data]="childComponentData" (getInstance)="getInstance($event)"></lib-dynamic-component>
+	<div *ngIf="item.Statement!='list' && !item.IsStatic">
+		<!--begin::Form-->
+		<form class="m-form" [formGroup]="itemForm">
+			<div class="row">
+				<ng-container *ngFor="let c of item.controls; let i=index">
+					<div *ngIf="c.Width>0" [hidden]="c.GroupBtn && c.IdColumn!=SelectedButton.IdDF" class="{{'col-md-'+c.Width}}">
+						<ng-container *ngIf="c.IdControl==-2">
+							<kt-dynamic-form #df [FormID]="c.IdColumn" [Data]="c.Data" [DataID]="DataID" [GroupBtn]="c.GroupBtn" [Conditions]="Conditions" (ConditionsChange)="getConditions($event)"></kt-dynamic-form>
+						</ng-container>
+
+						<mat-form-field class="mat-form-field-fluid" *ngIf="c.IdControl==1">
+							<input matInput placeholder="{{c.TenHienThi?c.TenHienThi:c.Description}}" required="{{c.Required}}" formControlName="{{c.IdRow}}" [readonly]="c.ReadOnly">
+						</mat-form-field>
+
+						<mat-form-field class="mat-form-field-fluid" *ngIf="c.IdControl==2">
+							<input matInput placeholder="{{c.TenHienThi?c.TenHienThi:c.Description}}" type="number" required="{{c.Required}}" formControlName="{{c.IdRow}}" [readonly]="c.ReadOnly">
+						</mat-form-field>
+
+						<mat-form-field class="mat-form-field-fluid" *ngIf="c.IdControl==3">
+							<input matInput placeholder="{{c.TenHienThi?c.TenHienThi:c.Description}}" [matDatepicker]="dpDate" required="{{c.Required}}" formControlName="{{c.IdRow}}" [readonly]="c.ReadOnly" />
+							<mat-datepicker-toggle matSuffix [for]="dpDate" [disabled]="c.ReadOnly"></mat-datepicker-toggle>
+							<mat-datepicker #dpDate></mat-datepicker>
+						</mat-form-field>
+
+						<mat-form-field class="mat-form-field-fluid" *ngIf="c.IdControl==4">
+							<textarea rows="1" matInput placeholder="{{c.TenHienThi?c.TenHienThi:c.Description}}" required="{{c.Required}}" formControlName="{{c.IdRow}}" [readonly]="c.ReadOnly"></textarea>
+						</mat-form-field>
+
+						<mat-form-field class="mat-form-field-fluid" *ngIf="c.IdControl==5">
+							<mat-select placeholder="{{c.TenHienThi?c.TenHienThi:c.Description}}" required="{{c.Required}}" formControlName="{{c.IdRow}}" [disabled]="c.ReadOnly" (selectionChange)="selectionChange(c, $event.value)">
+								<mat-option *ngFor="let opt of c.DataInit" [value]="opt.id">{{opt.title}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+
+						<mat-form-field class="mat-form-field-fluid" *ngIf="c.IdControl==6">
+							<mat-select placeholder="{{c.TenHienThi?c.TenHienThi:c.Description}}" multiple required="{{c.Required}}" formControlName="{{c.IdRow}}" [disabled]="c.ReadOnly">
+								<mat-option *ngFor="let opt of c.DataInit" [value]="opt.id">{{opt.title}}</mat-option>
+							</mat-select>
+						</mat-form-field>
+
+						<div *ngIf="c.IdControl==7">
+							<section style="margin-top:16px">
+								<mat-checkbox formControlName="{{c.IdRow}}" [disabled]="c.ReadOnly">
+									{{c.TenHienThi?c.TenHienThi:c.Description}}
+								</mat-checkbox>
+							</section>
+						</div>
+
+						<div *ngIf="c.IdControl==8">
+							<p>{{c.TenHienThi?c.TenHienThi:c.Description}}</p>
+							<section>
+								<mat-checkbox style="margin-right: 15px;" *ngFor="let opt of c.DataInit" value="{{opt.id}}" [disabled]="c.ReadOnly">{{opt.title}}</mat-checkbox>
+							</section>
+						</div>
+
+						<div *ngIf="c.IdControl==9">
+							<p>{{c.TenHienThi?c.TenHienThi:c.Description}}</p>
+							<mat-radio-group formControlName="{{c.IdRow}}" [disabled]="c.ReadOnly">
+								<mat-radio-button style="margin-right: 15px;" *ngFor="let opt of c.DataInit" value="{{opt.id}}">{{opt.title}}</mat-radio-button>
+							</mat-radio-group>
+						</div>
+						<div *ngIf="c.IdControl==10">
+							<dl-image-control formControlName="{{c.IdRow}}" type="image/*" [required]="c.Required" [disabled]="c.ReadOnly" ></dl-image-control>
+						</div>
+						<div *ngIf="c.IdControl==13">
+							<dl-image-control formControlName="{{c.IdRow}}" [required]="c.Required" [disabled]="c.ReadOnly" ></dl-image-control>
+						</div>
+						<div *ngIf="c.IdControl==12">
+							<dl-image-control formControlName="{{c.IdRow}}" type="image/*" [multiple]="true" [required]="c.Required" [disabled]="c.ReadOnly" ></dl-image-control>
+						</div>
+						<div *ngIf="c.IdControl==14">
+							<dl-image-control formControlName="{{c.IdRow}}" [multiple]="true" [required]="c.Required" [disabled]="c.ReadOnly" ></dl-image-control>
+						</div>
+						<div *ngIf="c.IdControl==11">
+							<m-dropdown-tree formControlName="{{c.IdRow}}" [DropdownTitle]="c.TenHienThi?c.TenHienThi:c.Description" [disabled]="c.ReadOnly">
+							</m-dropdown-tree>
+						</div>
+
+						<div *ngIf="c.IdControl==15">
+							<label>
+								<span>{{c.TenHienThi?c.TenHienThi:c.Description}}</span>
+							</label>
+							<table style="width:100%">
+								<tr *ngFor="let item of c.value; let i=index">
+									<td *ngFor="let col of c.TableColumns">{{item[col]}}</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</ng-container>
+			</div>
+		</form>
+		<!--end::Form-->
+	</div>
+	<div *ngIf="item.Statement=='list'">
+		<table style="width:100%">
+			<tr>
+				<th *ngFor="let c of item.controls">{{c.TenHienThi?c.TenHienThi:c.Description}}</th>
+			</tr>
+			<tr *ngFor="let val of item.list">
+				<td *ngFor="let c of item.controls">{{val[c.ColumnName]}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="row" *ngIf="item.Buttons && !GroupBtn" style="margin-top: 15px;">
+		<div class="col-md-12" style="text-align:center">
+			<span *ngFor="let btn of item.Buttons">
+				<button *ngIf="btn.IdButtonType==1" mat-raised-button color="primary" (click)="onSumbit(btn)">{{btn.ButtonText}}</button>
+				<button *ngIf="btn.IdButtonType==4" mat-raised-button color="primary" (click)="onSumbit(btn,true)">{{btn.ButtonText}}</button>
+				<button *ngIf="btn.IdButtonType==5" mat-raised-button color="primary" (click)="onSumbit(btn,false,true)">{{btn.ButtonText}}</button>
+				<button *ngIf="btn.IdButtonType==2" mat-raised-button (click)="goBack('')">{{btn.ButtonText}}</button>
+				<button *ngIf="btn.IdButtonType==3" mat-raised-button color="warn" (click)="reset()">{{btn.ButtonText}}</button>
+				&nbsp;
+			</span>
+			<mat-button-toggle-group appearance="legacy" color="primary" name="groupBtn" aria-label="Thao tác" *ngIf="item.GroupButton.length>0">
+				<mat-button-toggle color="primary" (click)="onSumbitGroup()">{{SelectedButton.ButtonText}}</mat-button-toggle>
+				<mat-button-toggle color="primary" [matMenuTriggerFor]="menu">
+					<mat-icon>arrow_drop_down</mat-icon>
+				</mat-button-toggle>
+				<mat-menu #menu="matMenu">
+					<button mat-menu-item *ngFor="let btn of item.GroupButton" (click)="SelectedButton=btn;">{{btn.ButtonText}}</button>
+				</mat-menu>
+			</mat-button-toggle-group>
+		</div>
+	</div>
+</ng-container>

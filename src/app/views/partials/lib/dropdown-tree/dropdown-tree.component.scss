@@ -1,0 +1,235 @@
+.dl-dropdown-tree-control {
+    width: 100%;
+}
+
+.dl-dropdown-tree-control .class-width {
+    width: 100%;
+}
+
+.dl-dropdown-tree-control .btn {
+    padding: 0 !important;
+}
+
+.dl-dropdown-tree-control .show {
+    display: flex !important;
+}
+
+.btn.dl-drop-tree-custom-css.dropdown-toggle::after {
+    right: 0px !important;
+    margin-top: -5.5px !important;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.dropdown-tree {
+    overflow: auto;
+    height: 250px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.dl-dropdown-tree-control {
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-size: 12px;
+    width: 100%
+}
+
+.btn.btn-outline-primary.dl-drop-tree-custom-css {
+    color: #5867dd;
+    padding-left: 0;
+    border: none;
+    border-radius: 0;
+    text-align: left;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    background-color: transparent;
+    width: 100%
+}
+
+.btn.btn-outline-primary.dl-drop-tree-custom-css .mat-form-field {
+    border: none
+}
+
+.btn-outline-primary.dl-drop-tree-custom-css:not(:disabled):not(.disabled).active,
+.btn-outline-primary.dl-drop-tree-custom-css:not(:disabled):not(.disabled):active,
+.btn.btn-outline-primary.dl-drop-tree-custom-css.active,
+.btn.btn-outline-primary.dl-drop-tree-custom-css.focus,
+.btn.btn-outline-primary.dl-drop-tree-custom-css:focus,
+.btn.btn-outline-primary.dl-drop-tree-custom-css:hover:not(:disabled),
+.show>.btn-outline-primary.dl-drop-tree-custom-css.dropdown-toggle {
+    color: #5867dd !important;
+    background-color: transparent
+}
+
+.btn.dl-drop-tree-custom-css.dropdown-toggle .drp-clear {
+    color: #000;
+    position: absolute;
+    right: 18px;
+    font-size: 10px;
+    top: 50%;
+    margin-top: -5px;
+    display: none
+}
+
+.btn.dl-drop-tree-custom-css.dropdown-toggle:hover .drp-clear {
+    display: block
+}
+
+.btn.dl-drop-tree-custom-css .mat-form-field-flex .mat-form-field-infix::before {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid;
+    margin: -2.5px 4px 0;
+    content: "";
+    color: rgba(0, 0, 0, .54)
+}
+
+.example-tree-invisible {
+    display: none
+}
+
+.example-tree li,
+.example-tree ul {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none
+}
+
+.example-tree-node {
+    display: block;
+    white-space: nowrap
+}
+
+.example-tree-node .example-tree-node {
+    padding-left: 40px
+}
+
+.example-tree-node .example-tree-node .dl-out-let {
+    background: url(/assets/images/dot.png) 9px repeat-y
+}
+
+.dl-tree-dropdown .dl-out-let .example-tree-node:last-child .mat-icon-button {
+    background-repeat: no-repeat
+}
+
+html .m-body .m-content {
+    min-height: 100%
+}
+
+.dl-drop-menu-tree.dropdown-menu {
+    padding: 0;
+    min-width: 100%;
+    border-radius: unset
+}
+
+.dl-tree-dropdown .example-tree-node[aria-expanded=true] .dl-leaf-node {
+    background-position: -34px -4px
+}
+
+.dl-tree-dropdown .dl-out-let .example-tree-node[aria-expanded=true] .dl-leaf-node {
+    background-position: -31px -4px
+}
+
+.dl-tree-dropdown .example-tree-node .dl-name-node .mat-icon-button {
+    width: auto;
+    height: auto;
+    line-height: 30px;
+    border-radius: unset
+}
+
+.dl-tree-dropdown .example-tree-node[aria-expanded=false] .dl-leaf-node {
+    background-position: -99px -4px
+}
+
+.dl-tree-dropdown .dl-out-let .example-tree-node .mat-icon-button {
+    width: auto;
+    height: auto
+}
+
+.dl-tree-dropdown .example-tree-node .dl-leaf-icon {
+    background-position: -67px -4px;
+    vertical-align: middle
+}
+
+.dl-tree-dropdown .example-tree-node .icon-check {
+    color: #0ebb0e
+}
+
+.dl-tree-dropdown .example-tree-node .dl-name-node {
+    color: rgba(0, 0, 0, .87);
+    text-decoration: none;
+    padding-left: 15px;
+    width: 100%;
+    background: url(/assets/images/dot.png) center repeat-x;
+    margin-left: 9px;
+    display: flex;
+    position: relative
+}
+
+.dl-tree-dropdown .example-tree-node .dl-name-node .name-txt {
+    background: #fff;
+    width: 100%;
+    padding-right: 15px;
+    font-size: 14px;
+    line-height: 3em
+}
+
+.dl-tree-dropdown .example-tree-node .dl-cover-tree-node {
+    background: url(/assets/images/dot.png) 9px repeat-y;
+    display: flex;
+    line-height: 30px;
+    cursor: pointer
+}
+
+.dl-tree-dropdown .dl-out-let .example-tree-node:last-child>.dl-cover-tree-node {
+    background-image: linear-gradient(to top, #fff 50%, #000 50%);
+    background-size: 1px 100%
+}
+
+.dl-tree-dropdown .dl-out-let .example-tree-node:last-child>.dl-cover-tree-node~.dl-out-let {
+    background: 0 0
+}
+
+.dl-tree-dropdown .example-tree-node .dl-cover-tree-node.active .dl-name-node .name-txt {
+    background-color: #f5f5f5
+}
+
+.dl-tree-dropdown .example-tree-node .dl-cover-tree-node.active .dl-name-node {
+    color: #5867dd
+}
+
+.dl-tree-dropdown .example-tree-node .dl-cover-tree-node:hover .dl-name-node .name-txt {
+    background-color: #f5f5f5
+}
+
+.cdk-tree>cdk-nested-tree-node.example-tree-node.cdk-tree-node.cdk-nested-tree-node>.dl-out-let {
+    background: url(/assets/images/dot.png) 9px repeat-y
+}
+
+.cdk-tree>cdk-nested-tree-node.example-tree-node.cdk-tree-node.cdk-nested-tree-node:last-child>.dl-out-let {
+    background: 0 0
+}
+
+.cdk-tree>cdk-nested-tree-node.example-tree-node.cdk-tree-node.cdk-nested-tree-node:last-child>.dl-cover-tree-node {
+    background-image: linear-gradient(to top, #fff 50%, #000 50%);
+    background-size: 1px 100%
+}
+
+.btn.btn-outline-primary.dl-drop-tree-custom-css .input-tree {
+    border: none;
+    text-overflow: ellipsis;
+    outline: 0;
+    cursor: pointer;
+    width: 100%;
+    background-color: transparent;
+    padding-right: 25px
+}
+
+.dl-dropdown-tree-control .dropdown-item {
+    padding: 0;
+    display: inline
+}

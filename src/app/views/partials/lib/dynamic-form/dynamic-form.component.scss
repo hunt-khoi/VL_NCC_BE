@@ -1,0 +1,33 @@
+.n-image-review-group {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.n-image-review {
+	height: 120px;
+	width: 100px;
+	margin: 5px 10px;
+	position: relative;
+	border: dashed 2px;
+}
+
+.n-image-review p {
+	word-break: break-all;
+	margin: 5px;
+}
+
+.n-image-review img {
+	max-width: 100%;
+	max-height: 100%;
+	position: absolute;
+	margin: auto;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.mat-button-toggle {
+	background-color: #5d78ff;
+	color: white;
+}

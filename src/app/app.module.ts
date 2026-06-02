@@ -1,10 +1,9 @@
 // Angular
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GestureConfig } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OverlayModule } from '@angular/cdk/overlay';
 // Perfect Scroll bar
@@ -13,8 +12,6 @@ import { PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarConfigInterface } from 'ngx-p
 import { InlineSVGModule } from 'ng-inline-svg';
 // Env
 import { environment } from '../environments/environment';
-// Hammer JS
-import 'hammerjs';
 // NGX Permissions
 import { NgxPermissionsModule } from 'ngx-permissions';
 // NGRX
@@ -104,10 +101,6 @@ export function initializeLayoutConfig(appConfig: LayoutConfigService) {
 		{
 			provide: PERFECT_SCROLLBAR_CONFIG,
 			useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
-		},
-		{
-			provide: HAMMER_GESTURE_CONFIG,
-			useClass: GestureConfig
 		},
 		{
 			// layout config initializer

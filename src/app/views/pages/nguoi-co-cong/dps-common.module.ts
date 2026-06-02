@@ -53,7 +53,7 @@ import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MY_FORMATS_EDIT } from './datepicker';
 
-import { DropdownTreeModule, DatetimePickerModule, ImageControlModule, DynamicComponentModule } from 'dps-lib';//,
+import { LibModule } from '../../partials/lib/lib.module';
 
 //Share
 import { ActionNotificationComponent, DeleteEntityDialogComponent, AlertComponent } from '../../partials/content/crud';
@@ -153,11 +153,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 		ScrollingModule,
 		CdkTableModule,
 		CdkTreeModule,
-		DropdownTreeModule,
-		DatetimePickerModule,
-		DynamicComponentModule,
+		LibModule,
 		MatTreeModule,
-		ImageControlModule,
 		ColorPickerModule,
 		MatExpansionModule,
 		NgxPrintModule,
@@ -321,10 +318,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 		ScrollingModule,
 		CdkTableModule,
 		CdkTreeModule,
-		DropdownTreeModule,
-		DatetimePickerModule,
-		DynamicComponentModule,
-		ImageControlModule,
+		LibModule,
 		MatTreeModule,
 		MatExpansionModule,
 		NgxPrintModule,

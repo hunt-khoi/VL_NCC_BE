@@ -51,13 +51,17 @@ yarn install --ignore-engines
 nvm use 24.14.0
 ```
 
-**2. Cài đặt Yarn cho Node 24 (nếu chưa có):**
-*Do NVM cô lập môi trường, Node 24 có thể chưa có sẵn Yarn.*
+**2. Đảm bảo môi trường Node 24 có đủ công cụ (Yarn & NPX):**
+Do NVM cô lập môi trường hoàn toàn, bản Node 24 mới cài có thể chưa có sẵn `yarn`. Hơn nữa, chúng ta cần dùng lệnh `npx` (công cụ chạy package dùng 1 lần) để mượn tạm Angular CLI.
+Nếu bạn gõ `npx` mà máy báo không nhận diện được lệnh, hãy đảm bảo cài đặt lại npm/npx bằng tay. 
+Chạy 2 lệnh sau để cài đặt chắc chắn Yarn (và NPX nếu cần thiết) cho môi trường Node 24:
 ```bash
+npm install -g npx
 npm install -g yarn
 ```
 
 **3. Chạy lệnh Migration cho Core (Sửa cú pháp @ViewChild, Injectable, v.v.):**
+Sử dụng `npx` để ép hệ thống tải tạm thời Angular CLI phiên bản 9 (nếu gõ `ng update` chay, hệ thống sẽ dùng phiên bản CLI mặc định bị lỗi):
 ```bash
 npx @angular/cli@9 update @angular/core@9 --migrate-only --from 8 --allow-dirty
 ```

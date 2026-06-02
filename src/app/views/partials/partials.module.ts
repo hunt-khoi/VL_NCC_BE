@@ -63,11 +63,11 @@ import { InlineSVGModule } from 'ng-inline-svg';
 import { CommonService } from '../pages/nguoi-co-cong/services/common.service';
 import { CKEditorModule } from 'ckeditor4-angular';
 import { UploadFileComponent } from '../pages/nguoi-co-cong/components/upload-file/upload-file.component';
-import { ImageControlModule } from 'dps-lib';
 import { TranslateModule } from '@ngx-translate/core';
 import { ChartsModule } from 'ng2-charts';
-import {ScrollingModule} from '@angular/cdk/scrolling';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { AvatarModule } from 'ngx-avatar';
+import { LibModule } from './lib/lib.module';
 @NgModule({
 	declarations: [
 		ScrollTopComponent,
@@ -120,7 +120,8 @@ import { AvatarModule } from 'ngx-avatar';
 		ErrorComponent,
 		UploadFileComponent,
 		VaiTroComponent,
-		ChartsModule
+		ChartsModule,
+		LibModule
 	],
 	imports: [
 		AvatarModule,
@@ -163,9 +164,9 @@ import { AvatarModule } from 'ngx-avatar';
 		NgbTooltipModule,
 		TranslateModule,
 		CKEditorModule,
-		ImageControlModule,
 		ChartsModule,
-		ScrollingModule
+		ScrollingModule,
+		LibModule
 	],
 	entryComponents: [
 		VaiTroComponent,

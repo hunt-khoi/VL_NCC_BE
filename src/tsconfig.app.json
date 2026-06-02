@@ -10,6 +10,11 @@
 		"test.ts",
 		"**/*.spec.ts",
 		"src/app/views/pages/nguoi-co-cong/components/canvas-demo",
-		"src/app/views/pages/nguoi-co-cong/quan-tri/no-checker",
+		"src/app/views/pages/nguoi-co-cong/quan-tri/no-checker"
+	],
+	"files": [
+		"main.ts",
+		"polyfills.ts",
+		"typings.d.ts"
 	]
 }

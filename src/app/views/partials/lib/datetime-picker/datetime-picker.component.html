@@ -1,0 +1,24 @@
+<mat-form-field class="mat-form-field-fluid">
+	<input matInput placeholder="{{placeholder}}" [readonly]="disabled" [attr.disabled]="disabled ? true : null"
+		[formControl]="datetimepicker" (blur)="onBlur($event)" [required]="required" />
+	<div [matMenuTriggerFor]="menu"></div>
+	<mat-datepicker-toggle matSuffix (click)="showMenu($event)" [disabled]="disabled"></mat-datepicker-toggle>
+	<mat-hint align="start">{{hint}}</mat-hint>
+	<mat-error>
+		{{placeholder}}
+		<strong *ngIf="datetimepicker.errors && datetimepicker.errors['required']">bắt buộc nhập</strong>
+		<strong *ngIf="datetimepicker.errors && datetimepicker.errors['pattern']">không đúng định dạng</strong>
+	</mat-error>
+</mat-form-field>
+<mat-menu #menu="matMenu" class="menu-container">
+	<div (click)="$event.stopPropagation()">
+		<mat-calendar #calendar name="datepicker" id="datepicker" ngDefaultControl [selected]="selectedDate"
+			(selectedChange)="onSelect($event)">
+		</mat-calendar>
+		<div class="time-container">
+			<ngb-timepicker [(ngModel)]="time" name="timepicker" ngDefaultControl [minuteStep]="5"
+				(ngModelChange)="changetime()">
+			</ngb-timepicker>
+		</div>
+	</div>
+</mat-menu>

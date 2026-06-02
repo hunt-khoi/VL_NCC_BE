@@ -1,0 +1,30 @@
+<form class="m-form">
+    <label>
+        <span class="dl-title-img-ctl">{{data.Title?data.Title:""}}</span>
+        <span class="dl-error-img" *ngIf="required">*</span>
+    </label>
+    <div class="dl-button-img-ctl">
+        <button mat-flat-button (click)="triggerClick()" class="mat-primary"
+            [disabled]="disabled">{{nameButton}}</button> &nbsp;
+        <input class="hide-control" #fileUpload [formControl]="ImageControl" type="file" [accept]="type" ng2FileSelect
+            [uploader]="uploader" (onFileSelected)="onFileSelected($event)" [multiple]="multiple" />
+        <div class="dl-error-img" *ngIf="!IsValid&&required">
+            {{data.Title?data.Title:""}} is <strong>required</strong>
+        </div>
+    </div>
+    <div style="text-align:center;">
+        <div class="dl-image-review-group" *ngIf="files && files.length>0">
+            <div class="dl-image-review" *ngFor="let item of files; let idx = index">
+                <div *ngIf="!item.IsDel">
+                    <div class="dl-ico-del-img" (click)="DeleteImg(idx)" *ngIf="!disabled">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </div>
+                    <img *ngIf="item.type && item.type.includes('image')" title="{{item.filename}}"
+                        src="{{item.strBase64? ('data:'+item.type+';base64,'+item.strBase64):item.src}}"
+                        onerror="this.onerror=null; this.src='/assets/images/default_img.png';" />
+                    <p *ngIf="!item.type || !item.type.includes('image')">{{item.filename}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

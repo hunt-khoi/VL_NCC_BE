@@ -1,0 +1,52 @@
+.hide-control {
+    display: none
+}
+
+.dl-button-img-ctl {
+    padding-bottom: 10px
+}
+
+.dl-button-img-ctl .btn-white {
+    background-color: #fff;
+    color: #333
+}
+
+.dl-title-img-ctl {
+    font-size: 13px;
+    color: rgba(0, 0, 0, .54)
+}
+
+.dl-error-img {
+    color: red;
+    font-size: 10px;
+    padding: 5px 0
+}
+
+.dl-image-review-group {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding-top: 10px
+}
+
+.dl-image-review-group .dl-image-review {
+    position: relative;
+    padding-right: 5px;
+    margin-right: 10px;
+    margin-bottom: 15px
+}
+
+.dl-image-review-group .dl-image-review .dl-ico-del-img {
+    width: 18px;
+    border-radius: 50%;
+    position: absolute;
+    background-color: #e0e0e0;
+    top: -12px;
+    color: #676363;
+    right: -6px
+}
+
+.dl-image-review-group .dl-image-review img {
+    max-width: 100px;
+    max-height: 100px
+}

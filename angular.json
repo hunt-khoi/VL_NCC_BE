@@ -56,12 +56,22 @@
                 "src/assets"
               ]
             },
-            "es5BrowserSupport": true
+            "allowedCommonJsDependencies": [
+              "angular2-recaptcha",
+              "jwt-decode",
+              "chart.js",
+              "lodash",
+              "object-path",
+              "rxjs",
+              "file-saver",
+              "core-js",
+              "@babel/runtime",
+              "raf"
+            ]
           },
           "configurations": {
             "dev": {
               "tsConfig": "src/tsconfig.serve.json",
-              "es5BrowserSupport": false,
               "sourceMap": false,
               "aot": false,
               "optimization": false,
