@@ -2,23 +2,24 @@
 
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~highlight.js/styles/googlecode.css";
+
 // header base skins
 .kt-header-base-light {
 	@import "sass/global/layout/header/skins/base/light.scss";
 }
 
-.kt-header-base-dark {
-	@import "sass/global/layout/header/skins/base/dark.scss";
-}
+// .kt-header-base-dark {
+// 	@import "sass/global/layout/header/skins/base/dark.scss";
+// }
 
 // header menu skins
 .kt-header-menu-light {
 	@import "sass/global/layout/header/skins/menu/light.scss";
 }
 
-.kt-header-menu-dark {
-	@import "sass/global/layout/header/skins/menu/dark.scss";
-}
+// .kt-header-menu-dark {
+// 	@import "sass/global/layout/header/skins/menu/dark.scss";
+// }
 
 // brand skins
 .kt-brand-dark {
@@ -30,9 +31,9 @@
 }
 
 // aside skins
-.kt-aside-dark {
-	@import "sass/global/layout/aside/skins/dark.scss";
-}
+// .kt-aside-dark {
+// 	@import "sass/global/layout/aside/skins/dark.scss";
+// }
 
 .kt-aside-light {
 	@import "sass/global/layout/aside/skins/light.scss";
@@ -43,7 +44,8 @@
 	display: none !important;
 }
 
-.mat-table__wrapper { //xổ filter không bị khuất
+.mat-table__wrapper {
+	//xổ filter không bị khuất
 	display: contents;
 	height: fit-content;
 
@@ -259,6 +261,7 @@ $orange_BgColor: #ffb822;
 .mat-mini-fab.mat-orange {
 	background-color: $orange_BgColor;
 }
+
 //===============================
 
 //===***mat-info***/
@@ -289,6 +292,7 @@ $info_BgColor: #4CAF50;
 .mat-mini-fab.mat-info {
 	background-color: $info_BgColor;
 }
+
 //===============================
 
 /*#region green*/
@@ -327,6 +331,7 @@ $info_BgColor: #4CAF50;
 .mat-tab-label {
 	opacity: 1 !important;
 }
+
 // .num-menu{
 //     position: absolute;
 //     right: 0;
@@ -348,6 +353,7 @@ $info_BgColor: #4CAF50;
 	z-index: 999;
 	background-color: orange;
 }
+
 /*#region porlet body loading*/
 kt-portlet {
 	background-color: white;
@@ -366,6 +372,7 @@ kt-portlet {
 		display: none;
 	}
 }
+
 /*#endregion*/
 
 .title-header {
@@ -373,10 +380,12 @@ kt-portlet {
 	font-weight: 500;
 	color: #48465b;
 }
+
 //show error
 .mat-snack-bar-container.error {
 	background: #fd397a;
 }
+
 //style button
 .action-cell {
 	white-space: nowrap;
@@ -400,8 +409,10 @@ kt-portlet {
 		}
 	}
 }
+
 // ẩn khi print
 @media print {
+
 	.hiden-print,
 	.mat-sort-header-arrow {
 		display: none !important;
@@ -415,7 +426,7 @@ kt-portlet {
 }
 
 .mat-form-field-fluid .mat-form-field-underline {
-	background-color: #d9d9d9 !important; 
+	background-color: #d9d9d9 !important;
 }
 
 m-thong-ke-theo-doi-tuong,
@@ -432,7 +443,7 @@ kt-tong-hop {
 
 	.sticky-body-col1 {
 		position: sticky;
-        left: 29px;
+		left: 29px;
 		top: 0;
 		background: #fefefe;
 		z-index: 1;
