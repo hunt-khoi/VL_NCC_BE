@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../services/common.service';
 import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-to-trinh-edit',
@@ -24,6 +25,8 @@ export class ToTrinhEditComponent implements OnInit {
 	image: any;
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME = '';
+	ngay1 = moment(new Date());
+	ngay2 = moment(new Date());
 
 	constructor(
 		private fb: FormBuilder,
@@ -52,9 +55,9 @@ export class ToTrinhEditComponent implements OnInit {
 			NgayRaToTrinh: [this.item.NgayRaTT, Validators.required],
 		};
 		this.itemForm = this.fb.group(temp);
-		if (this.focusInput) 
+		if (this.focusInput)
 			this.focusInput.nativeElement.focus();
-		if (!this.allowEdit) 
+		if (!this.allowEdit)
 			this.itemForm.disable();
 		this.changeDetectorRefs.detectChanges();
 	}

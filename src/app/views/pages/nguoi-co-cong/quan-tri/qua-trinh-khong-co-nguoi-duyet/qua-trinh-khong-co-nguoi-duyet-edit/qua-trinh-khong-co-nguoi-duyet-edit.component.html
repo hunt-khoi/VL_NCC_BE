@@ -1,6 +1,6 @@
 <div class="btn-close-container">
 	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn"
-			title="Đóng">
+		title="Đóng">
 		<mat-icon>clear</mat-icon>
 	</button>
 </div>
@@ -17,9 +17,10 @@
 		</div>
 	</div>
 
-	<form class="kt-form" [formGroup]="QuaTrinhKhongCoNguoiDuyetForm">
+	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true"
+				(close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 
@@ -47,7 +48,7 @@
 					</mat-form-field>
 				</div>
 				<div class="col-md-12 form-group kt-margin-bottom-10-mobile" *ngIf="ListNguoiDuyet.length > 0">
-					Đang trong quá trình duyệt của: 
+					Đang trong quá trình duyệt của:
 					<span *ngFor="let item of ListNguoiDuyet; let l= last">
 						<b>{{ item.FullName }}</b>
 						<span *ngIf="!l">, </span>

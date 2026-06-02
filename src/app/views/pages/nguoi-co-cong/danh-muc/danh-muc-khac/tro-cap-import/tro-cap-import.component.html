@@ -22,14 +22,16 @@
 		</div>
 	</div>
 	<div class="kt-portlet__body">
-		<form class="kt-form" [formGroup]="HoSoNCCForm">
+		<form class="kt-form" [formGroup]="itemForm">
 			<div class="form-group kt-form__group row">
 				<div class="col-md-3" style="margin-top:-20px">
-					<dl-image-control formControlName="file" type=".xls,.xlsx" nameButton="Chọn file" [multiple]="false" [disabled]="false" [required]="false">
+					<dl-image-control formControlName="file" type=".xls,.xlsx" nameButton="Chọn file" [multiple]="false"
+						[disabled]="false" [required]="false">
 					</dl-image-control>
 				</div>
 				<div class="col-md-3">
-					<button type="button" (click)="loadImport()" mat-raised-button color="primary" matTooltip="Load" style="padding: 0px 20px;">
+					<button type="button" (click)="loadImport()" mat-raised-button color="primary" matTooltip="Load"
+						style="padding: 0px 20px;">
 						Load
 					</button>
 				</div>
@@ -40,8 +42,10 @@
 				<div class="mat-table__wrapper">
 					<table mat-table [dataSource]="dataSource" style="width:100%">
 						<ng-container matColumnDef="STT">
-							<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode"><span translate="COMMON.STT"></span></th>
-							<td mat-cell *matCellDef="let object;let vi = index" class="mat-column-vinCode">{{vi + 1}}</td>
+							<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode"><span
+									translate="COMMON.STT"></span></th>
+							<td mat-cell *matCellDef="let object;let vi = index" class="mat-column-vinCode">{{vi + 1}}
+							</td>
 						</ng-container>
 						<ng-container matColumnDef="MaTroCap">
 							<th mat-header-cell *matHeaderCellDef>{{ 'TROCAP.MA' | translate }}</th>
@@ -57,19 +61,23 @@
 						</ng-container>
 						<ng-container matColumnDef="TienTroCap">
 							<th mat-header-cell *matHeaderCellDef>{{ 'TROCAP.TienTroCap' | translate }}</th>
-							<td mat-cell *matCellDef="let object">{{object.TienTroCap | mask: 'separator':commonService.thousandSeparator}}</td>
+							<td mat-cell *matCellDef="let object">{{object.TienTroCap | mask:
+								'separator':commonService.thousandSeparator}}</td>
 						</ng-container>
 						<ng-container matColumnDef="PhuCap">
 							<th mat-header-cell *matHeaderCellDef>{{ 'TROCAP.PhuCap' | translate }}</th>
-							<td mat-cell *matCellDef="let object">{{object.PhuCap| mask: 'separator':commonService.thousandSeparator}}</td>
+							<td mat-cell *matCellDef="let object">{{object.PhuCap| mask:
+								'separator':commonService.thousandSeparator}}</td>
 						</ng-container>
 						<ng-container matColumnDef="TienMuaBao">
 							<th mat-header-cell *matHeaderCellDef>{{ 'TROCAP.TienMuaBao' | translate }}</th>
-							<td mat-cell *matCellDef="let object">{{object.TienMuaBao| mask: 'separator':commonService.thousandSeparator}}</td>
+							<td mat-cell *matCellDef="let object">{{object.TienMuaBao| mask:
+								'separator':commonService.thousandSeparator}}</td>
 						</ng-container>
 						<ng-container matColumnDef="TroCapNuoiDuong">
 							<th mat-header-cell *matHeaderCellDef>{{ 'TROCAP.TroCapND' | translate }}</th>
-							<td mat-cell *matCellDef="let object">{{object.TroCapNuoiDuong| mask: 'separator':commonService.thousandSeparator}}</td>
+							<td mat-cell *matCellDef="let object">{{object.TroCapNuoiDuong| mask:
+								'separator':commonService.thousandSeparator}}</td>
 						</ng-container>
 						<ng-container matColumnDef="Id_BieuMau">
 							<th mat-header-cell *matHeaderCellDef>Biểu mẫu</th>
@@ -79,18 +87,23 @@
 							<th mat-header-cell *matHeaderCellDef>
 							</th>
 							<td mat-cell *matCellDef="let object">
-								<mat-icon *ngIf="object.isError && object.message" title="{{object.message}}" color="warn">warning</mat-icon>
-								<mat-icon *ngIf="object.isError && object.messageError" title="{{object.messageError}}" color="warn">warning</mat-icon>
+								<mat-icon *ngIf="object.isError && object.message" title="{{object.message}}"
+									color="warn">warning</mat-icon>
+								<mat-icon *ngIf="object.isError && object.messageError" title="{{object.messageError}}"
+									color="warn">warning</mat-icon>
 							</td>
 						</ng-container>
 
 						<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-						<tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{ 'rowError' : row.isError }"></tr>
+						<tr mat-row *matRowDef="let row; columns: displayedColumns;"
+							[ngClass]="{ 'rowError' : row.isError }"></tr>
 					</table>
 				</div>
 			</div>
-			<div class="col-md-12 kt-margin-bottom-10-mobile text-center" style="margin-top: 2%" *ngIf="HoSoNCCForm.controls['file'].value && lstNCC.length>0">
-				<button style="padding: 0px 20px;" type="button" color="primary" mat-raised-button (click)="luuImport()">
+			<div class="col-md-12 kt-margin-bottom-10-mobile text-center" style="margin-top: 2%"
+				*ngIf="itemForm.controls['file'].value && lstNCC.length>0">
+				<button style="padding: 0px 20px;" type="button" color="primary" mat-raised-button
+					(click)="luuImport()">
 					Import dữ liệu
 				</button>&nbsp;
 			</div>

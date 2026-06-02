@@ -9,10 +9,13 @@
 		overflow: hidden !important;
 		text-overflow: ellipsis;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 	}
+
 	.min-th {
 		min-width: 160px;
 	}
+
 	.min-width-200px {
 		min-width: 200px;
 	}
@@ -62,11 +65,14 @@
 			max-height: none !important;
 			overflow: visible !important;
 		}
+
 		.table-scroll-container table thead,
 		.table-scroll-container table tfoot {
 			position: static !important;
 		}
-		.col-sticky-1, .col-sticky-2 {
+
+		.col-sticky-1,
+		.col-sticky-2 {
 			position: static !important;
 		}
 	}
@@ -76,23 +82,28 @@
 		<button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">
 			{{ 'COMMON.XEMTK' | translate }}
 		</button>
-		<button class="show-view-sm" *ngIf="allowExport1" mat-raised-button [matMenuTriggerFor]="chucnang" color="primary">
+		<button class="show-view-sm" *ngIf="allowExport" mat-raised-button [matMenuTriggerFor]="chucnang"
+			color="primary">
 			{{ 'COMMON.CHUCNANG' | translate }}
 		</button>
 		<mat-menu #chucnang="matMenu">
-			<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">{{ 'COMMON.XEMTK' | translate }}</button>
-			<button (click)="export()" mat-menu-item color="info" matTooltip="Xuất thống kê" *ngIf="allowExport">Export</button>
-			<button mat-menu-item color="primary" matTooltip="In thống kê" printTitle={{this._name}} 
-				[printStyle]="stype_print" printSectionId="print-section" ngxPrint>
+			<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">{{ 'COMMON.XEMTK' |
+				translate }}</button>
+			<button (click)="export()" mat-menu-item color="info" matTooltip="Xuất thống kê"
+				*ngIf="allowExport">Export</button>
+			<button mat-menu-item color="primary" matTooltip="In thống kê" printTitle={{this._name}}
+				[printStyle]="style_print" printSectionId="print-section" ngxPrint>
 				{{ 'COMMON.PRINT' | translate }}
 			</button>
 		</mat-menu>
 		<!-- view nhỏ hơn 768 bị ẩn -->
 		<div class="hide-view-sm" style="display: contents;">
-			<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">{{ 'COMMON.XEMTK' | translate }}</button>
-			<button (click)="export()" mat-raised-button color="info" matTooltip="Xuất thống kê" *ngIf="allowExport">Export</button>
-			<button mat-raised-button color="primary" matTooltip="In thống kê" *ngIf="allowExport" printTitle={{this._name}}
-				[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+			<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">{{ 'COMMON.XEMTK' |
+				translate }}</button>
+			<button (click)="export()" mat-raised-button color="info" matTooltip="Xuất thống kê"
+				*ngIf="allowExport">Export</button>
+			<button mat-raised-button color="primary" matTooltip="In thống kê" *ngIf="allowExport"
+				printTitle={{this._name}} [printStyle]="style_print" printSectionId="print-section" ngxPrint>
 				{{ 'COMMON.PRINT' | translate }}
 			</button>
 		</div>
@@ -107,10 +118,11 @@
 					<mat-option [value]="0" disabled>--Chọn đợt tặng quà--</mat-option>
 					<mat-option [value]="opt.id" *ngFor="let opt of lstDot">{{opt.title}}</mat-option>
 				</mat-select>
-			</mat-form-field> 
-			</div>
+			</mat-form-field>
+		</div>
 		<div class="col-md-3 kt-margin-bottom-10-mobile" style="padding-top: 12px;" *ngIf="display && Capcocau == 1">
-			<mat-checkbox [(ngModel)]="hideEmptyRows" (change)="onToggleHideEmpty()">Ẩn dòng không có dữ liệu</mat-checkbox>
+			<mat-checkbox [(ngModel)]="hideEmptyRows" (change)="onToggleHideEmpty()">Ẩn dòng không có dữ
+				liệu</mat-checkbox>
 		</div>
 	</div>
 
@@ -132,7 +144,8 @@
 							<tr *ngFor="let item of dataFiltered; let i=index">
 								<td class="col-sticky-1 text-center">{{i+1}}</td>
 								<td class="col-sticky-2">{{item.TenXa}}</td>
-								<td style="text-align: right;" *ngFor="let dt of dataThongKe.DoiTuongs">{{getValue(item,dt.a)}}</td>
+								<td style="text-align: right;" *ngFor="let dt of dataThongKe.DoiTuongs">
+									{{getValue(item,dt.a)}}</td>
 							</tr>
 							<tr *ngIf="dataThongKe.data.length==0">
 								<td [attr.colspan]="dataThongKe.DoiTuongs.length+2" class="text-center">
