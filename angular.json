@@ -73,7 +73,7 @@
             "dev": {
               "tsConfig": "src/tsconfig.serve.json",
               "sourceMap": false,
-              "aot": false,
+              "aot": true,
               "optimization": false,
               "buildOptimizer": false,
               "vendorChunk": true,
