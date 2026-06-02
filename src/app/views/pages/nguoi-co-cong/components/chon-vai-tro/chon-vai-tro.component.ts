@@ -87,9 +87,9 @@ export class ChonVaiTroComponent implements OnInit {
 			this.changeDetect.detectChanges();
 		})
 		if (!this.sort || !this.paginator) return;
-		this.sort.sortChange.subscribe(() => { 
-			if (this.paginator) 
-				this.paginator.pageIndex = 0; 
+		this.sort.sortChange.subscribe(() => {
+			if (this.paginator)
+				this.paginator.pageIndex = 0;
 		});
 		merge(this.sort.sortChange, this.paginator.page)
 			.pipe(
@@ -175,8 +175,8 @@ export class ChonVaiTroComponent implements OnInit {
 		return filter;
 	}
 
-	closeDialog(data: any) {
-		this.dialogRef.close(data);
+	closeDialog() {
+		this.dialogRef.close({});
 	}
 
 	select(data: any) {

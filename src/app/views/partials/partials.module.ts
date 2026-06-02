@@ -61,10 +61,8 @@ import { ErrorComponent } from './content/general/error/error.component';
 // SVG inline
 import { InlineSVGModule } from 'ng-inline-svg';
 import { CommonService } from '../pages/nguoi-co-cong/services/common.service';
-import { CKEditorModule } from 'ckeditor4-angular';
 import { UploadFileComponent } from '../pages/nguoi-co-cong/components/upload-file/upload-file.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { ChartsModule } from 'ng2-charts';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { AvatarModule } from 'ngx-avatar';
 import { LibModule } from './lib/lib.module';
@@ -96,7 +94,6 @@ import { LibModule } from './lib/lib.module';
 	exports: [
 		//WidgetModule,
 		PortletModule,
-		CKEditorModule,
 
 		ScrollTopComponent,
 		NoticeComponent,
@@ -120,7 +117,6 @@ import { LibModule } from './lib/lib.module';
 		ErrorComponent,
 		UploadFileComponent,
 		VaiTroComponent,
-		ChartsModule,
 		LibModule
 	],
 	imports: [
@@ -163,8 +159,6 @@ import { LibModule } from './lib/lib.module';
 		NgbTabsetModule,
 		NgbTooltipModule,
 		TranslateModule,
-		CKEditorModule,
-		ChartsModule,
 		ScrollingModule,
 		LibModule
 	],

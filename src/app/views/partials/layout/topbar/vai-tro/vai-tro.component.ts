@@ -17,8 +17,8 @@ export class VaiTroComponent implements OnInit, OnDestroy {
 	ListVaiTro: any[] = [];
 	private componentSubscriptions: Subscription | undefined;
 	displayedColumns: string[] = ['STT', 'VaiTro', 'DonVi'];
-	disabledBtn: boolean=false;
-	viewLoading: boolean=false;
+	viewLoading: boolean = false;
+	disabledBtn: boolean = false;
 
 	constructor(
 		public dialogRef: MatDialogRef<VaiTroComponent>,
@@ -27,7 +27,6 @@ export class VaiTroComponent implements OnInit, OnDestroy {
 		private layoutUtilsService: LayoutUtilsService,
 		private auth: AuthService,
 		private tokenStorage: TokenStorage) { }
-
 
 	async ngOnInit() {
 		if (this.data && this.data.VaiTros)
@@ -56,17 +55,5 @@ export class VaiTroComponent implements OnInit, OnDestroy {
 
 	closeDialog() {
 		this.dialogRef.close();
-	}
-	
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-
 	}
 }

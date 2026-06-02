@@ -1,4 +1,4 @@
-<div class="comment-box" [popover]="myPopoverB" [popoverOnHover]="false" (click)="clickonbox($event)">
+<div class="comment-box" [popover]="myPopoverB" [popoverOnHover]="false" (click)="clickonbox()">
 	<popover-content #myPopoverB [closeOnMouseOutside]="true" class="user-info-container">
 		<div class="user-info">
 			<div class="kt-user-card__avatar">
@@ -6,7 +6,8 @@
 				<ngx-avatar size="44" src="{{it.image}}" *ngIf="it.image; else bindText">
 				</ngx-avatar>
 				<ng-template #bindText>
-					<ngx-avatar size="44" bgColor="{{commonService.get_colorByName(it.charname)}}" [name]="it.charname"></ngx-avatar>
+					<ngx-avatar size="44" bgColor="{{commonService.get_colorByName(it.charname)}}"
+						[name]="it.charname"></ngx-avatar>
 				</ng-template>
 			</div>
 			<div class="kt-user-card__name">
@@ -28,7 +29,8 @@
 							<ngx-avatar size="44" src="{{UserData.Image}}" *ngIf="UserData.Image; else bindText">
 							</ngx-avatar>
 							<ng-template #bindText>
-								<ngx-avatar size="44" bgColor="{{commonService.get_colorByName(UserData.Charname)}}" [name]="UserData.Charname"></ngx-avatar>
+								<ngx-avatar size="44" bgColor="{{commonService.get_colorByName(UserData.Charname)}}"
+									[name]="UserData.Charname"></ngx-avatar>
 							</ng-template>
 						</div>
 						<div class="kt-user-card__name">
@@ -40,7 +42,8 @@
 						</div>
 					</div>
 					<div class="attachment">
-						<button mat-icon-button type="button" (click)="selectFile_PDF(-1)" matTooltip="Upload File" [disabled]="disabledInput">
+						<button mat-icon-button type="button" (click)="selectFile_PDF(-1)" matTooltip="Upload File"
+							[disabled]="disabledInput">
 							<mat-icon>attach_file</mat-icon>
 						</button>&nbsp;
 						<input type='file' id="PDFInpdd" (change)="onSelectFile_PDF($event,-1)" style="display: none;">
@@ -54,7 +57,8 @@
 						(click)="click($event)" [disabled]="disabledInput">
 						</textarea>
 				</mat-form-field>
-				<div *ngIf="Comment != '' && !disabledInput" class="submit-comment" style="font-weight: 500;font-size:16px">
+				<div *ngIf="Comment != '' && !disabledInput" class="submit-comment"
+					style="font-weight: 500;font-size:16px">
 					<button class="btn btn-success float-left" style="padding: 5px 15px;"
 						(click)="CommentInsert(Comment,0,0,1)">
 						Bình luận
@@ -75,7 +79,8 @@
 							<div class="attach-item-name">
 								<p>{{att.filename}}</p>
 								<span>
-									<a href="viewer/file-dinh-kem/{{att.id_row}}" target="_blank"> Preview</a>&nbsp;&middot;&nbsp;
+									<a href="viewer/file-dinh-kem/{{att.id_row}}" target="_blank">
+										Preview</a>&nbsp;&middot;&nbsp;
 									<a href="javascript:;" (click)="DownloadFile(att.path)">Download</a>
 								</span>
 							</div>
@@ -97,10 +102,13 @@
 					<div class="user-info">
 						<div class="kt-user-card__avatar" matTooltip="{{quyen.NguoiTao.chucvu}}">
 							<!-- <img src="{{quyen.NguoiTao.image}}"> -->
-							<ngx-avatar size="44" src="{{quyen.NguoiTao.image}}" *ngIf="quyen.NguoiTao.image; else bindText">
+							<ngx-avatar size="44" src="{{quyen.NguoiTao.image}}"
+								*ngIf="quyen.NguoiTao.image; else bindText">
 							</ngx-avatar>
 							<ng-template #bindText>
-								<ngx-avatar size="44" bgColor="{{commonService.get_colorByName(quyen.NguoiTao.charname)}}" [name]="quyen.NguoiTao.charname"></ngx-avatar>
+								<ngx-avatar size="44"
+									bgColor="{{commonService.get_colorByName(quyen.NguoiTao.charname)}}"
+									[name]="quyen.NguoiTao.charname"></ngx-avatar>
 							</ng-template>
 						</div>
 						<div class="kt-user-card__name">
@@ -114,8 +122,8 @@
 									<span *ngIf="quyen.IsTre" style="color:red" title="Thời hạn">
 										<mat-icon color="warn">watch_later</mat-icon>{{quyen.Deadline}}
 									</span>
-									<button mat-button mat-raised-button color="info" (click)="inhuongdan(quyen.id_row)" 
-									*ngIf="(Loai==2 || Loai==5) && quyen.IsTraLai">In hướng dẫn</button>
+									<button mat-button mat-raised-button color="info" (click)="inhuongdan(quyen.id_row)"
+										*ngIf="(Loai==2 || Loai==5) && quyen.IsTraLai">In hướng dẫn</button>
 								</span>
 							</p>
 						</div>
@@ -131,7 +139,8 @@
 										matTooltip="Sửa nội dung bình luận" [disabled]="disabledInput">
 										<mat-icon class="action edit">create</mat-icon>
 									</button>
-									<button mat-icon-button (click)="remove(quyen, vi)" matTooltip="Xóa bình luận" [disabled]="disabledInput">
+									<button mat-icon-button (click)="remove(quyen, vi)" matTooltip="Xóa bình luận"
+										[disabled]="disabledInput">
 										<mat-icon class="action delete">delete</mat-icon>
 									</button>
 								</ng-container>
@@ -146,15 +155,18 @@
 									<div class="attach-item-name">
 										<p>{{quyen.ls_att.filename}}</p>
 										<span>
-											<a href="viewer/file-dinh-kem/0?path={{quyen.ls_att.path}}" target="_blank"> Preview</a>&nbsp;&middot;&nbsp;
-											<a href="javascript:;" (click)="DownloadFile(quyen.ls_att.path)">Download</a>
+											<a href="viewer/file-dinh-kem/0?path={{quyen.ls_att.path}}" target="_blank">
+												Preview</a>&nbsp;&middot;&nbsp;
+											<a href="javascript:;"
+												(click)="DownloadFile(quyen.ls_att.path)">Download</a>
 										</span>
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="row" *ngIf="quyen.Attachment ? quyen.Attachment.length>0 : false">
-							<div class="col-md-12 kt-margin-bottom-10-mobile" *ngFor="let att2 of quyen.Attachment;let ind2 = index">
+							<div class="col-md-12 kt-margin-bottom-10-mobile"
+								*ngFor="let att2 of quyen.Attachment;let ind2 = index">
 								<div class="attach-item show-action">
 									<div class="attach-item-icon">
 										<img src="{{att2.icon}}" />
@@ -162,12 +174,14 @@
 									<div class="attach-item-name">
 										<p>{{att2.filename}}</p>
 										<span>
-											<a href="viewer/file-dinh-kem/{{att2.id_row}}" target="_blank">Preview</a>&nbsp;&middot;&nbsp;
+											<a href="viewer/file-dinh-kem/{{att2.id_row}}"
+												target="_blank">Preview</a>&nbsp;&middot;&nbsp;
 											<a href="javascript:;" (click)="DownloadFile(att2.path)">Download</a>
 										</span>
 									</div>
 									<div class="attach-item-del">
-										<button mat-icon-button color="warn" type="button" matTooltip="Xóa File" (click)="DeleteFile_PDF(vi,ind2)">
+										<button mat-icon-button color="warn" type="button" matTooltip="Xóa File"
+											(click)="DeleteFile_PDF(vi,ind2)">
 											<mat-icon>delete</mat-icon>
 										</button>
 									</div>
@@ -177,11 +191,12 @@
 						<div class="row" *ngIf="quyen.cmt=='1'">
 							<div class="col-md-12 comment-like">
 								<a href="javascript:void(0)" (click)="ShowOrHideComment(vi)" class="kt-font-bolder">
-									Trả lời <span class="comment-num">{{quyen.Children ? quyen.Children.length : 0}}</span>
+									Trả lời <span class="comment-num">{{quyen.Children ? quyen.Children.length :
+										0}}</span>
 								</a> &nbsp;&middot;&nbsp;
 								<span [popover]="myPopover" [popoverOnHover]="true" [popoverCloseOnMouseOutside]="true">
 									<a *ngIf="quyen.Like" href="javascript:;" class="{{quyen.Like.title}}"
-									   (click)="like(quyen,0)">
+										(click)="like(quyen,0)">
 										<img src="{{quyen.Like.icon}}" />
 										{{quyen.Like.title}}
 									</a>
@@ -204,7 +219,7 @@
 								<span class="total-like">
 									<ng-container *ngFor="let like of quyen.Likes">
 										<span *ngIf="like.tong>0">
-											<img src="{{like.icon}}"/>{{like.tong}}
+											<img src="{{like.icon}}" />{{like.tong}}
 										</span>
 									</ng-container>
 								</span>
@@ -217,10 +232,13 @@
 									<div class="kt-user-card__avatar">
 										<!-- <img src="{{child.NguoiTao.image}}"/> -->
 
-										<ngx-avatar size="44" src="{{child.NguoiTao.image}}" *ngIf="child.NguoiTao.image; else bindText">
+										<ngx-avatar size="44" src="{{child.NguoiTao.image}}"
+											*ngIf="child.NguoiTao.image; else bindText">
 										</ngx-avatar>
 										<ng-template #bindText>
-											<ngx-avatar size="44" bgColor="{{commonService.get_colorByName(child.NguoiTao.charname)}}" [name]="child.NguoiTao.charname"></ngx-avatar>
+											<ngx-avatar size="44"
+												bgColor="{{commonService.get_colorByName(child.NguoiTao.charname)}}"
+												[name]="child.NguoiTao.charname"></ngx-avatar>
 										</ng-template>
 									</div>
 									<div class="kt-user-card__name">
@@ -233,11 +251,12 @@
 												<div style="min-width: 50px; min-height: 45px;">
 													<ng-container *ngIf="child.AllowEdit">
 														<button mat-icon-button (click)="initUpdate(child,vi, vic)"
-															matTooltip="Sửa nội dung bình luận" [disabled]="disabledInput">
+															matTooltip="Sửa nội dung bình luận"
+															[disabled]="disabledInput">
 															<mat-icon class="action edit">create</mat-icon>
 														</button>
 														<button mat-icon-button (click)="remove(child, vi, vic)"
-																matTooltip="Xóa bình luận" [disabled]="disabledInput">
+															matTooltip="Xóa bình luận" [disabled]="disabledInput">
 															<mat-icon class="action delete">delete</mat-icon>
 														</button>
 													</ng-container>
@@ -247,7 +266,7 @@
 
 										<div *ngIf="child.Attachment?child.Attachment.length>0:false" class="row">
 											<div class="col-md-12 kt-margin-bottom-10-mobile"
-												 *ngFor="let att1 of child.Attachment;">
+												*ngFor="let att1 of child.Attachment;">
 												<div class="image-inline" *ngIf="att1.isImage">
 													<img src="{{att1.path}}" />
 												</div>
@@ -256,7 +275,8 @@
 														<mat-icon>attach_file</mat-icon>
 														{{att1.filename}}
 													</div>
-													<a href="javascript:void(0)" (click)="DownloadFile(att1.path)">Download </a>
+													<a href="javascript:void(0)"
+														(click)="DownloadFile(att1.path)">Download </a>
 												</div>
 											</div>
 										</div>
@@ -264,9 +284,9 @@
 										<div class="row" style="padding-right: 10px;" nowrap>
 											<div class="col-md-12 comment-like">
 												<span [popover]="myPopover" [popoverOnHover]="true"
-													  [popoverCloseOnMouseOutside]="true" style="text-align: center;">
+													[popoverCloseOnMouseOutside]="true" style="text-align: center;">
 													<a href="javascript:;" *ngIf="child.Like"
-													   class="{{child.Like.title}}" (click)="like(child,0)">
+														class="{{child.Like.title}}" (click)="like(child,0)">
 														<img src="{{child.Like.icon}}" />
 														{{child.Like.title}}
 													</a>
@@ -276,26 +296,26 @@
 													</a>
 												</span>
 												<popover-content #myPopover class="reaction-box-container"
-														[closeOnMouseOutside]="true">
-														<div class="reaction-box" style="left: -140px;">
-															<div class="reaction-icon" *ngFor="let icon of icons"
-																 (click)="like(child,icon.id_row)">
-																<label>{{icon.title}}</label>
-																<div class="reaction-img">
-																	<img src="{{icon.icon}}">
-																</div>
+													[closeOnMouseOutside]="true">
+													<div class="reaction-box" style="left: -140px;">
+														<div class="reaction-icon" *ngFor="let icon of icons"
+															(click)="like(child,icon.id_row)">
+															<label>{{icon.title}}</label>
+															<div class="reaction-img">
+																<img src="{{icon.icon}}">
 															</div>
 														</div>
-													</popover-content>
+													</div>
+												</popover-content>
 												&nbsp;&middot;&nbsp;
 												<a href="javascript:void(0)" (click)="reply(child, vi)">
 													Reply
-												</a> &nbsp;&middot;&nbsp; 
-												<span nowrap >{{child.CreatedDate}}</span>
+												</a> &nbsp;&middot;&nbsp;
+												<span nowrap>{{child.CreatedDate}}</span>
 												<span class="total-like">
 													<ng-container *ngFor="let like of child.Likes">
 														<span *ngIf="like.tong>0">
-															<img src="{{like.icon}}"/>{{like.tong}}
+															<img src="{{like.icon}}" />{{like.tong}}
 														</span>
 													</ng-container>
 												</span>
@@ -351,11 +371,11 @@
 			</div>
 		</div>
 	</div>
-	<span #hiddenText style="visibility:hidden; white-space: pre;font-size:1.1rem; position:absolute">{{CommentTemp}}</span>
+	<span #hiddenText
+		style="visibility:hidden; white-space: pre;font-size:1.1rem; position:absolute">{{CommentTemp}}</span>
 </div>
 <div>
 	<popover-content #myPopoverC placement="bottom-left" [closeOnClickOutside]="true">
 		<kt-choose-users [options]="options" (ItemSelected)="ItemSelected($event)"></kt-choose-users>
 	</popover-content>
 </div>
-

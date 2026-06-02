@@ -6,6 +6,7 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { GiayToService } from '../Services/giay-to.service';
 import { GiayToModel } from '../Model/giay-to.model';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-giay-to-edit',
@@ -27,6 +28,7 @@ export class GiayToEditDialogComponent implements OnInit {
 	image: any;
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_NAME: string = '';
+	maxNS = moment(new Date()).add(-16, 'year').toDate();
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
@@ -49,7 +51,7 @@ export class GiayToEditDialogComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private translate: TranslateService) {
-			this._NAME = this.translate.instant('GIAYTO.NAME');
+		this._NAME = this.translate.instant('GIAYTO.NAME');
 	}
 
 	/** LOAD DATA */
@@ -86,9 +88,9 @@ export class GiayToEditDialogComponent implements OnInit {
 			FileDinhKem: [this.item.FileDinhKem ? [this.item.FileDinhKem] : null],
 		};
 		this.itemForm = this.fb.group(temp);
-		if (this.focusInput) 
+		if (this.focusInput)
 			this.focusInput.nativeElement.focus();
-		if (!this.allowEdit) 
+		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
 
@@ -126,7 +128,7 @@ export class GiayToEditDialogComponent implements OnInit {
 		}
 		if (this.image && this.image.length > 0) {
 			_item.FileDinhKem = this.image[0];
-		} 
+		}
 		return _item;
 	}
 
@@ -209,7 +211,7 @@ export class GiayToEditDialogComponent implements OnInit {
 		});
 	}
 
-	changeLoaiGT(val: any){
+	changeLoaiGT(val: any) {
 		this.listLoaiGiayTo.forEach(x => {
 			if (this.itemForm && x.id == val)
 				this.itemForm.controls.GiayTo.setValue(x.title)

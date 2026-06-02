@@ -377,7 +377,7 @@ export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {
             let url = "/";
             if (this.UrlBack)
                 url = this.UrlBack;
-            this.router.navigateByUrl(url, { relativeTo: this.activatedRoute });
+            this.router.navigateByUrl(url, /* Removed unsupported properties by Angular migration: relativeTo. */ {});
         }
     }
 

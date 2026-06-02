@@ -15,7 +15,7 @@ export class SignalRService {
 	message: string = "";
 	info: string = "";
 	notifyReceived: EventEmitter<ThongBaoModel[]>;
-	
+
 	constructor(
 		private tokenStorage: TokenStorage) {
 		this.notifyReceived = new EventEmitter<ThongBaoModel[]>();
@@ -86,7 +86,7 @@ export class SignalRService {
 	}
 
 	keyup(e: any) {
-		if (e.keyCode === 13) 
+		if (e.keyCode === 13)
 			this.send();
 	}
 	send() {
@@ -104,6 +104,7 @@ export class SignalRService {
 
 export class ThongBaoModel {
 	IdRow: number = 0;
+	UserID: number = 0;
 	ThongBao: string = "";
 	Link: string = "";
 	Loai: number = 0;

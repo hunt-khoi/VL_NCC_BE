@@ -115,4 +115,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
 			})
 		).subscribe();
 	}
+
+	isControlHasError(controlName: string, validationType: string): boolean {
+		if (!this.itemForm) return false;
+		const control = this.itemForm.controls[controlName];
+		if (!control) return false;
+		const result = control.hasError(validationType) && (control.dirty || control.touched);
+		return result;
+	}
 }

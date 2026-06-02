@@ -4,6 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.service';
 
 @Component({
@@ -14,7 +15,7 @@ import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.se
 
 export class thongKeTongHopComponent implements OnInit {
     _name = "";
-	lstDot: any[] = [];
+    lstDot: any[] = [];
 
     dataThongKe: any[] = [];
     listMQ: any[] = []
@@ -31,53 +32,58 @@ export class thongKeTongHopComponent implements OnInit {
     viewLoading: boolean = false;
     queryParams: QueryParamsModel = new QueryParamsModel({});
     allowExport = false;
-	IdDotTangQua: number = 0;
-	loadingSubject = new BehaviorSubject<boolean>(false);
+    IdDotTangQua: number = 0;
+    loadingSubject = new BehaviorSubject<boolean>(false);
     loading$ = this.loadingSubject.asObservable();
-    
-    style_print:any = {
-		td : {
-			'border-right': '1px solid #dee2e6',
-			'border-bottom': '1px solid #dee2e6',
-		},
-        th : {
-            'border-right': '1px solid #dee2e6',
-            'border-bottom': '1px solid #dee2e6',    
-        },
-		table : {'border': '1px solid #dee2e6'}
-	};
+    Capcocau: number = 0;
 
-	constructor(public apiService: tracuuHoSoService,
-		private CommonService: CommonService,
+    style_print: any = {
+        td: {
+            'border-right': '1px solid #dee2e6',
+            'border-bottom': '1px solid #dee2e6',
+        },
+        th: {
+            'border-right': '1px solid #dee2e6',
+            'border-bottom': '1px solid #dee2e6',
+        },
+        table: { 'border': '1px solid #dee2e6' }
+    };
+
+    constructor(public apiService: tracuuHoSoService,
+        private CommonService: CommonService,
         public dialog: MatDialog,
         private changeDetectorRefs: ChangeDetectorRef,
         private layoutUtilsService: LayoutUtilsService,
+        private tokenStorage: TokenStorage,
         private translate: TranslateService) {
         this._name = this.translate.instant('QUA_TET.tktonghop');
     }
 
-	ngOnInit() {
-		this.CommonService.liteDotQua(true).subscribe(res => {
-			if (res && res.status == 1)
-				this.lstDot = res.data;
-		})
+    ngOnInit() {
+        this.tokenStorage.getUserInfo().subscribe(res => {
+            this.Capcocau = res.Capcocau;
+        })
+        this.CommonService.liteDotQua(true).subscribe(res => {
+            if (res && res.status == 1)
+                this.lstDot = res.data;
+        })
     }
 
     loadData() {
         if (this.IdDotTangQua <= 0) {
-			this.layoutUtilsService.showError("Vui lòng chọn đợt tặng quà");
-			return;
-		}
+            this.layoutUtilsService.showError("Vui lòng chọn đợt tặng quà");
+            return;
+        }
         this.queryParams = this.prepareQuery();
         this.viewLoading = true;
         this.tracuu();
     }
 
     tracuu() {
-		this.display = false
-		this.loadingSubject.next(true);
-		this.apiService.thongKeTongHop(this.queryParams).subscribe(res => {
-			this.loadingSubject.next(false);
+        this.display = false
+        this.loadingSubject.next(true);
+        this.apiService.thongKeTongHop(this.queryParams).subscribe(res => {
+            this.loadingSubject.next(false);
             this.viewLoading = false;
             if (res && res.status == 1) {
                 this.dataThongKe = res.data
@@ -85,9 +91,9 @@ export class thongKeTongHopComponent implements OnInit {
                 this.getElement();
                 this.display = true
             }
-            else 
-				this.layoutUtilsService.showError(res.error.message);
-			this.changeDetectorRefs.detectChanges(); 
+            else
+                this.layoutUtilsService.showError(res.error.message);
+            this.changeDetectorRefs.detectChanges();
         })
     }
 
@@ -96,42 +102,42 @@ export class thongKeTongHopComponent implements OnInit {
     }
 
     getElement() {
-        for (var i=0; i<this.dataThongKe.length; i++) {
+        for (var i = 0; i < this.dataThongKe.length; i++) {
             this.listTieuDe = this.dataThongKe[i].TongTien
             return;
         }
     }
 
-	export() {
+    export() {
         if (this.IdDotTangQua <= 0) {
-			this.layoutUtilsService.showError("Vui lòng chọn đợt tặng quà");
-			return;
-		}
-		this.loadingSubject.next(true);
-		this.apiService.exportTKTongHop(this.queryParams).subscribe(res => {
-			this.loadingSubject.next(false);
-			const headers = res.headers;
-			const filename = headers.get('x-filename');
-			const type = headers.get('content-type');
-			const blob = new Blob([res.body], { type });
-			const fileURL = URL.createObjectURL(blob);
-			const link = document.createElement('a');
-			link.href = fileURL;
-			link.download = filename;
-			link.click();
+            this.layoutUtilsService.showError("Vui lòng chọn đợt tặng quà");
+            return;
+        }
+        this.loadingSubject.next(true);
+        this.apiService.exportTKTongHop(this.queryParams).subscribe(res => {
+            this.loadingSubject.next(false);
+            const headers = res.headers;
+            const filename = headers.get('x-filename');
+            const type = headers.get('content-type');
+            const blob = new Blob([res.body], { type });
+            const fileURL = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = fileURL;
+            link.download = filename;
+            link.click();
         }, err => {
-			this.layoutUtilsService.showError("Xuất thống kê báo cáo thất bại");
-		});
+            this.layoutUtilsService.showError("Xuất thống kê báo cáo thất bại");
+        });
     }
 
-    prepareQuery(): QueryParamsModel { 
+    prepareQuery(): QueryParamsModel {
         const queryParams = new QueryParamsModel(this.filter(), '', '', 0, 10);
         return queryParams;
     }
 
     filter(): any {
         const filter: any = {};
-		filter.IdDot = this.IdDotTangQua;
+        filter.IdDot = this.IdDotTangQua;
         return filter;
     }
 }

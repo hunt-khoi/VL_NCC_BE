@@ -1,14 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
+import { GlobalVariable } from '../../../../pages/global';
 import { User } from '../../../../../core/auth';
 import { AuthService } from '../../../../../core/auth/_services/auth.service';
-import { Router } from '@angular/router';
-import { environment } from '../../../../../../environments/environment';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
-import { VaiTroComponent } from '../vai-tro/vai-tro.component';
-import { MatDialog } from '@angular/material/dialog';
-import { GlobalVariable } from '../../../../pages/global';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
+import { VaiTroComponent } from '../vai-tro/vai-tro.component';
+import { environment } from '../../../../../../environments/environment';
 
 var swRegistration: any = null;
 @Component({
@@ -41,10 +41,10 @@ export class UserProfileComponent implements OnInit {
 		})
 		this.auth.getDictionary().subscribe(res => {
 			if (res && res.status == 1) {
-				res.data.emotions.map((x : any) => {
+				res.data.emotions.map((x: any) => {
 					GlobalVariable.emotions[x.key] = x.value;
 				})
-				res.data.accounts.map((x : any) => {
+				res.data.accounts.map((x: any) => {
 					GlobalVariable.accounts[x.key] = x.value;
 				})
 				GlobalVariable.icons = res.data.icons;
@@ -81,7 +81,7 @@ export class UserProfileComponent implements OnInit {
 		}
 	}
 
-	resetSession() {		
+	resetSession() {
 		this.auth.resetSession().subscribe(
 			res => {
 				if (res && res.status == 1) {
@@ -107,9 +107,7 @@ export class UserProfileComponent implements OnInit {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(VaiTroComponent, { data: { VaiTros: res.data } });
 				dialogRef.afterClosed().subscribe(res => {
-					if (!res) {
-						return;
-					}
+					if (!res) return;
 				});
 			}
 		});
@@ -155,7 +153,7 @@ export class UserProfileComponent implements OnInit {
 		Nếu tên quá dài, chỉ lấy 2 ký tự đầu
 	*/
 	getName(name: string) {
-		if(name.length >= 15) {
+		if (name.length >= 15) {
 			let t = name.split(" ", 2);
 			let short_Name = t[0] + ' ' + t[1];
 			return short_Name

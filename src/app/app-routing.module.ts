@@ -2,30 +2,29 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-	{ 
-		path: 'auth', 
-		loadChildren: () => import('../app/views/pages/auth/auth.module').then(m => m.AuthModule) 
+	{
+		path: 'auth',
+		loadChildren: () => import('../app/views/pages/auth/auth.module').then(m => m.AuthModule)
 	},
-	{ 
-		path: 'viewer', 
-		loadChildren: () => import('../app/views/pages/nguoi-co-cong/file-viewer/file-viewer.module').then(m => m.FileViewerModule) 
+	{
+		path: 'viewer',
+		loadChildren: () => import('../app/views/pages/nguoi-co-cong/file-viewer/file-viewer.module').then(m => m.FileViewerModule)
 	},
-	{ 
-		path: '', 
-		loadChildren: () => import('../app/views/theme/theme.module').then(m => m.ThemeModule) 
+	{
+		path: '',
+		loadChildren: () => import('../app/views/theme/theme.module').then(m => m.ThemeModule)
 	},
-	{ 
-		path: '**', 
-		redirectTo: 'error/403', 
-		pathMatch: 'full' 
+	{
+		path: '**',
+		redirectTo: 'error/403',
+		pathMatch: 'full'
 	}
 ];
 
 @NgModule({
 	imports: [
-		RouterModule.forRoot(routes)
+		RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })
 	],
 	exports: [RouterModule]
 })
-export class AppRoutingModule {
-}
+export class AppRoutingModule { }

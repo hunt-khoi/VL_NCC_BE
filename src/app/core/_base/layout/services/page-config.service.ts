@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import objectPath from 'object-path';
 
 @Injectable()

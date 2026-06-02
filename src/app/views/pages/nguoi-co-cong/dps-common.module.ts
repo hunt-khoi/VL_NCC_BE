@@ -111,6 +111,8 @@ import { QuyetDinhBaseEditComponent } from './components/quyet-dinh-base-edit/qu
 import { MonthFormatDirective } from './services/month-format.directive';
 import { CookieService } from 'ngx-cookie-service';
 import { CanvasDemoModule } from './components/canvas-demo/canvas-demo.module';
+import { ChartsModule } from 'ng2-charts';
+import { CKEditorModule } from 'ckeditor4-angular';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 
@@ -166,7 +168,9 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 		AngularEditorModule,
 		EditorModule,
 		AvatarModule,
-		CanvasDemoModule
+		CanvasDemoModule,
+		ChartsModule,
+		CKEditorModule
 	],
 	providers: [
 		InterceptService,
@@ -326,6 +330,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 		NgxMaskModule,
 		AngularEditorModule,
 		AvatarModule,
+		ChartsModule,
+		CKEditorModule,
 
 		ActionNotificationComponent,
 		DeleteEntityDialogComponent,

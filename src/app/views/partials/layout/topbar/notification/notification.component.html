@@ -29,23 +29,25 @@
 				<ul ktTabClickEvent class="nav nav-tabs nav-tabs-line nav-tabs-bold nav-tabs-line-3x 
 					nav-tabs-line-{{type}} kt-notification-item-padding-x" role="tablist">
 					<li class="nav-item">
-						<a (click)="tab.select('tab-id-1')" class="nav-link active show" data-toggle="tab" href="javascript:;"
-							role="tab" aria-selected="false" matBadgeColor="warn"
-							matBadge="{{ (ThongBao.Total.ThongBao > 99) ? '99+' : ThongBao.Total.ThongBao }}">Thông báo</a>
+						<a (click)="tab.select('tab-id-1')" class="nav-link active show" data-toggle="tab"
+							href="javascript:;" role="tab" aria-selected="false" matBadgeColor="warn"
+							matBadge="{{ (ThongBao.Total.ThongBao > 99) ? '99+' : ThongBao.Total.ThongBao }}">Thông
+							báo</a>
 					</li>
-					
+
 				</ul>
 			</div>
 			<!--end: Head -->
 
-			<ngb-tabset #tab="ngbTabset"> 
+			<ngb-tabset #tab="ngbTabset">
 				<ngb-tab id="tab-id-1">
 					<ng-template ngbTabContent>
-						<div (scroll)="scrollViewHandler($event, 'ThongBao')" #scrollViewTB
-							[perfectScrollbar]="{wheelPropagation: false}" [ngStyle]="{'max-height': '40vh', 'position': 'relative'}"
+						<div (scroll)="scrollViewHandler('ThongBao')" #scrollViewTB
+							[perfectScrollbar]="{wheelPropagation: false}"
+							[ngStyle]="{'max-height': '40vh', 'position': 'relative'}"
 							class="kt-notification kt-margin-t-10 kt-margin-b-10">
 							<a href="javascript:;" *ngFor="let tb of ThongBao.ThongBao" class="kt-notification__item"
-								(click)="view('ThongBao', tb)">
+								(click)="view(tb)">
 								<div class="kt-notification__item-icon"></div>
 								<div class="kt-notification__item-details">
 									<div class="kt-notification__item-title" [ngClass]="{'text-unread': !tb.IsRead}">

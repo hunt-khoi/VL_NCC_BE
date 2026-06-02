@@ -2,7 +2,6 @@ import { Component, Input, OnInit, OnChanges, ViewChild, ChangeDetectionStrategy
 import { CommonService } from '../../../../pages/nguoi-co-cong/services/common.service';
 import { MatDialog } from '@angular/material/dialog';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { SignalRService } from '../../../../pages/nguoi-co-cong/services/signalR.service';
 import { MenuHorizontalService } from '../../../../../core/_base/layout';
@@ -17,7 +16,6 @@ import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 export class NotificationComponent implements OnInit, OnChanges {
 	// Show dot on top of the icon
 	@Input() dot: string;
-
 	// Show pulse on icon
 	@Input() pulse: boolean;
 	@Input() pulseLight: boolean;
@@ -28,15 +26,11 @@ export class NotificationComponent implements OnInit, OnChanges {
 
 	// Set true to icon as SVG or false as icon class
 	@Input() useSVG: boolean;
-
 	// Set bg image path
 	@Input() bgImage: string;
-
 	// Set skin color, default to light
 	@Input() skin: 'light' | 'dark' = 'light';
 	@Input() type: 'brand' | 'success' = 'success';
-
-	@Input() products$: Observable<any>;
 
 	@ViewChild(NgbDropdown, { static: true }) ngbDropdown: NgbDropdown;
 	isReset: any;
@@ -44,16 +38,14 @@ export class NotificationComponent implements OnInit, OnChanges {
 		Total: { Total: 0 },
 		Page: {}
 	}
-	LoaiThongBao = [{ }];
-	// ThongBaoNoiBo: any[]=[];
-	// ThongBao: any[]=[];
+	LoaiThongBao = [{}];
 	selectedLoai: any;
-	UserID: number;
+	UserID: number = 0;
 	isStopScroll: boolean = false;
 
 	@ViewChild('scrollViewTB') scrollViewTB: ElementRef;
 	@HostListener('scroll', ['$event'])
-	scrollViewHandler(event, item) {
+	scrollViewHandler(item: any) {
 		if (this.isStopScroll) return;
 		this.selectedLoai = item;
 		if (item = "ThongBao") {
@@ -85,14 +77,11 @@ export class NotificationComponent implements OnInit, OnChanges {
 		if (!this.bgImage) {
 			return 'none';
 		}
-
 		return 'url(' + this.bgImage + ')';
 	}
 
 	ngOnDestroy() {
 		this.signalRService.disconnectToken();
-	}
-	ngAfterViewInit() {
 	}
 
 	ngOnInit() {
@@ -106,7 +95,7 @@ export class NotificationComponent implements OnInit, OnChanges {
 			for (let i = 0; i < response.length; i++) {
 				let res = response[i];
 				if (res.UserID != this.UserID) continue; //check local
-				let index = this.ThongBao["ThongBao"].findIndex(x => x.IdRow == res.IdRow);
+				let index = this.ThongBao["ThongBao"].findIndex((x: any) => x.IdRow == res.IdRow);
 				if (index >= 0) {
 					if (res.Disabled)
 						this.ThongBao["ThongBao"].splice(index, 1);
@@ -135,7 +124,7 @@ export class NotificationComponent implements OnInit, OnChanges {
 		//clearInterval(this.isReset);
 	}
 
-	getLastest(lastID) {
+	getLastest(lastID: any) {
 		this.commonService.GetThongBaoLastest(lastID).subscribe(res => {
 			if (res && res.status == 1) {
 				let total = 0;
@@ -181,8 +170,8 @@ export class NotificationComponent implements OnInit, OnChanges {
 			this.changeDetect.detectChanges();
 		});
 	}
-	
-	GetThongBaoPage(pagesize, pageindex) {
+
+	GetThongBaoPage(pagesize: number, pageindex: number) {
 		this.isStopScroll = true;
 		this.commonService.GetThongBaoPage(pagesize, pageindex).subscribe(res => {
 			if (res && res.status == 1) {
@@ -193,7 +182,7 @@ export class NotificationComponent implements OnInit, OnChanges {
 		});
 	}
 
-	view(Key, ThongBao) {
+	view(ThongBao: any) {
 		this.commonService.ReadNotify(ThongBao.IdRow).subscribe(res => {
 			//ThongBao.IsRead = true;
 			//window.location.href = environment.BERoot + ThongBao.Link;

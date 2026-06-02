@@ -1,18 +1,19 @@
 <style>
-	.color-username{
+	.color-username {
 		color: #fff;
 	}
+
 	@media (max-width: 1024px) {
-		.color-username{
+		.color-username {
 			color: #000;
 		}
 	}
+
 	#scroll-text {
 		/* animation properties */
 		-moz-transform: translateX(100%);
 		-webkit-transform: translateX(100%);
 		transform: translateX(100%);
-		
 		-moz-animation: my-animation 10s linear infinite;
 		-webkit-animation: my-animation 10s linear infinite;
 		animation: my-animation 10s linear infinite;
@@ -20,32 +21,45 @@
 
 	/* for Firefox */
 	@-moz-keyframes my-animation {
-	from { -moz-transform: translateX(100%); }
-	to { -moz-transform: translateX(-100%); }
+		from {
+			-moz-transform: translateX(100%);
+		}
+
+		to {
+			-moz-transform: translateX(-100%);
+		}
 	}
 
 	/* for Chrome */
 	@-webkit-keyframes my-animation {
-	from { -webkit-transform: translateX(100%); }
-	to { -webkit-transform: translateX(-100%); }
+		from {
+			-webkit-transform: translateX(100%);
+		}
+
+		to {
+			-webkit-transform: translateX(-100%);
+		}
 	}
 
 	@keyframes my-animation {
-	from {
-		-moz-transform: translateX(100%);
-		-webkit-transform: translateX(100%);
-		transform: translateX(100%);
-	}
-	to {
-		-moz-transform: translateX(-100%);
-		-webkit-transform: translateX(-100%);
-		transform: translateX(-100%);
-	}
+		from {
+			-moz-transform: translateX(100%);
+			-webkit-transform: translateX(100%);
+			transform: translateX(100%);
+		}
+
+		to {
+			-moz-transform: translateX(-100%);
+			-webkit-transform: translateX(-100%);
+			transform: translateX(-100%);
+		}
+
 		/* .panel-custom-width {
-		width: 300px !important;
-		max-width: unset !important;
+			width: 300px !important;
+			max-width: unset !important;
 		} */
 	}
+
 	#scroll-container {
 		/* border: 3px solid black; */
 		/* border-radius: 5px; */
@@ -53,67 +67,73 @@
 		/* width: fit-content; */
 		max-width: 200px;
 		min-width: 120px;
-		}
-
-/*  */
-
+	}
 </style>
 
-<div ngbDropdown  placement="bottom-right" *ngIf="user$ | async as _user" class="kt-header__topbar-item kt-header__topbar-item--user">
-    <div ngbDropdownToggle class="kt-header__topbar-wrapper">
-        <div class="kt-header__topbar-user" [ngClass]="{'kt-header__topbar-icon': icon}">
-            <!-- <span class="kt-header__topbar-welcome kt-hidden-mobile" *ngIf="greeting">Xin chào,</span> -->
-            <i *ngIf="icon" class="flaticon2-user-outline-symbol"></i>
-            <!-- <img *ngIf="avatar" alt="Pic" [attr.src]="_user.avata">&nbsp; -->
-
+<div ngbDropdown placement="bottom-right" *ngIf="user$ | async as _user"
+	class="kt-header__topbar-item kt-header__topbar-item--user">
+	<div ngbDropdownToggle class="kt-header__topbar-wrapper">
+		<div class="kt-header__topbar-user" [ngClass]="{'kt-header__topbar-icon': icon}">
+			<!-- <span class="kt-header__topbar-welcome kt-hidden-mobile" *ngIf="greeting">Xin chào,</span> -->
+			<i *ngIf="icon" class="flaticon2-user-outline-symbol"></i>
+			<!-- <img *ngIf="avatar" alt="Pic" [attr.src]="_user.avata">&nbsp; -->
 			<div class="fd-avt">
 				<ngx-avatar size="38" src="{{_user.avata}}" *ngIf="_user.avata; else bindText"></ngx-avatar>
 				<ng-template #bindText>
 					<div style="padding-right: 5px;">
-						<ngx-avatar size="38" bgColor="{{commonService.get_colorByName(_user.charname)}}" [name]="_user.charname"></ngx-avatar>
+						<ngx-avatar size="38" bgColor="{{commonService.get_colorByName(_user.charname)}}"
+							[name]="_user.charname"></ngx-avatar>
 					</div>
 				</ng-template>
 			</div>
 
 			<div *ngIf="_user.fullname.length >= 20; else temp" matTooltip="{{_user.fullname}}" id="scroll-container">
-				<span id="scroll-text" class="kt-header__topbar-username color-username" *ngIf="greeting">{{_user.fullname}}</span>
+				<span id="scroll-text" class="kt-header__topbar-username color-username"
+					*ngIf="greeting">{{_user.fullname}}</span>
 			</div>
 			<ng-template #temp>
-				<span style="width: 150px" class="kt-header__topbar-username color-username" *ngIf="greeting">{{_user.fullname}}</span>
+				<span style="width: 150px" class="kt-header__topbar-username color-username"
+					*ngIf="greeting">{{_user.fullname}}</span>
 			</ng-template>
-            <!-- <span class="kt-header__topbar-username kt-hidden-mobile" style="color: #fff;" *ngIf="greeting"> {{_user.fullname}}</span> -->
-            <span *ngIf="badge" class="kt-badge kt-badge--username kt-badge--unified-success kt-badge--lg kt-badge--rounded kt-badge--bold">{{_user.fullname|firstLetter}}</span>
-        </div>
-    </div>
-    <div ngbDropdownMenu panelClass="panel-custom-width" class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-xl" >
-        <!--begin: Head -->
-        <div class="kt-user-card kt-user-card--skin-dark kt-notification-item-padding-x" style="background-image: url(./assets/media/misc/bg-1.jpg)">
-            <div  class="kt-user-card__avatar">
-                <!-- <img alt="Pic" [attr.src]="_user.avata" /> -->
+			<!-- <span class="kt-header__topbar-username kt-hidden-mobile" style="color: #fff;" *ngIf="greeting"> {{_user.fullname}}</span> -->
+			<span *ngIf="badge"
+				class="kt-badge kt-badge--username kt-badge--unified-success kt-badge--lg kt-badge--rounded kt-badge--bold">
+				{{_user.fullname|firstLetter}}
+			</span>
+		</div>
+	</div>
+	<div ngbDropdownMenu panelClass="panel-custom-width"
+		class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-xl">
+		<!--begin: Head -->
+		<div class="kt-user-card kt-user-card--skin-dark kt-notification-item-padding-x"
+			style="background-image: url(./assets/media/misc/bg-1.jpg)">
+			<div class="kt-user-card__avatar">
+				<!-- <img alt="Pic" [attr.src]="_user.avata" /> -->
 
 				<div class="fd-avt">
 					<ngx-avatar size="50" src="{{_user.avata}}" *ngIf="_user.avata; else bindText2"></ngx-avatar>
 					<ng-template #bindText2>
-						<ngx-avatar size="50" bgColor="{{commonService.get_colorByName(_user.charname)}}" [name]="_user.charname"></ngx-avatar>
+						<ngx-avatar size="50" bgColor="{{commonService.get_colorByName(_user.charname)}}"
+							[name]="_user.charname"></ngx-avatar>
 					</ng-template>
 				</div>
 
-                <!-- <span class="kt-badge kt-badge--lg kt-badge--rounded kt-badge--bold kt-font-success">
+				<!-- <span class="kt-badge kt-badge--lg kt-badge--rounded kt-badge--bold kt-font-success">
 					{{_user.fullname | firstLetter}}
 				</span> -->
-            </div>
-            <div class="kt-user-card__name">
-                {{_user.fullname}}
-                <p style="font-size:1rem">{{_user.tenvaitro}}</p>
-            </div>
-            <!--<div class="kt-user-card__badge">
+			</div>
+			<div class="kt-user-card__name">
+				{{_user.fullname}}
+				<p style="font-size:1rem">{{_user.tenvaitro}}</p>
+			</div>
+			<!--<div class="kt-user-card__badge">
 				<span class="btn btn-success btn-sm btn-bold btn-font-md">23 messages</span>
 			</div>-->
-        </div>
-        <!--end: Head -->
-        <!--begin: Navigation -->
-        <div class="kt-notification">
-            <a ngbDropdownItem routerLink="/profile" href="javascript:;" class="kt-notification__item">
+		</div>
+		<!--end: Head -->
+		<!--begin: Navigation -->
+		<div class="kt-notification">
+			<a ngbDropdownItem routerLink="/profile" href="javascript:;" class="kt-notification__item">
 				<div class="kt-notification__item-icon">
 					<i class="flaticon2-calendar-3 kt-font-success"></i>
 				</div>
@@ -126,7 +146,7 @@
 					</div>-->
 				</div>
 			</a>
-            <a ngbDropdownItem routerLink="/hdsd" href="javascript:;" class="kt-notification__item">
+			<a ngbDropdownItem routerLink="/hdsd" href="javascript:;" class="kt-notification__item">
 				<div class="kt-notification__item-icon">
 					<i class="flaticon-book kt-font-success"></i>
 				</div>
@@ -175,14 +195,16 @@
 					</div>
 				</div>
 			</a>-->
-            <div class="kt-notification__custom">
-                <a href="javascript:;" (click)="logout()" class="btn btn-outline-brand btn-upper btn-sm btn-bold">{{ 'COMMON.LOGOUT' | translate }}</a>&nbsp;
-                <a href="javascript:;" (click)="init_doivaitro()" class="btn btn-outline-brand btn-upper btn-sm btn-bold">{{ 'COMMON.CHANGEROLE' | translate }}</a>
-            </div>
-        </div>
-        <!--end: Navigation -->
-        <!--begin: Navigation(alternative) -->
-        <!--<ul class="kt-nav kt-margin-b-10 kt-hidden">
+			<div class="kt-notification__custom">
+				<a href="javascript:;" (click)="logout()" class="btn btn-outline-brand btn-upper btn-sm btn-bold">{{
+					'COMMON.LOGOUT' | translate }}</a>&nbsp;
+				<a href="javascript:;" (click)="init_doivaitro()"
+					class="btn btn-outline-brand btn-upper btn-sm btn-bold">{{ 'COMMON.CHANGEROLE' | translate }}</a>
+			</div>
+		</div>
+		<!--end: Navigation -->
+		<!--begin: Navigation(alternative) -->
+		<!--<ul class="kt-nav kt-margin-b-10 kt-hidden">
 			<li class="kt-nav__item">
 				<a ngbDropdownItem routerLink="profile" class="kt-nav__link">
 					<span class="kt-nav__link-icon"><i class="flaticon2-calendar-3"></i></span>
@@ -211,6 +233,6 @@
 				<a (click)="logout()" class="btn btn-outline-brand btn-upper btn-sm btn-bold">Sign Out</a>
 			</li>
 		</ul>-->
-        <!--end: Navigation(alternative) -->
-    </div>
+		<!--end: Navigation(alternative) -->
+	</div>
 </div>

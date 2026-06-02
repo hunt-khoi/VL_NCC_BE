@@ -87,7 +87,7 @@ export class ChangePasswordComponent implements OnInit {
 	}
 
 	back() {
-		this.router.navigateByUrl("profile", { relativeTo: this.activatedRoute });
+		this.router.navigateByUrl("profile", /* Removed unsupported properties by Angular migration: relativeTo. */ {});
 	}
 
 	onAlertClose() {
