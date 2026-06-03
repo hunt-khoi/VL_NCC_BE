@@ -57,3 +57,4 @@ yarn.lock
 
 /.vscode
 /.angular
+/build
