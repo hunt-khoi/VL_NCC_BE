@@ -6,20 +6,17 @@ import { DienChinhHinhListComponent } from './dien-chinh-hinh-list/dien-chinh-hi
 import { DienChinhHinhEditDialogComponent } from './dien-chinh-hinh-edit/dien-chinh-hinh-edit-dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-	],
-	providers: [
-		DienChinhHinhService,
-	],
-	entryComponents: [
-		DienChinhHinhComponent,
-	],
-	declarations: [
-		DienChinhHinhListComponent,
-		DienChinhHinhEditDialogComponent
-	],
-	exports: [DienChinhHinhListComponent]
+    imports: [
+        DPSCommonModule,
+    ],
+    providers: [
+        DienChinhHinhService,
+    ],
+    declarations: [
+        DienChinhHinhListComponent,
+        DienChinhHinhEditDialogComponent
+    ],
+    exports: [DienChinhHinhListComponent]
 })
 
 export class DienChinhHinhRefModule { }

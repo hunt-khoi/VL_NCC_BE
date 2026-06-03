@@ -8,31 +8,26 @@ import { thongKeTheoDoiTuongComponent } from './tk-theo-doi-tuong/tk-theo-doi-tu
 import { thongKeTheoDoiTuongNewComponent } from './tk-theo-doi-tuong-new/tk-theo-doi-tuong-new.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule
-	],
-	providers: [
-		tracuuHoSoService
-	],
-	entryComponents: [
-		thongKeTheoDoiTuongComponent,
-		thongKeTheoMucQuaComponent,
-		thongKeTongHopComponent,
-	],
-	declarations: [
-		thongKeTheoDoiTuongComponent,
-		thongKeTheoMucQuaComponent,
-		thongKeTongHopComponent,
-		thongKeTheoDoiTuongNewComponent,
-		TKPhanBoComponent,
-	],
-	exports:[
-		thongKeTheoDoiTuongComponent,
-		thongKeTheoMucQuaComponent,
-		thongKeTongHopComponent,
-		thongKeTheoDoiTuongNewComponent,
-		TKPhanBoComponent
-	]
+    imports: [
+        DPSCommonModule
+    ],
+    providers: [
+        tracuuHoSoService
+    ],
+    declarations: [
+        thongKeTheoDoiTuongComponent,
+        thongKeTheoMucQuaComponent,
+        thongKeTongHopComponent,
+        thongKeTheoDoiTuongNewComponent,
+        TKPhanBoComponent,
+    ],
+    exports: [
+        thongKeTheoDoiTuongComponent,
+        thongKeTheoMucQuaComponent,
+        thongKeTongHopComponent,
+        thongKeTheoDoiTuongNewComponent,
+        TKPhanBoComponent
+    ]
 })
 
 export class tracuuHoSoRefModule { }

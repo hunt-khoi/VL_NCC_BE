@@ -28,21 +28,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-	],
-	providers: [
-		HolidaysService
-	],
-	entryComponents: [
-		HolidaysListComponent
-	],
-	declarations: [
-		HolidaysComponent,
-		HolidaysListComponent,
-		HolidaysEditDialogComponent,
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+    ],
+    providers: [
+        HolidaysService
+    ],
+    declarations: [
+        HolidaysComponent,
+        HolidaysListComponent,
+        HolidaysEditDialogComponent,
+    ]
 })
 
 export class HolidayModule { }

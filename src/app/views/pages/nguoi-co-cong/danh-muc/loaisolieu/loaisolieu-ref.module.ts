@@ -5,23 +5,19 @@ import { loaisolieuEditDialogComponent } from './loaisolieu-edit/loaisolieu-edit
 import { loaisolieuListComponent } from './loaisolieu-list/loaisolieu-list.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule
-	],
-	providers: [
-		loaisolieuService
-	],
-	entryComponents: [
-		loaisolieuListComponent,
-		loaisolieuEditDialogComponent
-	],
-	declarations: [
-		loaisolieuListComponent,
-		loaisolieuEditDialogComponent
-	],
-	exports:[
-		loaisolieuListComponent,
-	]
+    imports: [
+        DPSCommonModule
+    ],
+    providers: [
+        loaisolieuService
+    ],
+    declarations: [
+        loaisolieuListComponent,
+        loaisolieuEditDialogComponent
+    ],
+    exports: [
+        loaisolieuListComponent,
+    ]
 })
 
 export class loaisolieuRefModule { }

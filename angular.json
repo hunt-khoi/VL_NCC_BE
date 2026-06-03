@@ -42,7 +42,6 @@
             "styles": [
               "src/styles.scss",
               "node_modules/perfect-scrollbar/css/perfect-scrollbar.css",
-              "node_modules/socicon/css/socicon.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "src/assets/sass/style.angular.scss"
             ],
@@ -213,8 +212,7 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "browserTarget": "metronic:build:dev",
-            "sourceMap": false
+            "browserTarget": "metronic:build:dev"
           },
           "configurations": {
             "production": {
@@ -245,14 +243,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         }
@@ -274,21 +269,13 @@
               "devServerTarget": "metronic:serve:production"
             }
           }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "e2e/tsconfig.e2e.json",
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
         }
       }
     }
   },
   "defaultProject": "metronic",
   "cli": {
-    "analytics": "ed88fc36-68b3-4e80-9db5-15bd9e5e535b"
+    "analytics": "ed88fc36-68b3-4e80-9db5-15bd9e5e535b",
+    "defaultCollection": "@angular-eslint/schematics"
   }
 }

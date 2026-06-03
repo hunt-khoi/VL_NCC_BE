@@ -1,12 +1,4 @@
-import {
-	ChangeDetectionStrategy,
-	ChangeDetectorRef,
-	Component,
-	ElementRef,
-	OnInit,
-	Renderer2,
-	ViewChild
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { filter } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
 import objectPath from 'object-path';
@@ -21,7 +13,7 @@ import { HtmlClassService } from '../html-class.service';
 })
 export class AsideLeftComponent implements OnInit {
 
-	@ViewChild('asideMenu', {static: true}) asideMenu: ElementRef | undefined;
+	@ViewChild('asideMenu', { static: true }) asideMenu: ElementRef | undefined;
 
 	currentRouteUrl = '';
 	insideTm: any;
@@ -79,7 +71,7 @@ export class AsideLeftComponent implements OnInit {
 		const config = this.layoutConfigService.getConfig();
 		if (this.asideMenu && objectPath.get(config, 'aside.menu.dropdown')) {
 			this.render.setAttribute(this.asideMenu.nativeElement, 'data-ktmenu-dropdown', '1');
-			// tslint:disable-next-line:max-line-length
+			// eslint-disable-next-line max-len
 			this.render.setAttribute(this.asideMenu.nativeElement, 'data-ktmenu-dropdown-timeout', objectPath.get(config, 'aside.menu.submenu.dropdown.hover-timeout'));
 		}
 	}

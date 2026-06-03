@@ -24,21 +24,17 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		CauHinhEmailService
-	],
-	entryComponents: [
-		CauHinhEmailEditComponent,
-		CauHinhEmailPopupDVCComponent
-	],
-	declarations: [
-		CauHinhEmailComponent,
-		CauHinhEmailListComponent,
-		CauHinhEmailEditComponent,
-		CauHinhEmailPopupDVCComponent
-	]
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        CauHinhEmailService
+    ],
+    declarations: [
+        CauHinhEmailComponent,
+        CauHinhEmailListComponent,
+        CauHinhEmailEditComponent,
+        CauHinhEmailPopupDVCComponent
+    ]
 })
 export class CauHinhEmailModule {}

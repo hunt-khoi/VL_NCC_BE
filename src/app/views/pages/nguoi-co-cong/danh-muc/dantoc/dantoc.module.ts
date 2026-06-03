@@ -20,21 +20,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		dantocService
-	],
-	entryComponents: [
-		dantocEditDialogComponent
-	],
-	declarations: [
-		dantocComponent,
-		dantocListComponent,
-		dantocEditDialogComponent
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        dantocService
+    ],
+    declarations: [
+        dantocComponent,
+        dantocListComponent,
+        dantocEditDialogComponent
+    ]
 })
 
 export class dantocModule { }

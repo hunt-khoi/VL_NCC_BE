@@ -27,21 +27,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		HoSoNCCDuyetRefModule,
-	],
-	providers: [
-		HoSoNCCDuyetService,
-		ThanNhanService,
-		GiayToService,
-	],
-	entryComponents: [
-	],
-	declarations: [
-		HoSoNCCDuyetPageComponent,
-		HoSoNCCDuyetComponent,
-	],
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        HoSoNCCDuyetRefModule,
+    ],
+    providers: [
+        HoSoNCCDuyetService,
+        ThanNhanService,
+        GiayToService,
+    ],
+    declarations: [
+        HoSoNCCDuyetPageComponent,
+        HoSoNCCDuyetComponent,
+    ]
 })
 export class HoSoNCCDuyetModule { }

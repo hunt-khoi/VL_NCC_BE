@@ -25,21 +25,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		NhapSoLieuRefModule2,
-	],
-	providers: [
-		NhapSoLieuService,
-		MauSoLieuService
-	],
-	entryComponents: [
-		NhapSoLieuListComponent,
-	],
-	declarations: [
-		NhapSoLieuListComponent,
-		NhapSoLieuComponent
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        NhapSoLieuRefModule2,
+    ],
+    providers: [
+        NhapSoLieuService,
+        MauSoLieuService
+    ],
+    declarations: [
+        NhapSoLieuListComponent,
+        NhapSoLieuComponent
+    ]
 })
 export class NhapSoLieuModule { }

@@ -25,49 +25,46 @@ import { DynamicComponentComponent, InsertionDirective } from './dynamic-compone
 import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 
 @NgModule({
-  declarations: [
-    DropdownTreeComponent,
-    ImageControlComponent,
-    DatetimePickerComponent,
-    DynamicComponentComponent,
-    InsertionDirective,
-    DynamicFormComponent
-  ],
-  imports: [
-    CommonModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    NgbModule,
-    NgbProgressbarModule,
-    CdkTreeModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatTooltipModule,
-    MatButtonModule,
-    MatMenuModule,
-    MatDatepickerModule,
-    MatCheckboxModule,
-    MatRadioModule,
-    MatIconModule,
-    MatButtonToggleModule,
-    MatSelectModule,
-    MatNativeDateModule,
-    FileUploadModule
-  ],
-  exports: [
-    DropdownTreeComponent,
-    ImageControlComponent,
-    DatetimePickerComponent,
-    DynamicComponentComponent,
-    DynamicFormComponent
-  ],
-  entryComponents: [
-    DynamicComponentComponent
-  ],
-  providers: [
-    DatePipe
-  ]
+    declarations: [
+        DropdownTreeComponent,
+        ImageControlComponent,
+        DatetimePickerComponent,
+        DynamicComponentComponent,
+        InsertionDirective,
+        DynamicFormComponent
+    ],
+    imports: [
+        CommonModule,
+        HttpClientModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NgbModule,
+        NgbProgressbarModule,
+        CdkTreeModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatTooltipModule,
+        MatButtonModule,
+        MatMenuModule,
+        MatDatepickerModule,
+        MatCheckboxModule,
+        MatRadioModule,
+        MatIconModule,
+        MatButtonToggleModule,
+        MatSelectModule,
+        MatNativeDateModule,
+        FileUploadModule
+    ],
+    exports: [
+        DropdownTreeComponent,
+        ImageControlComponent,
+        DatetimePickerComponent,
+        DynamicComponentComponent,
+        DynamicFormComponent
+    ],
+    providers: [
+        DatePipe
+    ]
 })
 
 export class LibModule { }

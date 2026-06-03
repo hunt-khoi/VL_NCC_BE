@@ -26,15 +26,12 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		RouterModule.forChild(routes),
+        RouterModule.forChild(routes),
         DPSCommonModule,
         loaiGiayToRefModule
     ],
-	providers: [
+    providers: [
         loaiGiayToServices,
-    ],
-	entryComponents: [
-		
     ],
     declarations: [
         LoaiGiayToComponent,

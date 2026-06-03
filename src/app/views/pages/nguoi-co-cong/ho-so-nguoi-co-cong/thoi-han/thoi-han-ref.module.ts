@@ -6,20 +6,17 @@ import { ThoiHanComponent } from './thoi-han.component';
 import { ThoiHanListComponent } from './thoi-han-list/thoi-han-list.component';
 
 @NgModule({
-	imports: [
-		RouterModule,
-		DPSCommonModule,
-	],
-	providers: [
-		ThoiHanService
-	],
-	entryComponents: [
-		ThoiHanComponent,
-	],
-	declarations: [
-		ThoiHanListComponent,
-	],
-	exports: [ThoiHanListComponent]
+    imports: [
+        RouterModule,
+        DPSCommonModule,
+    ],
+    providers: [
+        ThoiHanService
+    ],
+    declarations: [
+        ThoiHanListComponent,
+    ],
+    exports: [ThoiHanListComponent]
 })
 
 export class ThoiHanRefModule { }

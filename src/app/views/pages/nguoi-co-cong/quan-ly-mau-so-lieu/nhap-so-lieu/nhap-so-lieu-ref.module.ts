@@ -5,20 +5,17 @@ import { MauSoLieuService } from '../mau-so-lieu/Services/mau-so-lieu.service';
 import { NhapSoLieuEditDialogComponent } from './nhap-so-lieu-edit/nhap-so-lieu-edit-dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-	],
-	providers: [
-		NhapSoLieuService,
-		MauSoLieuService
-	],
-	entryComponents: [
-		NhapSoLieuEditDialogComponent,
-	],
-	declarations: [
-		NhapSoLieuEditDialogComponent,
-	],
-	exports: [NhapSoLieuEditDialogComponent]
+    imports: [
+        DPSCommonModule,
+    ],
+    providers: [
+        NhapSoLieuService,
+        MauSoLieuService
+    ],
+    declarations: [
+        NhapSoLieuEditDialogComponent,
+    ],
+    exports: [NhapSoLieuEditDialogComponent]
 })
 
 

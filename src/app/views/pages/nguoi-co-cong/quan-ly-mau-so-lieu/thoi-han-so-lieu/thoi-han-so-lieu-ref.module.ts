@@ -7,21 +7,18 @@ import { ThoiHanSoLieuListComponent } from './thoi-han-so-lieu-list/thoi-han-so-
 import { NhapSoLieuRefModule } from '../nhap-so-lieu/nhap-so-lieu-ref.module';
 
 @NgModule({
-	imports: [
-		RouterModule,
-		DPSCommonModule,
-		NhapSoLieuRefModule
-	],
-	providers: [
-		ThoiHanSoLieuService
-	],
-	entryComponents: [
-		ThoiHanSoLieuComponent,
-	],
-	declarations: [
-		ThoiHanSoLieuListComponent,
-	],
-	exports: [ThoiHanSoLieuListComponent]
+    imports: [
+        RouterModule,
+        DPSCommonModule,
+        NhapSoLieuRefModule
+    ],
+    providers: [
+        ThoiHanSoLieuService
+    ],
+    declarations: [
+        ThoiHanSoLieuListComponent,
+    ],
+    exports: [ThoiHanSoLieuListComponent]
 })
 
 

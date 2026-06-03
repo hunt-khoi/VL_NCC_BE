@@ -5,23 +5,19 @@ import { nhomletetListComponent } from './nhomletet-list/nhomletet-list.componen
 import { nhomletetEditDialogComponent } from './nhomletet-edit/nhomletet-edit.dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule
-	],
-	providers: [
-		nhomletetService
-	],
-	entryComponents: [
-		nhomletetListComponent,
-		nhomletetEditDialogComponent
-	],
-	declarations: [
-		nhomletetListComponent,
-		nhomletetEditDialogComponent
-	],
-	exports:[
-		nhomletetListComponent,
-	]
+    imports: [
+        DPSCommonModule
+    ],
+    providers: [
+        nhomletetService
+    ],
+    declarations: [
+        nhomletetListComponent,
+        nhomletetEditDialogComponent
+    ],
+    exports: [
+        nhomletetListComponent,
+    ]
 })
 
 export class nhomletetRefModule { }

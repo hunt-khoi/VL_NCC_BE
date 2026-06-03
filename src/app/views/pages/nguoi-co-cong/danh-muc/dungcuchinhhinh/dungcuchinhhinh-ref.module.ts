@@ -5,23 +5,19 @@ import { dungcuchinhhinhListComponent } from './dungcuchinhhinh-list/dungcuchinh
 import { dungcuchinhhinhEditDialogComponent } from './dungcuchinhhinh-edit/dungcuchinhhinh-edit.dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule
-	],
-	providers: [
-		dungcuchinhhinhService
-	],
-	entryComponents: [
-		dungcuchinhhinhListComponent,
-		dungcuchinhhinhEditDialogComponent
-	],
-	declarations: [
-		dungcuchinhhinhListComponent,
-		dungcuchinhhinhEditDialogComponent
-	],
-	exports:[
-		dungcuchinhhinhListComponent,
-	]
+    imports: [
+        DPSCommonModule
+    ],
+    providers: [
+        dungcuchinhhinhService
+    ],
+    declarations: [
+        dungcuchinhhinhListComponent,
+        dungcuchinhhinhEditDialogComponent
+    ],
+    exports: [
+        dungcuchinhhinhListComponent,
+    ]
 })
 
 export class dungcuchinhhinhRefModule { }

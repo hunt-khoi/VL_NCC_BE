@@ -24,26 +24,20 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		NguoiDungDPSService
-	],
-	entryComponents: [
-		NguoiDungDPSEditComponent,
-		NguoiDungDPSResetPasswordComponent,
-		NguoiDungDPSImportComponent,
-		NguoiDungVaiTroComponent
-	],
-	declarations: [
-		NguoiDungDPSComponent,
-		NguoiDungDPSListComponent,
-		NguoiDungDPSEditComponent,
-		NguoiDungDPSResetPasswordComponent,
-		NguoiDungDPSImportComponent,
-		NguoiDungVaiTroComponent
-	]
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        NguoiDungDPSService
+    ],
+    declarations: [
+        NguoiDungDPSComponent,
+        NguoiDungDPSListComponent,
+        NguoiDungDPSEditComponent,
+        NguoiDungDPSResetPasswordComponent,
+        NguoiDungDPSImportComponent,
+        NguoiDungVaiTroComponent
+    ]
 })
 
 export class NguoiDungDPSModule { }

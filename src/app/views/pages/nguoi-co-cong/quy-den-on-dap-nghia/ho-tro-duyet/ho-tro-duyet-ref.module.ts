@@ -5,7 +5,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
 import { HoTroDTDuyetService } from './Services/ho-tro-duyet.service';
-import { AngularEditorModule } from '@kolkov/angular-editor';
 import { HoTroRefModule } from '../ho-tro/ho-tro-ref.module';
 import { HoTroSupDialogComponent } from './ho-tro-sup-edit/ho-tro-sup-edit-dialog.component';
 
@@ -13,7 +12,6 @@ import { HoTroSupDialogComponent } from './ho-tro-sup-edit/ho-tro-sup-edit-dialo
 	imports: [
 		RouterModule,
 		DPSCommonModule,
-		AngularEditorModule,
 		HoTroRefModule
 	],
 	providers: [

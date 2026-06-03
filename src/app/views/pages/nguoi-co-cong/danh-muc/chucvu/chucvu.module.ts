@@ -20,22 +20,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-	],
-	providers: [
-		chucvuService
-	],
-	entryComponents: [
-		chucvuListComponent,
-		chucvuEditDialogComponent,
-	],
-	declarations: [
-		chucvuComponent,
-		chucvuListComponent,
-		chucvuEditDialogComponent,
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+    ],
+    providers: [
+        chucvuService
+    ],
+    declarations: [
+        chucvuComponent,
+        chucvuListComponent,
+        chucvuEditDialogComponent,
+    ]
 })
 
 export class chucvuModule { }

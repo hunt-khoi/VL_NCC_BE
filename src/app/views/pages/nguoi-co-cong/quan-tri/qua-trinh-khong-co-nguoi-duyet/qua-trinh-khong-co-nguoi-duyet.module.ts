@@ -29,28 +29,25 @@ const routes: Routes = [
 	}
 ];
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		QuaTrinhKhongCoNguoiDuyetService,
-		HoSoNCCDuyetService,
-		DeXuatService,
-		NhapSoLieuDuyetService,
-		NhapBaoHiemDuyetService,
-		HoSoNhaOService,
-		NienHanService,
-		HoTroService,
-	],
-	entryComponents: [
-		QuaTrinhKhongCoNguoiDuyetEditComponent
-	],
-	declarations: [
-		QuaTrinhKhongCoNguoiDuyetComponent,
-		QuaTrinhKhongCoNguoiDuyetListComponent,
-		QuaTrinhKhongCoNguoiDuyetEditComponent
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        QuaTrinhKhongCoNguoiDuyetService,
+        HoSoNCCDuyetService,
+        DeXuatService,
+        NhapSoLieuDuyetService,
+        NhapBaoHiemDuyetService,
+        HoSoNhaOService,
+        NienHanService,
+        HoTroService,
+    ],
+    declarations: [
+        QuaTrinhKhongCoNguoiDuyetComponent,
+        QuaTrinhKhongCoNguoiDuyetListComponent,
+        QuaTrinhKhongCoNguoiDuyetEditComponent
+    ]
 })
 
 export class QuaTrinhKhongCoNguoiDuyetModule { }

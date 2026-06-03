@@ -7,27 +7,21 @@ import { SoToTrinhEditDialogComponent } from './so-to-trinh-edit/so-to-trinh-edi
 import { dottangquaListComponent } from './dot-tang-qua-list/dot-tang-qua-list.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule
-	],
-	providers: [
-		dottangquaService
-	],
-	entryComponents: [
-		dottangquaListComponent,
-		dottangquannewEditDialogComponent,
-		dottangquaEditDialogComponent,
-		SoToTrinhEditDialogComponent
-	],
-	declarations: [
-		dottangquaListComponent,
-		dottangquannewEditDialogComponent,
-		dottangquaEditDialogComponent,
-		SoToTrinhEditDialogComponent
-	],
-	exports:[
-		dottangquaListComponent,
-	]
+    imports: [
+        DPSCommonModule
+    ],
+    providers: [
+        dottangquaService
+    ],
+    declarations: [
+        dottangquaListComponent,
+        dottangquannewEditDialogComponent,
+        dottangquaEditDialogComponent,
+        SoToTrinhEditDialogComponent
+    ],
+    exports: [
+        dottangquaListComponent,
+    ]
 })
 
 export class dottangquaRefModule { }

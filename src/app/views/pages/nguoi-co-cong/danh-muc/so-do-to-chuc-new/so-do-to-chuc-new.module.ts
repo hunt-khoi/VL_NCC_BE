@@ -31,23 +31,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),		
-		DndModule,
-		OrgChartRefNewModule,
-		DPSCommonModule
-	],
-	providers: [
-		OrgChartService,
-	],
-	entryComponents: [
-		SodotochucComponent,
-		sodotochuceditComponent,
-		DrawListComponent
-	],
-	declarations: [
-		SodotochucComponent,
-	],
+    imports: [
+        RouterModule.forChild(routes),
+        DndModule,
+        OrgChartRefNewModule,
+        DPSCommonModule
+    ],
+    providers: [
+        OrgChartService,
+    ],
+    declarations: [
+        SodotochucComponent,
+    ]
 })
 
 export class SoDoToChucModule { }

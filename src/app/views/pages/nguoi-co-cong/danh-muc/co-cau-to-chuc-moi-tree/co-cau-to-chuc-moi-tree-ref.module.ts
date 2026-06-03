@@ -7,28 +7,23 @@ import { cocautochucmoitreeComponent } from './co-cau-to-chuc-moi-tree-list/co-c
 import { CoCauToChucEditComponent } from './co-cau-to-chuc-moi-tree-edit/co-cau-to-chuc-moi-tree-edit.component';
 
 @NgModule({
-	imports: [
-		RouterModule,
-		DPSCommonModule
-	],
-	providers: [
-		cocautochucMoiTreeService,
-	],
-	entryComponents: [
-		cocautochucmoitreeComponent,
-		CoCauToChucEditComponent,
-		CoCauMapDialogComponent
-	],
-	declarations: [
-		cocautochucmoitreeComponent,
-		CoCauToChucEditComponent,
-		CoCauMapDialogComponent
-	],
-	exports: [
-		cocautochucmoitreeComponent,
-		CoCauToChucEditComponent,
-		CoCauMapDialogComponent
-	]
+    imports: [
+        RouterModule,
+        DPSCommonModule
+    ],
+    providers: [
+        cocautochucMoiTreeService,
+    ],
+    declarations: [
+        cocautochucmoitreeComponent,
+        CoCauToChucEditComponent,
+        CoCauMapDialogComponent
+    ],
+    exports: [
+        cocautochucmoitreeComponent,
+        CoCauToChucEditComponent,
+        CoCauMapDialogComponent
+    ]
 })
 
 export class cocautochucmoiTreeRefModule { }

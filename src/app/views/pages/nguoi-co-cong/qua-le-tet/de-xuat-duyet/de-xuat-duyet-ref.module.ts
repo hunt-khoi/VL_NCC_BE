@@ -7,23 +7,19 @@ import { DeXuatDuyetDialogComponent } from './de-xuat-duyet/de-xuat-duyet.dialog
 import { DeXuatRefModule } from '../de-xuat/de-xuat-ref.module';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-		DeXuatRefModule
-	],
-	providers: [
-		DeXuatDuyetService
-	],
-	entryComponents: [
-		DeXuatDuyetListComponent,
-		DeXuatDuyetDialogComponent,
-	],
-	declarations: [
-		DeXuatDuyetListComponent,
-		DeXuatDuyetDialogComponent,
-	],
-	exports: [
-		DeXuatDuyetListComponent,
-	]
+    imports: [
+        DPSCommonModule,
+        DeXuatRefModule
+    ],
+    providers: [
+        DeXuatDuyetService
+    ],
+    declarations: [
+        DeXuatDuyetListComponent,
+        DeXuatDuyetDialogComponent,
+    ],
+    exports: [
+        DeXuatDuyetListComponent,
+    ]
 })
 export class DeXuatDuyetRefModule { }

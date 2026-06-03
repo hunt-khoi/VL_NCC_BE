@@ -24,21 +24,17 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		CauHinhSMSService
-	],
-	entryComponents: [
-		CauHinhSMSEditComponent,
-		CauHinhSMSPopupDVCComponent
-	],
-	declarations: [
-		CauHinhSMSComponent,
-		CauHinhSMSListComponent,
-		CauHinhSMSEditComponent,
-		CauHinhSMSPopupDVCComponent
-	]
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        CauHinhSMSService
+    ],
+    declarations: [
+        CauHinhSMSComponent,
+        CauHinhSMSListComponent,
+        CauHinhSMSEditComponent,
+        CauHinhSMSPopupDVCComponent
+    ]
 })
 export class CauHinhSMSModule {}

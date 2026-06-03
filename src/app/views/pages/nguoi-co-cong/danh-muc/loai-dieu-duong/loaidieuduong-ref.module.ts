@@ -5,22 +5,19 @@ import { LoaiDieuDuongListComponent } from './loai-dieu-duong-list/loaidieuduong
 import { LoaiDieuDuongEditDialogComponent } from './loai-dieu-duong-edit/loaidieuduong-edit.dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-	],
-	providers: [
-		loaiDieuDuongServices
-	],
-	entryComponents: [
-		LoaiDieuDuongListComponent
-	],
-	declarations: [
-		LoaiDieuDuongListComponent,
-		LoaiDieuDuongEditDialogComponent 
-	],
-	exports:[
-		LoaiDieuDuongListComponent
-	]
+    imports: [
+        DPSCommonModule,
+    ],
+    providers: [
+        loaiDieuDuongServices
+    ],
+    declarations: [
+        LoaiDieuDuongListComponent,
+        LoaiDieuDuongEditDialogComponent
+    ],
+    exports: [
+        LoaiDieuDuongListComponent
+    ]
 })
 
 export class loaiDieuDuongRefModule { }

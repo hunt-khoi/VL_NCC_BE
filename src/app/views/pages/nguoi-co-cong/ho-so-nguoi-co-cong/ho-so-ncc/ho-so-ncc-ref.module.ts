@@ -34,87 +34,43 @@ import { FormCatTC_MTPComponent } from './ho-so-ncc-edit-page/form-cat-tro-cap-m
 import { FormCatTuatTTComponent } from './ho-so-ncc-edit-page/form-cat-tuat-tutran/form-cat-tuat-tutran.component';
 
 @NgModule({
-	imports: [
-		RouterModule,
-		DPSCommonModule
-	],
-	providers: [
-		HoSoNCCService,
-	],
-	entryComponents: [
-		HoSoNCCEditDialogComponent,
-		FormBaseComponent,
-
-		FormCatTCComponent,
-		FormCatTC_2LietSyComponent,
-		FormCatTC_MTPComponent,
-		FormCatTC_MTP_TuatComponent,
-		FormCatTuatComponent,
-		FormCatTuatTTComponent,
-
-		FormMTPComponent,
-
-		FormTangMoiComponent,
-		FormTangMoiBMComponent,
-		FormTangTuatComponent,
-		FormTangTuatLSComponent,
-
-		FormDC_LSComponent,
-		FormDiChuyenComponent,
-		FormDinhChinhComponent,
-		FormDinhChinhLSComponent,
-		FormDinhChiComponent,
-		FormDinhChiLSComponent,
-
-		FormTroCap1LanComponent,
-		FormTCThangComponent,
-		FormTCThang_TuDayComponent,
-		FormTDCComponent,
-		FormTDC_LSComponent,
-		FormThoCungComponent,
-
-		FormGiayBTComponent,
-		FormGiayGTComponent,
-
-		FormTongHopComponent
-	],
-	declarations: [
-		HoSoNCCEditDialogComponent,
-		FormBaseComponent,
-
-		FormCatTCComponent,
-		FormCatTC_2LietSyComponent,
-		FormCatTC_MTPComponent,
-		FormCatTC_MTP_TuatComponent,
-		FormCatTuatComponent,
-		FormCatTuatTTComponent,
-
-		FormMTPComponent,
-
-		FormTangMoiComponent,
-		FormTangMoiBMComponent,
-		FormTangTuatComponent,
-		FormTangTuatLSComponent,
-
-		FormTroCap1LanComponent,
-		FormTCThangComponent,
-		FormTCThang_TuDayComponent,
-		FormTDCComponent,
-		FormTDC_LSComponent,
-		FormThoCungComponent,
-
-		FormDC_LSComponent,
-		FormDiChuyenComponent,
-		FormDinhChinhComponent,
-		FormDinhChinhLSComponent,
-		FormDinhChiComponent,
-		FormDinhChiLSComponent,
-
-		FormGiayBTComponent,
-		FormGiayGTComponent,
-
-		FormTongHopComponent
-	],
+    imports: [
+        RouterModule,
+        DPSCommonModule
+    ],
+    providers: [
+        HoSoNCCService,
+    ],
+    declarations: [
+        HoSoNCCEditDialogComponent,
+        FormBaseComponent,
+        FormCatTCComponent,
+        FormCatTC_2LietSyComponent,
+        FormCatTC_MTPComponent,
+        FormCatTC_MTP_TuatComponent,
+        FormCatTuatComponent,
+        FormCatTuatTTComponent,
+        FormMTPComponent,
+        FormTangMoiComponent,
+        FormTangMoiBMComponent,
+        FormTangTuatComponent,
+        FormTangTuatLSComponent,
+        FormTroCap1LanComponent,
+        FormTCThangComponent,
+        FormTCThang_TuDayComponent,
+        FormTDCComponent,
+        FormTDC_LSComponent,
+        FormThoCungComponent,
+        FormDC_LSComponent,
+        FormDiChuyenComponent,
+        FormDinhChinhComponent,
+        FormDinhChinhLSComponent,
+        FormDinhChiComponent,
+        FormDinhChiLSComponent,
+        FormGiayBTComponent,
+        FormGiayGTComponent,
+        FormTongHopComponent
+    ]
 })
 
 export class HoSoNCCRefModule { }

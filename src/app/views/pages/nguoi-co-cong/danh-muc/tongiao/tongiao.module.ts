@@ -20,21 +20,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-	],
-	providers: [
-		tongiaoService
-	],
-	entryComponents: [
-		tongiaoEditDialogComponent
-	],
-	declarations: [
-		tongiaoComponent,
-		tongiaoListComponent,
-		tongiaoEditDialogComponent
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+    ],
+    providers: [
+        tongiaoService
+    ],
+    declarations: [
+        tongiaoComponent,
+        tongiaoListComponent,
+        tongiaoEditDialogComponent
+    ]
 })
 
 export class tongiaoModule { }

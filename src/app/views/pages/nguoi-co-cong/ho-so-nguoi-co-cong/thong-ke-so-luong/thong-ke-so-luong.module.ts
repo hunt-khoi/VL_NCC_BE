@@ -20,21 +20,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-	],
-	providers: [
-		ThongKeSoLuongService,
-	],
-	entryComponents: [
-		ChiTietThongKeComponent,
-	],
-	declarations: [
-		ThongKeSoLuongComponent,
-		ThongKeSoLuongViewComponent,
-		ChiTietThongKeComponent
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+    ],
+    providers: [
+        ThongKeSoLuongService,
+    ],
+    declarations: [
+        ThongKeSoLuongComponent,
+        ThongKeSoLuongViewComponent,
+        ChiTietThongKeComponent
+    ]
 })
 
 export class ThongKeSoLuongModule { }

@@ -7,27 +7,23 @@ import { NhapSoLieuDuyetDialogComponent } from './nhap-so-lieu-duyet/nhap-so-lie
 import { NhapSoLieuDuyetListComponent } from './nhap-so-lieu-duyet-list/nhap-so-lieu-duyet-list.component';
 
 @NgModule({
-	imports: [
-		RouterModule,
-		DPSCommonModule,
-	],
-	providers: [
-		NhapSoLieuDuyetService,
-	],
-	entryComponents: [
-		NhapSoLieuDuyetComponent,
-		NhapSoLieuDuyetDialogComponent,
-	],
-	declarations: [
-		NhapSoLieuDuyetComponent,
-		NhapSoLieuDuyetListComponent,
-		NhapSoLieuDuyetDialogComponent,
-	],
-	exports: [
-		NhapSoLieuDuyetListComponent,
-		NhapSoLieuDuyetComponent,
-		NhapSoLieuDuyetDialogComponent,
-	]
+    imports: [
+        RouterModule,
+        DPSCommonModule,
+    ],
+    providers: [
+        NhapSoLieuDuyetService,
+    ],
+    declarations: [
+        NhapSoLieuDuyetComponent,
+        NhapSoLieuDuyetListComponent,
+        NhapSoLieuDuyetDialogComponent,
+    ],
+    exports: [
+        NhapSoLieuDuyetListComponent,
+        NhapSoLieuDuyetComponent,
+        NhapSoLieuDuyetDialogComponent,
+    ]
 })
 
 export class NhapSoLieuDuyetRefModule { }

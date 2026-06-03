@@ -23,19 +23,16 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		ConfigService
-	],
-	entryComponents: [
-		ConfigEditComponent
-	],
-	declarations: [
-		ConfigComponent,
-		ConfigListComponent,
-		ConfigEditComponent
-	]
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        ConfigService
+    ],
+    declarations: [
+        ConfigComponent,
+        ConfigListComponent,
+        ConfigEditComponent
+    ]
 })
 export class ConfigModule {}

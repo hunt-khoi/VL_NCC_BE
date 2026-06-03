@@ -11,8 +11,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgbProgressbarModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { LoadingBarModule } from '@ngx-loading-bar/core';
-// Ngx DatePicker
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { InlineSVGModule } from 'ng-inline-svg';
 // Core Module
@@ -90,7 +88,6 @@ import { SignalRService } from '../pages/nguoi-co-cong/services/signalR.service'
 		MatTooltipModule,
 		TranslateModule.forChild(),
 		LoadingBarModule,
-		NgxDaterangepickerMd,
 		InlineSVGModule,
 
 		// ng-bootstrap modules

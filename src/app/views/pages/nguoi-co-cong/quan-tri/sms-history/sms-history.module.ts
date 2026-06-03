@@ -23,19 +23,16 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		SMSHistoryService
-	],
-	entryComponents: [
-		SMSHistoryEditComponent
-	],
-	declarations: [
-		SMSHistoryComponent,
-		SMSHistoryListComponent,
-		SMSHistoryEditComponent
-	]
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        SMSHistoryService
+    ],
+    declarations: [
+        SMSHistoryComponent,
+        SMSHistoryListComponent,
+        SMSHistoryEditComponent
+    ]
 })
 export class SMSHistoryModule {}

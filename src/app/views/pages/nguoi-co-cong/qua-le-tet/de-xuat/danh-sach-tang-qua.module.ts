@@ -16,28 +16,22 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		DeXuatRefModule,
-		DoiTuongNhanQuaRefModule,
-	],
-	providers: [
-		PhatQuaService,
-	],
-	entryComponents: [
-		DeXuatImportDialogComponent,
-		DeXuatDuyetDialogComponent,
-		dottangquaImportDialogComponent,
-		TangQuaDialogComponent,
-	],
-	declarations: [
-		DanhSachTangQuaComponent,
-		DeXuatImportDialogComponent,
-		DeXuatDuyetDialogComponent,
-		dottangquaImportDialogComponent,
-		TangQuaDialogComponent,
-	],
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        DeXuatRefModule,
+        DoiTuongNhanQuaRefModule,
+    ],
+    providers: [
+        PhatQuaService,
+    ],
+    declarations: [
+        DanhSachTangQuaComponent,
+        DeXuatImportDialogComponent,
+        DeXuatDuyetDialogComponent,
+        dottangquaImportDialogComponent,
+        TangQuaDialogComponent,
+    ]
 })
 
 export class DanhSachTangQuaModule { }

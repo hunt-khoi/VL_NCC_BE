@@ -6,20 +6,17 @@ import { NguonKinhPhiListComponent } from './nguon-kinh-phi-list/nguon-kinh-phi-
 import { NguonKinhPhiEditDialogComponent } from './nguon-kinh-phi-edit/nguon-kinh-phi-edit-dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-	],
-	providers: [
-		NguonKinhPhiService,
-	],
-	entryComponents: [
-		NguonKinhPhiComponent,
-	],
-	declarations: [
-		NguonKinhPhiListComponent,
-		NguonKinhPhiEditDialogComponent
-	],
-	exports: [NguonKinhPhiListComponent]
+    imports: [
+        DPSCommonModule,
+    ],
+    providers: [
+        NguonKinhPhiService,
+    ],
+    declarations: [
+        NguonKinhPhiListComponent,
+        NguonKinhPhiEditDialogComponent
+    ],
+    exports: [NguonKinhPhiListComponent]
 })
 
 export class NguonKinhPhiRefModule { }

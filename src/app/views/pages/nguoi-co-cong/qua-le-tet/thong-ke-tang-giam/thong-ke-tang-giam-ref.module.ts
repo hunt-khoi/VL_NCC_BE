@@ -9,34 +9,28 @@ import { thongkeGiamQuaNamComponent } from './tk-giam-qua-cac-nam/tk-giam-qua-ca
 import { thongkeGiamQuaNamTheoNhomComponent } from './tk-giam-qua-cac-nam-theo-nhom/tk-giam-qua-cac-nam-theo-nhom.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule
-	],
-	providers: [
-		dottangquaService
-	],
-	entryComponents: [
-		thongkeQuaCacNamComponent,
-		thongkeQuaCacNamTheoNhomComponent,
-		thongkeSLNhanQuaNamComponent,
-		thongkeSLNhanQuaNamTheoNhomComponent
-	],
-	declarations: [
-		thongkeQuaCacNamComponent,
-		thongkeQuaCacNamTheoNhomComponent,
-		thongkeSLNhanQuaNamComponent,
-		thongkeSLNhanQuaNamTheoNhomComponent,
-		thongkeGiamQuaNamComponent,
-		thongkeGiamQuaNamTheoNhomComponent
-	],
-	exports:[
-		thongkeQuaCacNamComponent,
-		thongkeQuaCacNamTheoNhomComponent,
-		thongkeSLNhanQuaNamComponent,
-		thongkeSLNhanQuaNamTheoNhomComponent,
-		thongkeGiamQuaNamComponent,
-		thongkeGiamQuaNamTheoNhomComponent
-	]
+    imports: [
+        DPSCommonModule
+    ],
+    providers: [
+        dottangquaService
+    ],
+    declarations: [
+        thongkeQuaCacNamComponent,
+        thongkeQuaCacNamTheoNhomComponent,
+        thongkeSLNhanQuaNamComponent,
+        thongkeSLNhanQuaNamTheoNhomComponent,
+        thongkeGiamQuaNamComponent,
+        thongkeGiamQuaNamTheoNhomComponent
+    ],
+    exports: [
+        thongkeQuaCacNamComponent,
+        thongkeQuaCacNamTheoNhomComponent,
+        thongkeSLNhanQuaNamComponent,
+        thongkeSLNhanQuaNamTheoNhomComponent,
+        thongkeGiamQuaNamComponent,
+        thongkeGiamQuaNamTheoNhomComponent
+    ]
 })
 
 export class thongkeTangGiamRefModule { }

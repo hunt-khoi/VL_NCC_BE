@@ -28,27 +28,24 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		CommonModule,
-		HttpClientModule,
-		PartialsModule,
-		RouterModule.forChild(routes),
-		FormsModule,
-		ReactiveFormsModule,
-		DPSCommonModule
+        CommonModule,
+        HttpClientModule,
+        PartialsModule,
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        DPSCommonModule
     ],
-	providers: [
-		donvihanhchinhService,
-		CommonService
-    ],
-	entryComponents: [
-		KhomApEditDialogComponent
+    providers: [
+        donvihanhchinhService,
+        CommonService
     ],
     declarations: [
         donvihanhchinhComponent,
         provincesListComponent,
-		wardListComponent,
-		KhomApListComponent,
-		KhomApEditDialogComponent
+        wardListComponent,
+        KhomApListComponent,
+        KhomApEditDialogComponent
     ]
 })
 

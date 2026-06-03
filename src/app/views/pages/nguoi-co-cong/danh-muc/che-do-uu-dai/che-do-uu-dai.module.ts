@@ -20,22 +20,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-	],
-	providers: [
-		chedouudaiService
-	],
-	entryComponents: [
-		chedouudaiListComponent,
-		chedouudaiEditDialogComponent,
-	],
-	declarations: [
-		chedouudaiComponent,
-		chedouudaiListComponent,
-		chedouudaiEditDialogComponent,
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+    ],
+    providers: [
+        chedouudaiService
+    ],
+    declarations: [
+        chedouudaiComponent,
+        chedouudaiListComponent,
+        chedouudaiEditDialogComponent,
+    ]
 })
 
 export class CheDoUuDaiModule { }

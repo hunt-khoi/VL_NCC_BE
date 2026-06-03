@@ -23,23 +23,19 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-	],
-	providers: [
-		DM_DonViService
-	],
-	entryComponents: [
-		DM_DonViEditComponent,
-		DM_DonViImportComponent
-	],
-	declarations: [
-		DM_DonViComponent,
-		DM_DonViListComponent,
-		DM_DonViEditComponent,
-		DM_DonViImportComponent,
-		DmNguoiDungDonViListComponent
-	]
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+    ],
+    providers: [
+        DM_DonViService
+    ],
+    declarations: [
+        DM_DonViComponent,
+        DM_DonViListComponent,
+        DM_DonViEditComponent,
+        DM_DonViImportComponent,
+        DmNguoiDungDonViListComponent
+    ]
 })
 
 export class DM_DonViModule {}

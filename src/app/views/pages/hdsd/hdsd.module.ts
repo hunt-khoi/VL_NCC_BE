@@ -20,21 +20,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		HDSDService
-	],
-	entryComponents: [
-		HDSDEditDialogComponent
-	],
-	declarations: [
-		HDSDComponent,
-		HDSDListComponent,
-		HDSDEditDialogComponent
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        HDSDService
+    ],
+    declarations: [
+        HDSDComponent,
+        HDSDListComponent,
+        HDSDEditDialogComponent
+    ]
 })
 
 export class HDSDModule { }

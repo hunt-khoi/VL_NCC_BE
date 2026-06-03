@@ -6,20 +6,17 @@ import { QuanHeGiaDinhListComponent } from './quan-he-gia-dinh-list/quan-he-gia-
 import { QuanHeGiaDinhEditDialogComponent } from './quan-he-gia-dinh-edit/quan-he-gia-dinh-edit-dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-	],
-	providers: [
-		QuanHeGiaDinhService,
-	],
-	entryComponents: [
-		QuanHeGiaDinhComponent,
-	],
-	declarations: [
-		QuanHeGiaDinhListComponent,
-		QuanHeGiaDinhEditDialogComponent
-	],
-	exports: [QuanHeGiaDinhListComponent]
+    imports: [
+        DPSCommonModule,
+    ],
+    providers: [
+        QuanHeGiaDinhService,
+    ],
+    declarations: [
+        QuanHeGiaDinhListComponent,
+        QuanHeGiaDinhEditDialogComponent
+    ],
+    exports: [QuanHeGiaDinhListComponent]
 })
 
 export class QuanHeGiaDinhRefModule { }

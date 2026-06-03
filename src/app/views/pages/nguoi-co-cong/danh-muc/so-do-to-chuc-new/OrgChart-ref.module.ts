@@ -9,28 +9,25 @@ import { RouterModule } from '@angular/router';
 import { DndModule } from 'ngx-drag-drop';
 
 @NgModule({
-	declarations: [
-		SodotochucListComponent,
-		sodotochuceditComponent,
-		DrawListComponent
-	],
-	imports: [
-		RouterModule,
-		DPSCommonModule,
-		DndModule
-	],
-	entryComponents: [
-		SodotochucListComponent
-	],
-	providers: [
-		[
-			OrgChartService,
-			chucvuService,
-		],
-	],
-	exports:[
-		SodotochucListComponent
-	]
+    declarations: [
+        SodotochucListComponent,
+        sodotochuceditComponent,
+        DrawListComponent
+    ],
+    imports: [
+        RouterModule,
+        DPSCommonModule,
+        DndModule
+    ],
+    providers: [
+        [
+            OrgChartService,
+            chucvuService,
+        ],
+    ],
+    exports: [
+        SodotochucListComponent
+    ]
 })
 
 export class OrgChartRefNewModule { }

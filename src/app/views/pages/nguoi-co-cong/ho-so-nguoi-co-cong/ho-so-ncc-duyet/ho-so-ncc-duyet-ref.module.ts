@@ -10,27 +10,21 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
 import { HuongDanListComponent } from './huong-dan-list/huong-dan-list.component';
 
 @NgModule({
-	imports: [
-		RouterModule,
-		DPSCommonModule,
-		AngularEditorModule
-	],
-	providers: [
-		HoSoNCCDuyetService,
-	],
-	entryComponents: [
-		HoSoNCCDuyetComponent,
-		HoSoNCCDuyetDialogComponent,
-		HuongDanHuongThienDialogComponent,
-		HuongDanListComponent
-	],
-	declarations: [
-		HoSoNCCDuyetListComponent,
-		HoSoNCCDuyetDialogComponent,
-		HuongDanHuongThienDialogComponent,
-		HuongDanListComponent
-	],
-	exports: [HoSoNCCDuyetListComponent]
+    imports: [
+        RouterModule,
+        DPSCommonModule,
+        AngularEditorModule
+    ],
+    providers: [
+        HoSoNCCDuyetService,
+    ],
+    declarations: [
+        HoSoNCCDuyetListComponent,
+        HoSoNCCDuyetDialogComponent,
+        HuongDanHuongThienDialogComponent,
+        HuongDanListComponent
+    ],
+    exports: [HoSoNCCDuyetListComponent]
 })
 
 

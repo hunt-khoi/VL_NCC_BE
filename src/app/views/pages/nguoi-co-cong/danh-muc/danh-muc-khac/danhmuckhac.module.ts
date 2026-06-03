@@ -40,40 +40,32 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		CommonModule,
-		HttpClientModule,
-		PartialsModule,
-		RouterModule.forChild(routes),
-		FormsModule,
-		ReactiveFormsModule,
+        CommonModule,
+        HttpClientModule,
+        PartialsModule,
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
         DPSCommonModule,
     ],
-	providers: [
+    providers: [
         DanhMucKhacService,
-		HoSoNCCService,
-		LoaiQuyetDinhService,
+        HoSoNCCService,
+        LoaiQuyetDinhService,
         NoiDungChiService
-    ],
-	entryComponents: [
-		DanhmuckhacDetailComponent,
-        TroCapDetailComponent,
-		TroCapImportComponent,
-		LoaiQuyetDinhDetailComponent,
-        NoiDungChiDetailComponent
     ],
     declarations: [
         DanhMucKhacComponent,
         DanhMucKhacListComponent,
         DanhmuckhacDetailComponent,
         DanhMucLoaiTroCapComponent,
-		TroCapDetailComponent,
-		TroCapImportComponent,
-		LoaiQuyetDinhListComponent,
-		LoaiQuyetDinhDetailComponent,
+        TroCapDetailComponent,
+        TroCapImportComponent,
+        LoaiQuyetDinhListComponent,
+        LoaiQuyetDinhDetailComponent,
         NoiDungChiListComponent,
         NoiDungChiDetailComponent
     ],
-	exports: [
-    ]
+    exports: []
 })
 export class DanhMucKhacModule { }

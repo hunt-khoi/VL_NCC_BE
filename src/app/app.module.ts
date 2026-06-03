@@ -51,7 +51,7 @@ import { PermissionUrl } from './core/auth/_services/permissionurl';
 import { UserProfileService } from './core/auth/_services/user-profile.service';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
 
-// tslint:disable-next-line:class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 	wheelSpeed: 0.5,
 	swipeEasing: true,

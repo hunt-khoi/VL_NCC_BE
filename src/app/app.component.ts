@@ -17,7 +17,7 @@ FormControlName.prototype.ngOnChanges = function () {
 };
 
 @Component({
-	// tslint:disable-next-line:component-selector
+	// eslint-disable-next-line @angular-eslint/component-selector
 	selector: 'body[kt-root]',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.scss'],

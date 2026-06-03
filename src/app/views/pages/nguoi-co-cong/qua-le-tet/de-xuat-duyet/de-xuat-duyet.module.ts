@@ -26,22 +26,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		DeXuatDuyetRefModule,
-	],
-	providers: [
-		DeXuatDuyetService
-	],
-	entryComponents: [
-		DeXuatTongHopDialogComponent
-	],
-	declarations: [
-		DeXuatDuyetComponent,
-		DuyetDeXuatPageComponent,
-		DeXuatTongHopDialogComponent
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        DeXuatDuyetRefModule,
+    ],
+    providers: [
+        DeXuatDuyetService
+    ],
+    declarations: [
+        DeXuatDuyetComponent,
+        DuyetDeXuatPageComponent,
+        DeXuatTongHopDialogComponent
+    ]
 })
 
 export class DeXuatDuyetModule { }

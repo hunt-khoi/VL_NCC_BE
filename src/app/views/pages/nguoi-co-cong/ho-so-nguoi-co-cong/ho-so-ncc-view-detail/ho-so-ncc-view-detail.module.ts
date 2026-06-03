@@ -70,44 +70,36 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		QuyetDinhRefModule,
-	],
-	providers: [
-		HoSoNCCService,
-		ThanNhanService,
-		GiayToService,
-		TroCapService, 
-		QuaTrinhHoatDongService,
-		DiChuyenService,
-		DinhChinhThongTinService,
-		PermissionViewHS
-	],
-	entryComponents: [
-		ThanNhanEditDialogComponent,
-		GiayToEditDialogComponent,
-		TroCapEditDialogComponent,
-		QuaTrinhHoatDongEditDialogComponent,
-		DiChuyenEditDialogComponent,
-		DinhchinhthongtinDialogComponent
-	],
-	declarations: [
-		HoSoNccViewDetailComponent,
-		ThanNhanListComponent,
-		ThanNhanEditDialogComponent,
-		GiayToListComponent,
-		GiayToEditDialogComponent,
-		TroCapListComponent,
-		TroCapEditDialogComponent,
-		QuaTrinhHoatDongListComponent,
-		QuaTrinhHoatDongEditDialogComponent,
-		InfoComponent,
-		DiChuyenEditDialogComponent,
-		DinhchinhthongtinDialogComponent,
-		DiChuyenListComponent,
-		DinhChinhThongTinComponent
-	],
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        QuyetDinhRefModule,
+    ],
+    providers: [
+        HoSoNCCService,
+        ThanNhanService,
+        GiayToService,
+        TroCapService,
+        QuaTrinhHoatDongService,
+        DiChuyenService,
+        DinhChinhThongTinService,
+        PermissionViewHS
+    ],
+    declarations: [
+        HoSoNccViewDetailComponent,
+        ThanNhanListComponent,
+        ThanNhanEditDialogComponent,
+        GiayToListComponent,
+        GiayToEditDialogComponent,
+        TroCapListComponent,
+        TroCapEditDialogComponent,
+        QuaTrinhHoatDongListComponent,
+        QuaTrinhHoatDongEditDialogComponent,
+        InfoComponent,
+        DiChuyenEditDialogComponent,
+        DinhchinhthongtinDialogComponent,
+        DiChuyenListComponent,
+        DinhChinhThongTinComponent
+    ]
 })
 export class HoSoNCCViewDetailModule { }

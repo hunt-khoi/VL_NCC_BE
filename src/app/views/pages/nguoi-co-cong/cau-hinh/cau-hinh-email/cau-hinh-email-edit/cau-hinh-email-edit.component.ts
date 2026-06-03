@@ -147,7 +147,7 @@ export class CauHinhEmailEditComponent implements OnInit, OnDestroy {
 			return;
 		}
 		this.disabledBtn = true;
-		// tslint:disable-next-line:prefer-const
+		// eslint-disable-next-line prefer-const
 		let editedCauHinhEmail = this.prepareCauHinhEmails();
 
 		if (this.ItemData.Id > 0) {

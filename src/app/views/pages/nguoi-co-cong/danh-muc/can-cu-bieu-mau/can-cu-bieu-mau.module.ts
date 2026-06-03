@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule, } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-import { AngularEditorModule } from '@kolkov/angular-editor';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 import { PartialsModule } from './../../../../partials/partials.module';
@@ -37,45 +36,35 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		CommonModule,
-		HttpClientModule,
-		PartialsModule,
-		RouterModule.forChild(routes),
-		FormsModule,
-		ReactiveFormsModule,
-		DPSCommonModule,
-		AngularEditorModule,
-		EditorModule
-	],
-	providers: [
-		CanCuService,
-		BieuMauService,
-		BieuMauQuaService,
-		{ provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
-	],
-	entryComponents: [
-		CanCuEditDialogComponent,
-		BieuMauEditDialogComponent,
-		BieuMauQuaEditDialogComponent,
-		KeyWordListComponent,
-		KeyWordListDialogComponent,
-		BieuMauThanhPhanEditDialogComponent,
-		BieuMauThanhPhanListComponent
-	],
-	declarations: [
-		CanCuBieuMauComponent,
-		CanCuListComponent,
-		CanCuEditDialogComponent,
-		BieuMauListComponent,
-		BieuMauEditDialogComponent,
-		BieuMauQuaListComponent,
-		BieuMauQuaEditDialogComponent,
-		KeyWordListComponent,
-		KeyWordListDialogComponent,
-		BieuMauThanhPhanEditDialogComponent,
-		BieuMauThanhPhanListComponent
-	],
+    imports: [
+        CommonModule,
+        HttpClientModule,
+        PartialsModule,
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        DPSCommonModule,
+        EditorModule
+    ],
+    providers: [
+        CanCuService,
+        BieuMauService,
+        BieuMauQuaService,
+        { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
+    ],
+    declarations: [
+        CanCuBieuMauComponent,
+        CanCuListComponent,
+        CanCuEditDialogComponent,
+        BieuMauListComponent,
+        BieuMauEditDialogComponent,
+        BieuMauQuaListComponent,
+        BieuMauQuaEditDialogComponent,
+        KeyWordListComponent,
+        KeyWordListDialogComponent,
+        BieuMauThanhPhanEditDialogComponent,
+        BieuMauThanhPhanListComponent
+    ]
 })
 
 export class CanCuBieuMauModule { }

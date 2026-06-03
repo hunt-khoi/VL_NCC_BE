@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef, HostListener } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';

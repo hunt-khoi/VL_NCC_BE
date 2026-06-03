@@ -7,25 +7,21 @@ import { DeXuatListComponent } from './de-xuat-list/de-xuat-list.component';
 import { DeXuatEditDialogComponent } from './de-xuat-edit/de-xuat-edit.dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-		DoiTuongNhanQuaRefModule
-	],
-	providers: [
-		DeXuatService
-	],
-	entryComponents: [
-		DeXuatEditDialogComponent,
-		SoQuyetDinhComponent
-	],
-	declarations: [
-		DeXuatListComponent,
-		DeXuatEditDialogComponent,
-		SoQuyetDinhComponent
-	],
-	exports: [
-		DeXuatListComponent,
-	],
+    imports: [
+        DPSCommonModule,
+        DoiTuongNhanQuaRefModule
+    ],
+    providers: [
+        DeXuatService
+    ],
+    declarations: [
+        DeXuatListComponent,
+        DeXuatEditDialogComponent,
+        SoQuyetDinhComponent
+    ],
+    exports: [
+        DeXuatListComponent,
+    ]
 })
 
 export class DeXuatRefModule { }

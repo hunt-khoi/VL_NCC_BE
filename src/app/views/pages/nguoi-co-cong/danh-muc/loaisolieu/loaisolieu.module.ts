@@ -20,19 +20,17 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
         loaisolieuRefModule,
-	],
-	providers: [
-		loaisolieuService
-	],
-	entryComponents: [
-	],
-	declarations: [
-		loaisolieuComponent,
-	]
+    ],
+    providers: [
+        loaisolieuService
+    ],
+    declarations: [
+        loaisolieuComponent,
+    ]
 })
 
 export class loaisolieuModule { }

@@ -48,32 +48,29 @@ const routes: Routes = [
 ]
 
 @NgModule({
-	imports: [
-		CoreModule,
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		HoSoNCCRefModule,
-		QuyetDinhRefModule,
-		CommonModule
-	],
-	providers: [
-		CommonService,
-		LayoutUtilsService,
-		{ provide: MAT_DATE_LOCALE, useValue: 'vi' },
-		{ provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-		{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS_EDIT },
-		NotifyService
-	],
-	entryComponents: [
-		ActionNotificationComponent,
-	],
-	declarations: [
-		ProfileComponent,
-		OverviewComponent,
-		ChangePasswordComponent,
-		PersonalInformationComponent,
-		NotifyListComponent
-	]
+    imports: [
+        CoreModule,
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        HoSoNCCRefModule,
+        QuyetDinhRefModule,
+        CommonModule
+    ],
+    providers: [
+        CommonService,
+        LayoutUtilsService,
+        { provide: MAT_DATE_LOCALE, useValue: 'vi' },
+        { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS_EDIT },
+        NotifyService
+    ],
+    declarations: [
+        ProfileComponent,
+        OverviewComponent,
+        ChangePasswordComponent,
+        PersonalInformationComponent,
+        NotifyListComponent
+    ]
 })
 
 export class ProfileModule { }

@@ -14,35 +14,24 @@ import { ListPhienBanDialogComponent } from './list-phien-ban-dialog/list-phien-
 import { SoLuongGiaoDialogComponent } from './so-luong-giao/so-luong-giao-dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-	],
-	providers: [
-		MauSoLieuService,
-	],
-	entryComponents: [
-		MauSoLieuComponent,
-		MauSoLieuEditDialogComponent,
-		MauSoLieuDetailEditDialogComponent,
-		PhiSoLieuEditDialogComponent,
-		SoLieuBoSungEditDialogComponent,
-		MauSoLieuDonViDialogComponent,
-		MauSoLieuGiaoDialogComponent,
-		ListPhienBanDialogComponent,
-		SoLuongGiaoDialogComponent
-	],
-	declarations: [
-		MauSoLieuListComponent,
-		MauSoLieuEditDialogComponent,
-		MauSoLieuDetailEditDialogComponent,
-		PhiSoLieuEditDialogComponent,
-		SoLieuBoSungEditDialogComponent,
-		MauSoLieuDonViDialogComponent,
-		MauSoLieuGiaoDialogComponent,
-		ListPhienBanDialogComponent,
-		SoLuongGiaoDialogComponent
-	],
-	exports: [MauSoLieuListComponent]
+    imports: [
+        DPSCommonModule,
+    ],
+    providers: [
+        MauSoLieuService,
+    ],
+    declarations: [
+        MauSoLieuListComponent,
+        MauSoLieuEditDialogComponent,
+        MauSoLieuDetailEditDialogComponent,
+        PhiSoLieuEditDialogComponent,
+        SoLieuBoSungEditDialogComponent,
+        MauSoLieuDonViDialogComponent,
+        MauSoLieuGiaoDialogComponent,
+        ListPhienBanDialogComponent,
+        SoLuongGiaoDialogComponent
+    ],
+    exports: [MauSoLieuListComponent]
 })
 
 export class MauSoLieuRefModule { }

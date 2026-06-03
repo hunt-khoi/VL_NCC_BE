@@ -4,20 +4,17 @@ import { QuyetDinhService } from './Services/quyet-dinh.service';
 import { QuyetDinhEditDialogComponent } from './quyet-dinh-edit/quyet-dinh-edit-dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule
-	],
-	providers: [
-		QuyetDinhService
-	],
-	entryComponents: [
-		QuyetDinhEditDialogComponent
-	],
-	declarations: [
-		QuyetDinhEditDialogComponent
-	],
-	exports: [
-		QuyetDinhEditDialogComponent
-	]
+    imports: [
+        DPSCommonModule
+    ],
+    providers: [
+        QuyetDinhService
+    ],
+    declarations: [
+        QuyetDinhEditDialogComponent
+    ],
+    exports: [
+        QuyetDinhEditDialogComponent
+    ]
 })
 export class QuyetDinhRefModule { }

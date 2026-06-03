@@ -5,22 +5,19 @@ import { LoaiGiayToListComponent } from './loaigiayto-list/loaigiayto-list.compo
 import { LoaiGiayToEditDialogComponent } from './loaigiayto-edit/loaigiayto-edit.dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-	],
-	providers: [
-		loaiGiayToServices
-	],
-	entryComponents: [
-		LoaiGiayToListComponent
-	],
-	declarations: [
-		LoaiGiayToListComponent,
-		LoaiGiayToEditDialogComponent,
-	],
-	exports:[
-		LoaiGiayToListComponent
-	]
+    imports: [
+        DPSCommonModule,
+    ],
+    providers: [
+        loaiGiayToServices
+    ],
+    declarations: [
+        LoaiGiayToListComponent,
+        LoaiGiayToEditDialogComponent,
+    ],
+    exports: [
+        LoaiGiayToListComponent
+    ]
 })
 
 export class loaiGiayToRefModule { }

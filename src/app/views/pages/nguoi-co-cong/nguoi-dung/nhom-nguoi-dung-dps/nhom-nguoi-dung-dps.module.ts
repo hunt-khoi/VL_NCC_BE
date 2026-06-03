@@ -23,23 +23,19 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		CdkTreeModule
-	],
-	providers: [
-		NhomNguoiDungDPSService
-	],
-	entryComponents: [
-		NhomNguoiDungDPSEditComponent,
-		PhanQuyenComponent
-	],
-	declarations: [
-		NhomNguoiDungDPSComponent,
-		NhomNguoiDungDPSListComponent,
-		NhomNguoiDungDPSEditComponent,
-		PhanQuyenComponent
-	]
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        CdkTreeModule
+    ],
+    providers: [
+        NhomNguoiDungDPSService
+    ],
+    declarations: [
+        NhomNguoiDungDPSComponent,
+        NhomNguoiDungDPSListComponent,
+        NhomNguoiDungDPSEditComponent,
+        PhanQuyenComponent
+    ]
 })
 
 export class NhomNguoiDungDPSModule {}

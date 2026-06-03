@@ -38,70 +38,65 @@ import { CanvasDemoDialogComponent } from './canvas-demo-dialog.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
-	imports: [
-		MatDialogModule,
-		CommonModule,
-		HttpClientModule,
-		PartialsModule,
-		NgxPermissionsModule.forChild(),
-		FormsModule,
-		ReactiveFormsModule,
-		TranslateModule.forChild(),
-		MatButtonModule,
-		MatMenuModule,
-		MatSelectModule,
-		MatInputModule,
-		MatTableModule,
-		MatAutocompleteModule,
-		MatRadioModule,
-		MatIconModule,
-		MatNativeDateModule,
-		MatProgressBarModule,
-		MatDatepickerModule,
-		MatCardModule,
-		MatPaginatorModule,
-		MatSortModule,
-		MatCheckboxModule,
-		MatProgressSpinnerModule,
-		MatSnackBarModule,
-		MatTabsModule,
-		MatTooltipModule,
-		NgbProgressbarModule,
-		DragDropModule
-	],
-	providers: [
-		InterceptService,
-		{
-			provide: HTTP_INTERCEPTORS,
-			useClass: InterceptService,
-			multi: true
-		},
-		{
-			provide: MAT_DIALOG_DEFAULT_OPTIONS,
-			useValue: {
-				hasBackdrop: true,
-				panelClass: 'kt-mat-dialog-container__wrapper',
-				height: 'auto',
-				width: '900px'
-			}
-		},
-		CanvasDemoService,
-		TypesUtilsService,
-		LayoutUtilsService,
-		HttpUtilsService,
-	],
-	entryComponents: [
-		DeleteEntityDialogComponent,
-		ActionNotificationComponent,
-		CanvasDemoDialogComponent
-	],
-	declarations: [
-		CanvasDemoComponent,
-		CanvasDemoDialogComponent
-	],
-	exports: [
-		CanvasDemoComponent,
-		CanvasDemoDialogComponent                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-	]
+    imports: [
+        MatDialogModule,
+        CommonModule,
+        HttpClientModule,
+        PartialsModule,
+        NgxPermissionsModule.forChild(),
+        FormsModule,
+        ReactiveFormsModule,
+        TranslateModule.forChild(),
+        MatButtonModule,
+        MatMenuModule,
+        MatSelectModule,
+        MatInputModule,
+        MatTableModule,
+        MatAutocompleteModule,
+        MatRadioModule,
+        MatIconModule,
+        MatNativeDateModule,
+        MatProgressBarModule,
+        MatDatepickerModule,
+        MatCardModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatCheckboxModule,
+        MatProgressSpinnerModule,
+        MatSnackBarModule,
+        MatTabsModule,
+        MatTooltipModule,
+        NgbProgressbarModule,
+        DragDropModule
+    ],
+    providers: [
+        InterceptService,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: InterceptService,
+            multi: true
+        },
+        {
+            provide: MAT_DIALOG_DEFAULT_OPTIONS,
+            useValue: {
+                hasBackdrop: true,
+                panelClass: 'kt-mat-dialog-container__wrapper',
+                height: 'auto',
+                width: '900px'
+            }
+        },
+        CanvasDemoService,
+        TypesUtilsService,
+        LayoutUtilsService,
+        HttpUtilsService,
+    ],
+    declarations: [
+        CanvasDemoComponent,
+        CanvasDemoDialogComponent
+    ],
+    exports: [
+        CanvasDemoComponent,
+        CanvasDemoDialogComponent
+    ]
 })
 export class CanvasDemoModule { }

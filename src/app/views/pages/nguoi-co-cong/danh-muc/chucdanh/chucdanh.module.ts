@@ -28,21 +28,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-	],
-	providers: [
-		ChucDanhService,
-	],
-	entryComponents: [
-		ChucDanhListComponent,
-	],
-	declarations: [
-		ChucDanhComponent,
-		ChucDanhListComponent,
-		ChucDanhEditDialogComponent,
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+    ],
+    providers: [
+        ChucDanhService,
+    ],
+    declarations: [
+        ChucDanhComponent,
+        ChucDanhListComponent,
+        ChucDanhEditDialogComponent,
+    ]
 })
 
 export class ChucDanhModule { }

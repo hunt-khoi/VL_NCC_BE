@@ -39,7 +39,7 @@ export class NhapSoLieuListComponent implements OnInit {
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
 	lstStatus: any[] = [];
-	// tslint:disable-next-line:variable-name
+	// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 	_name = '';
 
 	// khoi tao grildModel

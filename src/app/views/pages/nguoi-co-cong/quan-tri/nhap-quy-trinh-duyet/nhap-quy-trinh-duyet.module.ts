@@ -36,24 +36,20 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		NhapQuyTrinhDuyetService
-	],
-	entryComponents: [
-		NhapCapQuanLyDuyetEditComponent,
-		DieuKienEditDialogComponent
-	],
-	declarations: [
-		NhapQuyTrinhDuyetComponent,
-		NhapQuyTrinhDuyetEditComponent,
-		NhapQuyTrinhDuyetListComponent,
-		NhapCapQuanLyDuyetEditComponent,
-		DieuKienEditDialogComponent,
-		DieuKienListComponent
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        NhapQuyTrinhDuyetService
+    ],
+    declarations: [
+        NhapQuyTrinhDuyetComponent,
+        NhapQuyTrinhDuyetEditComponent,
+        NhapQuyTrinhDuyetListComponent,
+        NhapCapQuanLyDuyetEditComponent,
+        DieuKienEditDialogComponent,
+        DieuKienListComponent
+    ]
 })
 export class NhapQuyTrinhDuyetModule { }

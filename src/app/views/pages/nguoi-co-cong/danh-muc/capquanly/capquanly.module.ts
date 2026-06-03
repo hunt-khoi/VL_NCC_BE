@@ -28,21 +28,18 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-	],
-	providers: [
-		capquanlyService
-	],
-	entryComponents: [
-		capquanlyListComponent,
-	],
-	declarations: [
-		capquanlyComponent,
-		capquanlyListComponent,
-		capquanlyEditDialogComponent,
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+    ],
+    providers: [
+        capquanlyService
+    ],
+    declarations: [
+        capquanlyComponent,
+        capquanlyListComponent,
+        capquanlyEditDialogComponent,
+    ]
 })
 
 export class capquanlyModule { }

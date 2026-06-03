@@ -21,22 +21,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		DeXuatRefModule,
-	],
-	providers: [
-		DeXuatTangQuaService,
-		DeXuatService
-	],
-	entryComponents: [
-		DeXuatTQListComponent,
-	],
-	declarations: [
-		DeXuatTangQuaComponent,
-		DeXuatTQListComponent,
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        DeXuatRefModule,
+    ],
+    providers: [
+        DeXuatTangQuaService,
+        DeXuatService
+    ],
+    declarations: [
+        DeXuatTangQuaComponent,
+        DeXuatTQListComponent,
+    ]
 })
 
 export class DeXuatTangQuaModule { }

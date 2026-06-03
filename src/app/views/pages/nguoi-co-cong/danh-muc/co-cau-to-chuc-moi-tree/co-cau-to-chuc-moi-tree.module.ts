@@ -14,20 +14,17 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		cocautochucmoiTreeRefModule
-	],
-	providers: [
-		cocautochucMoiTreeService
-	],
-	entryComponents: [
-		cocautochucComponent,
-	],
-	declarations: [
-		cocautochucComponent,
-	],
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        cocautochucmoiTreeRefModule
+    ],
+    providers: [
+        cocautochucMoiTreeService
+    ],
+    declarations: [
+        cocautochucComponent,
+    ]
 })
 
 export class cocautochucmoiTreeModule { }

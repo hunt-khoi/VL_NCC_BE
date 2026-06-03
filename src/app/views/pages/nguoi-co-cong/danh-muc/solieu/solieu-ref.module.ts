@@ -11,32 +11,27 @@ import { cachNhapListComponent } from './cachnhap-list/cachnhap-list.component';
 import { cachnhapEditDialogComponent } from './cachnhap-edit/cachnhap-edit.dialog.component';
 
 @NgModule({
-	imports: [
-		DPSCommonModule
-	],
-	providers: [
-		solieuService,
-		filterService,
-		cachNhapService
-	],
-	entryComponents: [
-		solieuEditDialogComponent,
-		filterEditComponent,
-		cachnhapEditDialogComponent
-	],
-	declarations: [
-		solieuListComponent,
-		solieuEditDialogComponent,
-		FilterComponent,
-		filterEditComponent,
-		cachNhapListComponent,
-		cachnhapEditDialogComponent
-	],
-	exports:[
-		solieuListComponent,
-		FilterComponent,
-		cachNhapListComponent
-	]
+    imports: [
+        DPSCommonModule
+    ],
+    providers: [
+        solieuService,
+        filterService,
+        cachNhapService
+    ],
+    declarations: [
+        solieuListComponent,
+        solieuEditDialogComponent,
+        FilterComponent,
+        filterEditComponent,
+        cachNhapListComponent,
+        cachnhapEditDialogComponent
+    ],
+    exports: [
+        solieuListComponent,
+        FilterComponent,
+        cachNhapListComponent
+    ]
 })
 
 export class solieuRefModule { }

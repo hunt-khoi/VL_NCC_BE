@@ -19,19 +19,17 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule
-	],
-	providers: [
-		BaoCaoThongKeService
-	],
-	entryComponents: [
-	],
-	declarations: [
-		BaoCaoThongKeComponent,
-		BaoCaoThongKeViewComponent
-	],
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule
+    ],
+    providers: [
+        BaoCaoThongKeService
+    ],
+    declarations: [
+        BaoCaoThongKeComponent,
+        BaoCaoThongKeViewComponent
+    ]
 })
 
 export class BaoCaoThongKeModule { }

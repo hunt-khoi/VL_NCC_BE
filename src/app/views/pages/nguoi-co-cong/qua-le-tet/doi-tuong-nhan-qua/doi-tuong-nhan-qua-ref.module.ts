@@ -7,26 +7,22 @@ import { DoiTuongNhanQuaEditDialogComponent } from './doi-tuong-nhan-qua-edit/do
 import { DoiTuongNhanQuaImportComponent } from './doi-tuong-nhan-qua-import/doi-tuong-nhan-qua-import.component';
 
 @NgModule({
-	imports: [
-		RouterModule,
-		DPSCommonModule,
-	],
-	providers: [
-		DoiTuongNhanQuaService,
-	],
-	entryComponents: [
-		DoiTuongNhanQuaImportComponent,
-		DoiTuongNhanQuaEditDialogComponent
-	],
-	declarations: [
-		DoiTuongNhanQuaListComponent,
-		DoiTuongNhanQuaEditDialogComponent,
-		DoiTuongNhanQuaImportComponent
-	],
-	exports: [
-		DoiTuongNhanQuaListComponent, 
-		DoiTuongNhanQuaEditDialogComponent
-	]
+    imports: [
+        RouterModule,
+        DPSCommonModule,
+    ],
+    providers: [
+        DoiTuongNhanQuaService,
+    ],
+    declarations: [
+        DoiTuongNhanQuaListComponent,
+        DoiTuongNhanQuaEditDialogComponent,
+        DoiTuongNhanQuaImportComponent
+    ],
+    exports: [
+        DoiTuongNhanQuaListComponent,
+        DoiTuongNhanQuaEditDialogComponent
+    ]
 })
 
 export class DoiTuongNhanQuaRefModule { }

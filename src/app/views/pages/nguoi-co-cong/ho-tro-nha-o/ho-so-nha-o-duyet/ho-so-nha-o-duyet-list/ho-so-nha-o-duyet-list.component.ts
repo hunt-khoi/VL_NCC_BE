@@ -39,7 +39,7 @@ export class HoSoNhaODuyetListComponent implements OnInit {
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
-	// tslint:disable-next-line:variable-name
+	// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 	_name = '';
 	// filter District
 	filterprovinces: number;

@@ -22,21 +22,19 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		QuyetDinhRefModule
-	],
-	providers: [
-		QuyetDinhService
-	],
-	entryComponents: [
-	],
-	declarations: [
-		QuyetDinhComponent,
-		QuyetDinhListComponent,
-		XuatQuyetDinhComponent,
-		XuatDanhSachComponent,
-	]
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        QuyetDinhRefModule
+    ],
+    providers: [
+        QuyetDinhService
+    ],
+    declarations: [
+        QuyetDinhComponent,
+        QuyetDinhListComponent,
+        XuatQuyetDinhComponent,
+        XuatDanhSachComponent,
+    ]
 })
 export class QuyetDinhModule { }

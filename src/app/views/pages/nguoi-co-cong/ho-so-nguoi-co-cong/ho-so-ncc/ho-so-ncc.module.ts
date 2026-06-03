@@ -27,23 +27,20 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		QuyetDinhRefModule,
-	],
-	providers: [
-		HoSoNCCService,
-		ThanNhanService,
-		GiayToService,
-	],
-	entryComponents: [
-		HoSoNCCImportComponent,
-	],
-	declarations: [
-		HoSoNCCComponent,
-		HoSoNCCListComponent,
-		HoSoNCCImportComponent,
-	],
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        QuyetDinhRefModule,
+    ],
+    providers: [
+        HoSoNCCService,
+        ThanNhanService,
+        GiayToService,
+    ],
+    declarations: [
+        HoSoNCCComponent,
+        HoSoNCCListComponent,
+        HoSoNCCImportComponent,
+    ]
 })
 export class HoSoNCCModule { }

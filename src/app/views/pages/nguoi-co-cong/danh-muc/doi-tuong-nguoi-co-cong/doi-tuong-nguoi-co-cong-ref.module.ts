@@ -18,45 +18,35 @@ import { DoiTuongDungCuListComponent } from './doi-tuong-dung-cu-list/doi-tuong-
 import { ChonNhieuDungCuListComponent } from '../../components';
 
 @NgModule({
-	imports: [
-		DPSCommonModule,
-	],
-	providers: [
-		DoiTuongNguoiCoCongService,
-	],
-	entryComponents: [
-		DoiTuongNguoiCoCongComponent,
-		DoiTuongNhanQuaEditComponent,
-		DoiTuongNhanQuaMucQuaComponent,
-		UpdateMucQuaDialogComponent,
-		UpdateBieuMauDialogComponent,
-		DoiTuongDungCuEditComponent,
-		ChonNhieuDungCuListComponent,
-		DoiTuongBaoHiemEditComponent
-	],
-	declarations: [
-		DoiTuongNguoiCoCongListComponent,
-		DoiTuongNguoiCoCongEditDialogComponent,
-		DoiTuongNhanQuaListComponent,
-		DoiTuongNhanQuaEditComponent,
-		DoiTuongNhanQuaMucQuaComponent,
-		DoiTuongNhanQuaMucQuaListComponent,
-		UpdateMucQuaDialogComponent,
-		UpdateBieuMauDialogComponent,
-		DoiTuongDungCuListComponent,
-		DoiTuongDungCuEditComponent,
-		ChonNhieuDungCuListComponent,
-		DoiTuongBaoHiemListComponent,
-		DoiTuongBaoHiemEditComponent
-	],
-	exports: [
-		DoiTuongNguoiCoCongListComponent,
-		DoiTuongNhanQuaListComponent,
-		DoiTuongNhanQuaMucQuaListComponent,
-		UpdateBieuMauDialogComponent,
-		DoiTuongDungCuListComponent,
-		DoiTuongBaoHiemListComponent,
-	]
+    imports: [
+        DPSCommonModule,
+    ],
+    providers: [
+        DoiTuongNguoiCoCongService,
+    ],
+    declarations: [
+        DoiTuongNguoiCoCongListComponent,
+        DoiTuongNguoiCoCongEditDialogComponent,
+        DoiTuongNhanQuaListComponent,
+        DoiTuongNhanQuaEditComponent,
+        DoiTuongNhanQuaMucQuaComponent,
+        DoiTuongNhanQuaMucQuaListComponent,
+        UpdateMucQuaDialogComponent,
+        UpdateBieuMauDialogComponent,
+        DoiTuongDungCuListComponent,
+        DoiTuongDungCuEditComponent,
+        ChonNhieuDungCuListComponent,
+        DoiTuongBaoHiemListComponent,
+        DoiTuongBaoHiemEditComponent
+    ],
+    exports: [
+        DoiTuongNguoiCoCongListComponent,
+        DoiTuongNhanQuaListComponent,
+        DoiTuongNhanQuaMucQuaListComponent,
+        UpdateBieuMauDialogComponent,
+        DoiTuongDungCuListComponent,
+        DoiTuongBaoHiemListComponent,
+    ]
 })
 
 export class DoiTuongNguoiCoCongRefModule { }

@@ -26,19 +26,17 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forChild(routes),
-		DPSCommonModule,
-		NhapSoLieuDuyetRefModule,
-		NhapSoLieuRefModule
-	],
-	providers: [
-		NhapSoLieuDuyetService,
-	],
-	entryComponents: [
-	],
-	declarations: [
-		DuyetSoLieuPageComponent
-	],
+    imports: [
+        RouterModule.forChild(routes),
+        DPSCommonModule,
+        NhapSoLieuDuyetRefModule,
+        NhapSoLieuRefModule
+    ],
+    providers: [
+        NhapSoLieuDuyetService,
+    ],
+    declarations: [
+        DuyetSoLieuPageComponent
+    ]
 })
 export class NhapSoLieuDuyetModule { }
