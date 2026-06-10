@@ -6,9 +6,7 @@ import { HttpUtilsService } from '../../../../../core/_base/crud';
 @Injectable()
 export class CanvasDemoService {
 
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) {
-	}
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	public getData(url: string): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();

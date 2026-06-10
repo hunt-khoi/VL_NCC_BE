@@ -17,7 +17,7 @@
 			{{col.displayName}}
 		</mat-checkbox>
 	</button>
-    <button mat-menu-item (click)="gridService.getCookieService() != null ? gridService.applySelectedColumnsV2(): gridService.applySelectedColumns()">
+    <button mat-menu-item (click)="gridService.getCookieService() !== null ? gridService.applySelectedColumnsV2(): gridService.applySelectedColumns()">
 		<mat-icon>autorenew</mat-icon>
 		<span>{{'COMMON.APDUNG' | translate}}</span>
 	</button>

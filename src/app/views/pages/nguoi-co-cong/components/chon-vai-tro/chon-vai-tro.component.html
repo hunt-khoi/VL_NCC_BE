@@ -10,7 +10,6 @@
 		</div>
 		<div class="col-md-{{isZoomSize ? '3' : '5'}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
 			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="onSubmit()" *ngIf="multi">
-				<!--<mat-icon  style="margin-top: 2%" class="mat-Icon-update">check_circle</mat-icon>-->
 				Lưu
 			</button>
 		</div>
@@ -20,7 +19,6 @@
 		<div class="kt-portlet__body-progress">
 			<mat-spinner [diameter]="20"></mat-spinner>
 		</div>
-
 		<div class="kt-form__filtration">
 			<div class="row align-items-center">
 				<div class="col-md-6 kt-margin-bottom-10-mobile">
@@ -34,7 +32,6 @@
 				</div> -->
 			</div>
 		</div>
-
 		<div class="mat-table__wrapper" style="overflow-x:auto">
 			<table mat-table class="lmat-elevation-z8" #table [dataSource]="dataSource" matSort #sort1="matSort" 
 				matSortActive="GroupName" matSortDirection="asc" matSortDisableClear cdkDropListGroup style="min-width: auto;">

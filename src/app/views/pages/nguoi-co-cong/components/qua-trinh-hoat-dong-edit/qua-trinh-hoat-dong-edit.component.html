@@ -2,29 +2,29 @@
 	<div class="row" [hidden]="hideOther">
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<input matInput placeholder="Cấp bậc" formControlName="CapBac" [readonly]="itemForm.controls.TinhTrang.value==3" />
+				<input matInput placeholder="Cấp bậc" formControlName="CapBac" [readonly]="itemForm.controls.TinhTrang.value===3" />
 			</mat-form-field>
 		</div>
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<input matInput placeholder="Chức vụ" formControlName="ChucVu" [readonly]="itemForm.controls.TinhTrang.value==3" />
+				<input matInput placeholder="Chức vụ" formControlName="ChucVu" [readonly]="itemForm.controls.TinhTrang.value===3" />
 			</mat-form-field>
 		</div>
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<input matInput placeholder="Đơn vị" formControlName="DonVi" [readonly]="itemForm.controls.TinhTrang.value==3" />
+				<input matInput placeholder="Đơn vị" formControlName="DonVi" [readonly]="itemForm.controls.TinhTrang.value===3" />
 			</mat-form-field>
 		</div>
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<input matInput placeholder="Địa bàn" formControlName="DiaBan" [readonly]="itemForm.controls.TinhTrang.value==3" />
+				<input matInput placeholder="Địa bàn" formControlName="DiaBan" [readonly]="itemForm.controls.TinhTrang.value===3" />
 			</mat-form-field>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<input matInput placeholder="{{itemForm.controls.TinhTrang.value==3 ? 'Ngày từ trần' : 'Từ ngày'}}" formControlName="TuNgay" 
+				<input matInput placeholder="{{itemForm.controls.TinhTrang.value===3 ? 'Ngày từ trần' : 'Từ ngày'}}" formControlName="TuNgay" 
 					type="text" [matDatepicker]="picker" [(ngModel)]="ngay1" class="require" required>
 				<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
 				<mat-datepicker #picker></mat-datepicker>
@@ -32,7 +32,7 @@
 		</div>
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<input matInput placeholder="{{itemForm.controls.TinhTrang.value==3 ? 'Ngày khai giấy tử' : 'Đến ngày'}}" formControlName="DenNgay" 
+				<input matInput placeholder="{{itemForm.controls.TinhTrang.value===3 ? 'Ngày khai giấy tử' : 'Đến ngày'}}" formControlName="DenNgay" 
 					type="text" [(ngModel)]="ngay2" [matDatepicker]="picker1">
 				<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
 				<mat-datepicker #picker1></mat-datepicker>

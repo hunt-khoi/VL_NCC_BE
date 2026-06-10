@@ -37,7 +37,6 @@
 							</div>
 						</ng-container>
 					</div>
-
 				</div>
 			</div>
 			<div class="dl-tk-item col-xl-6" style="padding-left: 0; padding-right: 0;margin-top: 0px;">
@@ -54,9 +53,9 @@
 								<ngx-avatar size="45" src="{{item.NguoiGui_Img}}"
 									*ngIf="item.NguoiGui_Img; else bindText"></ngx-avatar>
 								<ng-template #bindText>
-									<ngx-avatar size="45"
-										bgColor="{{commonService.get_colorByName(item.NguoiGui_Name)}}"
-										[name]="item.NguoiGui_Name"></ngx-avatar>
+									<ngx-avatar size="45" [name]="item.NguoiGui_Name"
+										bgColor="{{commonService.get_colorByName(item.NguoiGui_Name)}}">
+									</ngx-avatar>
 								</ng-template>
 							</div>
 							<div class="fr-feedback">

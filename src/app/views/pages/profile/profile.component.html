@@ -73,8 +73,7 @@
 								<a class="btn btn-label-danger btn-bold btn-sm" href="javascript:;">Upgrade plan</a>
 								<a class="btn btn-clean btn-bold btn-sm" href="javascript:;" data-toggle="kt-tooltip"
 									data-placement="right" title="" data-original-title="Click to learn more...">
-									Learn
-									more
+									Learn more
 								</a>
 							</li>
 						</ul>
@@ -88,7 +87,6 @@
 					<div class="kt-widget__head">
 						<div class="kt-widget__media">
 							<!-- <img src="{{_user.avata}}" alt="image"> -->
-
 							<ngx-avatar size="55" src="{{_user.avata}}" *ngIf="_user.avata; else bindText"></ngx-avatar>
 							<ng-template #bindText>
 								<ngx-avatar size="55" bgColor="{{commonService.get_colorByName(_user.charname)}}" [name]="_user.charname"></ngx-avatar>
@@ -149,16 +147,13 @@
 											</g>
 										</svg>
 									</span>
-									<span class="kt-widget__desc">
-										Profile Overview
-									</span>
+									<span class="kt-widget__desc">Profile Overview</span>
 								</span>
 							</a>
 							<a [routerLink]="['/profile/personal-information']" class="kt-widget__item"
 								routerLinkActive="kt-widget__item--active">
 								<span class="kt-widget__section">
 									<span class="kt-widget__icon">
-										<!--#region icon -->
 										<svg xmlns="http://www.w3.org/2000/svg"
 											xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"
 											viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -172,17 +167,13 @@
 													fill="#000000" fill-rule="nonzero"></path>
 											</g>
 										</svg>
-										<!--#endregion -->
 									</span>
-									<span class="kt-widget__desc">
-										Thông tin cá nhân
-									</span>
+									<span class="kt-widget__desc">Thông tin cá nhân</span>
 								</span>
 							</a>
 							<a [routerLink]="['/profile/notification']"class="kt-widget__item " routerLinkActive="kt-widget__item--active">
 								<span class="kt-widget__section">
 									<span class="kt-widget__icon">
-										<!--#region icon -->
 										<svg xmlns="http://www.w3.org/2000/svg"
 											 xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"
 											 viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -194,19 +185,14 @@
 													  fill="#000000"></path>
 											</g>
 										</svg>
-										<!--#endregion -->
 									</span>
-									<span class="kt-widget__desc">
-										Thông báo
-									</span>
-
+									<span class="kt-widget__desc">Thông báo</span>
 								</span>
 							</a>
 							<a [routerLink]="['/profile/change-password']" class="kt-widget__item "
 								routerLinkActive="kt-widget__item--active">
 								<span class="kt-widget__section">
 									<span class="kt-widget__icon">
-										<!--#region icon -->
 										<svg xmlns="http://www.w3.org/2000/svg"
 											xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"
 											viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
@@ -223,11 +209,8 @@
 													fill="#000000" opacity="0.3"></path>
 											</g>
 										</svg>
-										<!--#endregion -->
 									</span>
-									<span class="kt-widget__desc">
-										Đổi mật khẩu
-									</span>
+									<span class="kt-widget__desc">Đổi mật khẩu</span>
 								</span>
 								<span
 									class="kt-badge kt-badge--unified-danger kt-badge--sm kt-badge--rounded kt-badge--bolder"
@@ -249,9 +232,7 @@
 											</g>
 										</svg>
 									</span>
-									<span class="kt-widget__desc">
-										Email settings
-									</span>
+									<span class="kt-widget__desc">Email settings</span>
 								</span>
 							</a>-->
 						</div>
@@ -264,8 +245,8 @@
 	</div>
 	<!--End:: App Aside-->
 	<div class="kt-grid__item kt-grid__item--fluid kt-app__content">
-		<button type="button" class="btn btn-label-brand btn-sm btn-icon btn-icon-md view-mobile" [matMenuTriggerFor]="menuleft" style="position: absolute;top: 10px;right: 30px;z-index: 10;"
-			aria-haspopup="true" aria-expanded="false">
+		<button type="button" class="btn btn-label-brand btn-sm btn-icon btn-icon-md view-mobile" [matMenuTriggerFor]="menuleft"
+		 	style="position: absolute; top: 10px; right: 30px; z-index: 10;" aria-haspopup="true" aria-expanded="false">
 			<i class="flaticon2-gear"></i>
 		</button>
 		<mat-menu #menuleft>
@@ -281,9 +262,7 @@
 								{{_user.fullname}}
 								<i class="flaticon2-correct kt-font-success"></i>
 							</a>
-							<span class="kt-widget__subtitle">
-								{{_user.tenvaitro}}
-							</span>
+							<span class="kt-widget__subtitle">{{_user.tenvaitro}}</span>
 						</div>
 						<!-- display == none cần dùng thì delete class d-none -->
 						<div class="kt-widget__action d-none">
@@ -327,9 +306,7 @@
 										</g>
 									</svg>
 								</span>
-								<span class="kt-widget__desc">
-									Profile Overview
-								</span>
+								<span class="kt-widget__desc">Profile Overview</span>
 							</span>
 						</a>
 						<a [routerLink]="['/profile/personal-information']" class="kt-widget__item"
@@ -350,9 +327,7 @@
 										</g>
 									</svg>
 								</span>
-								<span class="kt-widget__desc">
-									Thông tin cá nhân
-								</span>
+								<span class="kt-widget__desc">Thông tin cá nhân</span>
 							</span>
 						</a>
 						<a [routerLink]="['/profile/change-password']" class="kt-widget__item "
@@ -376,12 +351,11 @@
 										</g>
 									</svg>
 								</span>
-								<span class="kt-widget__desc">
-									Đổi mật khẩu
-								</span>
+								<span class="kt-widget__desc">Đổi mật khẩu</span>
 							</span>
 							<span class="kt-badge kt-badge--unified-danger kt-badge--sm kt-badge--rounded kt-badge--bolder"
-								*ngIf="num<=exp_show">{{num}}</span>
+								*ngIf="num<=exp_show">{{num}}
+							</span>
 						</a>
 					</div>
 				</div>

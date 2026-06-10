@@ -10,8 +10,7 @@ export class PortletFooterComponent implements OnInit {
 	@Input() class: string = "";
 
 	ngOnInit() {
-		if (this.class) {
+		if (this.class) 
 			this.classList += ' ' + this.class;
-		}
 	}
 }

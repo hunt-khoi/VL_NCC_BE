@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, Renderer2, Output, EventEmitter } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import objectPath from 'object-path';
 import { LayoutConfigService, MenuHorizontalService, MenuOptions, OffcanvasOptions } from '../../../../core/_base/layout';
 import { HtmlClassService } from '../../html-class.service';
+import objectPath from 'object-path';
 
 @Component({
 	selector: 'kt-menu-horizontal',
@@ -13,7 +13,6 @@ import { HtmlClassService } from '../../html-class.service';
 })
 
 export class MenuHorizontalComponent implements OnInit {
-	// Public properties
 	currentRouteUrl: any = '';
 	rootArrowEnabled: boolean = false;
 

@@ -14,15 +14,15 @@ export class ChonNhieuNhanVienListDataSource extends BaseDataSource {
 		this.loadingSubject.next(true);
 		this.service.findData_Emp(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					if (resultFromServer && resultFromServer.status == 1) {
-						this.entitySubject.next(resultFromServer.data);
-						var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					if (res && res.status == 1) {
+						this.entitySubject.next(res.data);
+						var totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 						this.paginatorTotalSubject.next(totalCount);
 					} else {
 						this.entitySubject.next([]);
 						this.paginatorTotalSubject.next(0);
-						this.layoutUtilsService.showError(resultFromServer.error.message);
+						this.layoutUtilsService.showError(res.error.message);
 					}
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),

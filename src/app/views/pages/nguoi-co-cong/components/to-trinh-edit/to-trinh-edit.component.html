@@ -7,7 +7,8 @@
 		</div>
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<input matInput placeholder="Ngày ra tờ trình" formControlName="NgayRaToTrinh" type="text" [matDatepicker]="picker" [max]="ngay2" [(ngModel)]="ngay1" class="require" required>
+				<input matInput placeholder="Ngày ra tờ trình" formControlName="NgayRaToTrinh" type="text" [matDatepicker]="picker" 
+					[max]="ngay2" [(ngModel)]="ngay1" class="require" required>
 				<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
 				<mat-datepicker #picker></mat-datepicker>
 			</mat-form-field>

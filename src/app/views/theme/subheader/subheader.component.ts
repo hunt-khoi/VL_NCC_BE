@@ -7,7 +7,6 @@ import objectPath from 'object-path';
 	templateUrl: './subheader.component.html',
 })
 export class SubheaderComponent implements OnInit {
-	// Public properties
 	layout: string = "";
 	fluid: boolean = false;
 	clear: boolean = false;

@@ -1,7 +1,7 @@
 import { AfterViewInit, Directive, ElementRef, HostBinding, HostListener, Inject, Input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
-import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
+import { animationFrameScheduler } from 'rxjs';
 import { filter, map, share, startWith, takeUntil, throttleTime } from 'rxjs/operators';
 
 export interface StickyPositions {
@@ -27,8 +27,8 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 	enable$ = new BehaviorSubject(true);
 
 	@Input() scrollContainer: string | HTMLElement | undefined;
-	@Input('spacerElement') spacerElement: HTMLElement | undefined;
-	@Input('boundaryElement') boundaryElement: HTMLElement | undefined;
+	@Input() spacerElement: HTMLElement | undefined;
+	@Input() boundaryElement: HTMLElement | undefined;
 	@HostBinding('class.is-sticky') sticky = false;
 	@HostBinding('class.boundary-reached') boundaryReached = false;
 	/**
@@ -47,14 +47,14 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 		/** Throttle the scroll to animation frame (around 16.67ms) */
 		this.scrollThrottled$ = this.scroll$
 			.pipe(
-				throttleTime(0, animationFrame),
+				throttleTime(0, animationFrameScheduler),
 				share()
 			);
 
 		/** Throttle the resize to animation frame (around 16.67ms) */
 		this.resizeThrottled$ = this.resize$
 			.pipe(
-				throttleTime(0, animationFrame),
+				throttleTime(0, animationFrameScheduler),
 				// emit once since we are currently using combineLatest
 				startWith(undefined),
 				share()
@@ -188,7 +188,12 @@ export class StickyDirective implements OnInit, AfterViewInit, OnDestroy {
 
 	private determineStatus(originalVals: StickyPositions, pageYOffset: number, marginTop: number, marginBottom: number, enabled: boolean): StickyStatus {
 		const stickyElementHeight = this.getComputedStyle(this.stickyElement.nativeElement).height;
-		const reachedLowerEdge = this.boundaryElement && window.pageYOffset + stickyElementHeight + marginBottom >= (originalVals.bottomBoundary - marginTop);
+		let reachedLowerEdge = false;
+		if (this.boundaryElement && originalVals.bottomBoundary != null) {
+			const currentBottomPosition = window.pageYOffset + stickyElementHeight + marginBottom;
+			const targetBottomBoundary = originalVals.bottomBoundary - marginTop;
+			reachedLowerEdge = currentBottomPosition >= targetBottomBoundary;
+		}
 		return {
 			isSticky: enabled && pageYOffset > originalVals.offsetY,
 			reachedLowerEdge,

@@ -1,11 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef, ComponentRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import moment from 'moment';
-import { Moment } from 'moment';
 import { Subject } from 'rxjs';
 import { CommonService } from '../../services/common.service';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
+	// eslint-disable-next-line @angular-eslint/component-selector
 	selector: 'tr[cancu-lietsi-row-edit]',
 	templateUrl: './cancu-lietsi-row-edit.component.html',
 })
@@ -14,16 +15,8 @@ export class CanCuLSRowEditComponent implements OnInit {
 	close$ = new Subject<void>();
 	data: any;
 	item: any;
-	hasFormErrors = false;
-	viewLoading = false;
-	loadingAfterSubmit = false;
-	disabledBtn = false;
-	isZoomSize = false;
-	allowEdit = false;
-
-	maxNS: Moment | undefined;
 	cmpRef: ComponentRef<any> | undefined;
-	showDel: boolean = false;
+	maxNS: Moment | undefined;
 	//form controls
 	HoTen: FormControl | undefined;
 	Id_QHGiaDinh: FormControl | undefined
@@ -53,7 +46,7 @@ export class CanCuLSRowEditComponent implements OnInit {
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	prepareCustomer(): any {
+	prepare(): any {
 		const _item: any = {};
 		_item.HoTen = this.HoTen ? this.HoTen.value : "";
 		_item.Id_QHGiaDinh = this.Id_QHGiaDinh ? this.Id_QHGiaDinh.value : 0;
@@ -64,9 +57,7 @@ export class CanCuLSRowEditComponent implements OnInit {
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
-		this.loadingAfterSubmit = false;
-		const EditTroCap = this.prepareCustomer();
+		const EditTroCap = this.prepare();
 		return EditTroCap;
 	}
 
@@ -77,6 +68,5 @@ export class CanCuLSRowEditComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
 	}
 }

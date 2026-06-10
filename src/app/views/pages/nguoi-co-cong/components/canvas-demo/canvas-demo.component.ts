@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef, Input, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { DiagramCanVas } from './canvas.class';
 import { CanvasDemoService } from './canvas-demo.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -15,7 +15,7 @@ import { DynamicProcessService } from '../../services/dynamic-process.service';
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CanvasDemoComponent implements OnInit, OnChanges {
+export class CanvasDemoComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() API: string | undefined;
 	@Input() width: number = 500;
 	@Input() height: number = 700;

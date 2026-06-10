@@ -1,10 +1,10 @@
 import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Observable } from 'rxjs';
-import moment from 'moment';
-import { CommonService } from '../nguoi-co-cong/services/common.service';
 import { MatDialog } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
+import { CommonService } from '../nguoi-co-cong/services/common.service';
 import { AuthService } from 'app/core/auth';
 import { VaiTroComponent } from 'app/views/partials/layout';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-profile',

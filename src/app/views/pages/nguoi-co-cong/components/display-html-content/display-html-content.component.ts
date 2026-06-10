@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { BehaviorSubject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
@@ -9,11 +8,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 	encapsulation: ViewEncapsulation.None,
 })
 export class DisplayHtmlContentComponent implements OnInit {
-	loadingSubject = new BehaviorSubject<boolean>(false);
-	loading$ = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isZoomSize: boolean = false;
-	disabledBtn: boolean = false;
 	strHtml: any;
 	title: any;
 

@@ -13,7 +13,7 @@
 					</label>
 				</div>
 			</div>
-			<button type="button" mat-raised-button color="primary" (click)="luuNhanVien()" [disabled]="viewLoading ||disabledBtn">Tiếp tục</button>
+			<button type="button" mat-raised-button color="primary" (click)="luu()" [disabled]="viewLoading ||disabledBtn">Tiếp tục</button>
 		</ng-container>
 	</kt-portlet-header>
 
@@ -23,18 +23,18 @@
 				<div class="row align-items-center">
 					<div class="col-md-6 m--margin-bottom-10-mobile">
 						<mat-form-field class="mat-form-field-fluid">
-							<input matInput #searchInput placeholder="Tìm kiếm"
-								class="mat-form-field mat-form-field-fluid">
+							<input matInput #searchInput placeholder="Tìm kiếm" class="mat-form-field mat-form-field-fluid">
 						</mat-form-field>
 					</div>
 					<div class="col-md-6 m--margin-bottom-10-mobile">
-						<button type="button" mat-raised-button color="accent" (click)="LoadDataList()" [disabled]="viewLoading">Tìm kiếm</button>
+						<button type="button" mat-raised-button color="accent" (click)="LoadDataList()" [disabled]="viewLoading">
+							Tìm kiếm
+						</button>
 					</div>
 				</div>
 				<div class="mat-table__wrapper">
 					<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="id"
 						matSortDirection="asc" matSortDisableClear>
-
 						<ng-container matColumnDef="select">
 							<th mat-header-cell *matHeaderCellDef class="mat-column-checkbox">
 								<mat-checkbox (change)="$event ? masterToggle() : null"
@@ -48,21 +48,18 @@
 								</mat-checkbox>
 							</td>
 						</ng-container>
-
 						<ng-container matColumnDef="MaDoiTuong">
 							<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">Mã đối tượng</th>
 							<td mat-cell *matCellDef="let item" class="mat-column-vinCode">
 								{{item.MaDoiTuong}}
 							</td>
 						</ng-container>
-
 						<ng-container matColumnDef="DoiTuong">
 							<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode min-width-th">Đối tượng</th>
 							<td mat-cell *matCellDef="let item" class="mat-column-vinCode">
 								{{item.DoiTuong}}
 							</td>
 						</ng-container>
-
 						<ng-container matColumnDef="MoTa">
 							<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">Mô tả</th>
 							<td mat-cell *matCellDef="let item" class="mat-column-vinCode">

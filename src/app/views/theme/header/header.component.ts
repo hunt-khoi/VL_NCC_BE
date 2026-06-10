@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationStart, RouteConfigLoadEnd, RouteConfigLoadStart, Router } from '@angular/router';
-import objectPath from 'object-path';
 import { LoadingBarService } from '@ngx-loading-bar/core';
 import { LayoutConfigService, LayoutRefService } from '../../../core/_base/layout';
 import { HtmlClassService } from '../html-class.service';
+import objectPath from 'object-path';
 
 @Component({
 	selector: 'kt-header',
@@ -12,10 +12,9 @@ import { HtmlClassService } from '../html-class.service';
 })
 
 export class HeaderComponent implements OnInit, AfterViewInit {
-	// Public properties
 	menuHeaderDisplay: boolean = false;
 	subheaderDisplay: boolean = false;
-	dataSubmenu:any;
+	dataSubmenu: any;
 	fluid: boolean = false;
 	fluid_sub: boolean = false;
 	constants:any;
@@ -52,7 +51,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 	ngOnInit(): void {
 		this.currentRouteUrl = this.router.url;
 		const config = this.layoutConfigService.getConfig();
-		this.constants = this.layoutConfigService.getConfig('constants');;
+		this.constants = this.layoutConfigService.getConfig('constants');
 		// get menu header display option
 		this.menuHeaderDisplay = objectPath.get(config, 'header.menu.self.display');
 		this.subheaderDisplay = objectPath.get(config, 'subheader.display');
@@ -62,7 +61,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 		this.clear = objectPath.get(config, 'subheader.clear');
 		// animate the header minimize the height on scroll down
 		if (this.ktHeader) {
-			if (objectPath.get(config, 'header.self.fixed.desktop.enabled') || objectPath.get(config, 'header.self.fixed.desktop')) {
+			if (objectPath.get(config, 'header.self.fixed.desktop.enabled') 
+				|| objectPath.get(config, 'header.self.fixed.desktop')) {
 				// header minimize on scroll down
 				this.ktHeader.nativeElement.setAttribute('data-ktheader-minimize', '1');
 			}
@@ -75,7 +75,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 			this.layoutRefService.addElement('header', this.ktHeader.nativeElement);
 	}
 
-	/**********Load Submenu Header********/
 	getActiveHeader(event: any){
 		this.dataSubmenu = event.submenu;
 		this.activeMenu= event.id ? event.id : 0;

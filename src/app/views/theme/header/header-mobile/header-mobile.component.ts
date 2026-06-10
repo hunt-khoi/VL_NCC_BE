@@ -6,7 +6,6 @@ import { LayoutConfigService, ToggleOptions } from '../../../../core/_base/layou
 	templateUrl: './header-mobile.component.html',
 })
 export class HeaderMobileComponent implements OnInit {
-	// Public properties
 	headerLogo: string = "";
 	asideDisplay: boolean = false;
 

@@ -1,10 +1,10 @@
 import { DataSource } from '@angular/cdk/collections';
+import { skip, distinctUntilChanged } from 'rxjs/operators';
 import { Observable, BehaviorSubject, Subscription, of } from 'rxjs';
 import { HttpExtenstionsModel } from './http-extentsions-model';
 import { QueryParamsModel } from './query-models/query-params.model';
 import { QueryResultsModel } from './query-models/query-results.model';
 import { BaseModel } from './_base.model';
-import { skip, distinctUntilChanged } from 'rxjs/operators';
 
 // Why not use MatTableDataSource?
 /*  In this example, we will not be using the built-in MatTableDataSource because its designed for filtering,

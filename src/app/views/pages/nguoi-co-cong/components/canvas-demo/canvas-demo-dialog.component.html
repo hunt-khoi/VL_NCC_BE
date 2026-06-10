@@ -19,7 +19,7 @@
 			<div class="kt-portlet__body-progress">
 				<mat-spinner [diameter]="20"></mat-spinner>
 			</div>
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 			<div class="form-group kt-form__group row">
@@ -38,8 +38,7 @@
 						<mat-error *ngIf="itemForm.controls['buttonText'].errors">
 							Tên nút xử lý
 							<strong *ngIf="itemForm.controls['buttonText'].errors.required"> bắt buộc nhập</strong>
-							<strong *ngIf="itemForm.controls['buttonText'].errors.maxlength">
-								tối đa
+							<strong *ngIf="itemForm.controls['buttonText'].errors.maxlength"> tối đa
 								{{itemForm.controls['buttonText'].errors.maxlength.requiredLength}} ký tự
 							</strong>
 						</mat-error>

@@ -2,12 +2,12 @@ import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, Chan
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { TranslateService } from '@ngx-translate/core';
-import moment from 'moment';
-import { Moment } from 'moment';
 import { Subject } from 'rxjs';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { CommonService } from '../../services/common.service';
 import { QuyetDinhEditComponent } from '../quyet-dinh-edit/quyet-dinh-edit.component';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-tro-cap-edit',
@@ -25,7 +25,7 @@ export class TroCapEditComponent implements OnInit {
 	public close$ = new Subject<void>();
 	data: any;
 	item: any;
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -87,7 +87,7 @@ export class TroCapEditComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.data.objectService.getItem(this.item.Id).subscribe(res => {
+			this.data.objectService.getItem(this.item.Id).subscribe((res: any) => {
 				this.viewLoading = false;
 				if (res && res.status === 1) {
 					this.item = res.data;
@@ -158,7 +158,6 @@ export class TroCapEditComponent implements OnInit {
 
 	chonTroCap(value: any) {
 		var find = this.listLoaiTroCap.find(x => +x.id == value);
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (find && find.data) {
 			this.LoaiTroCap = find.LoaiTroCap;
@@ -177,7 +176,6 @@ export class TroCapEditComponent implements OnInit {
 		}
 	}
 	chosenMonthHandler(normalizedMonth: Moment, datepicker: MatDatepicker<Moment>) {
-		if (!this.itemForm) return;
 		this.itemForm.controls.TuThang.setValue(normalizedMonth);
 		let y = moment(normalizedMonth).get('year');
 		this.itemForm.controls.TuNam.setValue(y); //gán từ năm
@@ -186,7 +184,6 @@ export class TroCapEditComponent implements OnInit {
 	}
 
 	changeNamCap(isNam = false) {
-		if (!this.itemForm) return;
 		if (isNam) { //chỉnh năm cấp thì clear từ ngày, từ tháng
 			this.itemForm.controls.NgayCap.setValue('');
 			this.itemForm.controls.TuThang.setValue('');
@@ -217,20 +214,18 @@ export class TroCapEditComponent implements OnInit {
 	Tu: any;
 	Den: any;
 	changeNamThuHoi(isTu = true) {
-		if (!this.itemForm) return;
 		this.Tu = this.itemForm.controls.ThuHoiDCTu.value
 		this.Den = this.itemForm.controls.ThuHoiDCDen.value
-		if(isTu && Number(this.Tu) > Number(this.Den)) {
+		if (isTu && Number(this.Tu) > Number(this.Den)) {
 			this.itemForm.controls.ThuHoiDCTu.setValue(this.itemForm.controls.ThuHoiDCDen.value)
 		}
-		if(!isTu && Number(this.Den) < Number(this.Tu)) {
+		if (!isTu && Number(this.Den) < Number(this.Tu)) {
 			this.itemForm.controls.ThuHoiDCDen.setValue(this.itemForm.controls.ThuHoiDCTu.value)
 		}
 	}
 
 	/** ACTIONS */
-	prepareCustomer(): any {
-		if (!this.itemForm) return;
+	prepare(): any {
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -315,7 +310,7 @@ export class TroCapEditComponent implements OnInit {
 			this.layoutUtilsService.showError("Vui lòng nhập ngày tạm đình chỉ");
 			return;
 		}
-		const EditTroCap = this.prepareCustomer();
+		const EditTroCap = this.prepare();
 		if (EditTroCap == undefined) {
 			this.hasFormErrors = true;
 			this.changeDetectorRefs.detectChanges();
@@ -337,7 +332,6 @@ export class TroCapEditComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

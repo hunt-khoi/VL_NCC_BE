@@ -13,7 +13,7 @@
 					</label>
 				</div>
 			</div>
-			<button type="button" mat-raised-button color="primary" (click)="luuNhanVien()" [disabled]="viewLoading ||disabledBtn">Tiếp tục</button>
+			<button type="button" mat-raised-button color="primary" (click)="luu()" [disabled]="viewLoading ||disabledBtn">Tiếp tục</button>
 		</ng-container>
 	</kt-portlet-header>
 	
@@ -28,13 +28,14 @@
 						</mat-form-field>
 					</div>
 					<div class="col-md-6 m--margin-bottom-10-mobile">
-						<button type="button" mat-raised-button color="accent" (click)="LoadDataList()" [disabled]="viewLoading">Tìm kiếm</button>&nbsp;
+						<button type="button" mat-raised-button color="accent" (click)="LoadDataList()" [disabled]="viewLoading">
+							Tìm kiếm
+						</button>
 					</div>
 				</div>
 				<div class="mat-table__wrapper d-block" style="overflow-x:auto">
 					<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="id"
 						matSortDirection="asc" matSortDisableClear>
-		
 						<ng-container matColumnDef="select">
 							<th mat-header-cell *matHeaderCellDef class="mat-column-checkbox stt-cell">
 								<mat-checkbox (change)="$event ? masterToggle() : null"
@@ -48,7 +49,6 @@
 								</mat-checkbox>
 							</td>
 						</ng-container>
-
 						<ng-container matColumnDef="BieuMau">
 							<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">Biểu mẫu</th>
 							<td mat-cell *matCellDef="let item" class="mat-column-vinCode">

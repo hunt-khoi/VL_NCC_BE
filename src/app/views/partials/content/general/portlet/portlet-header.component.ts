@@ -1,17 +1,5 @@
+import { AfterViewInit, Component, ElementRef, HostBinding, HostListener, Inject, Input, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
 import { KtDialogService, StickyDirective } from '../../../../../core/_base/layout';
-import {
-	AfterViewInit,
-	Component,
-	ElementRef,
-	HostBinding,
-	HostListener,
-	Inject,
-	Input,
-	OnDestroy,
-	OnInit,
-	PLATFORM_ID,
-	ViewChild
-} from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -91,12 +79,10 @@ export class PortletHeaderComponent implements OnInit, AfterViewInit, OnDestroy 
 						height = 60;
 					} else {
 						// normal fixed header
-						if (document.body.classList.contains('kt-header--fixed')) {
+						if (document.body.classList.contains('kt-header--fixed')) 
 							height += headerElement.offsetHeight;
-						}
-						if (document.body.classList.contains('kt-subheader--fixed') && subheaderElement) {
+						if (document.body.classList.contains('kt-subheader--fixed') && subheaderElement) 
 							height += subheaderElement.offsetHeight;
-						}
 					}
 				}
 			}
@@ -105,9 +91,8 @@ export class PortletHeaderComponent implements OnInit, AfterViewInit, OnDestroy 
 	}
 
 	ngOnInit() {
-		if (this.sticky) {
+		if (this.sticky) 
 			this.stickyDirective.ngOnInit();
-		}
 	}
 
 	ngAfterViewInit(): void {

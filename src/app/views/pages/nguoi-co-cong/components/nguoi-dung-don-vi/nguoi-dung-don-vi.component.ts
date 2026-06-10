@@ -19,7 +19,6 @@ export class TodoItemNode {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NguoiDungDonViComponent implements OnInit {
-	hasFormErrors: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
 	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
@@ -135,13 +134,13 @@ export class NguoiDungDonViComponent implements OnInit {
 
 	exist(data: any) {
 		let index = -1;
-		if (this.selected) {
-			for (var i = 0; i < this.selected.length; i++) {
-				let item = this.selected[i];
-				if (item.Id == data.Id && item.Type == data.Type && (!this.useVaiTro || (this.useVaiTro && item.IdGroup == data.IdGroup))) {
-					index = i;
-					break;
-				}
+		if (!this.selected)
+			return index;
+		for (var i = 0; i < this.selected.length; i++) {
+			let item = this.selected[i];
+			if (item.Id == data.Id && item.Type == data.Type && (!this.useVaiTro || (this.useVaiTro && item.IdGroup == data.IdGroup))) {
+				index = i;
+				break;
 			}
 		}
 		return index;
@@ -159,17 +158,6 @@ export class NguoiDungDonViComponent implements OnInit {
 
 	closeDialog() {
 		this.dialogRef.close();
-	}
-
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
 	}
 
 	/** Whether all the descendants of the node are selected. */

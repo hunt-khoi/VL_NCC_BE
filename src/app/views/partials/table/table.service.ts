@@ -1,7 +1,7 @@
 import { Injectable, ApplicationRef, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
 import { SelectionModel } from '@angular/cdk/collections';
 import { CdkDragStart, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Observable } from 'rxjs';
 import { LayoutUtilsService } from '../../../core/_base/crud';
 import { TableModel } from './table.model';
 import { CookieService } from 'ngx-cookie-service';

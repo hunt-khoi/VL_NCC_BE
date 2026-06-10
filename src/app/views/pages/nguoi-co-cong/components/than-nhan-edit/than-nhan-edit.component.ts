@@ -15,10 +15,8 @@ export class ThanNhanEditComponent implements OnInit {
 	data: any;
 	item: any;
 	oldItem: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
-	loadingAfterSubmit = false;
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
@@ -109,7 +107,6 @@ export class ThanNhanEditComponent implements OnInit {
 	}
 
 	changeNS(isNam = false) {
-		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh.setValue('');
 		}
@@ -122,8 +119,7 @@ export class ThanNhanEditComponent implements OnInit {
 		}
 	}
 
-	prepareCustomer(): any {
-		if (!this.itemForm) return;
+	prepare(): any {
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		_item.Id = this.item.Id;
@@ -157,19 +153,14 @@ export class ThanNhanEditComponent implements OnInit {
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
-		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
-		const EditThanNhan = this.prepareCustomer();
+		const EditThanNhan = this.prepare();
 		return EditThanNhan;
 	}
 }

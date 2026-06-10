@@ -1,14 +1,15 @@
 import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { SelectionModel } from '@angular/cdk/collections'
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { merge, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { QueryParamsModel, LayoutUtilsService } from 'app/core/_base/crud';
-import { SelectionModel } from '@angular/cdk/collections';
+import { CommonService } from '../../services/common.service';
+
 import { ChonNhieuNhanVienListModel } from './chon-nhieu-nhan-vien-list.model';
 import { ChonNhieuNhanVienListDataSource } from './chon-nhieu-nhan-vien-list.datasource';
-import { CommonService } from '../../services/common.service';
 
 @Component({
 	selector: 'm-chon-nhieu-nhan-vien-list',
@@ -52,9 +53,7 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 
 	];
 	selectedColumns = new SelectionModel<any>(true, this.availableColumns);
-	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
-	loadingAfterSubmit: boolean = false;
 	//===================================Khai báo dữ liệu===================
 	listDonVi: any[] = [];
 	listPhongBan: any[] = [];
@@ -349,7 +348,7 @@ export class ChonNhieuNhanVienListComponent implements OnInit {
 			this.dialogRef.close({ done: false, nhanVienSelected: [] });
 	}
 
-	luuNhanVien() {
+	luu() {
 		this.goBack(1);
 	}
 }

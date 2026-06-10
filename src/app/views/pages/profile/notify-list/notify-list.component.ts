@@ -1,17 +1,17 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
+import { TranslateService } from '@ngx-translate/core';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
-import { NotifyService } from '../Services/notify.service';
-import { NotifyDataSource } from '../Model/data-sources/notify.datasource';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../core/_base/crud';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
+import { NotifyService } from '../Services/notify.service';
+import { NotifyDataSource } from '../Model/data-sources/notify.datasource';
 import moment from 'moment';
 
 @Component({
@@ -37,6 +37,7 @@ export class NotifyListComponent implements OnInit {
 	list_button: boolean = false;
 	Capcocau: number = 0;
 	lstLoaiNoti: any[] = [];
+	btnClass: string = "";
 
 	constructor(public notifyService: NotifyService,
 		private danhMucService: CommonService,
@@ -50,10 +51,12 @@ export class NotifyListComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.Capcocau = res.Capcocau;
 		})
-
 		this.danhMucService.ListLoaiNoti().subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstLoaiNoti = res.data
@@ -163,14 +166,14 @@ export class NotifyListComponent implements OnInit {
 		}
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (res) {
-				this.notifyService.markAsRead(isDelete).subscribe(res => {
-					if (res && res.status == 1) {
-						this.loadDataList();
-					} else
-						this.layoutUtilsService.showError(res.error.message);
-				});
-			}
+			if (!res) return;
+
+			this.notifyService.markAsRead(isDelete).subscribe(res => {
+				if (res && res.status == 1) {
+					this.loadDataList();
+				} else
+					this.layoutUtilsService.showError(res.error.message);
+			});
 		});
 	}
 
@@ -180,14 +183,14 @@ export class NotifyListComponent implements OnInit {
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (res) {
-				this.notifyService.delete(object.IdRow).subscribe(res => {
-					if (res && res.status == 1) {
-						this.loadDataList();
-					} else
-						this.layoutUtilsService.showError(res.error.message);
-				});
-			}
+			if (!res) return;
+
+			this.notifyService.delete(object.IdRow).subscribe(res => {
+				if (res && res.status == 1) {
+					this.loadDataList();
+				} else
+					this.layoutUtilsService.showError(res.error.message);
+			});
 		});
 	}
 
@@ -196,19 +199,16 @@ export class NotifyListComponent implements OnInit {
 		const _title = this.translate.instant('OBJECT.DELETE_MULTY.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE_MULTY.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE_MULTY.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
-		const _deleteMessage = this.translate.instant('OBJECT.DELETE_MULTY.MESSAGE', { name: this._name });
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (res) {
-				this.notifyService.deletes(data).subscribe(res => {
-					if (res && res.status === 1) {
-						this.layoutUtilsService.showInfo(_deleteMessage);
-						this.loadDataList();
-					} else {
-						this.layoutUtilsService.showError(res.error.message);
-					}
-				});
-			}
+			if (!res) return;
+
+			this.notifyService.deletes(data).subscribe(res => {
+				if (res && res.status == 1) {
+					this.loadDataList();
+				} else
+					this.layoutUtilsService.showError(res.error.message);
+			});
 		});
 	}
 }

@@ -1,13 +1,9 @@
-// Angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-// Translate Module
 import { TranslateModule } from '@ngx-translate/core';
-// UI
 import { PartialsModule } from '../../../../partials/partials.module';
-// Core => Utils
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -33,7 +29,6 @@ import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
 import { CanvasDemoComponent } from './canvas-demo.component';
 import { CanvasDemoService } from './canvas-demo.service';
 import { TypesUtilsService, LayoutUtilsService, HttpUtilsService, InterceptService } from '../../../../../../../src/app/core/_base/crud';
-import { DeleteEntityDialogComponent, ActionNotificationComponent } from '../../../../../../../src/app/views/partials/content/crud';
 import { CanvasDemoDialogComponent } from './canvas-demo-dialog.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 

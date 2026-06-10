@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import objectPath from 'object-path';
 import { LayoutConfigService, SplashScreenService } from '../../../../core/_base/layout';
+import objectPath from 'object-path';
 
 @Component({
 	selector: 'kt-splash-screen',
@@ -8,7 +8,6 @@ import { LayoutConfigService, SplashScreenService } from '../../../../core/_base
 	styleUrls: ['./splash-screen.component.scss']
 })
 export class SplashScreenComponent implements OnInit {
-	// Public proprties
 	loaderLogo: string = "";
 	loaderType: string = "";
 	loaderMessage: string = "";

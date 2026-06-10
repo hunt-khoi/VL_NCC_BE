@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ViewEncapsulation, forwardRef, ChangeDetectorRef, Injector, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewEncapsulation, forwardRef, ChangeDetectorRef, Injector, Input, Output, EventEmitter, OnChanges, AfterViewInit } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { ArrayDataSource } from '@angular/cdk/collections';
 import { FormControl, NgControl, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS } from '@angular/forms';
@@ -22,9 +22,9 @@ import { FormControl, NgControl, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS } 
         }
     ]
 })
-export class DropdownTreeComponent {
+export class DropdownTreeComponent implements OnChanges, AfterViewInit {
     @Input() data: any;
-    @Input() DropdownTitle: string;
+    @Input() DropdownTitle: string = '';
     @Input() FieldTitle: string = "Title";
     @Input() FieldId: string = "RowID";
     @Input() FieldChildren: string = "Children";
@@ -66,7 +66,7 @@ export class DropdownTreeComponent {
 
     ngAfterViewInit() {
         const ngControl = this.injector.get(NgControl, null);
-        if (!ngControl) return;
+        if (!ngControl || !ngControl.control) return;
 
         let _val = ngControl.control.value;
         ngControl.control.setValue('');

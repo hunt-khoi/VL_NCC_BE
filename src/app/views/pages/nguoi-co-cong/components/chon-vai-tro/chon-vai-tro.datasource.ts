@@ -12,14 +12,14 @@ export class ChonVaiTroDataSource extends BaseDataSource {
 		this.loadingSubject.next(true);
 		this.service.ListVaiTroPhanTrang(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					if (resultFromServer.data != null && resultFromServer.data != undefined) {
-						this.entitySubject.next(resultFromServer.data);
-						this.paginatorTotalSubject.next(resultFromServer.page.TotalCount);
+				tap(res => {
+					if (res.data != null && res.data != undefined) {
+						this.entitySubject.next(res.data);
+						this.paginatorTotalSubject.next(res.page.TotalCount);
 					}
 					else {
-						this.entitySubject.next(null);
-						this.paginatorTotalSubject.next(null);
+						this.entitySubject.next([]);
+						this.paginatorTotalSubject.next(0);
 					}
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),

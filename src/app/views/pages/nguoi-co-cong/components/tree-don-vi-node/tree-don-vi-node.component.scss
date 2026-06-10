@@ -2,15 +2,63 @@
     .item-node {
         display: flex;
         align-items: center;
+
         .ea-quyen {
             width: 100%;
             padding: 5px 0;
             align-items: center;
             cursor: pointer;
+
             &:hover,
             &.dv-active {
                 background-color: #d3edfa;
             }
         }
     }
+}
+
+.tree-list-phan-quyen {
+    font-size: 14px;
+}
+
+.tree-list-phan-quyen ul,
+.tree-list-phan-quyen ul li {
+    list-style: none;
+}
+
+.tree-list-phan-quyen .ea-quyen {
+    display: inline-flex;
+}
+
+.color-folder {
+    color: #f1c40f;
+}
+
+.color-success {
+    color: #34bfa3;
+}
+
+.m-point {
+    cursor: pointer;
+}
+
+.hidding {
+    display: none;
+}
+
+:host>>>.mat-checkbox>label.mat-checkbox-layout>div.mat-checkbox-inner-container {
+    width: 14px;
+    height: 14px;
+}
+
+:host>>>.mat-checkbox>label {
+    margin-bottom: .5rem;
+}
+
+:host>>>.chk-sty.mat-checkbox-checked .mat-checkbox-checkmark {
+    opacity: 0;
+}
+
+.font-14 {
+    font-size: 14px;
 }

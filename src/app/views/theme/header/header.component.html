@@ -1,14 +1,16 @@
 <!-- begin: Header -->
 <div ktHeader #ktHeader class="kt-header kt-grid__item" [ngClass]="htmlClassService.getClasses('header', true)" 
     id="kt_header" [ngStyle]="{'background': '#0274b5 url(' + constants.background_header + ') right top no-repeat'}">
-    <ngb-progressbar class="kt-loading-bar" *ngIf="(loader.progress$|async) > 0" [value]="loader.progress$|async" height="3px"></ngb-progressbar>
+    <ngb-progressbar class="kt-loading-bar" *ngIf="(loader.progress$|async) > 0" [value]="loader.progress$|async" height="3px">
+    </ngb-progressbar>
 
     <!-- begin:: Brand -->
     <!-- <kt-brand></kt-brand> -->
     <!-- end:: Brand -->
 
     <!-- begin: Header Menu -->
-    <kt-menu-horizontal style="width: 80%;" *ngIf="menuHeaderDisplay" (getMenuItem)="getActiveHeader($event)"></kt-menu-horizontal>
+    <kt-menu-horizontal style="width: 80%;" *ngIf="menuHeaderDisplay" (getMenuItem)="getActiveHeader($event)">
+    </kt-menu-horizontal>
     <!-- end: Header Menu -->
 
     <!-- begin:: Header Topbar -->
@@ -20,5 +22,6 @@
 <!-- end: Header -->
 
 <!-- begin:: Content Submenu Head-->
-<kt-subheader-tab [fluid]="fluid_sub" [clear]="clear" [data]="dataSubmenu" [menuId]="activeMenu" *ngIf="dataSubmenu"></kt-subheader-tab>        
+<kt-subheader-tab [fluid]="fluid_sub" [clear]="clear" [data]="dataSubmenu" [menuId]="activeMenu" *ngIf="dataSubmenu">
+</kt-subheader-tab>        
 <!-- end:: Content Submenu Head -->

@@ -13,7 +13,6 @@ import 'chartjs-plugin-labels';
 	styleUrls: ['dashboard.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	encapsulation: ViewEncapsulation.None
-
 })
 export class DashboardComponent implements OnInit {
 	ThongKeDashboard: any[] = [];
@@ -104,7 +103,7 @@ export class DashboardComponent implements OnInit {
 		});
 
 		this.getListFeedBack();
-		this.signalRService.notifyReceived.subscribe((res: any) => {
+		this.signalRService.notifyReceived.subscribe(() => {
 			this.getListFeedBackLastest();
 		})
 	}

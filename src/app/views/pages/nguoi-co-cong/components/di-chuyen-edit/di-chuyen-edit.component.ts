@@ -3,9 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
-import moment from 'moment';
-import { Moment } from 'moment';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-di-chuyen-edit',
@@ -17,18 +17,13 @@ export class DiChuyenEditComponent implements OnInit {
 	data: any;
 	item: any;
 	ncc: any = {};
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
-	loadingAfterSubmit = false;
-	disabledBtn = false;
 	isZoomSize = false;
 	hideOther = false;//hide from
 	allowEdit = false;
 	isChuyenDi: boolean = true;
 	listTinh: any[] = [];
-	listHuyen: any[] = [];
-	listHuyenOld: any[] = [];
 	listXa: any[] = [];
 	listXaOld: any[] = [];
 	listKhomAp: any[] = [];
@@ -48,7 +43,6 @@ export class DiChuyenEditComponent implements OnInit {
 		this._NAME = this.translate.instant('DICHUYEN.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.maxNS = moment(new Date());
 		this.item = this.data._item;
@@ -81,7 +75,6 @@ export class DiChuyenEditComponent implements OnInit {
 					};
 					this.load_old();
 					this.changeTinh(this.item.Id_Tinh);
-					this.changeHuyen(this.item.Id_Huyen);
 					if (this.item.Id_KhomAp)
 						this.changeXa(this.item.Id_Xa);
 					this.createForm();
@@ -97,11 +90,7 @@ export class DiChuyenEditComponent implements OnInit {
 	}
 
 	load_old() {
-		this.commonService.GetListDistrictByProvinces(this.ncc.ProvinceID).subscribe(res => {
-			this.listHuyenOld = res.data;
-			this.changeDetectorRefs.detectChanges();
-		});
-		this.commonService.GetListWardByDistrict(this.ncc.DistrictID).subscribe(res => {
+		this.commonService.GetListWardByProvince(this.ncc.ProvinceID).subscribe(res => {
 			this.listXaOld = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
@@ -157,15 +146,13 @@ export class DiChuyenEditComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): any {
-		if (!this.itemForm) return;
+	prepare(): any {
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
 		_item.Id_NCC = this.item.Id_NCC;
 		_item.Id_Tinh = controls.tinh.value;
-		_item.Id_Huyen = controls.huyen.value;
+		// _item.Id_Huyen = controls.huyen.value;
 		_item.Id_Xa = controls.xa.value;
 		if (controls.khomap.value)
 		_item.Id_KhomAp = controls.khomap.value
@@ -185,35 +172,24 @@ export class DiChuyenEditComponent implements OnInit {
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
-		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		if (controls.xa_old.value == controls.xa.value) {
 			this.layoutUtilsService.showInfo("Địa chỉ chuyển đến không được trùng với địa chỉ hiện tại");
-			this.hasFormErrors = true;
 			return;
 		}
-		const EditTroCap = this.prepareCustomer();
-		EditTroCap.isChuyenDi = this.isChuyenDi;
-		return EditTroCap;
+		const Edit = this.prepare();
+		Edit.isChuyenDi = this.isChuyenDi;
+		return Edit;
 	}
 
 	changeTinh(val: number) {
-		this.commonService.GetListDistrictByProvinces(val).subscribe(res => {
-			this.listHuyen = res.data;
-			this.changeDetectorRefs.detectChanges();
-		});
-	}
-	changeHuyen(val: number) {
-		this.commonService.GetListWardByDistrict(val).subscribe(res => {
+		this.commonService.GetListWardByProvince(val).subscribe(res => {
 			this.listXa = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
@@ -225,13 +201,7 @@ export class DiChuyenEditComponent implements OnInit {
 		});
 	}
 	changeTinhOld(val: number) {
-		this.commonService.GetListDistrictByProvinces(val).subscribe(res => {
-			this.listHuyenOld = res.data;
-			this.changeDetectorRefs.detectChanges();
-		});
-	}
-	changeHuyenOld(val: number) {
-		this.commonService.GetListWardByDistrict(val).subscribe(res => {
+		this.commonService.GetListWardByProvince(val).subscribe(res => {
 			this.listXaOld = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
@@ -246,8 +216,6 @@ export class DiChuyenEditComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

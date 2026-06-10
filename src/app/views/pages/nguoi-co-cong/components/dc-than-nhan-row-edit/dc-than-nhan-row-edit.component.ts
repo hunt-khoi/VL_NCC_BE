@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { CommonService } from '../../services/common.service';
 
 @Component({
+	// eslint-disable-next-line @angular-eslint/component-selector
 	selector: 'tr[dc-than-nhan-row-edit]',
 	templateUrl: './dc-than-nhan-row-edit.component.html',
 })
@@ -15,23 +16,20 @@ export class DCThanNhanRowEditComponent implements OnInit {
 	public close$ = new Subject<void>();
 	data: any;
 	item: any;
-	hasFormErrors = false;
 	viewLoading = false;
-	loadingAfterSubmit = false;
-	disabledBtn = false;
 	allowEdit = false;
 
 	maxNS: Moment | undefined;
 	cmpRef: ComponentRef<any> | undefined;
 
 	//form controls
-	HoTenDung: FormControl | undefined;
-	NamSinhDung: FormControl | undefined;
-	CuTruDung: FormControl | undefined;
-	HoTenSai: FormControl | undefined;
-	NamSinhSai: FormControl | undefined;
-	CuTruSai: FormControl | undefined;
-	GhiChu: FormControl| undefined;
+	HoTenDung: FormControl = new FormControl("");
+	NamSinhDung: FormControl = new FormControl("");
+	CuTruDung: FormControl = new FormControl("");
+	HoTenSai: FormControl = new FormControl("");
+	NamSinhSai: FormControl = new FormControl("");
+	CuTruSai: FormControl = new FormControl("");
+	GhiChu: FormControl = new FormControl("");
 
 	showDel: boolean = true //mđ hiện cột xóa hàng
 	showGhiChu: boolean = true //mđ hiện cột ghi chú
@@ -68,8 +66,7 @@ export class DCThanNhanRowEditComponent implements OnInit {
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): any {
+	prepare(): any {
 		const _item: any = {};
 		_item.HoTenDung = this.HoTenDung ? this.HoTenDung.value : "";
 		_item.NamSinhDung = this.NamSinhDung ? this.NamSinhDung.value : "";
@@ -82,10 +79,8 @@ export class DCThanNhanRowEditComponent implements OnInit {
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
-		this.loadingAfterSubmit = false;
-		const EditTroCap = this.prepareCustomer();
-		return EditTroCap;
+		const Edit = this.prepare();
+		return Edit;
 	}
 
 	close() {
@@ -95,6 +90,5 @@ export class DCThanNhanRowEditComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
 	}
 }

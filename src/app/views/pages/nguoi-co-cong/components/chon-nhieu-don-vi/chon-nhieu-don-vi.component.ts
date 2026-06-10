@@ -19,7 +19,6 @@ export class TodoItemNode {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChonNhieuDonViComponent implements OnInit {
-	hasFormErrors: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
 	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
@@ -73,9 +72,6 @@ export class ChonNhieuDonViComponent implements OnInit {
 		private changeDetectorRefs: ChangeDetectorRef,
 		private commonService: CommonService) { }
 
-	/**
-	 * On init
-	 */
 	async ngOnInit() {
 		if (this.data.id_parent) {
 			this.id_parent = this.data.id_parent;
@@ -183,17 +179,6 @@ export class ChonNhieuDonViComponent implements OnInit {
 
 	closeDialog() {
 		this.dialogRef.close();
-	}
-
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
 	}
 
 	//#region multi

@@ -14,7 +14,6 @@ import { HDSDService } from '../Services/hdsd.service';
 export class HDSDEditDialogComponent implements OnInit {
 	item: any;
 	itemForm: FormGroup = new FormGroup({});
-	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -95,14 +94,12 @@ export class HDSDEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const data = this.prepare();

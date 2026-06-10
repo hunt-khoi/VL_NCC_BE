@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService } from '../../../../../core/_base/crud';
+import { environment } from '../../../../../../environments/environment';
 
 const API = environment.ApiRoot + '/comment';
 
@@ -10,8 +10,7 @@ const API = environment.ApiRoot + '/comment';
 export class CommentService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 	ReadOnlyControl: boolean = false; 
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) { }
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	getDSYKien(Id: number, Loai: number, include_cmt: boolean = true): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();

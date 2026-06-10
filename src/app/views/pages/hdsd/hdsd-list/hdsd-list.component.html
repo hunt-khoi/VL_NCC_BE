@@ -9,13 +9,12 @@
 		</ng-container>
 		<ng-container ktPortletTools>
 			<span>Phiên bản <b>{{ver.Version}}</b> - Cập nhật ngày <b>{{ver.Date}}</b></span>&nbsp;&nbsp;
-			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" color="accent"
-				type="button" *ngIf="rR.r1122">
+			<button mat-raised-button (click)="Add()" matTooltip="{{ 'COMMON.CREATE' | translate }}" 
+				color="accent" type="button" *ngIf="rR.r1122">
 				<span translate="COMMON.CREATE"></span>
 			</button>
 		</ng-container>
 	</kt-portlet-header>
-
 	<div class="kt-portlet__body">
 		<div class="mat-table__wrapper">
 			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="HDSD"
@@ -80,7 +79,6 @@
 				<span translate="COMMON.NO_RECORD_FOUND"></span>
 			</div>
 		</div>
-
 		<div class="mat-table__bottom" style="margin-top: 1px;">
 			<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
 			<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"

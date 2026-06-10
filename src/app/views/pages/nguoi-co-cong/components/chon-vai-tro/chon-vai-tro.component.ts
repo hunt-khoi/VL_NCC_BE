@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, Inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { FormControl } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -12,7 +12,6 @@ import { merge, BehaviorSubject } from 'rxjs';
 import { ChonVaiTroDataSource } from './chon-vai-tro.datasource';
 import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
 import { CommonService } from '../../services/common.service';
-import { FormControl } from '@angular/forms';
 
 @Component({
 	selector: 'm-chon-vai-tro',
@@ -25,7 +24,6 @@ export class ChonVaiTroComponent implements OnInit {
 	dataSource: ChonVaiTroDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
 	// Selection
 	selection = new SelectionModel<any>(true, []);
@@ -102,15 +100,17 @@ export class ChonVaiTroComponent implements OnInit {
 		this.dataSource = new ChonVaiTroDataSource(this.commonService);
 		let queryParams = new QueryParamsModel({});
 		this.route.queryParams.subscribe(_ => {
-			queryParams.filter.filterCap = this.filterCap;
-			if (this.filterCap == "5")
-				queryParams.filter.filterCapN = this.data.filterCapN;
-			if (this.DonVi > 0)
-				queryParams.filter.DonVi = this.DonVi
-			if (this.data.emptyRow)
-				queryParams.filter.emptyRow = this.data.emptyRow
-			// First load
-			this.dataSource.LoadData(queryParams);
+			if (this.dataSource) {
+				queryParams.filter.filterCap = this.filterCap;
+				if (this.filterCap == "5")
+					queryParams.filter.filterCapN = this.data.filterCapN;
+				if (this.DonVi > 0)
+					queryParams.filter.DonVi = this.DonVi
+				if (this.data.emptyRow)
+					queryParams.filter.emptyRow = this.data.emptyRow
+				// First load
+				this.dataSource.LoadData(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
 			this.item = res;

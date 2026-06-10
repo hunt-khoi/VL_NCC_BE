@@ -8,5 +8,4 @@ import { TableService } from '../table.service';
 })
 export class ColumnOptionComponent {
 	@Input() gridService: TableService | undefined; //ko được xóa
-	constructor() { }
 }

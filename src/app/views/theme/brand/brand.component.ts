@@ -7,7 +7,6 @@ import { HtmlClassService } from '../html-class.service';
 	templateUrl: './brand.component.html',
 })
 export class BrandComponent implements OnInit {
-	// Public properties
 	headerLogo: string = "";
 	headerStickyLogo: string = "";
 	toggleOptions: ToggleOptions = {

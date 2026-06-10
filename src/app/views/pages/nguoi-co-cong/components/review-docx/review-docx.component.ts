@@ -13,7 +13,6 @@ export class ReviewDocxComponent implements OnInit {
 	loading$ = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isZoomSize: boolean = false;
-	disabledBtn: boolean = false;
 
 	strHtml: any;
 	constructor(
@@ -30,7 +29,7 @@ export class ReviewDocxComponent implements OnInit {
 		this.strHtml = this.sanitized.bypassSecurityTrustHtml(this.data)
 	}
 
-	in() {
+	export() {
 		this.dialogRef.close(true);
 	}
 

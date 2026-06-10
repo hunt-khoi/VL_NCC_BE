@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
-import moment from 'moment';
 import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-quyet-dinh-edit',
@@ -15,11 +15,8 @@ import { Moment } from 'moment';
 export class QuyetDinhEditComponent implements OnInit {
 	data: any;
 	item: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
-	loadingAfterSubmit = false;
-	disabledBtn = false;
 	isZoomSize = false;
 	allowEdit = true;
 	callapi = true; //update trên form hay k
@@ -80,9 +77,7 @@ export class QuyetDinhEditComponent implements OnInit {
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): any {
-		if (!this.itemForm) return;
+	prepare(): any {
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -97,28 +92,20 @@ export class QuyetDinhEditComponent implements OnInit {
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
-		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
-			this.hasFormErrors = true;
 			return;
 		}
-		const EditQuyetDinh = this.prepareCustomer();
+		const EditQuyetDinh = this.prepare();
 		return EditQuyetDinh;
 	}
 
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

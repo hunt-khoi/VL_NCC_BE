@@ -1,21 +1,18 @@
 <div ngbDropdown placement="bottom" autoClose="outside" class="kt-header__topbar-item">
 	<div ngbDropdownToggle class="kt-header__topbar-wrapper">
 		<span class="kt-header__topbar-icon notification"
-			[ngClass]="{'kt-pulse kt-pulse--brand': pulse, 'kt-pulse--light' : pulseLight, 'kt-header__topbar-icon--success' : iconType === 'success'	}"
+			[ngClass]="{'kt-pulse kt-pulse--brand': pulse, 'kt-pulse--light' : pulseLight, 'kt-header__topbar-icon--success' : iconType === 'success'}"
 			matBadge="{{ (ThongBao.Total.Total > 99)? '99+' : ThongBao.Total.Total }}" matBadgeColor="warn">
 			<i *ngIf="!useSVG" [ngClass]="icon"></i>
 			<span *ngIf="useSVG" class="kt-svg-icon" [ngClass]="{'kt-svg-icon--success' : iconType === 'success'}"
 				[inlineSVG]="icon"></span>
 			<span class="kt-pulse__ring" [hidden]="!pulse"></span>
 		</span>
-		<span class="kt-badge kt-badge--dot kt-badge--notify kt-badge--sm kt-badge--brand notification"
-			[hidden]="!dot"></span>
+		<span class="kt-badge kt-badge--dot kt-badge--notify kt-badge--sm kt-badge--brand notification" [hidden]="!dot"></span>
 	</div>
-
 	<div ngbDropdownMenu
 		class="dropdown-menu dropdown-menu-fit dropdown-menu-right dropdown-menu-anim dropdown-menu-top-unround dropdown-menu-lg">
 		<form>
-			<!--begin: Head -->
 			<div class="kt-head kt-head--skin-{{skin}} kt-head--fit-x kt-head--fit-b"
 				[ngStyle]="{'background-image': backGroundStyle() }">
 				<h3 class="kt-head__title">
@@ -31,14 +28,12 @@
 					<li class="nav-item">
 						<a (click)="tab.select('tab-id-1')" class="nav-link active show" data-toggle="tab"
 							href="javascript:;" role="tab" aria-selected="false" matBadgeColor="warn"
-							matBadge="{{ (ThongBao.Total.ThongBao > 99) ? '99+' : ThongBao.Total.ThongBao }}">Thông
-							báo</a>
+							matBadge="{{ (ThongBao.Total.ThongBao > 99) ? '99+' : ThongBao.Total.ThongBao }}">
+							Thông báo
+						</a>
 					</li>
-
 				</ul>
 			</div>
-			<!--end: Head -->
-
 			<ngb-tabset #tab="ngbTabset">
 				<ngb-tab id="tab-id-1">
 					<ng-template ngbTabContent>
@@ -60,7 +55,6 @@
 					</ng-template>
 				</ngb-tab>
 			</ngb-tabset>
-
 		</form>
 	</div>
 </div>

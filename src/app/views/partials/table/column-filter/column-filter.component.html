@@ -7,7 +7,6 @@
 		}
 	}
 </style>
-
 <div *ngIf="enable_sort" mat-sort-header cdkDropList cdkDropListLockAxis="x" cdkDropListOrientation="horizontal" cdkDrag
     (cdkDropListDropped)="gridService.dropListDropped($event, column_name)" (cdkDragStarted)="gridService.dragStarted($event, column_name)">
     {{column_title}}

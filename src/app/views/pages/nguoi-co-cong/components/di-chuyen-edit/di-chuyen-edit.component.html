@@ -12,19 +12,12 @@
 		</div>
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<mat-select placeholder="Huyện" formControlName="huyen_old" (selectionChange)="changeHuyenOld($event.value)" [disabled]="!allowEdit || isChuyenDi">
-					<mat-option [value]="lgt.ID_Row" *ngFor="let lgt of listHuyenOld;">{{lgt.District}}</mat-option>
-				</mat-select>
-			</mat-form-field>
-		</div>
-		<div class="col-lg-6 m--margin-bottom-20-mobile">
-			<mat-form-field class="mat-form-field-fluid">
 				<mat-select placeholder="Xã" formControlName="xa_old" (selectionChange)="changeXaOld($event.value)" [disabled]="!allowEdit || isChuyenDi">
 					<mat-option [value]="lgt.ID_Row" *ngFor="let lgt of listXaOld;">{{lgt.Ward}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 		</div>
-		<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls.tinh_old.value == filterprovinces">
+		<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls.tinh_old.value === filterprovinces">
 			<mat-form-field class="mat-form-field-fluid">
 				<mat-select placeholder="Khóm ấp" formControlName="khomap_old" [disabled]="!allowEdit || isChuyenDi">
 					<mat-option [value]="lgt.id" *ngFor="let lgt of listKhomApOld;">{{lgt.title}}</mat-option>
@@ -71,19 +64,12 @@
 		</div>
 		<div class="col-lg-6 m--margin-bottom-20-mobile">
 			<mat-form-field class="mat-form-field-fluid">
-				<mat-select placeholder="Huyện" formControlName="huyen" required (selectionChange)="changeHuyen($event.value)" [disabled]="!allowEdit || !isChuyenDi">
-					<mat-option [value]="lgt.ID_Row" *ngFor="let lgt of listHuyen;">{{lgt.District}}</mat-option>
-				</mat-select>
-			</mat-form-field>
-		</div>
-		<div class="col-lg-6 m--margin-bottom-20-mobile">
-			<mat-form-field class="mat-form-field-fluid">
 				<mat-select placeholder="Xã" formControlName="xa" (selectionChange)="changeXa($event.value)" required [disabled]="!allowEdit || !isChuyenDi">
 					<mat-option [value]="lgt.ID_Row" *ngFor="let lgt of listXa;">{{lgt.Ward}}</mat-option>
 				</mat-select>
 			</mat-form-field>
 		</div>
-		<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls.tinh.value == filterprovinces">
+		<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="itemForm.controls.tinh.value === filterprovinces">
 			<mat-form-field class="mat-form-field-fluid">
 				<mat-select placeholder="Khóm ấp" formControlName="khomap" [disabled]="!allowEdit || !isChuyenDi">
 					<mat-option [value]="lgt.id" *ngFor="let lgt of listKhomAp;">{{lgt.title}}</mat-option>

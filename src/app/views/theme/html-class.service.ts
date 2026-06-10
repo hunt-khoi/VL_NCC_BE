@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import * as objectPath from 'object-path';
 import { BehaviorSubject } from 'rxjs';
 import { LayoutConfigModel } from '../../core/_base/layout';
+import objectPath from 'object-path';
 
 export interface ClassType {
 	header: string[];
@@ -12,7 +12,6 @@ export interface ClassType {
 
 @Injectable()
 export class HtmlClassService {
-	// Public properties
 	config: LayoutConfigModel | any;
 	classes: ClassType | any;
 	onClassesUpdated$: BehaviorSubject<ClassType>;
@@ -83,7 +82,8 @@ export class HtmlClassService {
 			}
 		}
 
-		if (objectPath.get(this.config, 'self.layout') === 'boxed' && objectPath.has(this.config, 'self.body.background-image')) {
+		if (objectPath.get(this.config, 'self.layout') === 'boxed' 
+			&& objectPath.has(this.config, 'self.body.background-image')) {
 			document.body.style.backgroundImage = 'url("' + objectPath.get(this.config, 'self.body.background-image') + '")';
 		}
 
@@ -109,7 +109,8 @@ export class HtmlClassService {
 			objectPath.push(this.classes, 'header_mobile', 'kt-header-mobile--fixed');
 		}
 		if (objectPath.get(this.config, 'header.menu.self.layout')) {
-			objectPath.push(this.classes, 'header_menu', 'kt-header-menu--layout-' + objectPath.get(this.config, 'header.menu.self.layout'));
+			objectPath.push(this.classes, 'header_menu', 
+				'kt-header-menu--layout-' + objectPath.get(this.config, 'header.menu.self.layout'));
 		}
 	}
 

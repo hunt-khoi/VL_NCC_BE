@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { LoadingBarService } from '@ngx-loading-bar/core';
 import { Observable } from 'rxjs';
 import { PortletBodyComponent } from './portlet-body.component';
@@ -14,7 +14,7 @@ export interface PortletOptions {
 	templateUrl: './portlet.component.html',
 	exportAs: 'ktPortlet'
 })
-export class PortletComponent implements OnInit {
+export class PortletComponent {
 	@Input() loading$: Observable<boolean> | undefined;
 	// portlet extra options
 	@Input() options: PortletOptions | undefined;
@@ -32,6 +32,4 @@ export class PortletComponent implements OnInit {
 	constructor(public loader: LoadingBarService) {
 		this.loader.complete();
 	}
-
-	ngOnInit() { }
 }

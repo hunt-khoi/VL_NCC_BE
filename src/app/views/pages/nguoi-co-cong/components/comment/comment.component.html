@@ -57,7 +57,7 @@
 						(click)="click($event)" [disabled]="disabledInput">
 						</textarea>
 				</mat-form-field>
-				<div *ngIf="Comment != '' && !disabledInput" class="submit-comment"
+				<div *ngIf="Comment !== '' && !disabledInput" class="submit-comment"
 					style="font-weight: 500;font-size:16px">
 					<button class="btn btn-success float-left" style="padding: 5px 15px;"
 						(click)="CommentInsert(Comment,0,0,1)">
@@ -115,7 +115,7 @@
 							<p class="m-card-user__name mg-0">{{quyen.NguoiTao.hoten}}</p>
 							<p>
 								{{quyen.CreatedDate}}
-								<span *ngIf="quyen.cmt==0">
+								<span *ngIf="quyen.cmt === 0">
 									<span *ngIf="!quyen.IsTre" title="Thời hạn">
 										<mat-icon>watch_later</mat-icon>{{quyen.Deadline}}
 									</span>
@@ -123,7 +123,7 @@
 										<mat-icon color="warn">watch_later</mat-icon>{{quyen.Deadline}}
 									</span>
 									<button mat-button mat-raised-button color="info" (click)="inhuongdan(quyen.id_row)"
-										*ngIf="(Loai==2 || Loai==5) && quyen.IsTraLai">In hướng dẫn</button>
+										*ngIf="(Loai===2 || Loai===5) && quyen.IsTraLai">In hướng dẫn</button>
 								</span>
 							</p>
 						</div>
@@ -135,7 +135,7 @@
 							</div>
 							<div style="min-width: 50px; min-height: 45px;">
 								<ng-container *ngIf="quyen.AllowEdit">
-									<button mat-icon-button (click)="initUpdate(quyen, vi)"
+									<button mat-icon-button (click)="initUpdate(quyen)"
 										matTooltip="Sửa nội dung bình luận" [disabled]="disabledInput">
 										<mat-icon class="action edit">create</mat-icon>
 									</button>
@@ -188,7 +188,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="row" *ngIf="quyen.cmt=='1'">
+						<div class="row" *ngIf="quyen.cmt === '1'">
 							<div class="col-md-12 comment-like">
 								<a href="javascript:void(0)" (click)="ShowOrHideComment(vi)" class="kt-font-bolder">
 									Trả lời <span class="comment-num">{{quyen.Children ? quyen.Children.length :
@@ -208,7 +208,7 @@
 								<popover-content #myPopover class="reaction-box-container" [closeOnMouseOutside]="true">
 									<div class="reaction-box" style="left: -155px;">
 										<div class="reaction-icon" *ngFor="let icon of icons"
-											(click)="like(quyen,icon.id_row)">
+											(click)="like(quyen, icon.id_row)">
 											<label>{{icon.title}}</label>
 											<div class="reaction-img">
 												<img src="{{icon.icon}}">
@@ -250,7 +250,7 @@
 												</div>
 												<div style="min-width: 50px; min-height: 45px;">
 													<ng-container *ngIf="child.AllowEdit">
-														<button mat-icon-button (click)="initUpdate(child,vi, vic)"
+														<button mat-icon-button (click)="initUpdate(child)"
 															matTooltip="Sửa nội dung bình luận"
 															[disabled]="disabledInput">
 															<mat-icon class="action edit">create</mat-icon>

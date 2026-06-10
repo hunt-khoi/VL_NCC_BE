@@ -7,6 +7,4 @@ import { TableService } from '../table.service';
 })
 export class ChipFilterComponent {
 	@Input() gridService: TableService | undefined;
-
-	constructor() { }
 }

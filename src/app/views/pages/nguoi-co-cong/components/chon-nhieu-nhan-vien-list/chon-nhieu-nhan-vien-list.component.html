@@ -13,7 +13,7 @@
 					</label>
 				</div>
 			</div>
-			<button type="button" mat-raised-button color="primary" (click)="luuNhanVien()" [disabled]="viewLoading ||disabledBtn">Tiếp tục</button>
+			<button type="button" mat-raised-button color="primary" (click)="luu()" [disabled]="viewLoading ||disabledBtn">Tiếp tục</button>
 		</ng-container>
 	</kt-portlet-header>
 
@@ -23,8 +23,7 @@
 				<div class="row align-items-center">
 					<div class="col-md-6 m--margin-bottom-10-mobile">
 						<mat-form-field class="mat-form-field-fluid">
-							<input matInput #searchInput placeholder="Tìm kiếm"
-								class="mat-form-field mat-form-field-fluid">
+							<input matInput #searchInput placeholder="Tìm kiếm" class="mat-form-field mat-form-field-fluid">
 						</mat-form-field>
 					</div>
 					<div class="col-md-6 m--margin-bottom-10-mobile">
@@ -75,7 +74,6 @@
 								</mat-checkbox>
 							</td>
 						</ng-container>
-
 						<ng-container matColumnDef="MaNV">
 							<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">Mã nhân viên</th>
 							<td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.MaNV}}</td>
@@ -100,7 +98,6 @@
 							<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">Chức vụ</th>
 							<td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.TenChucVu}}</td>
 						</ng-container>
-						
 						<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 						<tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 					</table>

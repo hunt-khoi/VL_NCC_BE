@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
@@ -13,7 +12,6 @@ import { environment } from '../../../../../environments/environment';
 @Injectable()
 export class CommonService {
 
-	Form: FormGroup | undefined;
 	fixedPoint: number = 0;
 	thousandSeparator: string = '.';
 	decimalSeperator: string = ',';
@@ -146,7 +144,6 @@ export class CommonService {
 	constructor(private layoutUtilsService: LayoutUtilsService,
 		private http: HttpClient,
 		private httpUtils: HttpUtilsService,
-		private fb: FormBuilder,
 		private tokenStorage: TokenStorage,
 		private idle: Idle,
 		private auth: AuthService) { }
@@ -163,28 +160,6 @@ export class CommonService {
 		var temp = localStorage.getItem('DROP_BUTTON');
 		return temp == "1";
 	};
-
-	ValidateChangeNumberEvent(columnName: string, item: any, event: any) {
-		var count = 0;
-		for (let i = 0; i < event.target.value.length; i++) {
-			if (event.target.value[i] == this.decimalSeperator) {
-				count += 1;
-			}
-		}
-		var regex = /[a-zA-Z -!$%^&*()_+|~=`{}[:;<>?@#\]]/g;
-		var found = event.target.value.match(regex);
-		if (found != null) {
-			const message = 'Dữ liệu không gồm chữ hoặc kí tự đặc biệt';
-			this.layoutUtilsService.showError(message);
-			return false;;
-		}
-		if (count >= 2) {
-			const message = 'Dữ liệu không thể có nhiều hơn 2 dấu .';
-			this.layoutUtilsService.showError(message);
-			return false;;
-		}
-		return true;
-	}
 
 	/**
 	 * Phonenumber: type= 'phone'
@@ -345,66 +320,11 @@ export class CommonService {
 		}
 	}
 
-	/*
-		cái hàm này load lại mỗi 5 giây để check link ảnh có hoạt động hay không.
-			- nhược điểm: đưa thông báo lỗi load ảnh liên tục nếu link ảnh lỗi
-			- ưu điểm: nó chạy được :D 
-	*/
-	checkImage(url: any, callback: any, timeout: any) {
-		timeout = timeout || 10000;
-		var timedOut = false, timer: any;
-		var img = new Image();
-		img.onerror = img.onabort = function() {
-			if (!timedOut) {
-				clearTimeout(timer);	
-				callback(url, "error");
-			}
-		};
-		img.onload = function() {
-			if (!timedOut) {
-				clearTimeout(timer);
-				callback(url, "success");
-			}
-		};
-		img.src = url;
-		timer = setTimeout(function() {
-			timedOut = true;
-			callback(url, "timeout");
-		}, timeout); 
-	}
-
-	record(result: any) {
-		if (result == 'error')
-			return false;
-		return true;
-	}  
-
-	//#region form helper
-	buildForm(data: any) {
-		this.Form = this.fb.group(data);
-	}
-	/**
-	 * Checking control validation
-	 *
-	 * @param controlName: string => Equals to formControlName
-	 * @param validationType: string => Equals to valitors name
-	 */
-	isControlHasError(controlName: string, validationType: string): boolean {
-		if (!this.Form) return false;
-		const control = this.Form.controls[controlName];
-		if (!control) return false;
-		const result = control.hasError(validationType) && (control.dirty || control.touched);
-		return result;
-	}
-	//#endregion
-
 	//#region file đính kèm
-	public download_dinhkem(Id: number): Observable<any> {
+	download_dinhkem(Id: number): Observable<any> {
 		var _token = '';
 		this.tokenStorage.getAccessToken().subscribe(t => { _token = t; });
-		let headers = new HttpHeaders({
-			'Authorization': 'Bearer ' + _token,
-		})
+		let headers = new HttpHeaders({ 'Authorization': 'Bearer ' + _token })
 		headers.append("Content-Type", "multipart/form-data");
 		return this.http.get(environment.ApiRoot + '/lite/download-dinhkem?id=' + Id, { headers });//, responseType: 'blob'
 	}
@@ -425,12 +345,6 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/lite_emotion';
 		return this.http.get<any>(url, { headers: httpHeaders });
-	}
-	//#endregion
-
-	//#region ***filter***
-	getFilterGroup(column: string, url: string): Observable<any> {
-		return this.http.get<any>(environment.ApiRoot + url + `${column}`);
 	}
 	//#endregion
 

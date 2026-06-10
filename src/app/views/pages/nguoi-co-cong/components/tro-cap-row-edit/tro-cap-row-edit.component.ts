@@ -2,13 +2,14 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Componen
 import { FormControl, Validators } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { TranslateService } from '@ngx-translate/core';
-import moment from 'moment';
-import { Moment } from 'moment';
 import { Subject } from 'rxjs';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { CommonService } from '../../services/common.service';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
+	// eslint-disable-next-line @angular-eslint/component-selector
 	selector: 'tr[tro-cap-row-edit]',
 	templateUrl: './tro-cap-row-edit.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,35 +42,35 @@ export class TroCapRowEditComponent implements OnInit {
 	hideNuoiDuong: boolean = false;
 	LoaiTroCap: string = '';
 	//form controls
-	Id_LoaiTroCap: FormControl | undefined;
-	TroCap: FormControl | undefined;
-	PhuCap: FormControl | undefined;
-	TienMuaBao: FormControl | undefined;
-	TroCapNuoiDuong: FormControl | undefined;
-	NgayCap: FormControl | undefined;
-	TuNam: FormControl | undefined;
-	TruyLinh_From: FormControl | undefined;
-	TruyLinh_To: FormControl | undefined;
+	Id_LoaiTroCap: FormControl = new FormControl('');
+	TroCap: FormControl = new FormControl('');
+	PhuCap: FormControl = new FormControl('');
+	TienMuaBao: FormControl = new FormControl('');
+	TroCapNuoiDuong: FormControl = new FormControl('');
+	NgayCap: FormControl = new FormControl('');
+	TuNam: FormControl = new FormControl('');
+	TruyLinh_From: FormControl = new FormControl('');
+	TruyLinh_To: FormControl = new FormControl('');
 	
-	SoThang: FormControl | undefined;
-	SoThangTruyLinh: FormControl | undefined;
-	ThangThuHoi: FormControl | undefined;
-	LyDoKhongGiaiQuyet: FormControl | undefined;
-	LyDoKhongMaiTangPhi: FormControl | undefined;
-	NgayDinhChi: FormControl | undefined;
-	LyDoDinhChi: FormControl | undefined;
+	SoThang: FormControl = new FormControl('');
+	SoThangTruyLinh: FormControl = new FormControl('');
+	ThangThuHoi: FormControl = new FormControl('');
+	LyDoKhongGiaiQuyet: FormControl = new FormControl('');
+	LyDoKhongMaiTangPhi: FormControl = new FormControl('');
+	NgayDinhChi: FormControl = new FormControl('');
+	LyDoDinhChi: FormControl = new FormControl('');
 
-	LyDoTamDC: FormControl | undefined;
-	ThuHoiDCTu: FormControl | undefined;
-	ThuHoiDCDen: FormControl | undefined;
-	TuThang: FormControl | undefined;
-	TiLeTroCap: FormControl | undefined;
-	STTruyLinhCuThe: FormControl | undefined;
-	SLTroCap: FormControl | undefined; //số lần trợ cấp
-	NDTruyLinh: FormControl | undefined;
-	TienDCTruyThu: FormControl | undefined;
-	ThangCat: FormControl | undefined;
-	ThangDaNhan: FormControl | undefined;
+	LyDoTamDC: FormControl = new FormControl('');
+	ThuHoiDCTu: FormControl = new FormControl('');
+	ThuHoiDCDen: FormControl = new FormControl('');
+	TuThang: FormControl = new FormControl('');
+	TiLeTroCap: FormControl = new FormControl('');
+	STTruyLinhCuThe: FormControl = new FormControl('');
+	SLTroCap: FormControl = new FormControl(''); //số lần trợ cấp
+	NDTruyLinh: FormControl = new FormControl('');
+	TienDCTruyThu: FormControl = new FormControl('');
+	ThangCat: FormControl = new FormControl('');
+	ThangDaNhan: FormControl = new FormControl('');
 
 	hiddenTienTC: boolean = false 
 
@@ -192,7 +193,7 @@ export class TroCapRowEditComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.data.objectService.getItem(this.item.Id).subscribe(res => {
+			this.data.objectService.getItem(this.item.Id).subscribe((res: any) => {
 				this.viewLoading = false;
 				if (res && res.status === 1) {
 					this.item = res.data;
@@ -426,10 +427,10 @@ export class TroCapRowEditComponent implements OnInit {
 		this.SoThangTruyLinh]; //this.Id_LoaiTroCap,
 		///* check form */
 		let e = 0;
-		Object.keys(controls).forEach(controlName => {
-			if (controls[controlName].invalid)
+		Object.keys(controls).forEach((controlName, index) => {
+			if (controls[index].invalid)
 				e++;
-			controls[controlName].markAsTouched()
+			controls[index].markAsTouched()
 		}
 		);
 		if (e > 0) {

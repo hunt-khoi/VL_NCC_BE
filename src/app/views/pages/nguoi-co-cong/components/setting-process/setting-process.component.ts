@@ -14,7 +14,7 @@ import { CommonService } from '../../services/common.service';
 })
 export class SettingProcessComponent implements OnInit {
 	Object: any;
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	filterStatic: Observable<string[]> | undefined;
 	viewLoading: boolean = false;
@@ -169,18 +169,9 @@ export class SettingProcessComponent implements OnInit {
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	isControlInvalid(controlName: string): boolean {
-		if (!this.itemForm) return false;
-		const control = this.itemForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
-	}
-
 	onSubmit() {
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/** check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName => {
 				controls[controlName].markAsTouched();
@@ -228,7 +219,7 @@ export class SettingProcessComponent implements OnInit {
 	themNguoi(item: any) {
 		this.showForm = true;
 		this.createForm();
-		if (!this.itemForm || !this.form) return;
+		if (!this.form) return;
 		this.idStepCurrent = item.IdStep;
 		//this.itemForm.controls["capQuanLy"].setValue('0');
 		//this.filterDVXL();

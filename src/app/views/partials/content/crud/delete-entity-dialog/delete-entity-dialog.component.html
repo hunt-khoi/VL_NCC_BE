@@ -21,8 +21,12 @@
 		</div>
 		<div class="kt-portlet__foot kt-portlet__no-border kt-portlet__foot--fit text-right">
 			<div class="kt-form__actions kt-form__actions--sm">
-				<button mat-button (click)="onNoClick()">{{data.CancelButton?data.CancelButton:'Cancel'}}</button>&nbsp;
-				<button mat-button (click)="onYesClick()" color="primary" cdkFocusInitial [disabled]="viewLoading">{{data.NameButton?data.NameButton:'Delete'}}</button>
+				<button mat-button (click)="onNoClick()">
+					{{data.CancelButton ? data.CancelButton : 'Cancel'}}
+				</button>&nbsp;
+				<button mat-button (click)="onYesClick()" color="primary" cdkFocusInitial [disabled]="viewLoading">
+					{{data.NameButton ? data.NameButton : 'Delete'}}
+				</button>
 			</div>
 		</div>
 	</div>

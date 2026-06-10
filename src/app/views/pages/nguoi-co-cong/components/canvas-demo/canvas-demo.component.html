@@ -4,8 +4,8 @@
         <mat-icon>add</mat-icon>
     </button>
 </p>
-<div class="canvas-cover" [hidden]="data==undefined">
-    <div style="position: absolute; z-index:1">
+<div class="canvas-cover" [hidden]="data === undefined">
+    <div style="position: absolute; z-index: 1">
         <button mat-raised-button (click)="ScaleReset()" color="primary">Đặt lại</button>
     </div>
     <div class="canvas">
@@ -19,13 +19,10 @@
                 <!--Content Tiltle-->
                 {{selectedNode.Title}}
             </div>
-            <!--begin::Form-->
             <form [formGroup]="formNode" class="kt-form kt-form--group-seperator-dashed" *ngIf="disableTitle" style="width: 100%">
                 <mat-form-field class="mat-form-field-fluid">
                     <input matInput placeholder="Nhập tiêu đề" formControlName="Title" type="text">
-                    <mat-error>
-                        Tiêu đề không được rỗng
-                    </mat-error>
+                    <mat-error>Tiêu đề không được rỗng</mat-error>
                 </mat-form-field>
             </form>
             <div class="fas fa-times cv-trl-delete" title="Đóng" (click)="selectedNode=undefined" style="position:absolute; right:0;"></div>

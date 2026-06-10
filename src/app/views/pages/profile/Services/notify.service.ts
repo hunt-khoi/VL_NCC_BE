@@ -1,8 +1,8 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { environment } from '../../../../../environments/environment';
 import { HttpUtilsService, QueryParamsModel, QueryResultsModel } from '../../../../core/_base/crud';
+import { environment } from '../../../../../environments/environment';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/thong-bao';
 
@@ -10,8 +10,8 @@ const API_PRODUCTS_URL = environment.ApiRoot + '/thong-bao';
 export class NotifyService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 	ReadOnlyControl: boolean = false;
-	constructor(private http: HttpClient,
-		private httpUtils: HttpUtilsService) { }
+
+	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();

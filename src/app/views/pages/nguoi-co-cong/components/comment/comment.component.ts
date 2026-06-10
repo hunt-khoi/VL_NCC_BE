@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Output, Input, EventEmitter, SimpleChange, AfterViewInit, ElementRef, ViewChild, Pipe } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Output, Input, EventEmitter, SimpleChange, AfterViewInit, ElementRef, ViewChild, Pipe, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, BehaviorSubject, Subscription, Subject } from 'rxjs';
@@ -19,7 +19,7 @@ import { ReviewExportComponent } from '../review-export/review-export.component'
 	templateUrl: './comment.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommentComponent implements OnInit, OnDestroy, AfterViewInit {
+export class CommentComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
 	@Output() ListResult: EventEmitter<any> = new EventEmitter<any>();//event for component
 	@Output() inserted: EventEmitter<any> = new EventEmitter<any>();//event for component
 	@Input() Id: number = 0;;//Id của đối tượng
@@ -31,15 +31,10 @@ export class CommentComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	listResult = new Subject();
 	ItemData: any = {};
-	FormControls: FormGroup | undefined;
-	hasFormErrors: boolean = false;
-	disBtnSubmit: boolean = false;
-	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean> = this.loadingSubject.asObservable();
+	FormControls: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 	isZoomSize: boolean = false;
-	LstDanhMucKhac: any[] = [];
 	datatreeDonVi: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	componentSubscriptions: Subscription | undefined;
 	ListDonViCon: any[] = [];
@@ -96,7 +91,7 @@ export class CommentComponent implements OnInit, OnDestroy, AfterViewInit {
 		return this.sanitized.bypassSecurityTrustHtml(value);
 	}
 
-	ngOnChanges(changes: SimpleChange) {
+	ngOnChanges(changes: any) {
 		if (changes['Id']) {
 			this.ngOnInit();
 		}
@@ -124,7 +119,6 @@ export class CommentComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.icons = GlobalVariable.icons;
 		this.options = this.getOptions();
 		this.commonService.getDSNguoiDungLite().subscribe(res => {
-			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				this.listUser = res.data.map((x: any) => {
 					return {
@@ -190,7 +184,6 @@ export class CommentComponent implements OnInit, OnDestroy, AfterViewInit {
 							rowi.NguoiTao.hoten = rowj.NguoiTao.hoten;
 							rowi.NguoiTao.image = rowj.NguoiTao.image;
 							rowi.Attachments = rowj.Attachment;
-
 							for (var a = 0; a < rowi.NguoiNhans.length; a++) {
 								NguoiNhan_Tam += rowi.NguoiNhans[a].NguoiTao.hoten + '\n';
 							}
@@ -507,7 +500,7 @@ export class CommentComponent implements OnInit, OnDestroy, AfterViewInit {
 		});
 	}
 
-	initUpdate(item: any, index: number, indexc: number = -1) {
+	initUpdate(item: any) {
 		var data = Object.assign({}, item);
 		const dialogRef = this.dialog.open(CommentEditDialogComponent, { data: data, width: '500px' });
 		dialogRef.afterClosed().subscribe(res => {

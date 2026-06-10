@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, forwardRef, Input, Output, EventEmitter, ViewChild, Injectable } from '@angular/core';
+import { Component, ViewEncapsulation, forwardRef, Input, Output, EventEmitter, ViewChild, Injectable, OnChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validators } from '@angular/forms';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatCalendar } from '@angular/material/datepicker';
@@ -9,9 +9,9 @@ const moment = moment$1;
 
 @Injectable()
 export class NgbTimeStringAdapter extends NgbTimeAdapter<string> {
-    fromModel(value: string | null): NgbTimeStruct | null {
+    fromModel(value: string): NgbTimeStruct {
         if (!value) {
-            return null;
+            return { hour: 0, minute: 0, second: 0 };
         }
         const split = value.split(':');
         return {
@@ -20,9 +20,9 @@ export class NgbTimeStringAdapter extends NgbTimeAdapter<string> {
             second: parseInt(split[2], 10)
         };
     }
-    toModel(time: NgbTimeStruct | null): string | null {
+    toModel(time: NgbTimeStruct): string {
         if (!time) {
-            return null;
+            return '00:00';
         }
         return `${this.pad(time.hour)}:${this.pad(time.minute)}`;
     }
@@ -49,15 +49,15 @@ export class NgbTimeStringAdapter extends NgbTimeAdapter<string> {
             multi: true
         }]
 })
-export class DatetimePickerComponent {
+export class DatetimePickerComponent implements OnChanges {
     @Input() value: any;
     @Input() disabled: boolean = false;
     @Input() placeholder: string = '';
     @Input() hint: string = '';
     @Input() required: boolean = false;
     @Output() selectionChange = new EventEmitter();
-    @ViewChild(MatMenuTrigger, { static: false }) menuTrigger: MatMenuTrigger;
-    @ViewChild(MatCalendar, { static: false }) calendar: MatCalendar<any>;
+    @ViewChild(MatMenuTrigger, { static: false }) menuTrigger: MatMenuTrigger | undefined;
+    @ViewChild(MatCalendar, { static: false }) calendar: MatCalendar<any> | undefined;
 
     datetimepicker = new FormControl();
     time = '00:00';
@@ -125,8 +125,12 @@ export class DatetimePickerComponent {
     showMenu($event: any) {
         $event.stopPropagation();
         if (!this.disabled) {
-            this.menuTrigger.openMenu();
-            document.getElementById('datepicker').focus();
+            if (this.menuTrigger) {
+                this.menuTrigger.openMenu();
+            }
+            let datePicker = document.getElementById('datepicker');
+            if (datePicker)
+                datePicker.focus();
         }
     }
 
@@ -156,7 +160,9 @@ export class DatetimePickerComponent {
             var m = moment(event.target.value, "DD/MM/YYYY HH:mm");
             if (m != undefined && m.isValid()) {
                 this.selectedDate = m;
-                this.calendar.activeDate = this.selectedDate;
+                if (this.calendar) {
+                    this.calendar.activeDate = this.selectedDate;
+                }
                 this.time = m.format("HH:mm");
                 this.changetime();
                 return;

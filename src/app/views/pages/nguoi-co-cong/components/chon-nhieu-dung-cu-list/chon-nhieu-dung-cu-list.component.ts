@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import { SelectionModel } from '@angular/cdk/collections';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { QueryParamsModel, LayoutUtilsService } from 'app/core/_base/crud';
-import { SelectionModel } from '@angular/cdk/collections';
 import { CommonService } from '../../services/common.service';
 import { ChonNhieuDungCuListDataSource } from './chon-nhieu-dung-cu-list.datasource';
 
@@ -30,7 +30,6 @@ export class ChonNhieuDungCuListComponent implements OnInit {
 		}
 	];
 	selectedColumns = new SelectionModel<any>(true, this.availableColumns);
-	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 

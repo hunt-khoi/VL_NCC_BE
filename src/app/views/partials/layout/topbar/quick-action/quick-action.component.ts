@@ -1,10 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
 	selector: 'kt-quick-action',
 	templateUrl: './quick-action.component.html',
 })
-export class QuickActionComponent implements OnInit {
+export class QuickActionComponent {
 	// Public properties
 	// Set icon class name
 	@Input() icon = 'flaticon2-gear';
@@ -15,10 +15,6 @@ export class QuickActionComponent implements OnInit {
 	// Set skin color, default to light
 	@Input() skin: 'light' | 'dark' = 'light';
 	@Input() gridNavSkin: 'light' | 'dark' = 'light';
-
-	constructor() { }
-
-	ngOnInit(): void { }
 
 	onSVGInserted(svg: any) {
 		svg.classList.add('kt-svg-icon', 'kt-svg-icon--success', 'kt-svg-icon--lg');

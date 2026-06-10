@@ -5,18 +5,14 @@
 </div>
 <div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
     <div class="kt-portlet__head kt-portlet__head__custom">
-
         <div class="col-md-7 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
             <h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
         </div>
         <div class="col-md-5 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
             <button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="onSubmit()">
-				<!--<mat-icon  style="margin-top: 2%" class="mat-Icon-update">check_circle</mat-icon>-->
+				<!--<mat-icon style="margin-top: 2%" class="mat-Icon-update">check_circle</mat-icon>-->
 				Lưu
 			</button>&nbsp;
-            <!--<button style="padding: 0px 10px;" type="button" color="accent" mat-raised-button (click)="resizeDialog()">
-				{{isZoomSize ? 'Thu nhỏ' : 'Phóng to'}}
-			</button>&nbsp;-->
         </div>
     </div>
     <form class="kt-form">
@@ -24,10 +20,6 @@
             <div class="kt-portlet__body-progress">
                 <mat-spinner [diameter]="20"></mat-spinner>
             </div>
-            <kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" (close)="onAlertClose($event)">
-                Không thể lưu, vui lòng kiểm tra lại thông tin!
-            </kt-alert>
-
             <div class="form-group kt-form__group row">
                 <div class="col-md-12">
                     <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl" class="dl-tree-dropdown">
@@ -39,18 +31,18 @@
                                         <div class="cover-drag-item">
                                             <span style="padding-left: 5px;">
                                                 <mat-checkbox class="checklist-leaf-node" [checked]="node.selected" [disabled]="node.disabled" (change)="checkedChange($event,node)" *ngIf="chonDV">
-                                                    <span style="color: blue;" [ngStyle]="{'color': node.data&&node.data.Type==1?'blue':'#111111'}">
-                                                        <i class="fas fa-user" *ngIf="node.data&&node.data.Type==1"></i>
-                                                        <i class="fas fa-landmark" *ngIf="!node.data||node.data.Type!=1"></i>
+                                                    <span style="color: blue;" [ngStyle]="{'color': node.data&&node.data.Type===1?'blue':'#111111'}">
+                                                        <i class="fas fa-user" *ngIf="node.data&&node.data.Type===1"></i>
+                                                        <i class="fas fa-landmark" *ngIf="!node.data||node.data.Type!==1"></i>
                                                         {{node.item}}
                                                     </span>
                                                 </mat-checkbox>
                                                 <mat-checkbox class="checklist-leaf-node"
                                                               [checked]="checklistSelection.isSelected(node)"
                                                               (change)="todoLeafItemSelectionToggle(node)" *ngIf="!chonDV">
-                                                    <span style="color: blue;" [ngStyle]="{'color': node.data&&node.data.Type==1?'blue':'#111111'}">
-                                                        <i class="fas fa-user" *ngIf="node.data&&node.data.Type==1"></i>
-                                                        <i class="fas fa-landmark" *ngIf="!node.data||node.data.Type!=1"></i>
+                                                    <span style="color: blue;" [ngStyle]="{'color': node.data&&node.data.Type===1?'blue':'#111111'}">
+                                                        <i class="fas fa-user" *ngIf="node.data&&node.data.Type===1"></i>
+                                                        <i class="fas fa-landmark" *ngIf="!node.data||node.data.Type!==1"></i>
                                                         {{node.item}}
                                                     </span>
                                                 </mat-checkbox>
@@ -80,18 +72,18 @@
 											</button>
                                             <span style="padding-left: 5px; ">
                                                 <mat-checkbox [checked]="node.selected" [disabled]="node.disabled" (change)="checkedChange($event,node)" *ngIf="chonDV">
-                                                    <span style="color: blue;" [ngStyle]="{'color': node.data&&node.data.Type==1?'blue':'#111111'}">
-                                                        <i class="fas fa-user" *ngIf="node.data&&node.data.Type==1"></i>
-                                                        <i class="fas fa-landmark" *ngIf="!node.data||node.data.Type!=1"></i>
+                                                    <span style="color: blue;" [ngStyle]="{'color': node.data&&node.data.Type===1?'blue':'#111111'}">
+                                                        <i class="fas fa-user" *ngIf="node.data&&node.data.Type===1"></i>
+                                                        <i class="fas fa-landmark" *ngIf="!node.data||node.data.Type!==1"></i>
                                                         {{node.item}}
                                                     </span>
                                                 </mat-checkbox>
                                                 <mat-checkbox [checked]="descendantsAllSelected(node)" *ngIf="!chonDV"
                                                               [indeterminate]="descendantsPartiallySelected(node)"
                                                               (change)="todoItemSelectionToggle(node)">
-                                                    <span style="color: blue;" [ngStyle]="{'color': node.data&&node.data.Type==1?'blue':'#111111'}">
-                                                        <i class="fas fa-user" *ngIf="node.data&&node.data.Type==1"></i>
-                                                        <i class="fas fa-landmark" *ngIf="!node.data||node.data.Type!=1"></i>
+                                                    <span style="color: blue;" [ngStyle]="{'color': node.data&&node.data.Type===1?'blue':'#111111'}">
+                                                        <i class="fas fa-user" *ngIf="node.data&&node.data.Type===1"></i>
+                                                        <i class="fas fa-landmark" *ngIf="!node.data||node.data.Type!==1"></i>
                                                         {{node.item}}
                                                     </span>
                                                 </mat-checkbox>

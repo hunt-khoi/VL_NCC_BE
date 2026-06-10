@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
@@ -13,7 +13,6 @@ export class ReviewExportComponent implements OnInit {
 	loading$ = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isZoomSize: boolean = false;
-	disabledBtn: boolean = false;
 	strHtml: any;
 
 	constructor(
@@ -31,7 +30,7 @@ export class ReviewExportComponent implements OnInit {
 	}
 
 	//loai: 1 word, 2 excel, 3 pdf
-	in(loai: number) {
+	export(loai: number) {
 		this.dialogRef.close({ loai: loai });
 	}
 

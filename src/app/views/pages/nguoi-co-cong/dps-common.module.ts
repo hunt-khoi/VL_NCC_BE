@@ -113,7 +113,7 @@ import { CanvasDemoModule } from './components/canvas-demo/canvas-demo.module';
 import { ChartsModule } from 'ng2-charts';
 import { CKEditorModule } from 'ckeditor4-angular';
 
-export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
+export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
 
 @NgModule({
     imports: [

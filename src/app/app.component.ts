@@ -10,9 +10,12 @@ import { DOCUMENT } from '@angular/common';
 import { FormControlName } from '@angular/forms';
 
 const originFormControlNameNgOnChanges = FormControlName.prototype.ngOnChanges;
-FormControlName.prototype.ngOnChanges = function () {
-  const result = originFormControlNameNgOnChanges.apply(this, arguments);
-  this.control.nativeElement = this.valueAccessor._elementRef ? this.valueAccessor._elementRef.nativeElement : null;
+FormControlName.prototype.ngOnChanges = function (changes: any) {
+  const result = originFormControlNameNgOnChanges.apply(this, [changes]);
+  if (this.control && this.valueAccessor) {
+	let valueAccessor = this.valueAccessor as any;
+    (this.control as any).nativeElement = valueAccessor._elementRef ? valueAccessor._elementRef.nativeElement : null;
+  }
   return result;
 };
 

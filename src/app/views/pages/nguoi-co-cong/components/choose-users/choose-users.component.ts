@@ -51,7 +51,7 @@ export class ChooseUsersComponent implements OnInit, OnChanges {
 			} else {
 				this.commonService.getDSNguoiDungLite().subscribe(res => {
 					if (res && res.status === 1) {
-						this.listUser = res.data.map((x: { UserID: any; FullName: any; UserName: any; image: any; }) => {
+						this.listUser = res.data.map((x: any) => {
 							return {
 								id_nv: x.UserID,
 								hoten: x.FullName,
@@ -77,7 +77,6 @@ export class ChooseUsersComponent implements OnInit, OnChanges {
 
 	protected filterUsers() {
 		if (!this.listUser) return;
-		
 		let search = !this.options.showSearch ? this.options.keyword : this.userFilterCtrl.value;
 		if (!search) {
 			this.filteredUsers.next(this.listUser.slice());

@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, forwardRef, ChangeDetectorRef, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewEncapsulation, forwardRef, ChangeDetectorRef, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS } from '@angular/forms';
 import { FileUploader } from 'ng2-file-upload';
 
@@ -18,6 +18,7 @@ function readBase64(file: any) {
 const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
 
 @Component({
+    // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'dl-image-control',
     templateUrl: './image-control.component.html',
     styleUrls: ['./image-control.component.scss'],
@@ -35,14 +36,14 @@ const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
         }
     ]
 })
-export class ImageControlComponent {
+export class ImageControlComponent implements OnInit {
     @Input() data: any;
     @Input() type: string = "";
     @Input() multiple: boolean = false;
     @Input() required: boolean = false;
     @Input() nameButton: string = "Choose File";
     @Input() disabled: boolean = false;
-    @ViewChild('fileUpload', { static: true }) fileUpload: ElementRef;
+    @ViewChild('fileUpload', { static: true }) fileUpload: ElementRef | undefined;
 
     files: any[] = [];
     ImageControl = new FormControl();
@@ -52,8 +53,7 @@ export class ImageControlComponent {
     onChangeCallback = (value: any) => { };
     onTouchCallback = () => { };
 
-    constructor(private changeDetectorRefs: ChangeDetectorRef) {
-    }
+    constructor(private changeDetectorRefs: ChangeDetectorRef) { }
 
     ngOnInit() {
         if (this.data == undefined)
@@ -80,8 +80,10 @@ export class ImageControlComponent {
     }
 
     triggerClick() {
-        let ele = this.fileUpload.nativeElement;
-        ele.click();
+        if (this.fileUpload) {
+            let ele = this.fileUpload.nativeElement;
+            ele.click();
+        }
     }
 
     checkDuplicated(_item: any, file: any) {

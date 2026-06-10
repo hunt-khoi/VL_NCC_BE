@@ -1,9 +1,9 @@
 
 import { Router, RouterStateSnapshot, ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route } from '@angular/router';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { TokenStorage } from './token-storage.service';
 import { UserProfileService } from './user-profile.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class PermissionUrl implements CanActivate, CanActivateChild, CanLoad {
@@ -40,7 +40,7 @@ export class PermissionUrl implements CanActivate, CanActivateChild, CanLoad {
 			const cached = this.permissionCache.get(urlKey);
 			if (!cached) 
 				this.router.navigate(['/error/403'], { queryParams: { url: state.url } });
-			return cached;
+			return cached ?? false;
 		}
 
 		const re = await this.per.isPermission(state.url).toPromise()

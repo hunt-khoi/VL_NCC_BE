@@ -42,12 +42,12 @@
 								<td>{{row.strNguoiNhan}}</td>
 								<td>{{row.Deadline}}</td>
 							</tr>
-							<tr *ngIf="ListXL.length == 0">
+							<tr *ngIf="ListXL.length === 0">
 								<td colspan="6" style="text-align: center;">Không có dữ liệu hiển thị</td>
 							</tr>
 						</tbody>
 					</table>
-					<table class="table table-hover table-bordered" *ngIf="curr!=null">
+					<table class="table table-hover table-bordered" *ngIf="curr">
 						<thead>
 							<tr>
 								<th colspan="4">Bước xử lý hiện tại</th>
@@ -59,7 +59,7 @@
 								<th class="text-center">Thời hạn</th>
 							</tr>
 						</thead>
-						<tbody *ngIf="curr!=null">
+						<tbody *ngIf="curr">
 							<tr>
 								<td>(Cấp duyệt: {{curr.title}}) <br/>{{curr.strNguoiNhan}}</td>
 								<td style="color: red;">Chưa xử lý</td>
@@ -122,8 +122,8 @@
 										<div class="row">
 											<div class="col-lg-12 kt-margin-bottom-20-mobile">
 												<mat-form-field class="mat-form-field-fluid">
-													<mat-select formControlName="next" placeholder="Liên kết đến bước" required
-																disabled="true">
+													<mat-select formControlName="next" placeholder="Liên kết đến bước" 
+														required disabled="true">
 														<mat-option *ngFor="let node of lstStep" [value]="node.id">
 															{{node.title}}
 														</mat-option>
@@ -137,16 +137,12 @@
 													<input matInput placeholder="Tên nút xử lý" formControlName="buttonText" type="text" required readonly>
 													<mat-error *ngIf="itemForm.controls['buttonText'].errors">
 														Tên nút xử lý
-														<strong *ngIf="itemForm.controls['buttonText'].errors.required">
-															bắt buộc nhập
-														</strong>
+														<strong *ngIf="itemForm.controls['buttonText'].errors.required">bắt buộc nhập</strong>
 														<strong *ngIf="itemForm.controls['buttonText'].errors.maxlength">
 															tối đa {{itemForm.controls['buttonText'].errors.maxlength.requiredLength}} ký tự
 														</strong>
 													</mat-error>
-													<mat-hint align="start">
-														Vui lòng nhập<strong> tên nút xử lý</strong>
-													</mat-hint>
+													<mat-hint align="start">Vui lòng nhập<strong> tên nút xử lý</mat-hint>
 												</mat-form-field>
 											</div>-->
 										</div>
@@ -171,7 +167,6 @@
 													</mat-select>
 												</mat-form-field>
 											</div>
-
 											<div class="col-lg-6 col-xs-12 kt-margin-bottom-20-mobile">
 												<mat-form-field class="mat-form-field-fluid">
 													<input matInput placeholder="Nhập từ khóa và nhấn tìm"
@@ -197,10 +192,7 @@
 													</mat-select>
 													<mat-error>Người xử lý<strong> là bắt buộc</strong></mat-error>
 													<mat-hint align="start">
-														<strong>
-															Vui lòng chọn người xử lý
-														</strong>
-
+														<strong>Vui lòng chọn người xử lý</strong>
 													</mat-hint>
 												</mat-form-field>
 											</div>

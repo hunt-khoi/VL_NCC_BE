@@ -33,5 +33,6 @@
 		<input matInput placeholder="Ghi chú" [formControl]="GhiChu">
 	</mat-form-field>
 </td>
-<td  *ngIf="showDel"><button mat-button mat-raised-button color="warn" (click)="close()" matTooltip="Xóa đính chính">Xóa ĐC</button></td>
-
+<td  *ngIf="showDel">
+	<button mat-button mat-raised-button color="warn" (click)="close()" matTooltip="Xóa đính chính">Xóa ĐC</button>
+</td>

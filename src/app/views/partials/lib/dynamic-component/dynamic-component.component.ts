@@ -1,7 +1,8 @@
-import { Component, ChangeDetectorRef, ComponentFactoryResolver, Directive, EventEmitter, Input, Output, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ChangeDetectorRef, Directive, EventEmitter, Input, Output, ViewChild, ViewContainerRef, OnDestroy, AfterViewInit } from '@angular/core';
 import { Subject } from 'rxjs';
 
 @Directive({
+    // eslint-disable-next-line @angular-eslint/directive-selector
     selector: '[libInsertion]'
 })
 export class InsertionDirective {
@@ -9,25 +10,23 @@ export class InsertionDirective {
 }
 
 @Component({
+    // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'lib-dynamic-component',
     templateUrl: './dynamic-component.component.html',
     styleUrls: ['./dynamic-component.component.scss']
 })
-export class DynamicComponentComponent {
+export class DynamicComponentComponent implements OnDestroy, AfterViewInit {
     @Input() childComponentType: any;
     @Input() data: any;
     @Output() getInstance = new EventEmitter();
-    @ViewChild(InsertionDirective, { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef;
+    @ViewChild(InsertionDirective, { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef | undefined;
 
     componentRef: any;
     instance: any;
     _onClose = new Subject();
     onClose = this._onClose.asObservable();
 
-    constructor(private componentFactoryResolver: ComponentFactoryResolver, private cd: ChangeDetectorRef) { }
-
-    ngOnInit() {
-    }
+    constructor(private cd: ChangeDetectorRef) { }
 
     ngAfterViewInit() {
         this.loadChildComponent(this.childComponentType);
@@ -41,10 +40,10 @@ export class DynamicComponentComponent {
     }
 
     loadChildComponent(componentType: any) {
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
         let viewContainerRef = this.insertionPoint;
+        if (!viewContainerRef) return;
         viewContainerRef.clear();
-        this.componentRef = viewContainerRef.createComponent(componentFactory);
+        this.componentRef = viewContainerRef.createComponent(componentType);
         this.instance = this.componentRef.instance;
         this.instance.data = this.data;
         this.getInstance.emit(this.instance);

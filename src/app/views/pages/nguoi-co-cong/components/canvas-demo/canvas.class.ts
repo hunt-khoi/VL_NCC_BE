@@ -840,7 +840,7 @@ export class DiagramCanVas {
 			if (root) {
 				this.arr_Level[0] = [];
 				this.arr_Level[0].push(root);
-				let rindex = arr_nodes.findIndex(x => x.ID == root.ID);
+				let rindex = arr_nodes.findIndex((x: any) => x.ID == root.ID);
 				arr_nodes.splice(rindex, 1);
 				for (var i = 0; i < this.arr_Level.length; i++) {
 					for (var j = 0; j < this.arr_Level[i].length; j++) {

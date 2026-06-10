@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
@@ -18,11 +17,8 @@ export class TodoItemNode {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListFileDinhKemComponent implements OnInit {
-	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isZoomSize: boolean = false;
-	disabledBtn: boolean = false;
 	datasource = new MatTableDataSource<any>([]);
 	displayedColumns: string[] = ["stt", "filename", "Version", "CreatedDate", "CreatedBy", "UpdatedDate", "UpdatedBy", "actions"];
  	files: Array<any> = [];
@@ -53,18 +49,6 @@ export class ListFileDinhKemComponent implements OnInit {
 
 	closeDialog() {
 		this.dialogRef.close();
-	}
-
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-
 	}
 
 	download(index: number) {

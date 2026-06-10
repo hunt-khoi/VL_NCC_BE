@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { LayoutUtilsService } from '../../../../core/_base/crud';
@@ -18,12 +18,11 @@ export class ChangePasswordComponent implements OnInit {
 	num: number = 0;
 	thoihan: string = '';
 	user$: Observable<any> | undefined;
-	Form: FormGroup | undefined;
+	Form: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	showWarning: boolean = false;
 
-	constructor(private activatedRoute: ActivatedRoute,
-		private router: Router,
+	constructor(private router: Router,
 		private commonService: CommonService,
 		private changeDetect: ChangeDetectorRef,
 		private fb: FormBuilder,
@@ -60,7 +59,6 @@ export class ChangePasswordComponent implements OnInit {
 
 	submit() {
 		this.hasFormErrors = false;
-		if (!this.Form) return;
 		const controls = this.Form.controls;
 		// check form
 		if (this.Form.invalid) {

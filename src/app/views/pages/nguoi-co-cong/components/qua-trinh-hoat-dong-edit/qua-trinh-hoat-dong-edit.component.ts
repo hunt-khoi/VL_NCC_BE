@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
-import moment from 'moment';
 import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-qua-trinh-hoat-dong-edit',
@@ -15,11 +15,8 @@ import { Moment } from 'moment';
 export class QuaTrinhHoatDongEditComponent implements OnInit {
 	data: any;
 	item: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
-	loadingAfterSubmit = false;
-	disabledBtn = false;
 	isZoomSize = false;
 	allowEdit = false;
 	hideOther = false; //ẩn  Cấp bậc, chức vụ, đơn vị, địa bàn, tình trạng chết
@@ -37,7 +34,6 @@ export class QuaTrinhHoatDongEditComponent implements OnInit {
 		private translate: TranslateService) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.maxNS = moment(new Date());
 		this.item = this.data._item;
@@ -82,19 +78,15 @@ export class QuaTrinhHoatDongEditComponent implements OnInit {
 			DenNgay: [this.item.DenNgay],
 			TinhTrang: [this.default]
 		};
-
 		this.itemForm = this.fb.group(temp);
 
 		// this.focusInput.nativeElement.focus();
-		if (!this.allowEdit) {
+		if (!this.allowEdit) 
 			this.itemForm.disable();
-		}
 		this.changeDetectorRefs.detectChanges();
-
 	}
-	/** ACTIONS */
-	prepareCustomer(): any {
-		if (!this.itemForm) return;
+
+	prepare(): any {
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -110,7 +102,6 @@ export class QuaTrinhHoatDongEditComponent implements OnInit {
 			_item.DenNgay = this.commonService.f_convertDate(controls.DenNgay.value);
 		else
 			_item.DenNgay = null;
-
 
 		if (controls.TinhTrang.value) {
 			var temp = controls.TinhTrang.value;
@@ -131,25 +122,18 @@ export class QuaTrinhHoatDongEditComponent implements OnInit {
 			_item.IsNghiHuu = false
 			_item.IsChet = false
 		}
-
 		return _item;
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
-		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
-			this.hasFormErrors = true;
 			return;
 		}
-		const EditTroCap = this.prepareCustomer();
-		return EditTroCap;
+		const Edit = this.prepare();
+		return Edit;
 	}
 }

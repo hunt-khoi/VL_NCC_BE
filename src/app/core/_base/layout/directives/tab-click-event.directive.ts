@@ -1,11 +1,11 @@
-import { Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
+import { Directive, HostListener, Renderer2 } from '@angular/core';
 
 @Directive({
 	selector: '[ktTabClickEvent]'
 })
 export class TabClickEventDirective {
 
-	constructor(private el: ElementRef, private render: Renderer2) { }
+	constructor(private render: Renderer2) { }
 
 	@HostListener('click', ['$event.target'])
 	onClick(target: HTMLElement) {

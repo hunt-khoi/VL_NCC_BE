@@ -89,15 +89,4 @@ export class ChonDonViComponent implements OnInit {
 	closeDialog() {
 		this.dialogRef.close();
 	}
-
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-	}
 }

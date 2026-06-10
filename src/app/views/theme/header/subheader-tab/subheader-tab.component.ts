@@ -1,9 +1,9 @@
+import { Router, NavigationEnd } from '@angular/router';
 import { Component, Input, OnDestroy, ChangeDetectorRef, OnChanges, Renderer2 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { HtmlClassService } from '../../html-class.service';
 import { MenuHorizontalService } from 'app/core/_base/layout';
-import { Router, NavigationEnd } from '@angular/router';
 import { QueryParamsModel } from 'app/core/_base/crud';
 
 @Component({
@@ -11,9 +11,7 @@ import { QueryParamsModel } from 'app/core/_base/crud';
 	templateUrl: './subheader-tab.component.html',
 	styleUrls: ['./subheader-tab.component.scss'],
 })
-
 export class SubheaderTabComponent implements OnChanges, OnDestroy {
-	// Public properties
 	@Input() fluid: boolean = false;
 	@Input() clear: boolean = false;
 	@Input() data: any;
@@ -55,19 +53,14 @@ export class SubheaderTabComponent implements OnChanges, OnDestroy {
 	}
 
 	getItemCssClasses(item: any) {
-		if(this.isMenuItemIsActive(item)){
+		if (this.isMenuItemIsActive(item))
 			return "active";
-		}
 		return "";
 	}
 
 	isMenuItemIsActive(item: any): boolean {
-		// if (item.submenu) {
-		// 	return this.isMenuRootItemIsActive(item);
-		// }
-		if (!item.page) {
+		if (!item.page) 
 			return false;
-		}
 		return this.currentRouteUrl.indexOf(item.page) !== -1;
 	}
 
@@ -78,14 +71,16 @@ export class SubheaderTabComponent implements OnChanges, OnDestroy {
 		else
 			this.render.removeClass(document.body, 'subheader-collapse');
 			
-		let ele=(<HTMLInputElement>document.getElementById('kt_content'));
-		ele.style.maxHeight=this.htmlClassService.getContentHeight();
+		let ele = (<HTMLInputElement>document.getElementById('kt_content'));
+		ele.style.maxHeight = this.htmlClassService.getContentHeight();
 	}
 
 	onWheel(event: WheelEvent): void {
 		let speedScroll = 30;
-		if (event.deltaY > 0) document.getElementById('container')!.scrollLeft += speedScroll;
-		else document.getElementById('container')!.scrollLeft -= speedScroll;
+		if (event.deltaY > 0) 
+			document.getElementById('container')!.scrollLeft += speedScroll;
+		else 
+			document.getElementById('container')!.scrollLeft -= speedScroll;
 		event.preventDefault();
 	}
 }

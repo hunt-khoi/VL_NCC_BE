@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, HostListener, OnDestroy } from '@angular/core';
 import { CommonService } from '../../../../pages/nguoi-co-cong/services/common.service';
 import { MatDialog } from '@angular/material/dialog';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
@@ -13,26 +13,26 @@ import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 	styleUrls: ['notification.component.scss'],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotificationComponent implements OnInit, OnChanges {
+export class NotificationComponent implements OnInit, OnDestroy {
 	// Show dot on top of the icon
-	@Input() dot: string;
+	@Input() dot: string = '';
 	// Show pulse on icon
-	@Input() pulse: boolean;
-	@Input() pulseLight: boolean;
+	@Input() pulse: boolean = false;
+	@Input() pulseLight: boolean = false;
 
 	// Set icon class name
 	@Input() icon = 'flaticon2-bell-alarm-symbol';
-	@Input() iconType: '' | 'success';
+	@Input() iconType: '' | 'success' = '';
 
 	// Set true to icon as SVG or false as icon class
-	@Input() useSVG: boolean;
+	@Input() useSVG: boolean = false;
 	// Set bg image path
-	@Input() bgImage: string;
+	@Input() bgImage: string = '';
 	// Set skin color, default to light
 	@Input() skin: 'light' | 'dark' = 'light';
 	@Input() type: 'brand' | 'success' = 'success';
 
-	@ViewChild(NgbDropdown, { static: true }) ngbDropdown: NgbDropdown;
+	@ViewChild(NgbDropdown, { static: true }) ngbDropdown: NgbDropdown | any;
 	isReset: any;
 	ThongBao: any = {
 		Total: { Total: 0 },
@@ -43,21 +43,20 @@ export class NotificationComponent implements OnInit, OnChanges {
 	UserID: number = 0;
 	isStopScroll: boolean = false;
 
-	@ViewChild('scrollViewTB') scrollViewTB: ElementRef;
+	@ViewChild('scrollViewTB') scrollViewTB: ElementRef | any;
 	@HostListener('scroll', ['$event'])
 	scrollViewHandler(item: any) {
 		if (this.isStopScroll) return;
 		this.selectedLoai = item;
-		if (item = "ThongBao") {
+		if (item === "ThongBao") {
 			if (this.scrollViewTB) {
 				let total = this.scrollViewTB.nativeElement.scrollHeight - this.scrollViewTB.nativeElement.offsetHeight;
 				try {
 					if (this.scrollViewTB.nativeElement.scrollTop + 5 >= total) {
-						if (total > 0) {
-							if (this.ThongBao.Page[item].Page < this.ThongBao.Page[item].AllPage) {
-								this.ThongBao.Page[item].Page++;
-								this.GetThongBaoPage(this.ThongBao.Page[item].Size, this.ThongBao.Page[item].Page);
-							}
+						let thongbao = this.ThongBao.Page[item];
+						if (total > 0 && thongbao.Page < thongbao.AllPage) {
+							thongbao.Page++;
+							this.GetThongBaoPage(thongbao.Size, thongbao.Page);
 						}
 					}
 				} catch (err) { }
@@ -120,10 +119,6 @@ export class NotificationComponent implements OnInit, OnChanges {
 		})
 	}
 
-	ngOnChanges() {
-		//clearInterval(this.isReset);
-	}
-
 	getLastest(lastID: any) {
 		this.commonService.GetThongBaoLastest(lastID).subscribe(res => {
 			if (res && res.status == 1) {
@@ -133,7 +128,7 @@ export class NotificationComponent implements OnInit, OnChanges {
 					this.ThongBao.Total[property] = _property.Unread;
 					total += _property.Unread;
 					if (_property.List.length > 0) {
-						_property.List.forEach(element => {
+						_property.List.forEach((element: any) => {
 							this.ThongBao[property].unshift(element);
 						});
 					}

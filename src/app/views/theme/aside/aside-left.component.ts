@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { filter } from 'rxjs/operators';
 import { NavigationEnd, Router } from '@angular/router';
-import objectPath from 'object-path';
+import { filter } from 'rxjs/operators';
 import { LayoutConfigService, MenuAsideService, MenuOptions, OffcanvasOptions } from '../../../core/_base/layout';
 import { HtmlClassService } from '../html-class.service';
+import objectPath from 'object-path';
 
 @Component({
 	selector: 'kt-aside-left',

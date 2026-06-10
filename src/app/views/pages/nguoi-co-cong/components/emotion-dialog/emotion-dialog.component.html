@@ -9,8 +9,8 @@
 			<div style="display:flex; flex-wrap:wrap">
 				<ng-container *ngFor="let group of ListEmotion">
 					<div *ngFor="let emo of group.icons" 
-					style="flex-grow:1;padding: 6px; width: 36px; height: 36px; margin: 5px; text-align: center;
-					border-radius: 4px; background-color: #f9f9f9;" >
+						style="flex-grow: 1; width: 36px; height: 36px; padding: 6px; margin: 5px; 
+						text-align: center; border-radius: 4px; background-color: #f9f9f9;">
 						<a href="javascript:;" (click)="select(emo.key)">
 							<img src="{{emo.path}}" title="{{emo.key}}" />
 						</a>

@@ -5,11 +5,12 @@ import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { DynamicProcessService } from '../../services/dynamic-process.service';
 
 @Component({
+	// eslint-disable-next-line @angular-eslint/component-selector
 	selector: 'canvas-demo-dialog',
 	templateUrl: 'canvas-demo-dialog.component.html',
 })
 export class CanvasDemoDialogComponent implements OnInit {
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	selectedNodeEnd: any;
 	buttonText: string = "";
 	dataNode: any[] = [];
@@ -61,8 +62,6 @@ export class CanvasDemoDialogComponent implements OnInit {
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			this.hasFormErrors = true;
@@ -100,6 +99,7 @@ export class CanvasDemoDialogComponent implements OnInit {
 			this.changeDetectorRef.detectChanges();
 		});
 	}
+	
 	onAlertClose() {
 		this.hasFormErrors = false;
 	}

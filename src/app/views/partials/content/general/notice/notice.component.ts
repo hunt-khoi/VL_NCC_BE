@@ -9,11 +9,8 @@ export class NoticeComponent implements OnInit {
 	@Input() classes: any = '';
 	@Input() icon: any;
 
-	constructor() {}
-
 	ngOnInit() {
-		if (this.icon) {
+		if (this.icon) 
 			this.classes += ' kt-alert--icon';
-		}
 	}
 }

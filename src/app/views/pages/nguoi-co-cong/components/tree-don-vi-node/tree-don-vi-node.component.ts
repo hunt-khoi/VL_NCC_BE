@@ -9,9 +9,9 @@ import { Subject } from 'rxjs';
 })
 
 export class TreeDonViNodeComponent implements OnInit {
-	loadActive:boolean=true;//load  các node active trong lần load đầu tiên, nhưng khi chọn sẽ ẩn đi những active mặc định
-	@Input() nodeCheckedChange= new Subject();
-	@Input() nodeActiveChange= new Subject();
+	loadActive:boolean = true;//load  các node active trong lần load đầu tiên, nhưng khi chọn sẽ ẩn đi những active mặc định
+	@Input() nodeCheckedChange = new Subject();
+	@Input() nodeActiveChange = new Subject();
 	@Input() nameNode: string = "text";//default là text
 	@Input() propNameChild: string = "children";//tên node roof có chứa các con của node, default = children
 	@Input() propNameCss: string = "anCss";//tên thuộc tính sẽ chứa các định dạng css cho node, default = anCss
@@ -25,14 +25,13 @@ export class TreeDonViNodeComponent implements OnInit {
 	// @Output() CheckedChanged: EventEmitter<any> = new EventEmitter<any>();//event for component
 	//phải gọi public thì thằng cha mới có thể nhận dữ liệu
 	
-	constructor(
-		private render: Renderer2) {
-	}
+	
+	constructor(private render: Renderer2) { }
 
 	ngOnInit() {
 		this.duyetTree(this.valueDonVi);
 	}
-
+	
 	//duyệt node thêm một số thuộc tính để tiện cho việc xử lý dữ liệu
 	duyetTree(node: any) {
 		node.forEach((item: any) => {
@@ -42,7 +41,7 @@ export class TreeDonViNodeComponent implements OnInit {
 				state: 0,//trạng thái luôn luôn mở node này, 0 -> open, -1 -> close
 				checked: false,
 				parentChk: '',
-				active:false
+				active: false
 			};
 			if (item[this.propNameCss] == undefined)
 				item[this.propNameCss] = anCss;
@@ -82,7 +81,7 @@ export class TreeDonViNodeComponent implements OnInit {
 	}
 
 	getActiveNode(item: any){
-		if(item && item.anCss && item.anCss.active && this.loadActive) {
+		if (item && item.anCss && item.anCss.active && this.loadActive) {
 			this.loadActive=false;
 			this.nodeActiveChange.next(item);
 			return true;

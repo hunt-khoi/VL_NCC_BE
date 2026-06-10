@@ -12,9 +12,6 @@
 			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="onSubmit()">
 				Lưu
 			</button>
-			<!--<button style="padding: 0px 10px;" type="button" color="accent" mat-raised-button (click)="resizeDialog()">
-				{{isZoomSize ? 'Thu nhỏ' : 'Phóng to'}}
-			</button>-->
 		</div>
 	</div>
 	<form class="kt-form">
@@ -22,10 +19,6 @@
 			<div class="kt-portlet__body-progress">
 				<mat-spinner [diameter]="20"></mat-spinner>
 			</div>
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="30000" [showCloseButton]="true" (close)="onAlertClose($event)">
-				Không thể lưu, vui lòng kiểm tra lại thông tin!
-			</kt-alert>
-
 			<div class="form-group kt-form__group row">
 				<div class="col-md-12">
 					<cdk-tree [dataSource]="dataSource" [treeControl]="treeControl" class="dl-tree-dropdown">

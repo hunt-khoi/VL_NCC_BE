@@ -4,8 +4,7 @@
 	}
 </style>
 <div class="btn-close-container">
-	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn"
-			title="Đóng">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" title="Đóng">
 		<mat-icon>clear</mat-icon>
 	</button>
 </div>
@@ -20,17 +19,14 @@
 				Tải về
 			</button>
 			<mat-menu #menu="matMenu">
-				<button mat-menu-item (click)="in()">
-					Word
-				</button>
+				<button mat-menu-item (click)="export()">Word</button>
 			</mat-menu>
-			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" printSectionId="print-section-review-export" ngxPrint
-					[printStyle]="{p : {'margin': 0}}">
+			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" 
+				printSectionId="print-section-review-export" ngxPrint [printStyle]="{p : {'margin': 0}}">
 				In
 			</button>
 		</div>
 	</div>
-	<!-- end::Header -->
 	<kt-portlet-body>
 		<div class="kt-portlet__body-progress">
 			<mat-spinner [diameter]="20"></mat-spinner>
@@ -41,5 +37,4 @@
 			</div>
 		</div>
 	</kt-portlet-body>
-	<!-- end::Body -->
 </div>

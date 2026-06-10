@@ -41,8 +41,6 @@ export class TreeDonViComponent implements OnInit {
 		}
 	}
 
-	constructor() { }
-
 	ngOnInit() {
 		this.oldItem = {};
 		this.lst_DonVi = this.valuePhanQuyen;
@@ -124,7 +122,7 @@ export class TreeDonViComponent implements OnInit {
 		let obj, txtKey;
 		if (item[this.propNameChild]) {
 			//tìm node xem có children trong nó hay ko
-			if (item[this.nameNode] == [this.textFeildRoof]) obj = this.lst_DonVi[0];
+			if (item[this.nameNode] == this.textFeildRoof) obj = this.lst_DonVi[0];
 			else {
 				this.findItemCheck(this.lst_DonVi[0], item);
 				obj = Object.assign({}, this.g_NodeSlected);
@@ -191,7 +189,7 @@ export class TreeDonViComponent implements OnInit {
 	checkAllParent(itemA: any, key: any) {
 		//let objParent = this.findParentRecursion(this.lst_DonVi[0], key);
 		let objParent = Object.assign({}, itemA);
-		if (itemA[this.nameNode] != [this.textFeildRoof]) {
+		if (itemA[this.nameNode] != this.textFeildRoof) {
 			this.findParentRecursion(this.lst_DonVi[0], key);
 			objParent = Object.assign({}, this.g_ParentOfParent);
 			this.g_ParentOfParent = {};
@@ -203,7 +201,7 @@ export class TreeDonViComponent implements OnInit {
 			state: 0,//trạng thái luôn luôn mở node này, 0 -> open, -1 -> close
 			checked: false,
 			parentChk: '',
-			active:false
+			active: false
 		};
 
 		//gán thuốc tính anCss cho node
@@ -211,37 +209,38 @@ export class TreeDonViComponent implements OnInit {
 			objParent[this.propNameCss] = Object.assign({}, anCss);
 
 		if (objParent) {
-			objParent[this.propNameCss].checked = itemA[this.propNameCss].checked ? true : (this.countCheck(objParent) ? (this.countCheckNbr(objParent) == 0 ? false : true) : false);
-			objParent[this.propNameCss].parentChk = objParent[this.propNameCss].checked ? (this.countCheck(objParent) ? 'chk-sty' : '') : '';
-			if (objParent[this.nameNode] == [this.textFeildRoof]) {
-				this.masterNode[this.propNameCss].checked = objParent[this.propNameCss].checked;
-				this.masterNode[this.propNameCss].parentChk = objParent[this.propNameCss].checked ? (this.countCheck(objParent) ? 'chk-sty' : '') : '';
+			var countCheck = this.countCheck(objParent);
+			objParent[this.propNameCss].checked = itemA[this.propNameCss].checked || (countCheck && this.countCheckNbr(objParent) > 0);
+			var checked = objParent[this.propNameCss].checked;
+			objParent[this.propNameCss].parentChk = checked ? (countCheck ? 'chk-sty' : '') : '';
+			if (objParent[this.nameNode] == this.textFeildRoof) {
+				this.masterNode[this.propNameCss].checked = checked;
+				this.masterNode[this.propNameCss].parentChk = checked ? (countCheck ? 'chk-sty' : '') : '';
 				return;
 			} //node cuối cùng
-			else
+			else {
 				this.checkAllParent(objParent, objParent[this.nameNode]);
-
+			}
 		}
 	}
 
 	//tìm parent của parent
 	findParentRecursion(obj1: any, key: any): any {
 		let r = undefined;
-		if (obj1) {
-			if (obj1[this.propNameChild]) {
-				for (var i = 0; i < obj1[this.propNameChild].length; i++) {
-					if (obj1[this.propNameChild][i][this.nameNode] == key) {
-						r = obj1;
-						this.g_ParentOfParent = Object.assign({}, obj1);
-						break;
-					}
-					else
-						r = this.findParentRecursion(obj1[this.propNameChild][i], key);
+		if (!obj1) 
+			return r;
+		if (obj1[this.propNameChild]) {
+			for (var i = 0; i < obj1[this.propNameChild].length; i++) {
+				if (obj1[this.propNameChild][i][this.nameNode] == key) {
+					r = obj1;
+					this.g_ParentOfParent = Object.assign({}, obj1);
+					break;
 				}
-				return r;
+				else
+					r = this.findParentRecursion(obj1[this.propNameChild][i], key);
 			}
+			return r;
 		}
-		return r;
 	}
 
 	//check xem có check hết tất cả các check box con không

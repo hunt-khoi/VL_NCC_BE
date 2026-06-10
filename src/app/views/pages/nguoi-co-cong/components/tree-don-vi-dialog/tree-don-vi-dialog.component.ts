@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { DM_DonViService } from '../../danh-muc/dm-don-vi/Services/dm-don-vi.service';
 
 @Component({
@@ -11,11 +11,8 @@ import { DM_DonViService } from '../../danh-muc/dm-don-vi/Services/dm-don-vi.ser
 	
 export class TreeDonViDialogComponent implements OnInit, OnDestroy {
 	// Public properties
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
-	disabledBtn:boolean=false;
-	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean> | undefined;
+	itemForm: FormGroup = new FormGroup({});
+	disabledBtn: boolean = false;
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 	donvi: string = "";

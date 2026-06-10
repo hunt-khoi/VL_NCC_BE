@@ -68,8 +68,7 @@ export class UserProfileComponent implements OnInit {
 							return subscription.unsubscribe();
 						}
 					})
-					.catch(function (error: any) {
-					});
+					.catch(function (error: any) { });
 			}
 			clearInterval(this.isReset);
 			this.auth.logout(true);

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SubheaderService } from '../../../../../core/_base/layout';
 import { Breadcrumb } from '../../../../../core/_base/layout/services/subheader.service';
@@ -8,7 +8,7 @@ import { Breadcrumb } from '../../../../../core/_base/layout/services/subheader.
 	templateUrl: './subheader2.component.html',
 	styleUrls: ['./subheader2.component.scss']
 })
-export class Subheader2Component implements OnInit, OnDestroy, AfterViewInit {
+export class Subheader2Component implements OnDestroy, AfterViewInit {
 	// Public properties
 	@Input() fluid: boolean = false;
 	@Input() clear: boolean = false;
@@ -20,8 +20,6 @@ export class Subheader2Component implements OnInit, OnDestroy, AfterViewInit {
 	private subscriptions: Subscription[] = [];
 
 	constructor(public subheaderService: SubheaderService) { }
-
-	ngOnInit() { }
 
 	ngAfterViewInit(): void {
 		this.subscriptions.push(this.subheaderService.title$.subscribe(bt => {

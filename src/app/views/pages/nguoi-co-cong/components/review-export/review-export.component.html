@@ -4,7 +4,7 @@
 	}
 </style>
 <div class="btn-close-container">
-	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" [disabled]="disabledBtn" title="Đóng">
+	<button class="btn-close" type="button" mat-mini-fab color="" (click)="closeDialog()" title="Đóng">
 		<mat-icon>clear</mat-icon>
 	</button>
 </div>
@@ -19,9 +19,9 @@
 				Tải về
 			</button>
 			<mat-menu #menu="matMenu">
-				<button mat-menu-item (click)="in(3)">PDF</button>
-				<button mat-menu-item (click)="in(1)">Word</button>
-				<button mat-menu-item (click)="in(2)">Excel</button>
+				<button mat-menu-item (click)="export(3)">PDF</button>
+				<button mat-menu-item (click)="export(1)">Word</button>
+				<button mat-menu-item (click)="export(2)">Excel</button>
 			</mat-menu>
 			<button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" printSectionId="print-section-review-export" 
 				ngxPrint [printStyle]="{p : {'margin': 0}}">

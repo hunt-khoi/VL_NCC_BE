@@ -7,15 +7,12 @@
 
 <ng-template #itemTemplate let-item="item">
 	<div class="kt-quick-search__item">
-		<div class="" [innerHTML]="item.icon ? item.icon : item.img" [ngClass]="{'kt-quick-search__item-img': item.img, 'kt-quick-search__item-icon': item.icon}">
+		<div class="" [innerHTML]="item.icon ? item.icon : item.img" 
+			[ngClass]="{'kt-quick-search__item-img': item.img, 'kt-quick-search__item-icon': item.icon}">
 		</div>
 		<div class="kt-quick-search__item-wrapper">
-			<a href="#" class="kt-quick-search__item-title">
-				{{item.text}}
-			</a>
-			<div class="kt-quick-search__item-desc">
-				{{item.text}}
-			</div>
+			<a href="#" class="kt-quick-search__item-title">{{item.text}}</a>
+			<div class="kt-quick-search__item-desc">{{item.text}}</div>
 		</div>
 	</div>
 </ng-template>

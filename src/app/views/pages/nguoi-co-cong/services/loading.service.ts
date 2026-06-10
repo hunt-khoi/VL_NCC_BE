@@ -24,8 +24,8 @@ export class LoadingService {
     if (this.requestCount === 1) {
       const overlayRef = this.createOverlay();
       this.overlayRef = overlayRef;
-      this.dialogRef = new LoadingOverlayRef(overlayRef);
-      this.attachDialogContainer(overlayRef, this.dialogRef);
+      this.dialogRef = new LoadingOverlayRef(this.overlayRef);
+      this.attachDialogContainer(this.overlayRef, this.dialogRef);
     }
     return this.dialogRef!;
   }

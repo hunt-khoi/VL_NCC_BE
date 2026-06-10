@@ -3,8 +3,9 @@ import { Directive } from '@angular/core';
 import { MY_FORMATS } from "../datepicker";
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[monthDateFormats]',
   providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }],
 })
 
-export class MonthFormatDirective {}
+export class MonthFormatDirective { }

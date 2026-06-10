@@ -18,7 +18,7 @@ export class BaseComponent implements OnInit, OnDestroy {
 	asideDisplay: boolean = false;
 	asideSecondary: boolean = false;
 	desktopHeaderDisplay: boolean = false;
-	subheaderDisplay:boolean = false;
+	subheaderDisplay: boolean = false;
 	fitTop: boolean = false;
 	fluid: boolean = false;
 

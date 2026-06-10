@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../services/common.service';
 
 
@@ -16,7 +15,6 @@ export class EmotionDialogComponent implements OnInit {
 	constructor(public dialogRef: MatDialogRef<EmotionDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		public dialog: MatDialog,
-		private translate: TranslateService,
 		private service: CommonService) { }
 
 	ngOnInit() {
@@ -25,6 +23,7 @@ export class EmotionDialogComponent implements OnInit {
 				this.ListEmotion = res.data;
 		})
 	}
+
 	close() {
 		this.dialogRef.close();
 	}
