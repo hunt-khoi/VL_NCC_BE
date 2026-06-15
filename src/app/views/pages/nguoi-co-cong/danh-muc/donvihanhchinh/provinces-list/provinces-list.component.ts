@@ -26,13 +26,7 @@ export class provincesListComponent implements OnInit {
 	displayedColumns = ['STT', 'Id_row', 'ProvinceName', 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	listchucdanh: any[] = [];
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
-	_name = '';
-
+	_name: string = '';
     gridService: TableService | undefined;
     gridModel: TableModel | undefined;
 
@@ -47,7 +41,6 @@ export class provincesListComponent implements OnInit {
 		this._name = this.translate.instant('PROVINCE.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		//#region ***Filter***
 		this.gridModel = new TableModel();
@@ -128,14 +121,6 @@ export class provincesListComponent implements OnInit {
 			if (this.dataSource) {
 				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadListprovices(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}

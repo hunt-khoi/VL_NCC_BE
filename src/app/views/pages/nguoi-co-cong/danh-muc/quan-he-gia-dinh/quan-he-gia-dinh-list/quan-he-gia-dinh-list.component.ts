@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -23,20 +23,14 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class QuanHeGiaDinhListComponent implements OnInit {
+export class QuanHeGiaDinhListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: QuanHeGiaDinhDataSource | undefined;
-	displayedColumns = ['STT', 'Id', 'QuanHeGiaDinh', 'Priority', 'Locked', 'CreatedBy',
-		'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
-	
+	displayedColumns = ['STT', 'Id', 'QuanHeGiaDinh', 'Priority', 'Locked', 
+		'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 
 	_name = '';
 	_QUANHEGIADINH = '';
@@ -181,14 +175,11 @@ export class QuanHeGiaDinhListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	changeCol() {
@@ -290,12 +281,6 @@ export class QuanHeGiaDinhListComponent implements OnInit {
 	filterConfiguration(): any {
 		const filter: any = {};
 		filter.ByQua = this.selectedTab;
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterType && this.filterType.length > 0) {
-			filter.type = +this.filterType;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.QHGiaDinh = this.gridService.model.filterText.QHGiaDinh;
 		}
@@ -329,7 +314,7 @@ export class QuanHeGiaDinhListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.objectService.delete(item.Id).subscribe(res => {
+			this.objectService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -358,7 +343,6 @@ export class QuanHeGiaDinhListComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
 
@@ -394,7 +378,7 @@ export class QuanHeGiaDinhListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.objectService.lock(item.Id, value).subscribe(res => {
+			this.objectService.lock(item.Id, value).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_message);
 				} else {

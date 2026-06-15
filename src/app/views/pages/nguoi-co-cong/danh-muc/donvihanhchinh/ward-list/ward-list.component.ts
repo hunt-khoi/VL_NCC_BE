@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
@@ -22,7 +22,8 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class wardListComponent implements OnInit {
+export class wardListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: donvihanhchinhDataSource | undefined;
 	displayedColumns = ['RowID', 'WardName', "DistrictName", 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
@@ -31,8 +32,7 @@ export class wardListComponent implements OnInit {
 	// Filter fields
 	filterprovinces: number = 0;
 	listprovinces: any[] = [];
-	_name = '';
-
+	_name: string = '';
     gridService: TableService | undefined;
     gridModel: TableModel | undefined;
 
@@ -50,10 +50,10 @@ export class wardListComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.danhMucService.GetAllProvinces().subscribe(res => {
+		this.danhMucService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listprovinces = res.data;
 		});
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 		})
 
@@ -127,6 +127,11 @@ export class wardListComponent implements OnInit {
 				this.dataSource.loadListward(queryParams);
 			}
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {

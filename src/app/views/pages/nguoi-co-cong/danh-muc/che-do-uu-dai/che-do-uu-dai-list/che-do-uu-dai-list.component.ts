@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
@@ -22,19 +22,15 @@ import { CookieService } from 'ngx-cookie-service';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class chedouudaiListComponent implements OnInit {
+export class chedouudaiListComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     // Table fields
     dataSource: chedouudaiDataSource | undefined;
     displayedColumns = ['Id', 'CheDoUuDai', 'MoTa', 'Locked', 'Priority', 'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
     @ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
-    filterStatus = '';
-    filterCondition = '';
-    // Selection
-    selection = new SelectionModel<chedouudaiModel>(true, []);
-    productsResult: chedouudaiModel[] = [];
-    _name = "";
+    _name: string = "";
     gridService: TableService | undefined;
     gridModel: TableModel | undefined;
 
@@ -184,15 +180,12 @@ export class chedouudaiListComponent implements OnInit {
                 this.dataSource.loadList(queryParams);
             }
         });
-        this.dataSource.entitySubject.subscribe(res => {
-            this.productsResult = res;
-            if (this.productsResult && this.paginator) {
-                if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-                    this.loadDataList(false);
-                }
-            }
-        });
     }
+    
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
     loadDataList(holdCurrentPage: boolean = true) {
         if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
@@ -209,12 +202,6 @@ export class chedouudaiListComponent implements OnInit {
 
     filterConfiguration(): any {
         const filter: any = {};
-        if (this.filterStatus && this.filterStatus.length > 0) {
-            filter.status = +this.filterStatus;
-        }
-        if (this.filterCondition && this.filterCondition.length > 0) {
-            filter.type = +this.filterCondition;
-        }
         if (this.gridService && this.gridService.model.filterText) {
             filter.CheDoUuDai = this.gridService.model.filterText['CheDoUuDai'];
             filter.MoTa = this.gridService.model.filterText['MoTa'];
@@ -232,7 +219,7 @@ export class chedouudaiListComponent implements OnInit {
         dialogRef.afterClosed().subscribe(res => {
             if (!res) return;
 
-            this.apiService.delete(item.Id).subscribe(res => {
+            this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 if (res && res.status === 1) {
                     this.layoutUtilsService.showInfo(_deleteMessage);
                 }
@@ -267,7 +254,7 @@ export class chedouudaiListComponent implements OnInit {
                 this.loadDataList(); //để không biến mất ổ khóa
                 return;
             }
-            this.apiService.update(item).subscribe(res => {
+            this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 if (res && res.status === 1) {
                     const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
                     this.layoutUtilsService.showInfo(_messageType);
@@ -287,8 +274,7 @@ export class chedouudaiListComponent implements OnInit {
     }
 
     Edit(_item: chedouudaiModel, allowEdit: boolean = true) {
-        let saveMessageTranslateParam = '';
-        saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+        let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
         //thông báo khi thực hiện trong tác vụ
         const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
         const dialogRef = this.dialog.open(chedouudaiEditDialogComponent, { data: { _item, allowEdit } });

@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -15,7 +15,6 @@ import { TableService } from './../../../../../partials/table/table.service';
 import { TokenStorage } from './../../../../../../core/auth/_services/token-storage.service';
 import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
 import { DanhmuckhacModel } from '../Models/danh-muc-khac.model';
-import { loaiDieuDuongModel } from './../../loai-dieu-duong/Model/loaidieuduong.model';
 import { DanhMucKhacDataSource } from './../Models/data-sources/danh-muc-khac.datasource';
 import { DanhmuckhacDetailComponent } from './../danhmuckhac-detail/danhmuckhac-detail.component';
 import { CookieService } from 'ngx-cookie-service';
@@ -24,21 +23,16 @@ import { CookieService } from 'ngx-cookie-service';
 	selector: 'kt-danh-muc-khac-list',
 	templateUrl: './danh-muc-khac-list.component.html'
 })
-export class DanhMucKhacListComponent implements OnInit {
+export class DanhMucKhacListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	dataSource: DanhMucKhacDataSource | undefined;
 	haveFilter: boolean = false;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Filter fields
 	curUser: any = {};
-	// Selection
-	selection = new SelectionModel<loaiDieuDuongModel>(true, []);
-	productsResult: loaiDieuDuongModel[] = [];
 	_name: string = "";
-	_listHoso: any;
-
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
@@ -60,7 +54,7 @@ export class DanhMucKhacListComponent implements OnInit {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.curUser = res;
 		})
 
@@ -117,7 +111,6 @@ export class DanhMucKhacListComponent implements OnInit {
 			//	isShow: true
 			//},
 			//{
-
 			//	stt: 6,
 			//	name: 'LoaiGiayTo',
 			//	displayName: 'Loại giấy tờ',
@@ -125,7 +118,6 @@ export class DanhMucKhacListComponent implements OnInit {
 			//	isShow: true
 			//},
 			//{
-
 			//	stt: 7,
 			//	name: 'LoaiGiayToCC',
 			//	displayName: 'Loại giấy tờ căn cứ',
@@ -133,7 +125,6 @@ export class DanhMucKhacListComponent implements OnInit {
 			//	isShow: true
 			//},
 			{
-
 				stt: 10,
 				name: 'config',
 				displayName: 'Thao tác',
@@ -168,18 +159,12 @@ export class DanhMucKhacListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.gridService)
 			this.gridService.Clear();
 	}
@@ -206,7 +191,6 @@ export class DanhMucKhacListComponent implements OnInit {
 		}
 		return filter;
 	}
-
 
 	Add() {
 		let item = new DanhmuckhacModel();

@@ -8,9 +8,12 @@
 		<div class="col-md-{{isZoomSize ? '7' : '5'}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
-		<div class="col-md-{{isZoomSize ? '5' : '7'}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
-			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
-				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
+		<div class="col-md-{{isZoomSize ? '5' : '7'}} kt-margin-bottom-10-mobile" 
+			style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" 
+				matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
+				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>
 		</div>
 	</div>

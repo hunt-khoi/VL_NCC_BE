@@ -1,15 +1,18 @@
-import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { DoiTuongNguoiCoCongService } from './../Services/doi-tuong-nguoi-co-cong.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-doi-tuong-nhan-qua-muc-qua',
 	templateUrl: './doi-tuong-nhan-qua-muc-qua.component.html'
 })
 
-export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
+export class DoiTuongNhanQuaMucQuaComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -24,7 +27,7 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit();
 		}
 	}
@@ -56,7 +59,7 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 
 		if (this.data._item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItemNhanQua(this.item.Id).subscribe(res => {
+			this.apiService.getItemNhanQua(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.ready = true;
 				this.changeDetectorRefs.detectChanges();
@@ -67,6 +70,11 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	getValue(id_nhom: number, id_nguon: number) {
@@ -98,7 +106,7 @@ export class DoiTuongNhanQuaMucQuaComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateMucQua(this.item.Id, this.item.Details).subscribe(res => {
+		this.apiService.UpdateMucQua(this.item.Id, this.item.Details).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

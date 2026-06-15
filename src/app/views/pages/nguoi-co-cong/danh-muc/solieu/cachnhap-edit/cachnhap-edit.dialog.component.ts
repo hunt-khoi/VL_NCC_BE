@@ -1,47 +1,41 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { cachNhapModel } from '../Model/cachnhap.model';
 import { TranslateService } from '@ngx-translate/core';
 import { cachNhapService } from '../Services/cachnhap.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'm-cachnhap-edit-dialog',
 	templateUrl: './cachnhap-edit.dialog.component.html',
 })
 
-export class cachnhapEditDialogComponent implements OnInit {
+export class cachnhapEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: cachNhapModel = new cachNhapModel();
-	oldItem: cachNhapModel = new cachNhapModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
-	filterDonVi: string = '';
 	loadingAfterSubmit: boolean = false;
 	disabledBtn = false;
 	allowEdit = false;
 	isZoomSize: boolean = false;
-
 	id: number = 0;
 	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
-	_name = "";
-	listLoaiSoLieu: any[] = [];
-
-	FilterCtrl: string = '';
-	listOpt: any[] = [];
-	listFilter: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
+	_name: string = "";
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -63,7 +57,7 @@ export class cachnhapEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -74,6 +68,11 @@ export class cachnhapEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -101,7 +100,6 @@ export class cachnhapEditDialogComponent implements OnInit {
 	}
 
 	prepare(): cachNhapModel {
-		if (!this.itemForm) return new cachNhapModel();
 		const controls = this.itemForm.controls;
 		const _item = new cachNhapModel();
 		_item.Id = this.item.Id;
@@ -112,7 +110,6 @@ export class cachnhapEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -138,7 +135,7 @@ export class cachnhapEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -148,7 +145,7 @@ export class cachnhapEditDialogComponent implements OnInit {
 				else { 
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
+					this.layoutUtilsService.showInfo(_messageType);
 					if (this.focusInput)
 						this.focusInput.nativeElement.focus();
 				}
@@ -163,7 +160,7 @@ export class cachnhapEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -172,7 +169,7 @@ export class cachnhapEditDialogComponent implements OnInit {
 				}
 				else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
+					this.layoutUtilsService.showInfo(_messageType);
 					if (this.focusInput)
 						this.focusInput.nativeElement.focus();
 					this.ngOnInit();

@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectorRef, OnChanges, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -11,7 +10,6 @@ import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_ba
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
 import { DM_DonViService } from '../Services/dm-don-vi.service';
-import { DM_User_DonViModel } from '../Model/dm-don-vi.model';
 import { DM_NguoiDungDonViDataSource } from '../Model/data-sources/dm-nguoi-dung-don-vi.datasource';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -27,16 +25,8 @@ export class DmNguoiDungDonViListComponent implements OnChanges {
 	displayedColumns = [];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
 	availableColumns = [
-		// {
-		// 	stt: 1,
-		// 	name: 'select',
-		// 	displayName: 'Check chọn',
-		// 	alwaysChecked: true,
-		// 	isShow: true
-		// },
 		{
 			stt: 2,
 			name: 'STT',
@@ -68,7 +58,6 @@ export class DmNguoiDungDonViListComponent implements OnChanges {
 			alwaysChecked: false,
 			isShow: true
 		},
-
 		{
 
 			stt: 7,
@@ -77,7 +66,6 @@ export class DmNguoiDungDonViListComponent implements OnChanges {
 			alwaysChecked: false,
 			isShow: true
 		},
-
 		{
 
 			stt: 8,
@@ -96,12 +84,6 @@ export class DmNguoiDungDonViListComponent implements OnChanges {
 		},
 	];
 
-	// Selection
-	selectedColumns = new SelectionModel<any>(true, this.availableColumns);
-	selection = new SelectionModel<DM_User_DonViModel>(true, []);
-	dm_donvisResult: DM_User_DonViModel[] = [];
-	tmpdm_donvisResult: DM_User_DonViModel[] = [];
-
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	haveFilter: boolean = false;
@@ -113,7 +95,7 @@ export class DmNguoiDungDonViListComponent implements OnChanges {
     gridModel: TableModel | undefined;
 
 	constructor(
-		private dm_donvisService: DM_DonViService,
+		private apiService: DM_DonViService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private changeDetect: ChangeDetectorRef,
@@ -172,7 +154,7 @@ export class DmNguoiDungDonViListComponent implements OnChanges {
 		}
 
 		// Init DataSource
-		this.dataSource = new DM_NguoiDungDonViDataSource(this.dm_donvisService);
+		this.dataSource = new DM_NguoiDungDonViDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
 		if (this.donvi) {
 			this.loadList();
@@ -181,28 +163,15 @@ export class DmNguoiDungDonViListComponent implements OnChanges {
 			// // Read from URL itemId, for restore previous state
 			this.route.queryParams.subscribe(_ => {
 				if (this.dataSource) {
-					queryParams = this.dm_donvisService.lastFilter$.getValue();
+					queryParams = this.apiService.lastFilter$.getValue();
 					this.dataSource.loadDM_User_DonVis(queryParams);
 				}
 			});
-			
 		}
-		this.dataSource.entitySubject.subscribe(res => {
-			this.dm_donvisResult = res;
-			this.tmpdm_donvisResult = [];
-			if (this.dm_donvisResult != null) {
-				for (let i = 0; i < this.dm_donvisResult.length; i++) {
-					let tmpElement = new DM_User_DonViModel();
-					tmpElement.copy(this.dm_donvisResult[i])
-					this.tmpdm_donvisResult.push(tmpElement);
-				}
-			}
-		});
 	}
 
 	loadList(holdCurrentPage: boolean = false) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -228,22 +197,6 @@ export class DmNguoiDungDonViListComponent implements OnChanges {
 		}
 		// filter.DonVi = this.searchDonVi.nativeElement.value;
 		return filter;
-	}
-
-	/** SELECTION */
-	isAllSelected() {
-		const numSelected = this.selection.selected.length;
-		const numRows = this.dm_donvisResult.length;
-		return numSelected === numRows;
-	}
-
-	/** Selects all rows if they are not all selected; otherwise clear selection. */
-	masterToggle() {
-		if (this.isAllSelected()) {
-			this.selection.clear();
-		} else {
-			this.dm_donvisResult.forEach(row => this.selection.select(row));
-		}
 	}
 
 	getItemStatusString(status: number = 0): string {

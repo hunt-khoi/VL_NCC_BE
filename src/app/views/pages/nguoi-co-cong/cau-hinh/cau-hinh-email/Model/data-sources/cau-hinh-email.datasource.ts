@@ -13,10 +13,10 @@ export class CauHinhEmailDataSource extends BaseDataSource {
         this.loadingSubject.next(true);
 		this.productsService.getData(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					if(resultFromServer && resultFromServer.status ==1){
-						this.entitySubject.next(resultFromServer.data);
-						this.paginatorTotalSubject.next(resultFromServer.page.TotalCount);
+				tap(res => {
+					if(res && res.status ==1){
+						this.entitySubject.next(res.data);
+						this.paginatorTotalSubject.next(res.page.TotalCount);
 					}else{
 						this.entitySubject.next([]);
 						this.paginatorTotalSubject.next(0);

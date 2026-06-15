@@ -1,13 +1,14 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, Injectable } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, Injectable, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { ArrayDataSource } from '@angular/cdk/collections';
-import { BehaviorSubject } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { OrgChartModel } from '../Model/so-do-to-chuc.model';
 import { OrgChartService } from '../Services/so-do-to-chuc.service';
 import { sodotochuceditComponent } from '../so-do-to-chuc-edit/so-do-to-chuc-edit.component';
-import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 interface TreeNode {
 	Name: string;
@@ -190,8 +191,8 @@ export class ChecklistDatabase {
 	providers: [ChecklistDatabase],
 	encapsulation: ViewEncapsulation.None
 })
-export class SodotochucListComponent implements OnInit {
-	// displayedColumns = ['STT', 'ChucVu', 'NgayCap', 'actions'];
+export class SodotochucListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	treeControl = new NestedTreeControl<TreeNode>(node => node.children);
 	dataSource: any;
 	selectedNode: any;
@@ -250,14 +251,18 @@ export class SodotochucListComponent implements OnInit {
 		await this.getTreeValue();
 		this.changeDetectorRefs.detectChanges();
 	};
-
+	
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
 	//DEMO Treeview
 	async getTreeValue() {
 		this.loadingSubject.next(true);
 		this.viewLoading = true;
 		this.changeDetectorRefs.detectChanges();
-		this.apiService.GetOrganizationalChart(this.jobtitleid).subscribe(res => {
+		this.apiService.GetOrganizationalChart(this.jobtitleid).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
@@ -277,8 +282,7 @@ export class SodotochucListComponent implements OnInit {
 		// const itemNode = this.flatNodeMap.get(node);
 		this._itemchart = new OrgChartModel();
 		this._itemchart.ID = node.ID;
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
+		let saveMessageTranslateParam = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		let Id_parent = node.ID;
 		let id_cd = 0;
@@ -312,7 +316,7 @@ export class SodotochucListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.apiService.DeleteOrgChart(node.ID).subscribe(res => {
+			this.apiService.DeleteOrgChart(node.ID).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage)
 				}
@@ -392,7 +396,7 @@ export class SodotochucListComponent implements OnInit {
 
 	handleDrop(event: any, node: any) {
 		event.preventDefault();
-		this.apiService.GetOrganizationalChart(this.jobtitleid).subscribe(res => {
+		this.apiService.GetOrganizationalChart(this.jobtitleid).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.dataSource.data = res.data;
 			if (!res.Visible) {
 				this.layoutUtilsService.showError('Bạn không có quyền thao tác');
@@ -413,7 +417,7 @@ export class SodotochucListComponent implements OnInit {
 
 			if (this.dragNodeExpandOverArea === 'above') {
 				this._itemchart.IsAbove = true;
-				this.apiService.handleDropLevel(this._itemchart).subscribe(res => {
+				this.apiService.handleDropLevel(this._itemchart).pipe(takeUntil(this.destroy$)).subscribe(res => {
 					this.treeControl.expandAll();
 				});
 				// newItem = this.database.copyPasteItemAbove(this.flatNodeMap.get(this.dragNode), this.flatNodeMap.get(node));
@@ -421,7 +425,7 @@ export class SodotochucListComponent implements OnInit {
 			else
 				if (this.dragNodeExpandOverArea === 'below') {// Update vị trí 
 					this._itemchart.IsAbove = false;
-					this.apiService.handleDropLevel(this._itemchart).subscribe(res => {
+					this.apiService.handleDropLevel(this._itemchart).pipe(takeUntil(this.destroy$)).subscribe(res => {
 						this.treeControl.expandAll();
 					});
 					// newItem = this.database.copyPasteItemBelow(this.flatNodeMap.get(this.dragNode), this.flatNodeMap.get(node));
@@ -434,7 +438,7 @@ export class SodotochucListComponent implements OnInit {
 						vitritieptheo = 1;
 
 					this._itemchart.drop_levelto = '' + vitritieptheo;
-					this.apiService.handleDropParent(this._itemchart).subscribe(res => {
+					this.apiService.handleDropParent(this._itemchart).pipe(takeUntil(this.destroy$)).subscribe(res => {
 						this.treeControl.expandAll();
 					});
 					// newItem = this.database.copyPasteItem(this.flatNodeMap.get(this.dragNode), this.flatNodeMap.get(node));
@@ -450,8 +454,7 @@ export class SodotochucListComponent implements OnInit {
 	}
 
 	CapNhatThongTinChucVu(id_cd: string) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
+		let saveMessageTranslateParam = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		let Id_parent = 0;
 		let chucdanhParent = '';

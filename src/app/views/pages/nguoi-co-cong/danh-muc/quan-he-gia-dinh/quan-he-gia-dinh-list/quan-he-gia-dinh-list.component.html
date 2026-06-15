@@ -6,7 +6,8 @@
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="objectService.ReadOnlyControl" color="accent" type="button">
+			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" 
+				*ngIf="objectService.ReadOnlyControl" color="accent" type="button">
 				<span translate="COMMON.CREATE"></span>
 			</button>
 			<kt-column-option [gridService]="gridService"></kt-column-option>
@@ -23,8 +24,10 @@
 			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="Priority" 
 				matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
 				<ng-container matColumnDef="STT">
-					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell"><span translate="COMMON.STT"></span></th>
-					<td mat-cell *matCellDef="let object; let vi = index" class="mat-column-vinCode stt-cell">{{vi + 1}}</td>
+					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell">
+						<span translate="COMMON.STT"></span>
+					</th>
+					<td mat-cell *matCellDef="let i = index" class="mat-column-vinCode stt-cell">{{i + 1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="Id">
 					<th mat-header-cell *matHeaderCellDef class="stt-cell">ID</th>
@@ -38,14 +41,12 @@
 						<a href="javascript:;" (click)="Edit(object, false)">{{object.QHGiaDinh}}</a>
 					</td>
 				</ng-container>
-				<!-- <div *ngIf="selectedTab==0"> -->
-					<ng-container matColumnDef="IsChuYeu">
-						<th mat-header-cell *matHeaderCellDef>
-							<kt-column-filter [gridService]="gridService" column_name="IsChuYeu" [column_title]="'Là thân nhân chủ yếu'"></kt-column-filter>
-						</th>
-						<td mat-cell *matCellDef="let object"><mat-checkbox disabled [checked]="object.IsChuYeu"></mat-checkbox></td>
-					</ng-container>
-				<!-- </div> -->
+				<ng-container matColumnDef="IsChuYeu">
+					<th mat-header-cell *matHeaderCellDef>
+						<kt-column-filter [gridService]="gridService" column_name="IsChuYeu" [column_title]="'Là thân nhân chủ yếu'"></kt-column-filter>
+					</th>
+					<td mat-cell *matCellDef="let object"><mat-checkbox disabled [checked]="object.IsChuYeu"></mat-checkbox></td>
+				</ng-container>
 				<ng-container matColumnDef="Locked">
 					<th style="white-space: nowrap;" mat-header-cell *matHeaderCellDef>
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Locked" [column_title]="_LOCKED"></kt-column-filter>
@@ -111,7 +112,9 @@
 				</ng-container>
 
 				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
-				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" 
+					[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
+				</tr>
 			</table>
 			<div class="mat-table__message" *ngIf="!dataSource.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
 		</div>

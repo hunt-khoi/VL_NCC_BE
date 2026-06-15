@@ -2,7 +2,7 @@ import { BaseModel } from '../../../../../../core/_base/crud';
 
 export class DoiTuongNguoiCoCongModel extends BaseModel {
 	Id: number = 0;
-	DoiTuong: string = '';
+	DoiTuong!: string;
 	MaDoiTuong: string = '';
 	MoTa: string = '';
 	Locked: boolean = false;

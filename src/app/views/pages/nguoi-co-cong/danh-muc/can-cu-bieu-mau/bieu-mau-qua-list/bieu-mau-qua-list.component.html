@@ -5,6 +5,7 @@
 		text-overflow: ellipsis;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		-webkit-box-orient: vertical;
 	}
 </style>
@@ -26,8 +27,10 @@
 		<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" 
 			matSort #sort1="matSort" matSortActive="BieuMau" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
 			<ng-container matColumnDef="STT">
-				<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%"><span translate="COMMON.STT"></span></th>
-				<td mat-cell *matCellDef="let item;let vi = index" class="mat-column-vinCode stt-cell" style="flex: 0 0 6%">{{vi + 1}}</td>
+				<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%">
+					<span translate="COMMON.STT"></span>
+				</th>
+				<td mat-cell *matCellDef="let i = index" class="mat-column-vinCode stt-cell" style="flex: 0 0 6%">{{i + 1}}</td>
 			</ng-container>
 			<ng-container matColumnDef="BieuMau">
 				<th mat-header-cell *matHeaderCellDef style="width:500px;">

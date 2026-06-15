@@ -10,9 +10,9 @@
 		</ng-container>
 	</kt-portlet-header>
 
-	<div class="kt-portlet-body" style="display: flex; overflow: auto;" [ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
+	<div class="kt-portlet-body" style="display: flex; overflow: auto;" 
+		[ngClass]="{ 'kt-portlet--body-progress kt-portlet--body-progress-overlay' : viewLoading }">
 		<cdk-tree [dataSource]="dataSource" [treeControl]="treeControl" class="dl-tree-dropdown">
-			
 			<cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
 				<div class="dl-cover-tree-node">
 					<div class="dl-name-node">
@@ -20,10 +20,11 @@
 							<div class="cover-drag-item" [id]="node.RowID" draggable="true"
 								(dragstart)="handleDragStart(node);" (dragover)="handleDragOver($event, node);"
 								(drop)="handleDrop($event, node);" (dragend)="handleDragEnd();">
-								<span style="padding-left: 5px;" [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
+								<span style="padding-left: 5px;" [ngClass]="{
+									'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
                             		'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
                             		'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node,
-                            		'selected-node': __selectedNode === node}">
+                            		'selected-node': __selectedNode === node }">
 									{{node.Code}} - {{node.Title}} - ({{node.RowID}})</span>
 								<button mat-icon-button *ngIf="Visible" [matMenuTriggerFor]="menu">
 									<mat-icon>more_vert</mat-icon>
@@ -37,7 +38,7 @@
 										translate="CO_CAU_TO_CHUC.themmoi"></span>
 								</button>
 								<button class="btn-node btn-node-2" mat-menu-item (click)="removeNode(node)"
-									matTooltip="{{ 'CO_CAU_TO_CHUC.xoacocau' | translate }}" *ngIf="Visible && node.ParentID != 0">
+									matTooltip="{{ 'CO_CAU_TO_CHUC.xoacocau' | translate }}" *ngIf="Visible && node.ParentID !== 0">
 									<mat-icon style="color: red;">close</mat-icon>
 									<span style="font-size: 9pt; color: red !important;"
 										translate="CO_CAU_TO_CHUC.xoacocau"></span>
@@ -65,7 +66,8 @@
 									<img src="/assets/images/_plus.png" *ngIf="!treeControl.isExpanded(node)">
 									<img src="/assets/images/_sub.png" *ngIf="treeControl.isExpanded(node)">
 								</button>
-								<span style="padding-left: 5px; " [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
+								<span style="padding-left: 5px; " [ngClass]="{
+										'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
                                         'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
                                         'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node,
                                         'selected-node' : __selectedNode === node}">
@@ -83,7 +85,7 @@
 								</button>
 								<button class="btn-node btn-node-2" mat-menu-item (click)="removeNode(node)"
 									matTooltip="{{ 'CO_CAU_TO_CHUC.xoacocau' | translate }}"
-									*ngIf="Visible && node.ParentID != 0">
+									*ngIf="Visible && node.ParentID !== 0">
 									<mat-icon style="color: red;">close</mat-icon>
 									<span style="font-size: 9pt; color: red !important;"
 										translate="CO_CAU_TO_CHUC.xoacocau"></span>
@@ -104,6 +106,5 @@
 				</div>
 			</cdk-nested-tree-node>
 		</cdk-tree>
-
 	</div>
 </kt-portlet>

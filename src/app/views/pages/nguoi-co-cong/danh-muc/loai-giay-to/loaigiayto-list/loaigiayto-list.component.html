@@ -12,7 +12,8 @@
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="!apiService.ReadOnlyControl" color="accent" type="button">
+			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" 
+				*ngIf="!apiService.ReadOnlyControl" color="accent" type="button">
 				<span translate="COMMON.CREATE"></span>
 			</button>
 			<kt-column-option [gridService]="gridService"></kt-column-option>
@@ -21,9 +22,12 @@
 
 	<kt-portlet-body>
 		<div class="mat-table__wrapper" cdkDropListGroup [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}">
-			<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" matSort #sort1="matSort" matSortActive="Priority" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
+			<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" 
+				matSort #sort1="matSort" matSortActive="Priority" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
 				<ng-container matColumnDef="STT">
-					<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%"><span translate="COMMON.STT"></span></th>
+					<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%">
+						<span translate="COMMON.STT"></span>
+					</th>
 					<td mat-cell *matCellDef="let vi = index" class="mat-column-vinCode" style="flex: 0 0 6%">{{vi + 1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="Id">

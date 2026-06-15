@@ -1,10 +1,10 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { HttpUtilsService } from '../../../../../../core/_base/crud/utils/http-utils.service';
 import { QueryResultsModel } from '../../../../../../core/_base/crud/models/query-models/query-results.model';
 import { QueryParamsModel } from '../../../../../../core/_base/crud/models/query-models/query-params.model';
 import { environment } from '../../../../../../../environments/environment';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { HttpUtilsService } from '../../../../../../core/_base/crud/utils/http-utils.service';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
 const API_URL = environment.ApiRoot + '/noi-dung-chi-quy';
 @Injectable({
@@ -24,8 +24,7 @@ export class NoiDungChiService {
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_URL;
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_URL, {
 			headers: httpHeaders,
 			params: httpParams
 		});

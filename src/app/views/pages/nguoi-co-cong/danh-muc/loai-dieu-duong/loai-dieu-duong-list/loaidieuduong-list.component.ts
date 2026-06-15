@@ -5,8 +5,8 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -25,16 +25,12 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	dataSource: loaiDieuDuongDataSource | undefined;
 	displayedColumns = ['STT', 'Id', 'LoaiDieuDuong', 'MoTa', 'Locked', 'Priority', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
-
-	// Selection
-	selection = new SelectionModel<loaiDieuDuongModel>(true, []);
-	productsResult: loaiDieuDuongModel[] = [];
-	haveFilter: boolean = false;
 
 	_name: string = "";
 	gridModel: TableModel | undefined;
@@ -98,7 +94,6 @@ export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			//{
-
 			//	stt: 2,
 			//	name: 'Id',
 			//	displayName: 'Id',
@@ -106,7 +101,6 @@ export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
 			//	isShow: true
 			//},
 			{
-
 				stt: 3,
 				name: 'LoaiDieuDuong',
 				displayName: 'Loại điều dưỡng',
@@ -114,7 +108,6 @@ export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			{
-
 				stt: 4,
 				name: 'MoTa',
 				displayName: 'Mô tả',
@@ -122,7 +115,6 @@ export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			{
-
 				stt: 5,
 				name: 'Locked',
 				displayName: 'Tình trạng',
@@ -130,7 +122,6 @@ export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
 				isShow: true
 			},
 			{
-
 				stt: 6,
 				name: 'Priority',
 				displayName: 'Thứ tự',
@@ -173,17 +164,11 @@ export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult  && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
   	}
 	
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.gridService) 
 			this.gridService.Clear();
 	}
@@ -219,7 +204,7 @@ export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -251,7 +236,7 @@ export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.apiService.lock(item.Id, islock).subscribe(res => {
+			this.apiService.lock(item.Id, islock).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_message);
 				}

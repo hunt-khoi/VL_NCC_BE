@@ -1,7 +1,9 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { cocautochucMoiTreeService } from '../Services/co-cau-to-chuc-moi-tree.service';
 
@@ -19,8 +21,8 @@ export class TodoItemNode {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class CoCauMapDialogComponent implements OnInit {
-	hasFormErrors = false;
+export class CoCauMapDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -53,7 +55,7 @@ export class CoCauMapDialogComponent implements OnInit {
 		this.treeControl = new NestedTreeControl<TodoItemNode>(node => node.children);
 		this.dataSource = new ArrayDataSource(this.TREE_DATA);
 		this.viewLoading = true;
-		this.service.getCoCauMap().subscribe(res => {
+		this.service.getCoCauMap().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.TREE_DATA = res.data;
 				this.treeControl = new NestedTreeControl<TodoItemNode>(node => node.children);
@@ -69,7 +71,11 @@ export class CoCauMapDialogComponent implements OnInit {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 		});
+	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	bindSelection(parent: TodoItemNode | null, nodes: TodoItemNode[] = []) {
@@ -189,7 +195,7 @@ export class CoCauMapDialogComponent implements OnInit {
 	}
 	
 	getTitle(): string {
-		return "Đơn vị hành chánh tương ứng";
+		return "Đơn vị hành chính tương ứng";
 	}
 
 	prepareCustomer(): any {
@@ -212,7 +218,7 @@ export class CoCauMapDialogComponent implements OnInit {
 
 	onSubmit() {
 		const data = this.prepareCustomer();
-		this.service.map(data).subscribe(res => {
+		this.service.map(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.dialogRef.close(true);
 			} else {

@@ -1,21 +1,17 @@
 import { Component, OnInit, Injectable } from '@angular/core';
-import { CauHinhEmailService } from './Services/cau-hinh-email.service';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from 'app/core/_base/crud';
+import { CauHinhEmailService } from './Services/cau-hinh-email.service';
 
 @Component({
     selector: 'kt-cau-hinh-email',
     templateUrl: './cau-hinh-email.component.html',
 })
-@Injectable()
 export class CauHinhEmailComponent implements OnInit {
-
-  constructor(
-		private CauHinhEmailService : CauHinhEmailService
-	) {}
+  constructor(private apiService : CauHinhEmailService) { }
 
   ngOnInit() {
-    if (this.CauHinhEmailService != undefined)
-		this.CauHinhEmailService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'DanhMuc', 0, 10));
+    if (this.apiService != undefined)
+		  this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'DanhMuc', 0, 10));
   }
 }

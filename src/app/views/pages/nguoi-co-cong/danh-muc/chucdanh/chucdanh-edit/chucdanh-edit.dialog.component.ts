@@ -1,9 +1,11 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { ChucDanhModel } from '../Model/chucdanh.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { ChucDanhModel } from '../Model/chucdanh.model';
 import { ChucDanhService } from '../Services/chucdanh.service';
 
 @Component({
@@ -11,27 +13,28 @@ import { ChucDanhService } from '../Services/chucdanh.service';
 	templateUrl: './chucdanh-edit.dialog.component.html',
 })
 
-export class ChucDanhEditDialogComponent implements OnInit {
+export class ChucDanhEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: ChucDanhModel = new ChucDanhModel();
 	oldItem: ChucDanhModel = new ChucDanhModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
 	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
-	_name = "";
+	_name: string = "";
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -54,7 +57,7 @@ export class ChucDanhEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id_CV > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id_CV).subscribe(res => {
+			this.apiService.getItem(this.item.Id_CV).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -65,6 +68,11 @@ export class ChucDanhEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -91,7 +99,6 @@ export class ChucDanhEditDialogComponent implements OnInit {
 	}
 
 	prepare(): ChucDanhModel {
-		if (!this.itemForm) return new ChucDanhModel();
 		const controls = this.itemForm.controls;
 		const _item = new ChucDanhModel();
 		_item.Id_CV = this.item.Id_CV;
@@ -104,7 +111,6 @@ export class ChucDanhEditDialogComponent implements OnInit {
 
 	onSubmit(withBack: boolean = false) {
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -124,7 +130,7 @@ export class ChucDanhEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -148,7 +154,7 @@ export class ChucDanhEditDialogComponent implements OnInit {
 	Create(item: ChucDanhModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -172,7 +178,6 @@ export class ChucDanhEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

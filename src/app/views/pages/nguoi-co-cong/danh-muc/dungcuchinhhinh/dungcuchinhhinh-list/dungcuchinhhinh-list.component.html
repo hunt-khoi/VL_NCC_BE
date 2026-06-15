@@ -3,12 +3,13 @@
 		<ng-container ktPortletTitle>
 			<div class="kt-form__filtration">
 				<h3 class="kt-portlet__head-title">
-					<span translate="OBJECT.LIST"  [translateParams]="{name:this._name.toLowerCase()}"></span>
+					<span translate="OBJECT.LIST" [translateParams]="{name:this._name.toLowerCase()}"></span>
 				</h3>
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<!-- <button (click)="AddWorkplace()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="apiService.ReadOnlyControl" color="accent" type="button">
+			<!-- <button (click)="AddWorkplace()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" 
+				*ngIf="apiService.ReadOnlyControl" color="accent" type="button">
 				<span translate="COMMON.CREATE"></span>
 			</button> -->
 			<kt-column-option [gridService]="gridService"></kt-column-option>
@@ -21,7 +22,7 @@
 				style="width: 100%;" matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" cdkDropListGroup>
 				<ng-container matColumnDef="STT">
 					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell">STT</th>
-					<td mat-cell class="stt-cell" *matCellDef="let item; let i=index">{{i+1}}</td>
+					<td mat-cell class="stt-cell" *matCellDef="let i=index">{{i+1}}</td>
                 </ng-container>
 				<ng-container matColumnDef="MaDungCu">
 					<th mat-header-cell *matHeaderCellDef style="flex: 0 0 5%">
@@ -48,7 +49,9 @@
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Locked" column_title="Tình trạng"></kt-column-filter>
 					</th>
 					<td mat-cell *matCellDef="let item">
-						<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide {{covertLockToColor(item.Locked)}}">{{covertLockToString(item.Locked)}}</span>
+						<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide {{covertLockToColor(item.Locked)}}">
+							{{covertLockToString(item.Locked)}}
+						</span>
 					</td>
 				</ng-container>
                 <ng-container matColumnDef="Priority">

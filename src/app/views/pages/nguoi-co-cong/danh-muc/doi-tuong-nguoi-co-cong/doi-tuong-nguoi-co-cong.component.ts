@@ -1,6 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { QueryParamsModel } from 'app/core/_base/crud';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { DoiTuongNguoiCoCongService } from './Services/doi-tuong-nguoi-co-cong.service';
 
@@ -11,17 +12,23 @@ import { DoiTuongNguoiCoCongService } from './Services/doi-tuong-nguoi-co-cong.s
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DoiTuongNguoiCoCongComponent implements OnInit {
+export class DoiTuongNguoiCoCongComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	
 	constructor(public apiService: DoiTuongNguoiCoCongService, private tokenStorage: TokenStorage) { }
-
 	filterprovinces: number = 0;
+	
 	ngOnInit() {
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 		})
 		if (this.apiService !== undefined) {
 			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

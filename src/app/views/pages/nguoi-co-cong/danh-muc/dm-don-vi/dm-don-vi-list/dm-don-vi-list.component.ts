@@ -1,13 +1,12 @@
-import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, Input, OnChanges, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, Input, OnChanges, EventEmitter, Output, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
@@ -25,7 +24,8 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	providers: [DatePipe]
 })
-export class DM_DonViListComponent implements OnChanges {
+export class DM_DonViListComponent implements OnChanges, OnDestroy {
+	private destroy$ = new Subject<void>();
 	@Input() donvi: string = "";
 	@Output() ChangeTreDonVi: EventEmitter<any> = new EventEmitter<any>();
 	@Output() ChangeListUser: EventEmitter<any> = new EventEmitter<any>();
@@ -35,7 +35,6 @@ export class DM_DonViListComponent implements OnChanges {
 	displayedColumns = [];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
 	// Selection
 	selection = new SelectionModel<DM_DonViModel>(true, []);
@@ -62,7 +61,6 @@ export class DM_DonViListComponent implements OnChanges {
 		private layoutUtilsService: LayoutUtilsService) { }
 
 
-	/** LOAD DATA */
 	ngOnChanges() {
 		//#region ***Filter***
 		this.gridModel = new TableModel();
@@ -232,7 +230,7 @@ export class DM_DonViListComponent implements OnChanges {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -258,7 +256,7 @@ export class DM_DonViListComponent implements OnChanges {
 			for (let i = 0; i < this.selection.selected.length; i++) {
 				idsForDeletion.push(this.selection.selected[i].Id);
 			}
-			this.apiService.deletes(idsForDeletion).subscribe(() => {
+			this.apiService.deletes(idsForDeletion).pipe(takeUntil(this.destroy$)).subscribe(() => {
 				this.layoutUtilsService.showInfo(_deleteMessage);
 				this.ChangeTreDonVi.emit(res);
 				this.loadList(true);
@@ -322,8 +320,13 @@ export class DM_DonViListComponent implements OnChanges {
 	ImportExcel() {
 		const dialogRef = this.dialog.open(DM_DonViImportComponent);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) return;
-			this.loadList();
+			if (res)
+				this.loadList();
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

@@ -1,26 +1,21 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, ApplicationRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, OnInit, OnDestroy, ViewChild, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { DatePipe } from '@angular/common';
 import { SelectionModel } from '@angular/cdk/collections';
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { ReplaySubject, fromEvent, merge, BehaviorSubject } from 'rxjs';
-//Datasource
-import { ConfigDataSource } from '../Model/data-sources/config.datasource';
-//Service
-import { ConfigService } from '../Services/config.service';
-import { CommonService } from '../../../services/common.service';
-import { ConfigEditComponent } from '../config-edit/config-edit.component';
-import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-//Model
-import { SysConfigModel } from '../Model/config.model';
-import { TableService } from '../../../../../partials/table/table.service';
-import { TableModel } from '../../../../../partials/table';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
+import { CommonService } from '../../../services/common.service';
+import { ConfigDataSource } from '../Model/data-sources/config.datasource';
+import { ConfigService } from '../Services/config.service';
+import { ConfigEditComponent } from '../config-edit/config-edit.component';
+import { SysConfigModel } from '../Model/config.model';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -30,59 +25,53 @@ import { CookieService } from 'ngx-cookie-service';
 	providers: [DatePipe]
 })
 export class ConfigListComponent implements OnInit, OnDestroy {
-
-	haveFilter: boolean = false;
-
 	// Table fields
-	dataSource: ConfigDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
+	dataSource: ConfigDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 
-	// Filter fields
 	IdGroup: number = 0;
 	// Selection
 	selection = new SelectionModel<SysConfigModel>(true, []);
 	configsResult: SysConfigModel[] = [];
 	tmpconfigsResult: SysConfigModel[] = [];
+	haveFilter: boolean = false;
 
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
-	list_button: boolean;
+
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 	
 	constructor(
-		private configsService: ConfigService,
+		private apiService: ConfigService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
-		private router: Router,
 		private translate: TranslateService,
 		private changeDetect: ChangeDetectorRef,
 		private cookieService: CookieService,
 		private layoutUtilsService: LayoutUtilsService,
-		private tokenStorage: TokenStorage,
 		private ref: ApplicationRef,
 		private commonService: CommonService) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		//#region ***Filter***
-		this.girdModel.haveFilter = true;
-		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
-		this.girdModel.filterText['Code'] = "";
-		this.girdModel.filterText['Value'] = "";
-		this.girdModel.filterText['Description'] = "";
-		//TH1: #filter
+		this.gridModel = new TableModel();
+		this.gridModel.haveFilter = true;
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
+		this.gridModel.filterText['Code'] = "";
+		this.gridModel.filterText['Value'] = "";
+		this.gridModel.filterText['Description'] = "";
+		this.gridModel.filterGroupDataChecked = {};
+		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
-		this.girdModel.filterGroupDataChecked = {};
-
-		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
-
-		this.configsService.configGroup().subscribe(res => {
+		this.apiService.configGroup().subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
-				this.gridService.model.filterGroupDataChecked['IdGroup'] = res.data.map(x => {
+				this.gridService.model.filterGroupDataChecked['IdGroup'] = res.data.map((x: any) => {
 					return {
 						name: x.title,
 						value: x.id,
@@ -153,52 +142,48 @@ export class ConfigListComponent implements OnInit, OnDestroy {
 				isShow: true
 			}
 		];
-
-		this.girdModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.girdModel.selectedColumns = new SelectionModel<any>(true, this.girdModel.availableColumns);
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService, 
 			this.ref, 
-			this.girdModel,
+			this.gridModel,
 			this.cookieService
 		);
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumns();
 		//#endregion
 
-
 		this.commonService.fixedPoint = 0;
 
-		// // If the Config changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+		if (!this.sort || !this.paginator) return;
+		this.sort.sortChange.subscribe(() => { 
+			if (this.paginator) 
+				this.paginator.pageIndex = 0; 
+		});
+		merge(this.sort.sortChange, this.paginator.page)
 			.pipe(
 				tap(() => {
-					this.loadConfigsList(true);
+					this.loadDataList(true);
 				})
-			)
-			.subscribe();
+			).subscribe();
+
 		// Init DataSource
-		this.dataSource = new ConfigDataSource(this.configsService);
+		this.dataSource = new ConfigDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-		// // Read from URL itemId, for restore previous state
 		this.route.queryParams.subscribe(params => {
-			queryParams = this.configsService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadConfigs(queryParams);
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadConfigs(queryParams);
+			}
 		});
 		this.dataSource.entitySubject.subscribe(res => {
-			this.configsResult = res
-			this.tmpconfigsResult = []
-			if (this.configsResult != null) {
+			this.configsResult = res;
+			this.tmpconfigsResult = [];
+			if (this.configsResult  && this.paginator) {
 				if (this.configsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadConfigsList();
+					this.loadDataList();
 				} else {
 					for (let i = 0; i < this.configsResult.length; i++) {
 						let tmpElement = new SysConfigModel();
@@ -211,37 +196,34 @@ export class ConfigListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
-		this.gridService.Clear();
+		if (this.gridService)
+			this.gridService.Clear();
 	}
 
-	loadConfigsList(holdCurrentPage: boolean = false) {
+	loadDataList(holdCurrentPage: boolean = false) {
+		if (!this.sort || !this.paginator || !this.gridService || !this.dataSource) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(),
+			this.filter(),
 			this.sort.direction,
 			this.sort.active,
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
 			this.paginator.pageSize,
-
 			this.gridService.model.filterGroupData
-
 		);
 		this.dataSource.loadConfigs(queryParams);
 	}
 
-
-	/** FILTRATION */
-	filterConfiguration(): any {
+	filter(): any {
 		const filter: any = {};
-		//#filter
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.Code = this.gridService.model.filterText['Code'];
 			filter.Value = this.gridService.model.filterText['Value'];
 			filter.Description = this.gridService.model.filterText['Description'];
 		}
-
 		return filter;
 	}
+
 	/** SELECTION */
 	isAllSelected() {
 		const numSelected = this.selection.selected.length;
@@ -257,18 +239,12 @@ export class ConfigListComponent implements OnInit, OnDestroy {
 			this.configsResult.forEach(row => this.selection.select(row));
 		}
 	}
-	/**
-	 * Show Edit Config dialog and save after success close result
-	 * @param Config: SysConfigModel
-	 */
+
 	editConfig(Config: SysConfigModel, allowEdit: boolean = true) {
 		const dialogRef = this.dialog.open(ConfigEditComponent, { data: { Config: Config, allowEdit: allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.loadConfigsList(true);
+			if (!res) return;
+			this.loadDataList(true);
 		});
 	}
 }

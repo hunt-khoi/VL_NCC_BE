@@ -1,6 +1,8 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { chedouudaiModel } from '../../che-do-uu-dai/Model/che-do-uu-dai.model';
 import { TranslateService } from '@ngx-translate/core';
 import { chedouudaiService } from '../Services/che-do-uu-dai.service';
@@ -11,11 +13,11 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 	templateUrl: './che-do-uu-dai-edit.dialog.component.html',
 })
 
-export class chedouudaiEditDialogComponent implements OnInit {
+export class chedouudaiEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: chedouudaiModel = new chedouudaiModel();
 	oldItem: chedouudaiModel = new chedouudaiModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
 	loadingAfterSubmit: boolean = false;
@@ -30,11 +32,11 @@ export class chedouudaiEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -55,7 +57,7 @@ export class chedouudaiEditDialogComponent implements OnInit {
 		this.createForm();
         if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			this.chedouudaiService.getItem(this.item.Id).subscribe(res => {
+			this.chedouudaiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -66,6 +68,11 @@ export class chedouudaiEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
+	}
+	
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -96,7 +103,6 @@ export class chedouudaiEditDialogComponent implements OnInit {
 	}
 
 	prepare(): chedouudaiModel {
-		if (!this.itemForm) return new chedouudaiModel();
 		const controls = this.itemForm.controls;
 		const _item = new chedouudaiModel();
 		_item.Id = this.item.Id;
@@ -108,15 +114,12 @@ export class chedouudaiEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const EditNhomLeTet = this.prepare();
@@ -131,7 +134,7 @@ export class chedouudaiEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.chedouudaiService.update(item).subscribe(res => {
+		this.chedouudaiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -155,7 +158,7 @@ export class chedouudaiEditDialogComponent implements OnInit {
 	Create(item: chedouudaiModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.chedouudaiService.create(item).subscribe(res => {
+		this.chedouudaiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

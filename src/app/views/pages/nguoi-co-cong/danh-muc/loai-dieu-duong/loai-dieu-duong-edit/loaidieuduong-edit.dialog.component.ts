@@ -1,11 +1,13 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { loaiDieuDuongModel } from '../Model/loaidieuduong.model';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { loaiDieuDuongServices } from '../Services/loaidieuduong.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { loaiDieuDuongModel } from '../Model/loaidieuduong.model';
+import { loaiDieuDuongServices } from '../Services/loaidieuduong.service';
 
 @Component({
 	selector: 'kt-loai-dieu-duong-edit',
@@ -13,10 +15,11 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class LoaiDieuDuongEditDialogComponent implements OnInit {
+export class LoaiDieuDuongEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: loaiDieuDuongModel = new loaiDieuDuongModel();
 	oldItem: loaiDieuDuongModel = new loaiDieuDuongModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -30,11 +33,11 @@ export class LoaiDieuDuongEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -58,7 +61,7 @@ export class LoaiDieuDuongEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -70,6 +73,11 @@ export class LoaiDieuDuongEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			})
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -98,7 +106,6 @@ export class LoaiDieuDuongEditDialogComponent implements OnInit {
 	}
 
 	prepare(): loaiDieuDuongModel {
-		if (!this.itemForm) return new loaiDieuDuongModel();
 		const controls = this.itemForm.controls;
 		const _item = new loaiDieuDuongModel();
 		_item.Id = this.item.Id;
@@ -111,7 +118,6 @@ export class LoaiDieuDuongEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -132,7 +138,7 @@ export class LoaiDieuDuongEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -157,7 +163,7 @@ export class LoaiDieuDuongEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		//	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -183,7 +189,6 @@ export class LoaiDieuDuongEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

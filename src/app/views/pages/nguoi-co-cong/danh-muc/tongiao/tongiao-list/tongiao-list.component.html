@@ -8,7 +8,8 @@
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="apiService.ReadOnlyControl" color="accent" type="button">
+			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" 
+				*ngIf="apiService.ReadOnlyControl" color="accent" type="button">
 				<span translate="COMMON.CREATE"></span>
 			</button>
 		</ng-container>
@@ -19,7 +20,7 @@
 			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="Priority" matSortDirection="asc" matSortDisableClear>
 				<ng-container matColumnDef="Id_row">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode stt-cell" style="flex: 0 0 10%">{{'COMMON.STT'|translate}}</th>
-					<td mat-cell *matCellDef="let tongiao;let i=index" class="mat-column-vinCode stt-cell" style="flex: 0 0 10%">{{i+1}}</td>
+					<td mat-cell *matCellDef="let i=index" class="mat-column-vinCode stt-cell" style="flex: 0 0 10%">{{i+1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="Tentongiao">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode" style="flex: 0 0 50%">

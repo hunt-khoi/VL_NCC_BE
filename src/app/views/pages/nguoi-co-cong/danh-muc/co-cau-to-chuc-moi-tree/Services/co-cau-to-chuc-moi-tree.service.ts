@@ -1,10 +1,10 @@
-import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { _ParseAST } from '@angular/compiler';
-import { environment } from '../../../../../../../environments/environment';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { OrgStructureModel } from '../Model/CoCauToChuc.model';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/co-cau-to-chuc';
 
@@ -16,10 +16,7 @@ export class cocautochucMoiTreeService {
 
 	Get_CoCauToChuc(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_PRODUCTS_URL}`;
-		return this.http.get<QueryResultsModel>(url, {
-			headers: httpHeaders,
-		});
+		return this.http.get<QueryResultsModel>(API_PRODUCTS_URL, { headers: httpHeaders });
 	}
 
 	Createorgstructure(item: OrgStructureModel): Observable<any> {

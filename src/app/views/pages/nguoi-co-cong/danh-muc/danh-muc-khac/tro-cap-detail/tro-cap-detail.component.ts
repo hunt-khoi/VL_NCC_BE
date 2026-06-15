@@ -1,23 +1,22 @@
-import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
 import { CommonService } from './../../../services/common.service';
 import { DanhmucTrocapModel } from './../Models/danh-muc-tro-cap.model';
 import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
-import { DanhmuckhacModel } from './../Models/danh-muc-khac.model';
 
 @Component({
 	selector: 'kt-tro-cap-detail',
 	templateUrl: './tro-cap-detail.component.html',
 })
-export class TroCapDetailComponent implements OnInit {
+export class TroCapDetailComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: DanhmucTrocapModel = new DanhmucTrocapModel();
-	oldItem: DanhmuckhacModel = new DanhmuckhacModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -40,11 +39,11 @@ export class TroCapDetailComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -65,20 +64,20 @@ export class TroCapDetailComponent implements OnInit {
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
 
-		this.commonService.liteBieuMau(3).subscribe(res => {
+		this.commonService.liteBieuMau(3).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listBieumau.next(res.data);
 			this.listOpt = res.data;
 		});
-		this.commonService.liteBieuMau(5).subscribe(res => {
+		this.commonService.liteBieuMau(5).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listBieumauCat.next(res.data);
 			this.listOpt1 = res.data;
 		});
-		this.commonService.liteDoiTuongNCC().subscribe(res => {
+		this.commonService.liteDoiTuongNCC().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listLoaiHoSo = res.data;
 		})
 		this.createForm();
 		if (this.item.Id > 0) {
-			this.apiService.getDetailTC(this.item.Id).subscribe(res => {
+			this.apiService.getDetailTC(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.item = res.data;
 					this.loadDM(this.item.Id_LoaiHoSo);
@@ -87,6 +86,11 @@ export class TroCapDetailComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			})
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -122,7 +126,7 @@ export class TroCapDetailComponent implements OnInit {
 	loadDM(Id_LoaiHoSo: number) {
 		if (!this.itemForm) return;
 		this.itemForm.controls['Id_Parent'].setValue(0)
-		this.commonService.liteConstLoaiTroCapCha(Id_LoaiHoSo).subscribe(res => {
+		this.commonService.liteConstLoaiTroCapCha(Id_LoaiHoSo).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listLoaiTroCapCha = res.data;
 			if (this.item.Id_Parent != null && this.item.Id_Parent > 0)
 				this.chooseParent(this.item.Id_Parent, true);
@@ -142,7 +146,6 @@ export class TroCapDetailComponent implements OnInit {
 	}
 
 	prepare(): DanhmucTrocapModel {
-		if (!this.itemForm) return new DanhmucTrocapModel();
 		const controls = this.itemForm.controls;
 		const _item = new DanhmucTrocapModel();
 		_item.Id_LoaiHoSo = controls['Id_LoaiHoSo'].value;
@@ -166,15 +169,12 @@ export class TroCapDetailComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const EditTroCap = this.prepare();
@@ -190,7 +190,7 @@ export class TroCapDetailComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.updateTC(item).subscribe(res => {
+		this.apiService.updateTC(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -215,7 +215,7 @@ export class TroCapDetailComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		//	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.createTC(item).subscribe(res => {
+		this.apiService.createTC(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -240,8 +240,6 @@ export class TroCapDetailComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

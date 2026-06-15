@@ -1,7 +1,9 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, Type } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { BieuMauService } from '../Services/bieu-mau.service';
@@ -12,10 +14,10 @@ import { BieuMauService } from '../Services/bieu-mau.service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class BieuMauThanhPhanEditDialogComponent implements OnInit {
+export class BieuMauThanhPhanEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -28,11 +30,11 @@ export class BieuMauThanhPhanEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -56,7 +58,7 @@ export class BieuMauThanhPhanEditDialogComponent implements OnInit {
 
 		this.createForm();
 		this.viewLoading = true;
-		this.objectService.getItemTP(this.item.Id).subscribe(res => {
+		this.objectService.getItemTP(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -66,6 +68,11 @@ export class BieuMauThanhPhanEditDialogComponent implements OnInit {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -101,7 +108,6 @@ export class BieuMauThanhPhanEditDialogComponent implements OnInit {
 	}
 
 	prepare(): any {
-		if (!this.itemForm) return {};
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -131,7 +137,7 @@ export class BieuMauThanhPhanEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.UpdateTP(item).subscribe(res => {
+		this.objectService.UpdateTP(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

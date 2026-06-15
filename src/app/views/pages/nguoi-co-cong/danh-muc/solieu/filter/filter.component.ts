@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
 // RXJS
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { debounceTime, distinctUntilChanged, tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, fromEvent, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 // Services
 import { filterEditComponent } from '../filter-edit/filter-edit.component';
@@ -25,15 +25,13 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class FilterComponent implements OnInit {
+export class FilterComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: FilterDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	filterStatus = '';
-	filterCondition = '';
-	_name = "";
-
+	_name: string = "";
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
@@ -164,6 +162,11 @@ export class FilterComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
@@ -194,7 +197,7 @@ export class FilterComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Delete(item.id_row).subscribe(res => {
+			this.apiService.Delete(item.id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -205,7 +208,6 @@ export class FilterComponent implements OnInit {
 			});
 		});
 	}
-
 
 	Add() {
 		const FilterModels = new FilterModel();

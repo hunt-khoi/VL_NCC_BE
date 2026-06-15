@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { DoiTuongBHYTModel, DoiTuongDCCHModel, DoiTuongNguoiCoCongModel, DoiTuongNhanQuaModel } from './../Model/doi-tuong-nguoi-co-cong.model';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/doi-tuong-ncc';
 const API_URL_NQ = environment.ApiRoot + '/dm-doi-tuong-nhan-qua';

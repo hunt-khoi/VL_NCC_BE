@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -20,16 +19,14 @@ import { capquanlyEditDialogComponent } from '../capquanly-edit/capquanly-edit.d
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class capquanlyListComponent implements OnInit {
+export class capquanlyListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: capquanlyDataSource | undefined;
 	displayedColumns = ['STT','RowID', 'Title', 'Range','Summary','NguoiCapNhat','NgayCapNhat', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
-	// Selection
-	selection = new SelectionModel<capquanlyModel>(true, []);
-	productsResult: capquanlyModel[] = [];
 	_name: string = "";
 	list_button: boolean = false;
 	btnClass: string = "";
@@ -67,14 +64,11 @@ export class capquanlyListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -97,7 +91,7 @@ export class capquanlyListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.apiService.Delete(item.RowID).subscribe(res => {
+			this.apiService.Delete(item.RowID).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}

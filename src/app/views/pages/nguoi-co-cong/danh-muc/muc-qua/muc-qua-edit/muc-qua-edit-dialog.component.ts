@@ -1,6 +1,8 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
@@ -13,11 +15,11 @@ import { MucQuaModel } from './../Model/muc-qua.model';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class MucQuaEditDialogComponent implements OnInit {
+export class MucQuaEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: MucQuaModel = new MucQuaModel();
 	oldItem: MucQuaModel = new MucQuaModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -30,11 +32,11 @@ export class MucQuaEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -57,7 +59,7 @@ export class MucQuaEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -68,6 +70,11 @@ export class MucQuaEditDialogComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -99,7 +106,6 @@ export class MucQuaEditDialogComponent implements OnInit {
 	}
 
 	prepare(): MucQuaModel {
-		if (!this.itemForm) return new MucQuaModel();
 		const controls = this.itemForm.controls;
 		const _item = new MucQuaModel();
 		_item.Id = this.item.Id;
@@ -111,15 +117,12 @@ export class MucQuaEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const Edit = this.prepare();
@@ -134,7 +137,7 @@ export class MucQuaEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -157,7 +160,7 @@ export class MucQuaEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -180,15 +183,9 @@ export class MucQuaEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
-	}
-	
-	onAlertClose() {
-		this.hasFormErrors = false;
 	}
 
 	close() {

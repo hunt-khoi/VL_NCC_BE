@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -23,20 +23,15 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class NguonKinhPhiListComponent implements OnInit {
+export class NguonKinhPhiListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: NguonKinhPhiDataSource | undefined;
-	displayedColumns = ['STT', 'Id', 'NguonKinhPhi', 'Locked', 'Priority', 'Locked', 'CreatedBy',
-		'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
+	displayedColumns = ['STT', 'Id', 'NguonKinhPhi', 'Locked', 'Priority', 'Locked', 
+		'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
 
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 
 	_name = '';
 	_NguonKinhPhi = '';
@@ -204,14 +199,11 @@ export class NguonKinhPhiListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -229,12 +221,6 @@ export class NguonKinhPhiListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterType && this.filterType.length > 0) {
-			filter.type = +this.filterType;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.NguonKinhPhi = this.gridService.model.filterText.NguonKinhPhi;
 		}
@@ -259,7 +245,6 @@ export class NguonKinhPhiListComponent implements OnInit {
 		}
 	}
 
-	/** Delete */
 	Delete(item: NguonKinhPhiModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
@@ -269,7 +254,7 @@ export class NguonKinhPhiListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Delete(item.Id).subscribe(res => {
+			this.apiService.Delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -287,8 +272,7 @@ export class NguonKinhPhiListComponent implements OnInit {
 	}
 
 	Edit(_item: NguonKinhPhiModel, allowEdit: boolean = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(NguonKinhPhiEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
@@ -319,7 +303,7 @@ export class NguonKinhPhiListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Lock(item.Id, value).subscribe(res => {
+			this.apiService.Lock(item.Id, value).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_message);
 				} else {

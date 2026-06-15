@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -21,17 +20,12 @@ import { CookieService } from 'ngx-cookie-service';
 	selector: 'kt-bieu-mau-qua-list',
 	templateUrl: './bieu-mau-qua-list.component.html'
 })
-export class BieuMauQuaListComponent implements OnInit {
+export class BieuMauQuaListComponent implements OnInit, OnDestroy {
 	dataSource: CanCuBieuMauDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
 	// Filter fields
-	curUser: any = {};
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	_name: string = "";
 	gridService: TableService | undefined;
 	girdModel: TableModel | undefined;
@@ -45,7 +39,7 @@ export class BieuMauQuaListComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
 		private translate: TranslateService,
-		private bmService: BieuMauQuaService) {
+		private apiService: BieuMauQuaService) {
 		this._name = this.translate.instant("BIEUMAU.NAME");
 	}
 
@@ -133,19 +127,11 @@ export class BieuMauQuaListComponent implements OnInit {
 				).subscribe();
 		}
 
-		this.dataSource = new CanCuBieuMauDataSource(null, null, this.bmService);
+		this.dataSource = new CanCuBieuMauDataSource(null, null, this.apiService);
 		this.route.queryParams.subscribe(_ => {
 			if (this.dataSource) {
-				let queryParams = this.bmService.lastFilter$.getValue();
+				let queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadListBieuMauQua(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}
@@ -178,8 +164,7 @@ export class BieuMauQuaListComponent implements OnInit {
 	}
 
 	Edit(_item: any, allowEdit: boolean = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(BieuMauQuaEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {

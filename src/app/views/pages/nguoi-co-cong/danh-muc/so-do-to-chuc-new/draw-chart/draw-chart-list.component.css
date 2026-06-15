@@ -1,9 +1,6 @@
 .data table {
     margin: auto;
-    /* border: #555 1px solid;
-    background-color: rgb(217, 217, 217); */
     border: #b6b6b6 1px solid;
-    /* border: rgb(217, 217, 217); */
     background-color: #FFF;
 }
 

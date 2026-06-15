@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -19,7 +19,8 @@ import { chucvuEditDialogComponent } from '../chucvu-edit/chucvu-edit.dialog.com
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class chucvuListComponent implements OnInit {
+export class chucvuListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
     // Table fields
     dataSource: chucvuDataSource | undefined;
     displayedColumns = ['STT','Id_row', 'Tenchucdanh', 'Tentienganh', 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
@@ -66,6 +67,11 @@ export class chucvuListComponent implements OnInit {
 		});
     }
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
         if (!this.paginator || !this.sort || !this.dataSource) return;
         const queryParams = new QueryParamsModel({},
@@ -86,7 +92,7 @@ export class chucvuListComponent implements OnInit {
         dialogRef.afterClosed().subscribe(res => {
             if (!res) return;
             
-            this.apiService.Delete(_item.Id_row).subscribe(res => {
+            this.apiService.Delete(_item.Id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
                 }
@@ -105,8 +111,7 @@ export class chucvuListComponent implements OnInit {
     }
 
     Edit(_item: chucvuModel) {
-        let saveMessageTranslateParam = '';
-        saveMessageTranslateParam += _item.Id_row > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+        let saveMessageTranslateParam = _item.Id_row > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
         const _saveMessage = this.translate.instant(saveMessageTranslateParam, {name:this._name});
         const dialogRef = this.dialog.open(chucvuEditDialogComponent, { data: { _item } });
         dialogRef.afterClosed().subscribe(res => {

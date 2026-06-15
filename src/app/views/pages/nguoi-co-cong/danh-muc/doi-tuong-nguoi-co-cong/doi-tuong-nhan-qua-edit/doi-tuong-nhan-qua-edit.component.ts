@@ -1,21 +1,23 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { DoiTuongNguoiCoCongService } from './../Services/doi-tuong-nguoi-co-cong.service';
 import { DoiTuongNguoiCoCongModel, DoiTuongNhanQuaModel } from './../Model/doi-tuong-nguoi-co-cong.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'kt-doi-tuong-nhan-qua-edit',
   templateUrl: './doi-tuong-nhan-qua-edit.component.html',
 })
-export class DoiTuongNhanQuaEditComponent implements OnInit {
+export class DoiTuongNhanQuaEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 
   	item: DoiTuongNguoiCoCongModel = new DoiTuongNguoiCoCongModel();
 	oldItem: DoiTuongNguoiCoCongModel = new DoiTuongNguoiCoCongModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -27,11 +29,11 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -53,7 +55,7 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItemNhanQua(this.item.Id).subscribe(res => {
+			this.apiService.getItemNhanQua(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -66,6 +68,11 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 		}
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	createForm() {
 		const temp: any = {
 			DoiTuong: ['' + this.item.DoiTuong?this.item.DoiTuong:'', Validators.required],
@@ -73,22 +80,16 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 			MoTa: ['' + this.item.MoTa?this.item.MoTa:''],
 			Priority: [this.item.Priority?this.item.Priority:''],
 		};
-
-		if (this.allowEdit) {
-			this.itemForm = this.fb.group(temp);
-			if (this.focusInput)
-				this.focusInput.nativeElement.focus();
-		} else {
+		if (!this.allowEdit) {
 			temp.CreatedBy = ['' + this.item.CreatedBy];
 			temp.CreatedDate = ['' + this.item.CreatedDate];
 			temp.UpdatedBy = ['' + this.item.UpdatedBy];
 			temp.UpdatedDate = ['' + this.item.UpdatedDate];
-			this.itemForm = this.fb.group(temp);
-			this.itemForm.disable();
-			if (this.focusInput)
-				this.focusInput.nativeElement.focus();
 		}
-
+		this.itemForm = this.fb.group(temp);
+		this.itemForm.disable();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 	}
 
 	getTitle(): string {
@@ -105,7 +106,6 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 	}
 
 	prepare(): DoiTuongNguoiCoCongModel {
-		if (!this.itemForm) return new DoiTuongNguoiCoCongModel();
 		const controls = this.itemForm.controls;
 		const _item = new DoiTuongNguoiCoCongModel();
 		_item.Id = this.item.Id;
@@ -117,19 +117,15 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		if (controls.Priority.value < 0 || controls.Priority.value === '') {
-			this.hasFormErrors = true;
 			return;
 		}
 		const Edit = this.prepare();
@@ -144,7 +140,7 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateDoiTuongNhanQua(item).subscribe(res => {
+		this.apiService.UpdateDoiTuongNhanQua(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -167,7 +163,7 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.CreateDoiTuongNhanQua(item).subscribe(res => {
+		this.apiService.CreateDoiTuongNhanQua(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -190,8 +186,6 @@ export class DoiTuongNhanQuaEditComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

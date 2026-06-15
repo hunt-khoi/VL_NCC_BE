@@ -1,16 +1,18 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
 import { CommonService } from './../../../services/common.service';
 import { DoiTuongNguoiCoCongService } from '../Services/doi-tuong-nguoi-co-cong.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-update-bieu-mau-dialog',
 	templateUrl: './update-bieu-mau-dialog.component.html',
 })
-export class UpdateBieuMauDialogComponent implements OnInit {
-
+export class UpdateBieuMauDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -25,8 +27,13 @@ export class UpdateBieuMauDialogComponent implements OnInit {
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		// lưu đóng
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
+		}
+		//lưu tiếp tục
+		if (event.ctrlKey && event.key === 'Enter') {
+			this.onSubmit(false);
 		}
 	}
 	
@@ -53,7 +60,7 @@ export class UpdateBieuMauDialogComponent implements OnInit {
 			this.item.Id_Template_ThanNhan = 0;
 
 		//list biểu mẫu
-		this.commonService.liteBieuMau(1).subscribe(res => {
+		this.commonService.liteBieuMau(1).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listBieumau = res.data;
 			this.listBieumau.unshift({
 				id: 0,
@@ -61,7 +68,7 @@ export class UpdateBieuMauDialogComponent implements OnInit {
 			})
 		});
 		// biểu mẫu công nhận
-		this.commonService.liteBieuMau(2).subscribe(res => {
+		this.commonService.liteBieuMau(2).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listBieumau_congnhan = res.data;
 			this.listBieumau_congnhan.unshift({
 				id: 0,
@@ -69,13 +76,18 @@ export class UpdateBieuMauDialogComponent implements OnInit {
 			})
 		});
 		// biểu mẫu di chuyển
-		this.commonService.liteBieuMau(4).subscribe(res => {
+		this.commonService.liteBieuMau(4).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listBieumau_dichuyen = res.data;
 			this.listBieumau_dichuyen.unshift({
 				id: 0,
 				title: '-- Chọn biểu mẫu --'
 			})
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	onSubmit(withBack: boolean = false) {
@@ -96,7 +108,7 @@ export class UpdateBieuMauDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateBieuMau(item).subscribe(res => {
+		this.apiService.UpdateBieuMau(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

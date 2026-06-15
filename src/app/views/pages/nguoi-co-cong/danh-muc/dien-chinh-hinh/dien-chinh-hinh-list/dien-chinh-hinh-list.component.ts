@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -23,17 +23,12 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DienChinhHinhListComponent implements OnInit {
+export class DienChinhHinhListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: DienChinhHinhDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
-	// Selection
-	selection = new SelectionModel<DienChinhHinhModel>(true, []);
-	productsResult: DienChinhHinhModel[] = [];
 
 	_name = '';
 	_DIENCHINHHINH = '';
@@ -135,14 +130,14 @@ export class DienChinhHinhListComponent implements OnInit {
 				alwaysChecked: false,
 				isShow: true,
 			},
-
 			{
 				stt: 5,
 				name: 'MoTa',
 				displayName: this._MOTA,
 				alwaysChecked: false,
 				isShow: true,
-			}, {
+			}, 
+			{
 				stt: 7,
 				name: 'CreatedBy',
 				displayName: this._CREATEDBY,
@@ -213,14 +208,11 @@ export class DienChinhHinhListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -238,12 +230,6 @@ export class DienChinhHinhListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterType && this.filterType.length > 0) {
-			filter.type = +this.filterType;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.DienChinhHinh = this.gridService.model.filterText.DienChinhHinh;
 			filter.MoTa = this.gridService.model.filterText.MoTa;
@@ -278,7 +264,7 @@ export class DienChinhHinhListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.apiService.Delete(item.Id).subscribe(res => {
+			this.apiService.Delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -327,7 +313,7 @@ export class DienChinhHinhListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Lock(item.Id, value).subscribe(res => {
+			this.apiService.Lock(item.Id, value).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_message);
 				} else {

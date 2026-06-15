@@ -11,7 +11,8 @@
 <div class="kt-portlet__body">
 	
 	<div class="example-container-hc mat-table__wrapper" [ngStyle]="{'height': getHeight()}">
-		<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
+		<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc" 
+			matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
 			<!-- Checkbox Column -->
 			<ng-container matColumnDef="STT">
 				<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell" style="flex: 0 0 5%">

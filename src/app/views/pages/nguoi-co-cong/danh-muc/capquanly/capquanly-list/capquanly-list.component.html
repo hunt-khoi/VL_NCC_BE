@@ -6,7 +6,8 @@
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="apiService.ReadOnlyControl" color="accent" type="button">
+			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" 
+				*ngIf="apiService.ReadOnlyControl" color="accent" type="button">
 				<span translate="COMMON.CREATE"></span>
 			</button>
 		</ng-container>
@@ -16,15 +17,19 @@
 		<div class="mat-table__wrapper d-block">
 			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="RowID" matSortDirection="asc" matSortDisableClear>
 				<ng-container matColumnDef="STT">
-					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell"><span translate="COMMON.STT"></span></th>
-					<td mat-cell *matCellDef="let item; let vi = index" class="mat-column-vinCode stt-cell">{{vi + 1}}</td>
+					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell">
+						<span translate="COMMON.STT"></span>
+					</th>
+					<td mat-cell *matCellDef="let i=index" class="mat-column-vinCode stt-cell">{{i + 1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="RowID">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">ID</th>
 					<td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.RowID}}</td>
 				</ng-container>
 				<ng-container matColumnDef="Title">
-					<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode"><span translate="CAP_QL.TIEU_DE"></span></th>
+					<th mat-header-cell *matHeaderCellDef mat-sort-header class="mat-column-vinCode">
+						<span translate="CAP_QL.TIEU_DE"></span>
+					</th>
 					<td mat-cell *matCellDef="let item" class="mat-column-vinCode">
 						<a href="javascript:;" (click)="Edit(item, false)">{{item.Title}}</a>
 					</td>

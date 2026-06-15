@@ -1,11 +1,13 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DropEffect, DndDropEvent } from 'ngx-drag-drop';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { OrgChartService } from '../Services/so-do-to-chuc.service';
 import { ChartStaffModel } from '../Model/so-do-to-chuc.model';
-import { MatDialog } from '@angular/material/dialog';
-import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import * as jspdf from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -16,16 +18,15 @@ import html2canvas from 'html2canvas';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class DrawListComponent implements OnInit {
-	// Table fields
+export class DrawListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	dataSourceChart: any[] = [];
 	ListItemChart: any[] = [];
-	//lưu lại giá trị drag
 	index_drag: number = 0;
 	list_drag: any[] = [];
 	viewLoading: boolean = false;
 	ID: string = '';
-	_widthpage = 0;
+	_widthpage: number = 0;
 
 	constructor(
 		private activatedRoute: ActivatedRoute,
@@ -36,13 +37,18 @@ export class DrawListComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService) { }
 
 	ngOnInit() {
-		this.activatedRoute.params.subscribe(params => {
+		this.activatedRoute.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
 			this.ID = '' + params.ID;
 		});
 		this.index_drag = 0;
 		this.list_drag = [];
 		this.ListItemChart = [];
 		this.getDatasourceChart();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	filterConfiguration(): any {
@@ -86,15 +92,14 @@ export class DrawListComponent implements OnInit {
 		var total_w = 0;
 		var idx = 0;
 		root.forEach((element: any) => {
-			var _cw = null;
 			element.offset = startindex + _offset;
 			if (idx == 0) {
 				element.firstchild = true;
 			}
 			total_w += element.children.width;
-			if (element.children && element.children.length) {
-				_cw = this.genArr(element.children, arr, level + 1, startindex + _offset);
-			}
+			// if (element.children && element.children.length) {
+			// 	var _cw = this.genArr(element.children, arr, level + 1, startindex + _offset);
+			// }
 			idx++;
 			if (total_w == root.width) {
 				element.lastchild = true;
@@ -142,7 +147,6 @@ export class DrawListComponent implements OnInit {
 				var el = arr_chart[i][j];
 				if (!el) continue;
 				var elTopLevel = level_max - el.level_jobtitle;
-				// var elLevel = level_max - el.item.level_jobtitle;
 				if (!el.diff) el.diff = 1;
 				for (var k = el.diff - 1; k >= 0; k--) {
 					var elLevel = elTopLevel - k;
@@ -187,7 +191,7 @@ export class DrawListComponent implements OnInit {
 
 	getDatasourceChart() {
 		this.viewLoading = true;
-		this.apiService.GetOrganizationalChartById(this.ID).subscribe(res => {
+		this.apiService.GetOrganizationalChartById(this.ID).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			this.dataSourceChart = res.data;
 			this.ListItemChart = [];
@@ -198,35 +202,33 @@ export class DrawListComponent implements OnInit {
 		});
 	}
 
-	onMoved_Staff(item: any, list: any[], parent: any, effect: DropEffect) {
+	onMoved_Staff(item: any, list: any[]) {
 		const index = list.indexOf(item);
 		list.splice(index, 1);
 	}
 
 	onDrop_Staff(event: DndDropEvent, parent: any, list?: any[]) {
-		if (list) {
-			let index = event.index;
-			if (typeof index === "undefined") {
-				index = list.length;
-			}
-			//Gọi API
-			let itemMove = new ChartStaffModel();
-			itemMove.id_nv = event.data.ID_NV;
-			itemMove.id_chucdanhmoi = parent.ID;
-			this.apiService.handleDropStaff(itemMove).subscribe(res => {
-				;
-				if (res.status == 1) {
-					list.splice(index, 0, event.data);
-					this.changeDetectorRefs.detectChanges();
-					return;
-				}
-				else {
-					this.layoutUtilsService.showError(res.error.message);
-					this.getDatasourceChart();
-					return;
-				}
-			});
+		if (!list) return;
+		let index = event.index;
+		if (typeof index === "undefined") {
+			index = list.length;
 		}
+		//Gọi API
+		let itemMove = new ChartStaffModel();
+		itemMove.id_nv = event.data.ID_NV;
+		itemMove.id_chucdanhmoi = parent.ID;
+		this.apiService.handleDropStaff(itemMove).pipe(takeUntil(this.destroy$)).subscribe(res => {
+			if (res.status == 1) {
+				list.splice(index, 0, event.data);
+				this.changeDetectorRefs.detectChanges();
+				return;
+			}
+			else {
+				this.layoutUtilsService.showError(res.error.message);
+				this.getDatasourceChart();
+				return;
+			}
+		});
 	}
 
 	@ViewChild('scrollOne', { static: true }) scrollOne: ElementRef | undefined;
@@ -238,21 +240,17 @@ export class DrawListComponent implements OnInit {
 	}
 
 	getTitlePrint() {
-		if (this.GetwidthPage() < (window.innerWidth - 50)) {
+		if (this.GetwidthPage() < (window.innerWidth - 50)) 
 			return 'In';
-		}
-		else {
+		else 
 			return 'Xuất PDF';
-		}
 	}
 
 	PrintAndExport() {
-		if (this.GetwidthPage() < (window.innerWidth - 50)) {
+		if (this.GetwidthPage() < (window.innerWidth - 50)) 
 			this.printMePls();
-		}
-		else {
+		else 
 			this.convetToPDF();
-		}
 	}
 
 	public convetToPDF() {
@@ -265,8 +263,7 @@ export class DrawListComponent implements OnInit {
 			var imgWidth = 512;
 			var imgHeight = canvas.height * imgWidth / canvas.width;
 			const contentDataURL = canvas.toDataURL('image/png');
-			var x = 0;
-			var y = 0;
+			var x = 0, y = 0;
 			let pdf = new jspdf.jsPDF('l', 'mm', [imgHeight, imgWidth]);
 			pdf.addImage(contentDataURL, 'PNG', x, y, imgWidth, imgHeight)
 			pdf.save('so-do-to-chuc.pdf'); // Generated PDF
@@ -286,10 +283,9 @@ export class DrawListComponent implements OnInit {
 		const scrollOne = this.scrollOne.nativeElement as HTMLElement;
 		const scrollTwo = this.scrollTwo.nativeElement as HTMLElement;
 		// do logic and set
-		if (!top) {
+		if (!top) 
 			scrollTwo.scrollLeft = scrollOne.scrollLeft;
-		} else {
+		else 
 			scrollOne.scrollLeft = scrollTwo.scrollLeft;
-		}
 	}
 }

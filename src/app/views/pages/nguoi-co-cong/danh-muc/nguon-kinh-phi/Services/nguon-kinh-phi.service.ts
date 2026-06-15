@@ -1,9 +1,9 @@
-import { NguonKinhPhiModel } from '../Model/nguon-kinh-phi.model';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { NguonKinhPhiModel } from '../Model/nguon-kinh-phi.model';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/nguon-kinh-phi';
 
@@ -22,8 +22,7 @@ export class NguonKinhPhiService {
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_URL;
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_URL, {
 			headers: httpHeaders,
 			params: httpParams
 		});

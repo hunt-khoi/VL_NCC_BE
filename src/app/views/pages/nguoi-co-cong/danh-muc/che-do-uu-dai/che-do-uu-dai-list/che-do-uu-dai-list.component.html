@@ -22,7 +22,7 @@
 				[ngClass]="{'dl-table-flt': gridService.model.haveFilter}" cdkDropListGroup>
 				<ng-container matColumnDef="STT">
 					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode">STT</th>
-					<td mat-cell class="stt-cell" *matCellDef="let item; let i=index">{{i+1}}</td>
+					<td mat-cell class="stt-cell" *matCellDef="let i=index">{{i+1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="CheDoUuDai">
 					<th mat-header-cell *matHeaderCellDef style="flex: 0 0 25%">

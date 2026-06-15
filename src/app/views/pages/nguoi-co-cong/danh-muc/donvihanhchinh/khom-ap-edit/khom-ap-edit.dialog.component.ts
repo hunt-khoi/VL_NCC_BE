@@ -1,22 +1,24 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { donvihanhchinhService } from '../Services/donvihanhchinh.service';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
+import { CommonService } from '../../../services/common.service';
+import { donvihanhchinhService } from '../Services/donvihanhchinh.service';
 
 @Component({
 	selector: 'kt-khom-ap-edit-dialog',
 	templateUrl: './khom-ap-edit.dialog.component.html',
 })
 
-export class KhomApEditDialogComponent implements OnInit {
+export class KhomApEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
 	oldItem: any;
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -35,7 +37,7 @@ export class KhomApEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit();
 		}
 	}
@@ -58,15 +60,20 @@ export class KhomApEditDialogComponent implements OnInit {
 			this.allowEdit = this.data.allowEdit;
 
 		this.createForm();
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.id_provinces = res.IdTinh;
 			this.loadTinhThanhChange(this.id_provinces);
 		})
-		this.danhMucService.GetAllProvinces().subscribe(res => {
+		this.danhMucService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listTinh = res.data;
 		});
 		if (this.focusInput)
 			this.focusInput.nativeElement.focus();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -88,7 +95,6 @@ export class KhomApEditDialogComponent implements OnInit {
 	}
 
 	prepare(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		_item.RowID = this.item.RowID;
@@ -100,7 +106,6 @@ export class KhomApEditDialogComponent implements OnInit {
 	onSubmit() {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -122,7 +127,7 @@ export class KhomApEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateKhomAp(item).subscribe(res => {
+		this.apiService.UpdateKhomAp(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -137,7 +142,7 @@ export class KhomApEditDialogComponent implements OnInit {
 	Create(item: any) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.apiService.CreateKhomAp(item).subscribe(res => {
+		this.apiService.CreateKhomAp(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -151,7 +156,7 @@ export class KhomApEditDialogComponent implements OnInit {
 	}
 
 	loadTinhThanhChange(idtinh: any) {
-		this.danhMucService.GetListWardByProvince(idtinh).subscribe(res => {
+		this.danhMucService.GetListWardByProvince(idtinh).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listXa = res.data;
 			this.filteredListXa.next(this.listXa);
 			this.changeDetectorRefs.detectChanges();
@@ -185,7 +190,6 @@ export class KhomApEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

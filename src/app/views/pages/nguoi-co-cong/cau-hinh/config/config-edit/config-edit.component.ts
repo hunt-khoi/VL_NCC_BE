@@ -2,12 +2,12 @@ import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRe
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatChipInputEvent, MatChipList } from '@angular/material/chips';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { LayoutUtilsService } from 'app/core/_base/crud';
+import { CommonService } from '../../../services/common.service';
 import { SysConfigModel } from '../Model/config.model';
 import { ConfigService } from '../Services/config.service';
-import { CommonService } from '../../../services/common.service';
-import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 @Component({
 	selector: 'kt-config-edit',
@@ -17,20 +17,20 @@ import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 export class ConfigEditComponent implements OnInit, OnDestroy {
 	// Public properties
-	Config: SysConfigModel;
-	ConfigForm: FormGroup;
+	Config: SysConfigModel = new SysConfigModel();
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	disabledBtn: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 	isZoomSize: boolean = false;
-	private componentSubscriptions: Subscription;
+	private componentSubscriptions: Subscription | undefined;
 	allowEdit: boolean = true;
 
 	//chip
-	@ViewChild("chipList", { static: true }) chipList: MatChipList;
+	@ViewChild("chipList", { static: true }) chipList: MatChipList | undefined;
 	readonly separatorKeysCodes: number[] = [ENTER, COMMA];
 	chips: string[] = [];
 
@@ -39,22 +39,18 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
 		if (event.altKey && event.keyCode == 13) { //phím Enter
-			this.onSubmit(true);
-		}
-		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
-			this.onSubmit(false);
+			this.onSubmit();
 		}
 	}
 
 	constructor(
 		public dialogRef: MatDialogRef<ConfigEditComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private ConfigFB: FormBuilder,
+		private itemFB: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private configsService: ConfigService,
+		private apiService: ConfigService,
 		private commonService: CommonService) { }
 
 	async ngOnInit() {
@@ -64,7 +60,7 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 		this.allowEdit = this.data.allowEdit;
 		this.createForm();
 		if (this.data.Config && this.data.Config.IdRow > 0) {
-			this.configsService.getConfigById(this.data.Config.IdRow).subscribe(res => {
+			this.apiService.getConfigById(this.data.Config.IdRow).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.Config = res.data;
@@ -100,10 +96,10 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 		if (this.Config.Pattern && this.Config.Type != 'LIST') {
 			temp.value = [value, [Validators.required, Validators.maxLength(200), Validators.pattern(this.Config.Pattern)]];
 		}
-		this.ConfigForm = this.ConfigFB.group(temp);
+		this.itemForm = this.itemFB.group(temp);
 		if (this.Config.Type == 'LIST') {
 			this.chips = this.Config.Value.split(",");
-			this.ConfigForm.get('value').statusChanges.subscribe(
+			this.itemForm.get('value')?.statusChanges.subscribe(
 				status => {
 					if (this.chipList)
 						this.chipList.errorState = status === 'INVALID';
@@ -111,31 +107,29 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 			);
 		}
 		if (!this.allowEdit)
-			this.ConfigForm.disable();
+			this.itemForm.disable();
 	}
 
 	getTitle(): string {
 		if (!this.allowEdit)
 			return 'Xem chi tiết cấu hình';
-
 		return `Chỉnh sửa cấu hình - ${this.Config.Code} `;
 	}
 
 	isControlInvalid(controlName: string): boolean {
-		const control = this.ConfigForm.controls[controlName];
+		const control = this.itemForm.controls[controlName];
 		const result = control.invalid && control.touched;
 		return result;
 	}
 
-	onSubmit(type: boolean) {
+	onSubmit() {
 		this.hasFormErrors = false;
-		const controls = this.ConfigForm.controls;
-		/** check form */
-		if (this.ConfigForm.invalid) {
+		const controls = this.itemForm.controls;
+		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			let invalid = <FormControl[]>Object.keys(this.ConfigForm.controls).map(key => this.ConfigForm.controls[key]).filter(ctl => ctl.invalid);
+			let invalid = <FormControl[]>Object.keys(controls).map(key => controls[key]).filter(ctl => ctl.invalid);
 			let invalidElem: any = invalid[0];
 			invalidElem.nativeElement.focus();
 			this.hasFormErrors = true;
@@ -148,7 +142,7 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 	}
 
 	prepareConfigs(): SysConfigModel {
-		const controls = this.ConfigForm.controls;
+		const controls = this.itemForm.controls;
 		const _Config = Object.assign({}, this.Config);
 		if (this.Config.Type == 'LIST')
 			_Config.Value = this.chips.join(",");
@@ -158,13 +152,12 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 			else
 				_Config.Value = controls['value'].value + '';
 		}
-
 		_Config.Priority = controls['priority'].value;
 		return _Config;
 	}
 
-	updateConfig(_Config: SysConfigModel, withBack: boolean = false) {
-		this.configsService.updateConfig(_Config).subscribe(res => {
+	updateConfig(item: SysConfigModel) {
+		this.apiService.updateConfig(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Cập nhật cấu hình thành công`;
@@ -179,7 +172,7 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -187,22 +180,10 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 		this.dialogRef.close(this.isChange);
 	}
 
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-	}
-	
 	//#region chip
 	add(event: MatChipInputEvent): void {
 		const input = event.input;
 		const value = event.value;
-
 		// Add our fruit
 		if ((value || '').trim()) {
 			if (this.Config.Pattern) {
@@ -221,16 +202,15 @@ export class ConfigEditComponent implements OnInit, OnDestroy {
 		if (input) {
 			input.value = '';
 		}
-		this.ConfigForm.controls['value'].setValue(this.chips.join(","));
+		this.itemForm.controls['value'].setValue(this.chips.join(","));
 	}
 
 	remove(chip: string): void {
 		const index = this.chips.indexOf(chip);
-
 		if (index >= 0) {
 			this.chips.splice(index, 1);
 		}
-		this.ConfigForm.controls['value'].setValue(this.chips.join(","));
+		this.itemForm.controls['value'].setValue(this.chips.join(","));
 	}
 	//#endregion
 }

@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { environment } from 'environments/environment';
-import { HttpUtilsService } from 'app/core/_base/crud/utils/http-utils.service';
-import { QueryParamsModel, QueryResultsModel } from 'app/core/_base/crud';
 
 const API_filter = environment.ApiRoot + '/filter';
 

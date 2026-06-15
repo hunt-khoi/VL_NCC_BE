@@ -1,8 +1,8 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { dantocModel } from '../Model/dantoc.model';
-import { Injectable } from '@angular/core';
 import { HttpUtilsService, QueryParamsModel, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { dantocModel } from '../Model/dantoc.model';
 import { environment } from '../../../../../../../environments/environment';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/dantoc';

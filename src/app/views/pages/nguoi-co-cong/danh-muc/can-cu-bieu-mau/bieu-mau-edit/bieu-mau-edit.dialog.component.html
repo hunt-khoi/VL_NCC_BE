@@ -10,11 +10,11 @@
 </div>
 <div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
 	<div class="kt-portlet__head kt-portlet__head__custom">
-		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
 			 style="margin-top: 20px;">
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
-		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
+		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
 			<button class="show-view-sm float-right" mat-raised-button [matMenuTriggerFor]="chucnang" color="primary">
 				Chức năng
 			</button>
@@ -23,11 +23,13 @@
 					{{ (isZoomSize ? 'BIEUMAU.HIDEKEY' : 'BIEUMAU.SHOWKEY') | translate }}
 				</button>
 				<ng-container *ngIf="allowEdit">
-					<button mat-menu-item type="button" color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+					<button mat-menu-item type="button" color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" 
+						matTooltip="{{'COMMON.LUU_DONG' | translate}}">
 						<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
 						<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 					</button>
-					<button mat-menu-item color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+					<button mat-menu-item type="button" color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" 
+						*ngIf="item.Id === 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
 						<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
 						<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 					</button>
@@ -38,11 +40,13 @@
 					{{ (isZoomSize ? 'BIEUMAU.HIDEKEY' : 'BIEUMAU.SHOWKEY') | translate }}
 				</button>
 				<ng-container *ngIf="allowEdit">
-					<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+					<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" 
+						matTooltip="{{'COMMON.LUU_DONG' | translate}}">
 						<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
 						<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 					</button>
-					<button mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
+					<button type="button" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" 
+						*ngIf="item.Id === 0" matTooltip="{{'COMMON.LUU_THEMMOI' | translate}}">
 						<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
 						<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 					</button>
@@ -54,7 +58,7 @@
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
 			<div class="row">
-				<div class="col-lg-{{isZoomSize?8:12}}">
+				<div class="col-lg-{{isZoomSize ? 8 : 12}}">
 					<div class="row">
 						<div class="col-lg-4 m--margin-bottom-20-mobile">
 							<mat-form-field class="mat-form-field-fluid ">
@@ -120,7 +124,7 @@
 								Tải file nội dung
 							</button>
 						</div>
-						<div class="col-lg-2 m--margin-bottom-20-mobile" style="padding-top: 20px;" [hidden]="item.Id==0 || !allowEdit">
+						<div class="col-lg-2 m--margin-bottom-20-mobile" style="padding-top: 20px;" [hidden]="item.Id===0 || !allowEdit">
 							<mat-checkbox formControlName="IsUp">Cập nhật phiên bản</mat-checkbox>
 						</div>
 						<div class="col-lg-2 m--margin-bottom-20-mobile" [hidden]="!itemForm.controls['IsUp'].value">
@@ -137,7 +141,7 @@
 						</div>
 						<div class="col-lg-12 m--margin-bottom-20-mobile">
 							<mat-checkbox formControlName="isTinh">Cấp tỉnh</mat-checkbox>&nbsp;&nbsp;&nbsp;
-							<mat-checkbox formControlName="isHuyen">Cấp huyện</mat-checkbox>&nbsp;&nbsp;&nbsp;
+							<!-- <mat-checkbox formControlName="isHuyen">Cấp huyện</mat-checkbox>&nbsp;&nbsp;&nbsp; -->
 							<mat-checkbox formControlName="isXa">Cấp xã</mat-checkbox>
 						</div>
 					</div>
@@ -148,11 +152,10 @@
 							</div>
 							<div class="col-lg-12 m--margin-bottom-20-mobile" *ngFor="let content of arr; let i=index">
 								<!--<angular-editor formControlName="content{{i}}" [config]="commonService.editorConfig"></angular-editor>-->
-								<!--<editor apiKey="test" formControlName="content{{i}}" [init]="commonService.tinyConfig"></editor>-->
 								<editor formControlName="content{{i}}" [init]="commonService.tinyConfig"></editor>
 							</div>
 						</div>
-						<div [hidden]="itemForm.controls['IsUp'].value || item.Id==0" class="col-lg-12 m--margin-bottom-20-mobile overflow-hidden">
+						<div [hidden]="itemForm.controls['IsUp'].value || item.Id===0" class="col-lg-12 m--margin-bottom-20-mobile overflow-hidden">
 							<b>Xem trước</b><hr />
 							<span [innerHtml]="strHtml" class="no-margin"></span>
 						</div>

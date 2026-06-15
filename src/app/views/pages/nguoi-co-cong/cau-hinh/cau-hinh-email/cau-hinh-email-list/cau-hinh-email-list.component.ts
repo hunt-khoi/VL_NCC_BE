@@ -1,26 +1,21 @@
-import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, ApplicationRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, OnInit, OnDestroy, ViewChild, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { DatePipe } from '@angular/common';
 import { SelectionModel } from '@angular/cdk/collections';
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
-//Datasource
-import { CauHinhEmailDataSource } from '../Model/data-sources/cau-hinh-email.datasource';
-//Service
-import { CauHinhEmailService } from '../Services/cau-hinh-email.service';
+import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { CommonService } from '../../../services/common.service';
-import { SubheaderService } from '../../../../../../core/_base/layout';
-import { LayoutUtilsService, QueryParamsModel, MessageType } from '../../../../../../core/_base/crud';
+import { CauHinhEmailDataSource } from '../Model/data-sources/cau-hinh-email.datasource';
+import { CauHinhEmailService } from '../Services/cau-hinh-email.service';
 import { CauHinhEmailEditComponent } from '../cau-hinh-email-edit/cau-hinh-email-edit.component';
-//Model
 import { CauHinhEmailModel } from '../Model/cau-hinh-email.model';
-import { TableService } from '../../../../../partials/table/table.service';
-import { TableModel } from '../../../../../partials/table';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -31,14 +26,10 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class CauHinhEmailListComponent implements OnInit, OnDestroy{
-
-	haveFilter: boolean = false;
-
 	// Table fields
-	dataSource: CauHinhEmailDataSource;
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger;
+	dataSource: CauHinhEmailDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 
 	// Selection
 	selection = new SelectionModel<CauHinhEmailModel>(true, []);
@@ -52,41 +43,41 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 	BatDau_denngay: string = '';
 	KetThuc_tungay: string = '';
 	KetThuc_denngay: string = '';
+	haveFilter: boolean = false;
 
-	IdDonVi:string='';
-	public datatreeDonVi: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	IdDonVi: string = '';
+	public datatreeDonVi: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 
-	gridService: TableService;
-	girdModel: TableModel = new TableModel();
-	list_button: boolean;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
-		private CauHinhEmailsService: CauHinhEmailService,
+		private apiService: CauHinhEmailService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private translate: TranslateService,
 		private cookieService: CookieService,
-		private subheaderService: SubheaderService,
 		private changeDetect: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private ref: ApplicationRef,
 		public commonService: CommonService) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		//#region ***Filter***
 		this.getTreeDonVi();
-
-		this.girdModel.haveFilter = true;
-		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
-		this.girdModel.filterText['Server'] = "";
-		this.girdModel.filterText['Port'] = "";
-		this.girdModel.filterText['UserName'] = "";
-		this.girdModel.disableButtonFilter['Locked'] = true;
-		//TH1: #filter
-
-		this.girdModel.filterGroupDataChecked = {
+		this.gridModel = new TableModel();
+		this.gridModel.haveFilter = true;
+		this.gridModel.tmpfilterText = Object.assign({}, this.gridModel.filterText);
+		this.gridModel.filterText['Server'] = "";
+		this.gridModel.filterText['Port'] = "";
+		this.gridModel.filterText['UserName'] = "";
+		this.gridModel.disableButtonFilter['Locked'] = true;
+		this.gridModel.filterGroupDataChecked = {
 			"Locked": [
 				{
 					name: "Hoạt động",
@@ -100,8 +91,7 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 				},
 			],
 		};
-
-		this.girdModel.filterGroupDataCheckedFake = Object.assign({}, this.girdModel.filterGroupDataChecked);
+		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 		//#endregion ***Filter***
 
 		//#region ***Drag Drop***
@@ -157,13 +147,13 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 			}
 		];
 
-		this.girdModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.girdModel.selectedColumns = new SelectionModel<any>(true, this.girdModel.availableColumns);
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService, 
 			this.ref, 
-			this.girdModel,
+			this.gridModel,
 			this.cookieService
 		);
 		this.gridService.showColumnsInTable();
@@ -172,38 +162,32 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 
 		this.commonService.fixedPoint = 0;
 
-		// // If the CauHinhEmail changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+		if (!this.sort || !this.paginator) return;
+		this.sort.sortChange.subscribe(() => { 
+			if (this.paginator) 
+				this.paginator.pageIndex = 0; 
+		});
+		merge(this.sort.sortChange, this.paginator.page)
 			.pipe(
 				tap(() => {
-					this.loadCauHinhEmailsList(true);
+					this.loadDataList(true);
 				})
-			)
-			.subscribe();
+			).subscribe();
 
-		// // Set title to page breadCrumbs
-		this.subheaderService.setTitle('');
 		// Init DataSource
-		this.dataSource = new CauHinhEmailDataSource(this.CauHinhEmailsService);
+		this.dataSource = new CauHinhEmailDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
-		// // Read from URL itemId, for restore previous state
 		this.route.queryParams.subscribe(params => {
-			queryParams = this.CauHinhEmailsService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadCauHinhEmails(queryParams);
+			queryParams = this.apiService.lastFilter$.getValue();
+			if (this.dataSource)
+				this.dataSource.loadCauHinhEmails(queryParams);
 		});
 		this.dataSource.entitySubject.subscribe(res => {
-			this.CauHinhEmailsResult = res
-			this.tmpCauHinhEmailsResult = []
-			if (this.CauHinhEmailsResult != null) {
+			this.CauHinhEmailsResult = res;
+			this.tmpCauHinhEmailsResult = [];
+			if (this.CauHinhEmailsResult && this.paginator) {
 				if (this.CauHinhEmailsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadCauHinhEmailsList();
+					this.loadDataList();
 				} else {
 					for (let i = 0; i < this.CauHinhEmailsResult.length; i++) {
 						let tmpElement = new CauHinhEmailModel();
@@ -217,8 +201,10 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 
 
 	ngOnDestroy() {
-		this.gridService.Clear();
+		if (this.gridService)
+			this.gridService.Clear();
 	}
+
 	getTreeDonVi() {
 		this.commonService.TreeDonVi().subscribe(res => {
 			if (res && res.status == 1) {
@@ -231,15 +217,15 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 		})
 	}
 
-	loadCauHinhEmailsList(holdCurrentPage: boolean = false) {
+	loadDataList(holdCurrentPage: boolean = false) {
+		if (!this.sort || !this.paginator || !this.gridService || !this.dataSource) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(),
+			this.filter(),
 			this.sort.direction,
 			this.sort.active,
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
 			this.paginator.pageSize,
-
 			this.gridService.model.filterGroupData
 
 		);
@@ -265,78 +251,76 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 		if (ind == 4) {
 			this.KetThuc_denngay = date[2] + '-' + date[1] + '-' + date[0];
 		}
-
-		this.loadCauHinhEmailsList();
+		this.loadDataList();
 	}
 
-	/** FILTRATION */
-	filterConfiguration(): any {
+	filter(): any {
 		const filter: any = {};
-
-		//#filter
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.Server = this.gridService.model.filterText['Server'];
 			filter.Port = this.gridService.model.filterText['Port'];
 			filter.UserName = this.gridService.model.filterText['UserName'];
 		}
-
 		filter.IdDonVi=this.IdDonVi;
-
 		return filter;
 	}
-	/** ACTIONS */
-	/** Delete */
-	delete(_item: CauHinhEmailModel) {
+
+	delete(item: CauHinhEmailModel) {
 		const _title: string = 'Xác nhận';
 		const _description: string = 'Bạn chắc chắn xóa cấu hình email?';
 		const _waitDesciption: string = 'Cấu hình email đang được xóa...';
 		const _deleteMessage = `Xóa thành công`;
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.CauHinhEmailsService.deleteCauHinhEmail(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.apiService.delete(item.Id).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
 				else {
 					this.layoutUtilsService.showError(res.error.message);
 				}
-				this.loadCauHinhEmailsList(true);
+				this.loadDataList(true);
 			});
 		});
 	}
 
-	deleteCauHinhEmails() {
+	deletes() {
 		const _title: string = 'Xóa danh mục khác';
 		const _description: string = 'Bạn có chắc muốn xóa những danh mục khác này không?';
 		const _waitDesciption: string = 'Danh mục khác đang được xóa...';
 		const _deleteMessage = `Danh mục khác đã được xóa`;
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
+			if (!res) return;
+			
 			const idsForDeletion: number[] = [];
 			for (let i = 0; i < this.selection.selected.length; i++) {
 				idsForDeletion.push(
-
 					this.selection.selected[i].Id
 
 				);
 			}
-			this.CauHinhEmailsService.deleteCauHinhEmails(idsForDeletion).subscribe(() => {
+			this.apiService.deletes(idsForDeletion).subscribe(() => {
 				this.layoutUtilsService.showInfo(_deleteMessage);
-				this.loadCauHinhEmailsList(true);
+				this.loadDataList(true);
 				this.selection.clear();
 			});
 		});
 	}
-
+	
+	lock(item:any) {
+		this.apiService.LockNUnLock(item.Id,item.Locked).subscribe(res => {
+			if (res && res.status==1) {
+				this.layoutUtilsService.showInfo(item.Locked ? 'Mở khóa thành công' : 'Khóa thành công');
+			}
+			else {
+				this.layoutUtilsService.showError(res.error.message);
+			}
+			this.loadDataList(true);
+		})
+	}
 
 	/** SELECTION */
 	isAllSelected() {
@@ -372,7 +356,6 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 		}
 	}
 
-
 	add() {
 		const newCauHinhEmail = new CauHinhEmailModel();
 		newCauHinhEmail.clear(); // Set all defaults fields
@@ -380,32 +363,16 @@ export class CauHinhEmailListComponent implements OnInit, OnDestroy{
 	}
 
 	edit(CauHinhEmail: any, View: boolean = false) {
-		CauHinhEmail.View=View;
+		CauHinhEmail.View = View;
 		const dialogRef = this.dialog.open(CauHinhEmailEditComponent, { data: { CauHinhEmail } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.loadCauHinhEmailsList(true);
+			if (!res) return;
+			this.loadDataList(true);
 		});
 	}
 
 	DonViChanged(e:any){
 		this.IdDonVi = e.id;
-		this.loadCauHinhEmailsList();
+		this.loadDataList();
 	}
-
-	LockAndUnLock(item:any) {
-		this.CauHinhEmailsService.LockNUnLock(item.Id,item.Locked).subscribe(res => {
-			if (res && res.status==1) {
-				this.layoutUtilsService.showInfo(item.Locked ? 'Mở khóa thành công' : 'Khóa thành công');
-			}
-			else {
-				this.layoutUtilsService.showError(res.error.message);
-			}
-			this.loadCauHinhEmailsList(true);
-		})
-	}
-
 }

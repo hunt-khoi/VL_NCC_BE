@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge, ReplaySubject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, ReplaySubject, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
@@ -22,8 +22,8 @@ import { CookieService } from 'ngx-cookie-service';
 	templateUrl: './khom-ap-list.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-
-export class KhomApListComponent implements OnInit {
+export class KhomApListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: donvihanhchinhDataSource | undefined;
 	displayedColumns = ['RowID','Title', 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
@@ -61,10 +61,10 @@ export class KhomApListComponent implements OnInit {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
-		this.danhMucService.GetAllProvinces().subscribe(res => {
+		this.danhMucService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listprovinces = res.data;
 		});
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 			this.loadWard();
 		})
@@ -119,7 +119,6 @@ export class KhomApListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
@@ -152,6 +151,11 @@ export class KhomApListComponent implements OnInit {
 				this.dataSource.loadListKhomAp(queryParams);
 			}
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -188,7 +192,7 @@ export class KhomApListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.apiService.DeleteKhomAp(item.RowID).subscribe(res => {
+			this.apiService.DeleteKhomAp(item.RowID).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -222,7 +226,7 @@ export class KhomApListComponent implements OnInit {
 	// ====================Hàm change
 	loadWard() {
 		this.filterward = '';
-		this.danhMucService.GetListWardByProvince(this.filterprovinces).subscribe(res => {
+		this.danhMucService.GetListWardByProvince(this.filterprovinces).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listward = res.data;
 			this.filteredListWard.next(this.listward);
 			// this.itemForm.controls['xa'].setValue('');

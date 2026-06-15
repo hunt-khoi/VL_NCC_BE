@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { ChucDanhModel } from '../Model/chucdanh.model';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/chuc-danh';
 
@@ -22,8 +22,7 @@ export class ChucDanhService {
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_PRODUCTS_URL;
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_PRODUCTS_URL, {
 			headers: httpHeaders,
 			params: httpParams
 		});

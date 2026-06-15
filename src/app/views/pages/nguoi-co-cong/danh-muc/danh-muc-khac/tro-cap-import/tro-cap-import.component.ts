@@ -2,7 +2,8 @@ import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRe
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
 
@@ -15,11 +16,11 @@ import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
 export class TroCapImportComponent implements OnInit, OnDestroy {
 	// Public properties
 	HoSoNCC: any;
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean> | undefined;
+	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	lstNCC: any[] = [];
 	dataSource = new MatTableDataSource(this.lstNCC);
 	viewLoading = false;
@@ -29,7 +30,7 @@ export class TroCapImportComponent implements OnInit, OnDestroy {
 	HTMLStr = '';
 	isReview = false;
 	displayedColumns: string[] = ['STT', 'MaTroCap', 'TroCap', 'Id_LoaiHoSo', 'TienTroCap', 'PhuCap', 'TienMuaBao','TroCapNuoiDuong', 'Id_BieuMau', 'actions'];
-	private componentSubscriptions: Subscription | undefined;
+	private destroy$ = new Subject<void>();
 
 	constructor(
 		public dialogRef: MatDialogRef<TroCapImportComponent>,
@@ -45,9 +46,8 @@ export class TroCapImportComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
-		if (this.componentSubscriptions) {
-			this.componentSubscriptions.unsubscribe();
-		}
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -73,7 +73,6 @@ export class TroCapImportComponent implements OnInit, OnDestroy {
 	}
 
 	loadImport() {
-		if (!this.itemForm) return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -81,7 +80,7 @@ export class TroCapImportComponent implements OnInit, OnDestroy {
 		}
 		this.viewLoading = true;
 		var data: any = files[0];
-		this.apiService.importFile(data).subscribe(res => {
+		this.apiService.importFile(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.lstNCC = res.data;
@@ -94,7 +93,6 @@ export class TroCapImportComponent implements OnInit, OnDestroy {
 	}
 
 	luuImport() {
-		if (!this.itemForm) return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -103,7 +101,7 @@ export class TroCapImportComponent implements OnInit, OnDestroy {
 		this.viewLoading = true;
 		var data: any = files[0];
 		data.review = false;
-		this.apiService.importFile(data).subscribe(res => {
+		this.apiService.importFile(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.dialogRef.close(true);
@@ -116,7 +114,7 @@ export class TroCapImportComponent implements OnInit, OnDestroy {
 	}
 
 	DownloadFileMau() {
-		this.apiService.downloadTemplate().subscribe(response => {
+		this.apiService.downloadTemplate().pipe(takeUntil(this.destroy$)).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

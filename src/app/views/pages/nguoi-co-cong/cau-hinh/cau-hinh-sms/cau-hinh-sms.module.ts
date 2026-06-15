@@ -1,12 +1,10 @@
-// Angular
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-// Service
+import { CauHinhSMSService } from './Services/cau-hinh-sms.service';
 import { CauHinhSMSComponent } from './cau-hinh-sms.component';
 import { CauHinhSMSListComponent } from './cau-hinh-sms-list/cau-hinh-sms-list.component';
 import { CauHinhSMSEditComponent } from './cau-hinh-sms-edit/cau-hinh-sms-edit.component';
-import { CauHinhSMSService } from './Services/cau-hinh-sms.service';
 import { CauHinhSMSPopupDVCComponent } from './cau-hinh-sms-popup-donvicon/cau-hinh-sms-popup-donvicon.component';
 
 const routes: Routes = [
@@ -37,4 +35,5 @@ const routes: Routes = [
         CauHinhSMSPopupDVCComponent
     ]
 })
-export class CauHinhSMSModule {}
+
+export class CauHinhSMSModule { }

@@ -1,38 +1,40 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { dantocModel } from '../../dantoc/Model/dantoc.model';
 import { TranslateService } from '@ngx-translate/core';
-import { dantocService } from '../Services/dantoc.service';
+import { Subject } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { dantocModel } from '../../dantoc/Model/dantoc.model';
+import { dantocService } from '../Services/dantoc.service';
 
 @Component({
 	selector: 'm-dantoc-edit-dialog',
 	templateUrl: './dantoc-edit.dialog.component.html',
 })
 
-export class dantocEditDialogComponent implements OnInit {
+export class dantocEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: dantocModel = new dantocModel();
 	oldItem: dantocModel = new dantocModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
-	_NAME: '';
+	_NAME: string = '';
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -47,7 +49,6 @@ export class dantocEditDialogComponent implements OnInit {
 		this._NAME = this.translate.instant('DANTOC.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
@@ -61,6 +62,11 @@ export class dantocEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.focusInput)
 			this.focusInput.nativeElement.focus();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -83,7 +89,6 @@ export class dantocEditDialogComponent implements OnInit {
 	}
 	
 	prepare(): dantocModel {
-		if (!this.itemForm) return new dantocModel();
 		const controls = this.itemForm.controls;
 		const _item = new dantocModel();
 		_item.Id_row = this.item.Id_row;
@@ -93,15 +98,12 @@ export class dantocEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const updatedantoc = this.prepare();
@@ -116,7 +118,7 @@ export class dantocEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -140,7 +142,7 @@ export class dantocEditDialogComponent implements OnInit {
 	Create(item: dantocModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -164,8 +166,6 @@ export class dantocEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

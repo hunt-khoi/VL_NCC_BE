@@ -1,12 +1,11 @@
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -15,24 +14,21 @@ import { NoiDungChiModel } from '../Models/danh-muc-khac.model';
 import { TableService } from './../../../../../partials/table/table.service';
 import { NoiDungChiService } from '../Services/noi-dung-chi.service';
 import { NoDungChiDataSource } from '../Models/data-sources/noi-dung-chi.datasource';
-import { CookieService } from 'ngx-cookie-service';
 import { NoiDungChiDetailComponent } from '../noi-dung-chi-detail/noi-dung-chi-detail.component';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
 	selector: 'kt-noi-dung-chi-list',
 	templateUrl: './noi-dung-chi-list.component.html'
 })
 
-export class NoiDungChiListComponent implements OnInit {
+export class NoiDungChiListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	dataSource: NoDungChiDataSource | undefined;
 	haveFilter: boolean = false;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	_name: string = "";
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
@@ -118,17 +114,11 @@ export class NoiDungChiListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.gridService)
 			this.gridService.Clear();
 	}
@@ -182,7 +172,7 @@ export class NoiDungChiListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.loadDataList();
 					this.layoutUtilsService.showInfo(_deleteMessage);

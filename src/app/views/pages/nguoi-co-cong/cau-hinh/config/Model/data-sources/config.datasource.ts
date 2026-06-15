@@ -4,20 +4,20 @@ import { BaseDataSource, QueryParamsModel, QueryResultsModel } from 'app/core/_b
 import { ConfigService } from '../../Services/config.service';
 
 export class ConfigDataSource extends BaseDataSource {
-	constructor(private productsService: ConfigService) {
+	constructor(private apiService: ConfigService) {
 		super();
 	}
 
 	loadConfigs(queryParams: QueryParamsModel) {
-		this.productsService.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
         this.loadingSubject.next(true);
-		this.productsService.getData(queryParams)
+		this.apiService.getData(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					if(resultFromServer && resultFromServer.status ==1){
-						this.entitySubject.next(resultFromServer.data);
-						this.paginatorTotalSubject.next(resultFromServer.page.TotalCount);
-					}else{
+				tap(res => {
+					if (res && res.status ==1){
+						this.entitySubject.next(res.data);
+						this.paginatorTotalSubject.next(res.page.TotalCount);
+					} else {
 						this.entitySubject.next([]);
 						this.paginatorTotalSubject.next(0);
 					}	

@@ -1,21 +1,23 @@
+import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener, OnDestroy } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
 import { CommonService } from './../../../services/common.service';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
 import { BieuMauService } from '../Services/bieu-mau.service';
-import { DomSanitizer } from '@angular/platform-browser';
 import { KeyWordListDialogComponent } from '../key-word-list-dialog/key-word-list-dialog.component';
 
 @Component({
 	selector: 'kt-bieu-mau-edit',
 	templateUrl: './bieu-mau-edit.dialog.component.html',
 })
-export class BieuMauEditDialogComponent implements OnInit {
+export class BieuMauEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -35,11 +37,11 @@ export class BieuMauEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -63,30 +65,44 @@ export class BieuMauEditDialogComponent implements OnInit {
 			this.allowEdit = this.data.allowEdit;
 		
 		this.createForm();
-		this.apiService.ListKey().subscribe(res => {
-			this.keys = res.data;
-		});
-		this.commonService.liteCanCu().subscribe(res => {
-			this.lstCanCu = res.data;
-		});
-		this.commonService.ListLoaiBieuMau().subscribe(res => {
-			if (res && res.status == 1)
-				this.lstLoai = res.data;
-		});
-		this.commonService.liteConstLoaiQuyetDinh().subscribe(res => {
-			if (res && res.status == 1)
-				this.lstLoaiQD = res.data;
-		});
+		this.loadData();
 		if (+this.item.Id > 0) {
-			this.apiService.getItem(this.item.Id).subscribe(res => {
-				if (res && res.status == 1) {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
+				if (res?.status === 1) {
 					this.item = res.data;
 					this.strHtml = this.parseHtml(this.item.content);
 					this.createForm();
-				} else
+				} else {
 					this.layoutUtilsService.showError(res.error.message);
-			})
+				}
+			});
 		}
+	}
+
+	loadData() {
+		this.apiService.ListKey().pipe(takeUntil(this.destroy$)).subscribe(res => {
+			this.keys = res.data;
+		});
+		this.commonService.liteCanCu().pipe(takeUntil(this.destroy$)).subscribe(res => {
+			this.lstCanCu = res.data;
+		});
+		this.commonService.ListLoaiBieuMau().pipe(
+			filter(res => res?.status === 1),
+			takeUntil(this.destroy$)
+		).subscribe(res => {
+			this.lstLoai = res.data;
+		});
+		this.commonService.liteConstLoaiQuyetDinh().pipe(
+			filter(res => res?.status === 1),
+			takeUntil(this.destroy$)
+		).subscribe(res => {
+			this.lstLoaiQD = res.data;
+		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	transform(value: string) {
@@ -102,8 +118,6 @@ export class BieuMauEditDialogComponent implements OnInit {
 			for (var i = 0; i < match1.length; i++) {
 				var key = match1[i] + '';
 				var key_c = key.replace(/\([0-9]*\)/gm, "");
-				// var re = `<span style="color:green">${key}</span>`;
-				// 	html = html.replaceAll(key, re);
 				let index = this.keys.findIndex(x => (':' + x.key + ':') == key_c);
 				if (index >= 0) {
 					var re = `<span style="color:green">${key}</span>`;
@@ -111,14 +125,11 @@ export class BieuMauEditDialogComponent implements OnInit {
 				}
 			}
 		}
-
 		var reg1 = /\:[A-Za-z]\w*\:/gm  //:TienTroCap:
 		var match = html.match(reg1);
 		if (match != null) {
 			for (var i = 0; i < match.length; i++) {
 				var key = match[i] + '';
-				// var re = `<span style="color:green">${key}</span>`;
-				// 	html = html.replaceAll(key, re);
 				let index = this.keys.findIndex(x => (':' + x.key + ':') == key);
 				if (index >= 0) {
 					var re = `<span style="color:green">${key}</span>`;
@@ -175,11 +186,10 @@ export class BieuMauEditDialogComponent implements OnInit {
 
 	viewKeyword() {
 		const dialogRef = this.dialog.open(KeyWordListDialogComponent, { data: null });
-		dialogRef.afterClosed().subscribe(res => { });
+		dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(res => { });
 	}
 
 	prepare(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -212,15 +222,12 @@ export class BieuMauEditDialogComponent implements OnInit {
 
 	fileDinhKem: any;
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		let f = controls['fileDinhKem'].value;
@@ -248,10 +255,10 @@ export class BieuMauEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
-			if (res && res.status === 1) {
+			if (res?.status === 1) {
 				this.dialogRef.close({ item });
 			}
 			else {
@@ -263,10 +270,10 @@ export class BieuMauEditDialogComponent implements OnInit {
 	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
-			if (res && res.status === 1) {
+			if (res?.status === 1) {
 				if (withBack) {
 					this.dialogRef.close({ item });
 				}
@@ -291,7 +298,7 @@ export class BieuMauEditDialogComponent implements OnInit {
 	}
 
 	download() {
-		this.apiService.download(this.item.Id).subscribe(response => {
+		this.apiService.download(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

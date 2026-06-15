@@ -1,11 +1,13 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { dungcuchinhhinhModel, TriGiaDungCuModel } from '../../dungcuchinhhinh/Model/dungcuchinhhinh.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { dungcuchinhhinhService } from '../Services/dungcuchinhhinh.service';
-import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { CommonService } from '../../../services/common.service';
+import { dungcuchinhhinhModel, TriGiaDungCuModel } from '../../dungcuchinhhinh/Model/dungcuchinhhinh.model';
+import { dungcuchinhhinhService } from '../Services/dungcuchinhhinh.service';
 import moment from 'moment';
 
 @Component({
@@ -13,10 +15,11 @@ import moment from 'moment';
 	templateUrl: './dungcuchinhhinh-edit.dialog.component.html',
 })
 
-export class dungcuchinhhinhEditDialogComponent implements OnInit {
+export class dungcuchinhhinhEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: dungcuchinhhinhModel = new dungcuchinhhinhModel();
 	oldItem: dungcuchinhhinhModel = new dungcuchinhhinhModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -34,11 +37,11 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -54,13 +57,12 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		this._name = this.translate.instant("DUNG_CU_CHINH_HINH.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item; 
 		this.allowEdit = this.data.allowEdit; 
 		this.allowUpdateCost = this.data.allowUpdateCost; 
 
-		this.danhMucService.liteDungCuChinhHinh(false, true).subscribe(res => {
+		this.danhMucService.liteDungCuChinhHinh(false, true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listdungcus = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
@@ -68,7 +70,7 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		this.createForm();
         if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -80,6 +82,11 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -107,7 +114,6 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	}
 
 	checkPhu($event: any) {
-		if (!this.itemForm) return;
 		if ($event.checked) {
 			this.isPhu = true;
 			this.itemForm.controls.Id_Child.setValue('0')
@@ -136,7 +142,6 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	}
 
 	prepare(): dungcuchinhhinhModel {
-		if (!this.itemForm) return new dungcuchinhhinhModel();
 		const controls = this.itemForm.controls;
 		const _item = new dungcuchinhhinhModel();
 		_item.Id = this.item.Id;
@@ -151,7 +156,6 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	}
 
 	prepareUpdateTriGia(): TriGiaDungCuModel {
-		if (!this.itemForm) return new TriGiaDungCuModel();
 		const controls = this.itemForm.controls;
 		const _item = new TriGiaDungCuModel();
 		_item.Id = 0;
@@ -167,7 +171,6 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -203,7 +206,7 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -227,7 +230,7 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -251,7 +254,7 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	UpdateTriGia(item: TriGiaDungCuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-		this.apiService.updateTriGia(item).subscribe(res => {
+		this.apiService.updateTriGia(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack) {
@@ -278,7 +281,6 @@ export class dungcuchinhhinhEditDialogComponent implements OnInit {
 	    this.allowUpdateCost = false;
 		this.createForm();
         this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

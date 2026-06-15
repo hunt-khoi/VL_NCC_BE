@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -23,19 +23,15 @@ import { CookieService } from 'ngx-cookie-service';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class nhomletetListComponent implements OnInit {
+export class nhomletetListComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     // Table fields
     dataSource: nhomletetDataSource | undefined;
     displayedColumns = ['STT', 'NhomLeTet', 'MoTa', 'Locked', 'Priority', 'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
 	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-    filterStatus = '';
-	filterCondition = '';
-    // Selection
-    selection = new SelectionModel<nhomletetModel>(true, []);
-    productsResult: nhomletetModel[] = [];
 
-    _name = "";
+    _name: string = "";
     gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
@@ -88,7 +84,6 @@ export class nhomletetListComponent implements OnInit {
 
         let availableColumns = [
 			{
-
 				stt: 1,
 				name: 'STT',
 				displayName: 'STT',
@@ -96,7 +91,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
 			},
 			{
-
 				stt: 2,
 				name: 'NhomLeTet',
 				displayName: 'Nhóm lễ tết',
@@ -104,7 +98,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
 			},
 			{
-
 				stt: 3,
 				name: 'MoTa',
 				displayName: 'Mô tả',
@@ -112,7 +105,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
 			},
 			{
-
 				stt: 4,
 				name: 'Locked',
 				displayName: 'Tình trạng',
@@ -120,7 +112,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 5,
 				name: 'Priority',
 				displayName: 'Thứ tự',
@@ -128,7 +119,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 6,
 				name: 'CreatedBy',
 				displayName: 'Người tạo',
@@ -136,7 +126,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 7,
 				name: 'CreatedDate',
 				displayName: 'Ngày tạo',
@@ -144,7 +133,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 8,
 				name: 'UpdatedBy',
 				displayName: 'Người sửa',
@@ -152,7 +140,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 9,
 				name: 'UpdatedDate',
 				displayName: 'Ngày sửa',
@@ -160,7 +147,6 @@ export class nhomletetListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 10,
 				name: 'NgayKhaiBao',
 				displayName: 'Ngày khai báo',
@@ -209,15 +195,12 @@ export class nhomletetListComponent implements OnInit {
                 this.dataSource.loadList(queryParams);
             }
         });
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
     }
+    
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
         if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
@@ -234,12 +217,6 @@ export class nhomletetListComponent implements OnInit {
 
     filterConfiguration(): any {
         const filter: any = {};
-        if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-            filter.type = +this.filterCondition;
-        }
         if (this.gridService && this.gridService.model.filterText) {
             filter.NhomLeTet = this.gridService.model.filterText['NhomLeTet'];
             filter.MoTa = this.gridService.model.filterText['MoTa'];
@@ -256,7 +233,7 @@ export class nhomletetListComponent implements OnInit {
         dialogRef.afterClosed().subscribe(res => {
             if (!res)  return;
             
-            this.apiService.delete(item.Id).subscribe(res => {
+            this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
                 }
@@ -292,7 +269,7 @@ export class nhomletetListComponent implements OnInit {
                 this.loadDataList(); //để không biến mất ổ khóa
                 return;
             }
-		    this.apiService.update(item).subscribe(res => {
+		    this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 if (res && res.status === 1) {
                     const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -325,7 +302,6 @@ export class nhomletetListComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_saveMessage);
                 this.loadDataList();
             }
-
         });
     }
 
@@ -378,4 +354,5 @@ export class nhomletetListComponent implements OnInit {
 				return 'kt-badge--metal';
 		}
 	}
+
 }

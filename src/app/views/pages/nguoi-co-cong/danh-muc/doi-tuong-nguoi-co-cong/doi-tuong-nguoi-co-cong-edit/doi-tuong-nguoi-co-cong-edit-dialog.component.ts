@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -6,6 +6,8 @@ import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { DoiTuongNguoiCoCongService } from './../Services/doi-tuong-nguoi-co-cong.service';
 import { DoiTuongNguoiCoCongModel } from './../Model/doi-tuong-nguoi-co-cong.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-doi-tuong-nguoi-co-cong',
@@ -13,11 +15,11 @@ import { DoiTuongNguoiCoCongModel } from './../Model/doi-tuong-nguoi-co-cong.mod
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit {
+export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: DoiTuongNguoiCoCongModel = new DoiTuongNguoiCoCongModel();
 	oldItem: DoiTuongNguoiCoCongModel = new DoiTuongNguoiCoCongModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -33,11 +35,11 @@ export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -58,21 +60,21 @@ export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
 		//list biểu mẫu
-		this.danhMucService.liteConstLoaiQuyetDinh().subscribe(res => {
+		this.danhMucService.liteConstLoaiQuyetDinh().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listLoaiQD = res.data;
 		});
-		this.danhMucService.liteNhomLoaiDoiTuongNCC().subscribe(res => {
+		this.danhMucService.liteNhomLoaiDoiTuongNCC().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.lstNhomLoaiDoiTuongNCC = res.data;
 		})
-		this.danhMucService.liteConstLoaiHoSo().subscribe(res => {
+		this.danhMucService.liteConstLoaiHoSo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.lstConstLoaiHoSo = res.data;
 		})
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -83,6 +85,11 @@ export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -143,19 +150,15 @@ export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		if (controls.Priority.value < 0 || controls.Priority.value === '') {
-			this.hasFormErrors = true;
 			return;
 		}
 		const Edit = this.prepare();
@@ -170,7 +173,7 @@ export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateDoiTuongNguoiCoCong(item).subscribe(res => {
+		this.apiService.UpdateDoiTuongNguoiCoCong(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -193,7 +196,7 @@ export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.CreateDoiTuongNguoiCoCong(item).subscribe(res => {
+		this.apiService.CreateDoiTuongNguoiCoCong(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -216,8 +219,6 @@ export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

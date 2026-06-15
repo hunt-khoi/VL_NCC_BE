@@ -46,16 +46,16 @@
     display: none;
 }
 
-:host>>>.mat-checkbox>label.mat-checkbox-layout>div.mat-checkbox-inner-container {
+:host ::ng-deep .mat-checkbox>label.mat-checkbox-layout>div.mat-checkbox-inner-container {
     width: 14px;
     height: 14px;
 }
 
-:host>>>.mat-checkbox>label {
+:host ::ng-deep .mat-checkbox>label {
     margin-bottom: .5rem;
 }
 
-:host>>>.chk-sty.mat-checkbox-checked .mat-checkbox-checkmark {
+:host ::ng-deep .chk-sty.mat-checkbox-checked .mat-checkbox-checkmark {
     opacity: 0;
 }
 

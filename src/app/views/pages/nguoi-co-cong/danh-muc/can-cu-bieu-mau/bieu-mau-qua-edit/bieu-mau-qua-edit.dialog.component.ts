@@ -1,21 +1,23 @@
-import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { CommonService } from './../../../services/common.service';
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
-import { BieuMauQuaService } from '../Services/bieu-mau-qua.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
+import { CommonService } from './../../../services/common.service';
+import { BieuMauQuaService } from '../Services/bieu-mau-qua.service';
 import { KeyWordListDialogComponent } from '../key-word-list-dialog/key-word-list-dialog.component';
 
 @Component({
 	selector: 'kt-bieu-mau-qua-edit',
 	templateUrl: './bieu-mau-qua-edit.dialog.component.html',
 })
-export class BieuMauQuaEditDialogComponent implements OnInit {
+export class BieuMauQuaEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -31,7 +33,7 @@ export class BieuMauQuaEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit();
 		}
 	}
@@ -55,12 +57,12 @@ export class BieuMauQuaEditDialogComponent implements OnInit {
 			this.allowEdit = this.data.allowEdit;
 
 		this.createForm();
-		this.apiService.ListKey().subscribe(res => {
+		this.apiService.ListKey().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.keys = res.data;
 		});
 		if (+this.item.Id > 0) {
-			this.apiService.getItem(this.item.Id).subscribe(res => {
-				if (res && res.status == 1) {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
+				if (res?.status == 1) {
 					this.item = res.data;
 					this.strHtml = this.parseHtml(this.item.content);
 					this.createForm();
@@ -68,6 +70,11 @@ export class BieuMauQuaEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			})
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 		
 	transform(value: string) {
@@ -82,8 +89,6 @@ export class BieuMauQuaEditDialogComponent implements OnInit {
 		if (match != null) {
 			for (var i = 0; i < match.length; i++) {
 				var key = match[i] + '';
-				// var re = `<span style="color:green">${key}</span>`;
-				// 	html = html.replaceAll(key, re);
 				let index = this.keys.findIndex(x => (':' + x.key + ':') == key);
 				if (index >= 0) {
 					var re = `<span style="color:green">${key}</span>`;
@@ -122,7 +127,6 @@ export class BieuMauQuaEditDialogComponent implements OnInit {
 	}
 
 	prepare(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -140,15 +144,12 @@ export class BieuMauQuaEditDialogComponent implements OnInit {
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const Edit = this.prepare();
@@ -159,7 +160,7 @@ export class BieuMauQuaEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Injectable, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { DM_DonViService } from './Services/dm-don-vi.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { QueryParamsModel } from 'app/core/_base/crud';
@@ -8,7 +8,6 @@ import { QueryParamsModel } from 'app/core/_base/crud';
 	templateUrl: './dm-don-vi.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-@Injectable()
 export class DM_DonViComponent implements OnInit {
 	donvi: string = "";
 	donvi_user: string = "";

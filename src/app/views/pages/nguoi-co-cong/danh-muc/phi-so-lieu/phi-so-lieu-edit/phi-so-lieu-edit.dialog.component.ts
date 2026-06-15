@@ -1,7 +1,9 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { PhiSoLieuModel } from '../Model/phi-so-lieu.model';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
@@ -14,10 +16,11 @@ import { ReplaySubject } from 'rxjs';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class PhiSoLieuDialogComponent implements OnInit {
+export class PhiSoLieuDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: PhiSoLieuModel = new PhiSoLieuModel();
 	oldItem: PhiSoLieuModel = new PhiSoLieuModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -35,11 +38,11 @@ export class PhiSoLieuDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -60,14 +63,15 @@ export class PhiSoLieuDialogComponent implements OnInit {
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
 
-		this.danhMucService.liteFilter().subscribe(res => {
+		this.danhMucService.liteFilter().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listOpt = res.data;
-			this.listFilter.next(res.data);
+			this.listFilter.next(this.listOpt);
 		});
+
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -82,6 +86,10 @@ export class PhiSoLieuDialogComponent implements OnInit {
 		}
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
 	filter() {
 		if (!this.listOpt) return;
@@ -140,7 +148,6 @@ export class PhiSoLieuDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -166,7 +173,7 @@ export class PhiSoLieuDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -190,7 +197,7 @@ export class PhiSoLieuDialogComponent implements OnInit {
 	Create(item: PhiSoLieuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -215,7 +222,6 @@ export class PhiSoLieuDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

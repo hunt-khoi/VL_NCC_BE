@@ -1,12 +1,10 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-// Service
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
-import { CauHinhSMSService } from '../Services/cau-hinh-sms.service';
 import { CommonService } from '../../../services/common.service';
+import { CauHinhSMSService } from '../Services/cau-hinh-sms.service';
 import { CauHinhSMSModel } from '../Model/cau-hinh-sms.model';
 
 @Component({
@@ -18,31 +16,30 @@ import { CauHinhSMSModel } from '../Model/cau-hinh-sms.model';
 export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 	// Public properties
 	ItemData: any;
-	FormControls: FormGroup;
+	FormControls: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	disabledBtn: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean>;
+	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isChange: boolean = false;
 	isZoomSize: boolean = false;
 	ListDonViCon: any[] = [];
-	public datatreeDonVi: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	private componentSubscriptions: Subscription;
+	public datatreeDonVi: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	private componentSubscriptions: Subscription | undefined;
 
 	constructor(
 		public dialogRef: MatDialogRef<CauHinhSMSPopupDVCComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
-		private FormControlFB: FormBuilder,
+		private itemFB: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private CauHinhSMSsService: CauHinhSMSService,
+		private apiService: CauHinhSMSService,
 		private commonService: CommonService) { }
 
 	async ngOnInit() {
 		this.commonService.fixedPoint = 0;
-
 		this.viewLoading = true;
 		this.ItemData = new CauHinhSMSModel();
 		this.ItemData.clear();
@@ -50,11 +47,12 @@ export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 			this.viewLoading = false;
 			if (res.status == 1 && res.data) {
 				let LstDVC: any[] = [];
-				for (var i = 0; i < res.data.length; i++) {
+				let data = res.data;
+				for (var i = 0; i < data.length; i++) {
 					var objdetail: any = {};
-					objdetail.check = this.data.InfoDonViCon?(this.data.InfoDonViCon.LstDonViCon.length>0?(this.data.InfoDonViCon.LstDonViCon.filter(x => x.Id == res.data[i].Id).length>0?true:false):false):false;
-					objdetail.Id = res.data[i].Id;
-					objdetail.DonVi = res.data[i].DonVi;
+					objdetail.check = this.data.InfoDonViCon?.LstDonViCon?.some((x: any) => x.Id == data[i].Id) ?? false;
+					objdetail.Id = data[i].Id;
+					objdetail.DonVi = data[i].DonVi;
 					LstDVC.push(objdetail)
 				}
 				this.ListDonViCon = LstDVC;
@@ -64,7 +62,6 @@ export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 			}
 			this.changeDetectorRefs.detectChanges();
 		});
-
 		//this.CheckRoles();
 	}
 
@@ -78,9 +75,8 @@ export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 		}
 	}
 
-
 	createForm() {
-		this.FormControls = this.FormControlFB.group({
+		this.FormControls = this.itemFB.group({
 			Server: [this.ItemData.Server == null ? '' : this.ItemData.Server, [Validators.required]],
 			Port: [this.ItemData.Port == null ? '' : this.ItemData.Port, [Validators.required]],
 			UserName: [this.ItemData.UserName == null ? '' : this.ItemData.UserName, [Validators.required]],
@@ -88,32 +84,20 @@ export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 			EnableSSL: [this.ItemData.EnableSSL == null ? false : this.ItemData.EnableSSL, [Validators.required]],
 			Password: [this.ItemData.Password == null ? '' : this.ItemData.Password, [Validators.required]],
 		});
-
 		if (this.data.CauHinhSMS.View)
 			this.FormControls.disable();
 	}
 
 	getTitle(): string {
-
-
-		if (this.ItemData.Id == 0) {
+		if (this.ItemData.Id == 0) 
 			return 'Thêm mới cấu hình email';
-		}
-
 		if (this.data.CauHinhSMS.View)
 			return `Xem cấu hình email `;
-
 		return `Chỉnh sửa cấu hình email`;
 	}
 
-	isControlInvalid(controlName: string): boolean {
-		const control = this.FormControls.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
-	}
-
 	onSubmit(type: boolean) {
-		let ArrDVC:any[]=[];
+		let ArrDVC: any[]=[];
 		for (var i = 0; i < this.ListDonViCon.length; i++) {
 			if (this.ListDonViCon[i].check) { 
 				ArrDVC.push(this.ListDonViCon[i]);
@@ -127,28 +111,23 @@ export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	prepareCauHinhSMSs(): any {
+	prepare(): any {
 		const controls = this.FormControls.controls;
 		const _item: any = {};
 		//_CauHinhSMS.clear();
-
 		_item.Cast_BDNghi = controls['bDNghi'].value.split('T')[0];
-
 		_item.Cast_KTNghi = controls['kTNghi'].value.split('T')[0];
 		_item.DotNghiRQ = controls['dotNghi'].value;
 		_item.MoTa = controls['moTa'].value;
 		//gán lại giá trị id 
-
 		if (this.ItemData.Id > 0) {
 			_item.Id = this.ItemData.Id;
 		}
-
 		return _item;
 	}
 
-	addCauHinhSMS(_CauHinhSMS: CauHinhSMSModel, withBack: boolean = false) {
-
-		this.CauHinhSMSsService.createCauHinhSMS(_CauHinhSMS).subscribe(res => {
+	addCauHinhSMS(item: CauHinhSMSModel, withBack: boolean = false) {
+		this.apiService.create(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Thêm thành công`;
@@ -165,8 +144,8 @@ export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	updateCauHinhSMS(_CauHinhSMS: CauHinhSMSModel, withBack: boolean = false) {
-		this.CauHinhSMSsService.updateCauHinhSMS(_CauHinhSMS).subscribe(res => {
+	updateCauHinhSMS(item: CauHinhSMSModel) {
+		this.apiService.update(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Cập nhật thành công`;
@@ -181,7 +160,7 @@ export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -199,17 +178,5 @@ export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		})
-	}
-
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		}
-		else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
-
 	}
 }

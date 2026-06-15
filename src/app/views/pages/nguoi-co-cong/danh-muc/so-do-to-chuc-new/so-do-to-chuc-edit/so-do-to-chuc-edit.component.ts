@@ -1,16 +1,16 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ChangeDetectorRef, ElementRef } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSelect } from '@angular/material/select';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ChangeDetectorRef, ElementRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { chucvuEditDialogComponent } from '../../chucvu/chucvu-edit/chucvu-edit.dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { CommonService } from '../../../services/common.service';
 import { chucvuModel } from '../../chucvu/Model/chucvu.model';
 import { UpdateThongTinChucVuModel } from '../Model/so-do-to-chuc.model';
 import { OrgChartService } from '../Services/so-do-to-chuc.service';
-import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { chucvuEditDialogComponent } from '../../chucvu/chucvu-edit/chucvu-edit.dialog.component';
 
 @Component({
 	selector: 'm-so-do-to-chuc-edit',
@@ -18,27 +18,23 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class sodotochuceditComponent implements OnInit {
+export class sodotochuceditComponent implements OnInit, OnDestroy {
 
+	private destroy$ = new Subject<void>();
 	item: UpdateThongTinChucVuModel = new UpdateThongTinChucVuModel();
 	oldItem: UpdateThongTinChucVuModel = new UpdateThongTinChucVuModel();
 	selectedTab: number = 0;
 	loadingSubject = new BehaviorSubject<boolean>(false);
-	loadingControl = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	hasFormErrors: boolean = false;
 	loadingAfterSubmit: boolean = false;
-	listDonVi: any[] = [];
-	listPhongBan: any[] = [];
 	listchucdanh: any[] = [];
 	listchucvu: any[] = [];
 	listcapquanly: any[] = [];
 
 	// Filter fields
-	filterDonVi: string = '';
-	filterPhongBan: string = '';
 	filterChucDanh: string = '';
 	filterChucVu: string = '';
 	ID_NV: string = '';
@@ -68,11 +64,11 @@ export class sodotochuceditComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { //phím Enter
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') { //phím Enter
 			this.onSubmit(false);
 		}
 	}
@@ -103,7 +99,7 @@ export class sodotochuceditComponent implements OnInit {
 			var _newmodel = new UpdateThongTinChucVuModel();
 			_newmodel.clear();
 			this.item = _newmodel;
-			this.apiService.SelectedNodeChanged(+this.id_cd).subscribe(res => {
+			this.apiService.SelectedNodeChanged(+this.id_cd).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.item = res.data;
 				this.oldItem = Object.assign({}, res);
 				this.loadthongtin();
@@ -116,10 +112,10 @@ export class sodotochuceditComponent implements OnInit {
 		}
 		else {
 			this.viewLoading = false;
-			this.danhMucService.GetListPosition().subscribe(res => {
+			this.danhMucService.GetListPosition().pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.listchucdanh = res.data;
 			});
-			this.danhMucService.getCapQuanLy().subscribe(res => {
+			this.danhMucService.getCapQuanLy().pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.listcapquanly = res.data;
 			});
 			if (this.itemForm)
@@ -128,6 +124,11 @@ export class sodotochuceditComponent implements OnInit {
 		this.getTreeValue();
 		this.initLoad();
 		this.changeDetectorRefs.detectChanges();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -156,12 +157,10 @@ export class sodotochuceditComponent implements OnInit {
 	}
 
 	getTreeValue() {
-		this.danhMucService.Get_CoCauToChuc().subscribe(res => {
+		this.danhMucService.Get_CoCauToChuc().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.data && res.data.length > 0) {
 				this.datatree.next(res.data);
-				this.selectedNode.next({
-					RowID: "" + this.item.StructureID,
-				});
+				this.selectedNode.next({ RowID: "" + this.item.StructureID });
 				if ("" + this.item.StructureID != undefined)
 					this.ID_Struct = '' + this.item.StructureID;
 				else
@@ -172,9 +171,9 @@ export class sodotochuceditComponent implements OnInit {
 
 	GetValueNode(val: any) {
 		this.ID_Struct = val.id;
-		this.danhMucService.GetListPositionbyStructure(this.ID_Struct).subscribe(res => {
+		this.danhMucService.GetListPositionbyStructure(this.ID_Struct).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.data && res.data.length > 0) {
-				this.danhMucService.GetListJobtitleByStructure(this.id_cd, this.ID_Struct).subscribe(res => {
+				this.danhMucService.GetListJobtitleByStructure(this.id_cd, this.ID_Struct).pipe(takeUntil(this.destroy$)).subscribe(res => {
 					//this.listChucVu = res.data;
 					if (!this.itemForm) return;
 					if (res.data && res.data.length > 0) {
@@ -187,19 +186,16 @@ export class sodotochuceditComponent implements OnInit {
 	}
 	
 	loadthongtin() {
-		this.danhMucService.GetListPosition().subscribe(res => {
+		this.danhMucService.GetListPosition().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listchucdanh = res.data;
-			this.danhMucService.GetListNhomChucDanhTheoChucDanh(this.item.ID_ChucDanh).subscribe(res => {
+			this.danhMucService.GetListNhomChucDanhTheoChucDanh(this.item.ID_ChucDanh).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.listchucvu = res.data;
 				if (this.listchucvu && this.listchucvu.length > 0) {
-					// this.filterChucVu = this.listchucvu[0].id_row;
-					// this.itemForm.controls["ID_ChucVu"].setValue('' + this.listchucvu[0].id_row);
-					// this.loadTextJobTitle();
 					this.changeDetectorRefs.detectChanges();
 				}
 			});
 		});
-		this.danhMucService.getCapQuanLy().subscribe(res => {
+		this.danhMucService.getCapQuanLy().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listcapquanly = res.data;
 		});
 	}
@@ -207,23 +203,12 @@ export class sodotochuceditComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.oldItem);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
 
-	checkValue(e: any, vi: any) {
-		if (!((e.keyCode > 95 && e.keyCode < 106)
-			|| (e.keyCode > 45 && e.keyCode < 58)
-			|| e.keyCode == 8)) {
-			e.preventDefault();
-		}
-	};
-
 	onSubmit(withBack: boolean = false) {
-		if (!this.itemForm) return;
 		this.itemForm.controls["StuctItem"].setValue(this.ID_Struct);
 		this.hasFormErrors = false;
 		const controls = this.itemForm.controls;
@@ -244,16 +229,15 @@ export class sodotochuceditComponent implements OnInit {
 	}
 
 	ThemMoiChucVu() {
-		let _item = new chucvuModel;
+		let _item = new chucvuModel();
 		_item.Id_row = 0;
 		_item.Id_CV = '';
 		_item.Tenchucdanh = '';
 		_item.Tentienganh = '';
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id_row > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id_row > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(chucvuEditDialogComponent, { data: { _item } });
-		dialogRef.afterClosed().subscribe(res => {
+		dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!res) {
 				this.ngOnInit();
 				return;
@@ -278,29 +262,26 @@ export class sodotochuceditComponent implements OnInit {
 	}
 
 	loadChucVuTheoNhomChucDanh() {
-		this.danhMucService.GetListNhomChucDanhTheoChucDanh(this.filterChucDanh).subscribe(res => {
+		this.danhMucService.GetListNhomChucDanhTheoChucDanh(this.filterChucDanh).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.itemForm) return;
 			this.listchucvu = res.data;
 			if (this.listchucvu && this.listchucvu.length > 0) {
 				this.filterChucVu = this.listchucvu[0].id_row;
 				this.itemForm.controls["ID_ChucVu"].setValue('' + this.listchucvu[0].id_row);
-				// this.loadTextJobTitle();
 				this.loadTextJobTitle('' + this.listchucvu[0].id_row);
 				this.changeDetectorRefs.detectChanges();
 			}
 			else {
 				this.filterChucVu = '';
-				// this.loadTextJobTitle();
 				this.itemForm.controls["ID_ChucVu"].setValue('');
 				this.itemForm.controls['TenChucVu'].setValue('');
-				// this.itemForm.controls['TenTiengAnh'].setValue('');
 				this.changeDetectorRefs.detectChanges();
 			}
 		});
 	}
 
 	loadTextJobTitle(id: string) {
-		this.danhMucService.GetListOnlyNhomChucDanh(id).subscribe(res => {
+		this.danhMucService.GetListOnlyNhomChucDanh(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.itemForm) return;
 			if (res.data && res.data.length > 0) {
 				let tenchucdanh = res.data[0].tenchucdanh;
@@ -310,7 +291,6 @@ export class sodotochuceditComponent implements OnInit {
 	}
 
 	Prepare(): UpdateThongTinChucVuModel {
-		if (!this.itemForm) return new UpdateThongTinChucVuModel();
 		const controls = this.itemForm.controls;
 		const update = new UpdateThongTinChucVuModel();
 		update.TenChucVu = controls['TenChucVu'].value;
@@ -333,7 +313,7 @@ export class sodotochuceditComponent implements OnInit {
 	AddItem(item: UpdateThongTinChucVuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-		this.apiService.UpdateThongTinChucVu(item).subscribe(res => {
+		this.apiService.UpdateThongTinChucVu(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				if (withBack) {
 					this.dialogRef.close({ item });
@@ -341,10 +321,8 @@ export class sodotochuceditComponent implements OnInit {
 				else {
 					this.ngOnInit();
 					this.getTreeValue();
-					if (this.itemForm) {
-						this.itemForm.controls["StuctItem"].setValue(null);
-						this.itemForm.controls["ViTri"].setValue(item.ViTri + 1);
-					}
+					this.itemForm.controls["StuctItem"].setValue(null);
+					this.itemForm.controls["ViTri"].setValue(item.ViTri + 1);
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
 					this.changeDetectorRefs.detectChanges();
@@ -361,7 +339,7 @@ export class sodotochuceditComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateThongTinChucVu(item).subscribe(res => {
+		this.apiService.UpdateThongTinChucVu(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -388,7 +366,6 @@ export class sodotochuceditComponent implements OnInit {
 	initLoad() {
 		this.createForm();
 		this.loadingSubject.next(false);
-		this.loadingControl.next(true);
 	}
 
 	onAlertClose() {

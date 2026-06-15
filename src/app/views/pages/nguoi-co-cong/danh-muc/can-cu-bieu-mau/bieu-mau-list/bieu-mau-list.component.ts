@@ -1,12 +1,11 @@
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -22,15 +21,12 @@ import { CookieService } from 'ngx-cookie-service';
 	selector: 'kt-bieu-mau-list',
 	templateUrl: './bieu-mau-list.component.html'
 })
-export class BieuMauListComponent implements OnInit {
+export class BieuMauListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	dataSource: CanCuBieuMauDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	_name: string = "";
 	gridService: TableService | undefined;
 	gridModel: TableModel | undefined;
@@ -45,7 +41,7 @@ export class BieuMauListComponent implements OnInit {
 		private ref: ApplicationRef,
 		private translate: TranslateService,
 		private cookieService: CookieService,
-		private bmService: BieuMauService,
+		private apiService: BieuMauService,
 		private ccService: CanCuService,
 		private commonService: CommonService) {
 		this._name = this.translate.instant("BIEUMAU.NAME");
@@ -84,7 +80,7 @@ export class BieuMauListComponent implements OnInit {
 		});
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
-		this.commonService.liteCanCu().subscribe(res => {
+		this.commonService.liteCanCu().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				let lst = res.data.map((x: any) => {
@@ -98,7 +94,7 @@ export class BieuMauListComponent implements OnInit {
 				this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
 			}
 		})
-		this.commonService.ListLoaiBieuMau().subscribe(res => {
+		this.commonService.ListLoaiBieuMau().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.lstLoai = res.data;
@@ -221,19 +217,11 @@ export class BieuMauListComponent implements OnInit {
 				).subscribe();
 		}
 
-		this.dataSource = new CanCuBieuMauDataSource(this.bmService, this.ccService);
+		this.dataSource = new CanCuBieuMauDataSource(this.apiService, this.ccService);
 		this.route.queryParams.subscribe(_ => {
 			if (this.dataSource) {
-				let queryParams = this.bmService.lastFilter$.getValue();
+				let queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadListBieuMau(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}
@@ -241,6 +229,8 @@ export class BieuMauListComponent implements OnInit {
 	ngOnDestroy() {
 		if (this.gridService) 
 			this.gridService.Clear();
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -272,8 +262,7 @@ export class BieuMauListComponent implements OnInit {
 	}
 
 	Edit(_item: any, allowEdit: boolean = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(BieuMauEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
@@ -293,7 +282,7 @@ export class BieuMauListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.bmService.Delete(item.Id).subscribe(res => {
+			this.apiService.Delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -336,13 +325,13 @@ export class BieuMauListComponent implements OnInit {
 
 	download(item: any) {
 		let IdTemplate = item.Id;
-		//this.bmService.previewByTemplate(IdTemplate).subscribe(res => {
+		//this.apiService.previewByTemplate(IdTemplate).subscribe(res => {
 		//	if (res && res.status == 1) {
 		//		const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 		//		dialogRef.afterClosed().subscribe(res => {
 		//			if (!res) {
 		//			} else {
-		//				this.bmService.exportByTemplate(IdTemplate, res.loai).subscribe(response => {
+		//				this.apiService.exportByTemplate(IdTemplate, res.loai).subscribe(response => {
 		//					const headers = response.headers;
 		//					const filename = headers.get('x-filename');
 		//					const type = headers.get('content-type');
@@ -359,7 +348,7 @@ export class BieuMauListComponent implements OnInit {
 		//		this.layoutUtilsService.showError(res.error.message);
 		//})
 
-		this.bmService.download(IdTemplate).subscribe(response => {
+		this.apiService.download(IdTemplate).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

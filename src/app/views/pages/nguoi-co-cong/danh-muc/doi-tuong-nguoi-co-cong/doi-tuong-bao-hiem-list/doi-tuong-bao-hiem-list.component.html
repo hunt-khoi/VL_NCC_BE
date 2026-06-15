@@ -9,6 +9,7 @@
 		overflow: hidden !important;
 		text-overflow: ellipsis;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		max-width: 600px;
 	}
 </style>
@@ -22,7 +23,8 @@
 		</div>
 	</ng-container>
 	<ng-container ktPortletTools>
-		<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="apiService.ReadOnlyControl" color="accent" type="button">
+		<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" 
+			*ngIf="apiService.ReadOnlyControl" color="accent" type="button">
 			<span translate="COMMON.CREATE"></span>
 		</button>
 		<kt-column-option [gridService]="gridService"></kt-column-option>
@@ -51,7 +53,7 @@
 			matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
 			<ng-container matColumnDef="STT">
 				<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode"><span translate="COMMON.STT"></span></th>
-				<td mat-cell *matCellDef="let item; let vi = index" class="mat-column-vinCode">{{vi + 1}}</td>
+				<td mat-cell *matCellDef="let vi = index" class="mat-column-vinCode">{{vi + 1}}</td>
 			</ng-container>
 			<ng-container matColumnDef="Id">
 				<th mat-header-cell *matHeaderCellDef style="justify-content: center">ID</th>
@@ -98,7 +100,9 @@
 				<td mat-cell *matCellDef="let item">{{item.CreatedBy}}</td>
 			</ng-container>
 			<ng-container matColumnDef="CreatedDate">
-				<th mat-header-cell *matHeaderCellDef style="justify-content: center"><span translate="DOITUONG_NCC.CREATEDDATE"></span></th>
+				<th mat-header-cell *matHeaderCellDef style="justify-content: center">
+					<span translate="DOITUONG_NCC.CREATEDDATE"></span>
+				</th>
 				<td mat-cell *matCellDef="let item" style="justify-content: center">{{item.CreatedDate }}</td>
 			</ng-container>
 			<ng-container matColumnDef="UpdatedBy">

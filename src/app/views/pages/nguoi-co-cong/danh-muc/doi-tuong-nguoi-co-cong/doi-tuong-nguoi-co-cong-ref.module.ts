@@ -2,7 +2,6 @@
 import { NgModule } from '@angular/core';
 import { DPSCommonModule } from '../../dps-common.module';
 import { DoiTuongNguoiCoCongService } from '../doi-tuong-nguoi-co-cong/Services/doi-tuong-nguoi-co-cong.service';
-import { DoiTuongNguoiCoCongComponent } from './doi-tuong-nguoi-co-cong.component';
 import { DoiTuongNguoiCoCongListComponent } from './doi-tuong-nguoi-co-cong-list/doi-tuong-nguoi-co-cong-list.component';
 import { DoiTuongNguoiCoCongEditDialogComponent } from './doi-tuong-nguoi-co-cong-edit/doi-tuong-nguoi-co-cong-edit-dialog.component';
 import { DoiTuongNhanQuaListComponent } from './doi-tuong-nhan-qua-list/doi-tuong-nhan-qua-list.component';

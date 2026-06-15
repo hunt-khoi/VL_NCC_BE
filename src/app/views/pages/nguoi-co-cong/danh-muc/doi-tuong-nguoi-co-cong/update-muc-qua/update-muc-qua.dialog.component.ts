@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -6,12 +6,15 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { DoiTuongNguoiCoCongService } from '../Services/doi-tuong-nguoi-co-cong.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'm-update-muc-qua',
 	templateUrl: './update-muc-qua.dialog.component.html',
 })
-export class UpdateMucQuaDialogComponent implements OnInit {
+export class UpdateMucQuaDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	itemForm: FormGroup | undefined;
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
@@ -52,7 +55,7 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 		this.createForm();
 		this.viewLoading = true;
 		this.loadNhom();
-		this.danhMucService.liteDoiTuongNhanQua(false, true).subscribe(res => {
+		this.danhMucService.liteDoiTuongNhanQua(false, true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
@@ -67,14 +70,19 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 	}
 
 	loadNhom() {
-		this.danhMucService.liteNhomLeTet().subscribe(res => {
+		this.danhMucService.liteNhomLeTet().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listNhomLeTet = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-		this.danhMucService.liteNguonKinhPhi().subscribe(res => {
+		this.danhMucService.liteNguonKinhPhi().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listNguon = res.data;
 			this.changeDetectorRefs.detectChanges();
 		})
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -124,7 +132,7 @@ export class UpdateMucQuaDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateMucQuaDoiTuongs(item).subscribe(res => {
+		this.apiService.UpdateMucQuaDoiTuongs(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

@@ -97,8 +97,8 @@
 </kt-portlet-header>
 
 <div class="mat-table__wrapper d-block" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}" >
-    <table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" matSort #sort1="matSort" 
-        matSortActive="Username" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
+    <table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" 
+        matSort #sort1="matSort" matSortActive="Username" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
         <ng-container matColumnDef="STT">
             <th mat-header-cell *matHeaderCellDef class="stt-cell">STT</th>
             <td mat-cell style="padding-bottom: 4px" class="stt-cell" *matCellDef="let i=index">{{i + 1}}</td>

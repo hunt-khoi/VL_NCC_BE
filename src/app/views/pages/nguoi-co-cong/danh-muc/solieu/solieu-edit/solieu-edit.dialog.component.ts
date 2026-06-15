@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { solieuModel } from '../../solieu/Model/solieu.model';
@@ -6,17 +6,18 @@ import { TranslateService } from '@ngx-translate/core';
 import { solieuService } from '../Services/solieu.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'm-solieu-edit-dialog',
 	templateUrl: './solieu-edit.dialog.component.html',
 })
 
-export class solieuEditDialogComponent implements OnInit {
+export class solieuEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: solieuModel = new solieuModel();
-	oldItem: solieuModel = new solieuModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
@@ -45,14 +46,15 @@ export class solieuEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
+
 	constructor(public dialogRef: MatDialogRef<solieuEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
@@ -62,7 +64,6 @@ export class solieuEditDialogComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("SO_LIEU.NAME");
-
 	}
 
 	ngOnInit() {
@@ -73,7 +74,7 @@ export class solieuEditDialogComponent implements OnInit {
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
 			this.loadCacSLCon(this.id)
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -90,20 +91,24 @@ export class solieuEditDialogComponent implements OnInit {
 		this.loadList();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadList() {
-		this.danhMucService.liteLoaiSoLieu().subscribe(res => {
+		this.danhMucService.liteLoaiSoLieu().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listLoaiSoLieu = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-		this.danhMucService.liteFilter().subscribe(res => {
+		this.danhMucService.liteFilter().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listOpt = res.data;
 			this.listFilter.next(res.data);
 		});
 	}
 
 	loadSLCha() {
-		if (!this.itemForm) return;
-		this.apiService.loadParent(this.itemForm.controls.Id_LoaiSoLieu.value).subscribe(res => {
+		this.apiService.loadParent(this.itemForm.controls.Id_LoaiSoLieu.value).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listOptSLCha = res.data;
 			if (this.item.Id > 0)
 				this.listOptSLCha = this.listOptSLCha.filter(x => x.Id != this.item.Id);
@@ -113,7 +118,7 @@ export class solieuEditDialogComponent implements OnInit {
 	}
 
 	loadCacSLCon(id: number) {
-		this.apiService.loadChilds(id).subscribe(res => {
+		this.apiService.loadChilds(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listSLCons = res.data;
 			this.changeDetectorRefs.detectChanges();
 		})
@@ -180,7 +185,6 @@ export class solieuEditDialogComponent implements OnInit {
 	}
 
 	prepare(): solieuModel {
-		if (!this.itemForm) return new solieuModel();
 		const controls = this.itemForm.controls;
 		const _item = new solieuModel();
 		_item.Id = this.item.Id;
@@ -197,7 +201,6 @@ export class solieuEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -229,9 +232,8 @@ export class solieuEditDialogComponent implements OnInit {
 			this.layoutUtilsService.showError("Số liệu này không được cập nhật loại số liệu");
 			return;
 		}
-
 		this.disabledBtn = true;
-		this.apiService.update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -256,7 +258,7 @@ export class solieuEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

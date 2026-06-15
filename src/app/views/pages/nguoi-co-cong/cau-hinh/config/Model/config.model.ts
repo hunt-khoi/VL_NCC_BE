@@ -1,14 +1,14 @@
 import { BaseModel } from 'app/core/_base/crud';
 
 export class SysConfigModel extends BaseModel {
-	IdRow: number
-	Code: string
-	Value: string
-	IdGroup: number
-	Priority: number
-	Type: string
-	Description: string
-	Pattern: string
+	IdRow: number = 0;
+	Code: string = '';
+	Value: string = '';
+	IdGroup: number = 0;
+	Priority: number = 1;
+	Type: string = '';
+	Description: string = '';
+	Pattern: string = '';
 
 	clear() {
 		this.IdRow = 0;

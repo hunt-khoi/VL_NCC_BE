@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -19,7 +19,8 @@ import { dantocEditDialogComponent } from '../dantoc-edit/dantoc-edit.dialog.com
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class dantocListComponent implements OnInit {
+export class dantocListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: dantocDataSource | undefined;
 	displayedColumns = ['Id_row', 'Tendantoc','Priority','NguoiCapNhat','NgayCapNhat', 'actions'];
@@ -64,6 +65,11 @@ export class dantocListComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource) return;
 		const queryParams = new QueryParamsModel({},
@@ -84,7 +90,7 @@ export class dantocListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Delete(item.Id_row).subscribe(res => {
+			this.apiService.Delete(item.Id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}

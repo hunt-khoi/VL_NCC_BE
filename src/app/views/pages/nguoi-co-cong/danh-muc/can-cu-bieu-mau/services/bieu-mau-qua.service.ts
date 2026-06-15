@@ -1,12 +1,13 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { HttpUtilsService } from '../../../../../../core/_base/crud/utils/http-utils.service';
 import { QueryResultsModel } from '../../../../../../core/_base/crud/models/query-models/query-results.model';
 import { QueryParamsModel } from '../../../../../../core/_base/crud/models/query-models/query-params.model';
 import { environment } from '../../../../../../../environments/environment';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { HttpUtilsService } from '../../../../../../core/_base/crud/utils/http-utils.service';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 
 const API_URL = environment.ApiRoot + '/bieu-mau-qua';
+
 @Injectable({
 	providedIn: 'root'
 })

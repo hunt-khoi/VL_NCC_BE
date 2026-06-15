@@ -134,7 +134,7 @@
         </ng-container>
         <ng-container matColumnDef="STT">
             <th mat-header-cell *matHeaderCellDef class="stt-cell">STT</th>
-            <td mat-cell style="padding-bottom: 4px" class="stt-cell" *matCellDef="let item">{{dm_donvisResult.indexOf(item) + 1}}</td>
+            <td mat-cell style="padding-bottom: 4px" class="stt-cell" *matCellDef="let vi = index">{{vi + 1}}</td>
         </ng-container>
         <ng-container matColumnDef="DonVi">
             <th mat-header-cell *matHeaderCellDef>

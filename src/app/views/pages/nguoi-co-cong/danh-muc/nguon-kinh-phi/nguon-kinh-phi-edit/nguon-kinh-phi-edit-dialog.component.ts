@@ -1,9 +1,11 @@
 import { NguonKinhPhiService } from '../Services/nguon-kinh-phi.service';
 import { NguonKinhPhiModel } from '../Model/nguon-kinh-phi.model';
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
@@ -12,10 +14,11 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class NguonKinhPhiEditDialogComponent implements OnInit {
+export class NguonKinhPhiEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: NguonKinhPhiModel = new NguonKinhPhiModel();
 	oldItem: NguonKinhPhiModel = new NguonKinhPhiModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -55,7 +58,7 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -95,7 +98,6 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 	}
 
 	prepare(): NguonKinhPhiModel {
-		if (!this.itemForm) return new NguonKinhPhiModel();
 		const controls = this.itemForm.controls;
 		const _item = new NguonKinhPhiModel();
 		_item.Id = this.item.Id;
@@ -107,7 +109,6 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -132,7 +133,7 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -141,7 +142,7 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
+					this.layoutUtilsService.showInfo(_messageType);
 					if (this.focusInput)
 						this.focusInput.nativeElement.focus();
 				}
@@ -155,7 +156,7 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -163,7 +164,7 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
+					this.layoutUtilsService.showInfo(_messageType);
 					if (this.focusInput)
 						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
@@ -179,7 +180,6 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -191,5 +191,10 @@ export class NguonKinhPhiEditDialogComponent implements OnInit {
 
 	close() {
 		this.dialogRef.close();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

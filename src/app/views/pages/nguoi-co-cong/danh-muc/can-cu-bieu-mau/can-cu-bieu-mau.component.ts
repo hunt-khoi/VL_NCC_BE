@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { BieuMauService } from './Services/bieu-mau.service';
-import { CanCuService } from './Services/can-cu.service';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
+import { BieuMauService } from './Services/bieu-mau.service';
+import { CanCuService } from './Services/can-cu.service';
 
 @Component({
 	selector: 'kt-can-cu-bieu-mau',
@@ -22,5 +22,4 @@ export class CanCuBieuMauComponent implements OnInit {
 			this.ccService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'Priority', 0, 10));
 		}
 	}
-
 }

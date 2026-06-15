@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -22,24 +22,20 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class BieuMauThanhPhanListComponent implements OnInit {
+export class BieuMauThanhPhanListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: CanCuBieuMauDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-	filterStatus = '';
-	filterCondition = '';
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
-	_name = "";
 
+	_name = "";
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
 	btnClass: string = "";
 
-	constructor(public objectSetvice: BieuMauService,
+	constructor(public apiService: BieuMauService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
 		private cookieService: CookieService,
@@ -49,14 +45,13 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 			this._name = this.translate.instant("BIEUMAU_TP.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
-		if (this.objectSetvice !== undefined) {
-			this.objectSetvice.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'ThanhPhan', 0, 10));
-		} //mặc định theo priority
+		if (this.apiService !== undefined) {
+			this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'ThanhPhan', 0, 10));
+		}
 
 		this.gridModel = new TableModel();
 		this.gridModel.clear();
@@ -164,22 +159,19 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 		}
 
 		// Init DataSource
-		this.dataSource = new CanCuBieuMauDataSource(this.objectSetvice, null, null);
+		this.dataSource = new CanCuBieuMauDataSource(this.apiService, null, null);
 		let queryParams = new QueryParamsModel({});
 		this.route.queryParams.subscribe(_ => {
 			if (this.dataSource) {
-				queryParams = this.objectSetvice.lastFilter$.getValue();
+				queryParams = this.apiService.lastFilter$.getValue();
 				this.dataSource.loadListTP(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -197,21 +189,14 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-			filter.type = +this.filterCondition;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.ThanhPhan = this.gridService.model.filterText['ThanhPhan'];
 		}
-		return filter; //trả về đúng biến filter
+		return filter;
 	}
 
 	Edit(_item: any, allowEdit: boolean = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		//thông báo khi thực hiện trong tác vụ
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(BieuMauThanhPhanEditDialogComponent, { data: { _item, allowEdit } });
@@ -225,7 +210,7 @@ export class BieuMauThanhPhanListComponent implements OnInit {
 
 	download(item: any, isfail: boolean = false) {
 		let IdTemplate = item.Id;
-		this.objectSetvice.downloadTP(IdTemplate, isfail).subscribe(response => {
+		this.apiService.downloadTP(IdTemplate, isfail).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

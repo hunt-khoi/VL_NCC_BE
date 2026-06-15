@@ -2,7 +2,7 @@
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     <kt-portlet-header [sticky]="true" [title]="getTitle()" [class]="'kt-portlet__head--lg'">
 		<ng-container ktPortletTools>
-            <button  color="primary" mat-raised-button type="button" (click)="PrintAndExport()"> {{getTitlePrint()}} </button>
+            <button  color="primary" mat-raised-button type="button" (click)="PrintAndExport()">{{getTitlePrint()}}</button>
 			<button class="d-none" color="primary" mat-raised-button type="button" (click)="printMePls()" >
 				<span translate="COMMON.PRINT"></span>
             </button>
@@ -17,11 +17,12 @@
 		<div class="wrapper1" (scroll)="updateScroll()" #scrollOne>
             <div class="div1" [style.width.px]="GetwidthPage()" ></div>
         </div>
-        <div id="print-table" class="dl-center-chart" style="overflow: auto; font-family: Tahoma;font-size:10px; padding-bottom: 100px;" #scrollTwo (scroll)="updateScroll(true)">
-            <table id="print-drawchart" style="text-align:center" cellspacing="0" cellpadding="0" >
+        <div id="print-table" class="dl-center-chart" #scrollTwo (scroll)="updateScroll(true)"
+            style="overflow: auto; font-family: Tahoma; font-size:10px; padding-bottom: 100px;">
+            <table id="print-drawchart" style="text-align:center" cellspacing="0" cellpadding="0">
                 <tr *ngFor="let item of ListItemChart; let i=index; let last_row= last" >
                     <td *ngFor="let box of item; let j=index; let last_col= last" [attr.colspan]="box&&box.width"
-                        valign="top" [ngClass]="{'cnn':box &&  (box.children.length>0 || box.fake)}">
+                        valign="top" [ngClass]="{'cnn':box && (box.children.length>0 || box.fake)}">
 
                         <!--Root Nodes-->
                         <div class="data dl-center-chart" *ngIf="i===0 && box">
@@ -29,7 +30,8 @@
                                 <tbody>
                                     <tr>
                                         <td colspan="4" class="dl-br-box">
-                                            <div class="dragCD" id="cd{{box.ID}}" style="position: relative; color:#fd7e14; font-weight: bold;font-size: 11px">
+                                            <div class="dragCD" id="cd{{box.ID}}" 
+                                                style="position: relative; color:#fd7e14; font-weight: bold; font-size: 11px">
                                                 <span innerHTML="{{box.Name}}"></span>
                                             </div>
                                             <div class="dlListNv" dndDropzone dndEffectAllowed="copyMove"
@@ -84,7 +86,8 @@
                                                         <tbody>
                                                             <tr>
                                                                 <td colspan="4" class="dl-br-box">
-                                                                    <div class="dragCD" id="cd{{box.ID}}" style="position: relative; color:#fd7e14; font-weight: bold; font-size: 11px">
+                                                                    <div class="dragCD" id="cd{{box.ID}}" 
+                                                                        style="position: relative; color:#fd7e14; font-weight: bold; font-size: 11px">
                                                                         <span innerHTML="{{box.Name}}"></span>
                                                                     </div>
                                                                     <div class="dlListNv" dndDropzone dndEffectAllowed="copyMove"
@@ -92,9 +95,9 @@
                                                                         <div dndPlaceholderRef
                                                                             class="row align-items-center dndPlaceholder">
                                                                         </div>
-                                                                        <div class="dl-align-items-center" *ngFor="let nv of box.Data_Emp;  let i = index"
+                                                                        <div class="dl-align-items-center" *ngFor="let nv of box.Data_Emp; let i = index"
                                                                             [dndDraggable]="nv" dndEffectAllowed="copyMove"
-                                                                            (dndMoved)="onMoved_Staff(nv, box.Data_Emp,box, 'move')">
+                                                                            (dndMoved)="onMoved_Staff(nv, box.Data_Emp)">
                                                                             <div class=" m--margin-bottom-5-mobile">
                                                                                 <img src="/assets/images/move_icon_hover.png"
                                                                                     alt="Di chuyển" title="Di chuyển"
@@ -130,8 +133,6 @@
                                 </tbody>
                             </table>
                         </div>
-
-
                     </td>
                 </tr>
             </table>

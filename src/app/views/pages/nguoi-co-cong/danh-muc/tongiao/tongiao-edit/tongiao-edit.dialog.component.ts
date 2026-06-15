@@ -1,28 +1,43 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { tongiaoModel } from '../Model/tongiao.model';
 import { TranslateService } from '@ngx-translate/core';
-import { tongiaoService } from '../Services/tongiao.service';
+import { Subject } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { tongiaoModel } from '../Model/tongiao.model';
+import { tongiaoService } from '../Services/tongiao.service';
 
 @Component({
 	selector: 'm-tongiao-edit-dialog',
 	templateUrl: './tongiao-edit.dialog.component.html',
 })
 
-export class tongiaoEditDialogComponent implements OnInit {
+export class tongiaoEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: tongiaoModel = new tongiaoModel();
 	oldItem: tongiaoModel = new tongiaoModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
-	_NAME: '';
+	_NAME: string = '';
+
+	@HostListener('document:keydown', ['$event'])
+	onKeydownHandler(event: KeyboardEvent) {
+		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+			this.item = this.data._item;
+			if (this.viewLoading == true) {
+				this.onSubmit(true);
+			}
+			else {
+				this.onSubmit(false);
+			}
+		}
+	}
 
 	constructor(public dialogRef: MatDialogRef<tongiaoEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
@@ -34,7 +49,6 @@ export class tongiaoEditDialogComponent implements OnInit {
 			this._NAME = this.translate.instant('TONGIAO.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
@@ -50,6 +64,11 @@ export class tongiaoEditDialogComponent implements OnInit {
 			this.focusInput.nativeElement.focus();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	createForm() {
 		this.itemForm = this.fb.group({
 			Tentongiao: ['' + this.item.Tentongiao, Validators.required],
@@ -59,7 +78,6 @@ export class tongiaoEditDialogComponent implements OnInit {
 			this.itemForm.disable()
 	}
 
-	/** UI */
 	getTitle(): string {
 		if (!this.allowEdit) return 'Xem chi tiết';
 		let result = this.translate.instant('COMMON.CREATE');
@@ -70,9 +88,7 @@ export class tongiaoEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
 	prepare(): tongiaoModel{
-		if (!this.itemForm) return new tongiaoModel();
 		const controls = this.itemForm.controls;
 		const _item = new tongiaoModel();
 		_item.Id_row = this.item.Id_row;
@@ -82,15 +98,12 @@ export class tongiaoEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const update = this.prepare();
@@ -105,7 +118,7 @@ export class tongiaoEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -129,7 +142,7 @@ export class tongiaoEditDialogComponent implements OnInit {
 	Create(item: tongiaoModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -158,23 +171,8 @@ export class tongiaoEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
-	}
-
-	@HostListener('document:keydown', ['$event'])
-	onKeydownHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
-			this.item = this.data._item;
-			if (this.viewLoading == true) {
-				this.onSubmit(true);
-			}
-			else {
-				this.onSubmit(false);
-			}
-		}
 	}
 }

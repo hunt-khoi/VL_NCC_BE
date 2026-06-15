@@ -15,10 +15,12 @@
             <h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
         </div>
         <div class="col-md-6 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
-            <button style="padding: 0px 20px;" type="button" mat-raised-button color="primary" (click)="onSubmit(true)" [disabled]="disabledBtn" *ngIf="!data.DM_DonVi.IsShow">
+            <button type="button" mat-raised-button color="primary" (click)="onSubmit(true)" [disabled]="disabledBtn" 
+                *ngIf="!data.DM_DonVi.IsShow" style="padding: 0px 20px;">
                 <span translate="COMMON.LUU_DONG"></span>
             </button>&nbsp;
-            <button class="hide-view-625"  *ngIf="DM_DonVi.Id == 0&&!data.DM_DonVi.IsShow" style="padding: 0px 20px;" type="button" [disabled]="disabledBtn" mat-raised-button color="primary" (click)="onSubmit(false)">
+            <button type="button" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn"
+                *ngIf="DM_DonVi.Id === 0 && !data.DM_DonVi.IsShow" style="padding: 0px 20px;" class="hide-view-625">
                 <span translate="COMMON.LUU_TIEPTUC"></span>
             </button>&nbsp;
         </div>
@@ -57,7 +59,8 @@
                 <div class="col-md-6 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
                         <input matInput placeholder="{{ 'DONVI.dvcaptren' | translate }} *" formControlName="parentName" type="text" readonly="true">
-                        <button mat-icon-button matSuffix *ngIf="!data.DM_DonVi.IsShow" (click)="openTreeDonVi()" color="primary" matTooltip="Chọn đơn vị" style="margin-right: 5px;">
+                        <button mat-icon-button matSuffix *ngIf="!data.DM_DonVi.IsShow" (click)="openTreeDonVi()" color="primary" 
+                            matTooltip="Chọn đơn vị" style="margin-right: 5px;">
                             <mat-icon>supervisor_account</mat-icon>
                         </button>
                         <button mat-icon-button matSuffix *ngIf="!data.DM_DonVi.IsShow" (click)="clearCapTren()" color="warn" matTooltip="Xóa">

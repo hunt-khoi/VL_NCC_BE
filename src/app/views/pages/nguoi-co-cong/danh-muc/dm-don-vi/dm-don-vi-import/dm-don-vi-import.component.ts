@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { DM_DonViService } from '../Services/dm-don-vi.service';
 import { DM_DonViModel } from '../Model/dm-don-vi.model';
@@ -16,7 +17,7 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 	// Public properties
 	@ViewChild('fileUpload', { static: true }) fileUpload: any; 
 	DM_DonVi: DM_DonViModel = new DM_DonViModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 
 	loadingSubject = new BehaviorSubject<boolean>(true);
@@ -28,6 +29,7 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 	disabledBtn:boolean=false;
 
 	private componentSubscriptions: Subscription | undefined;
+	private destroy$ = new Subject<void>();
 
 	constructor(
 		public dialogRef: MatDialogRef<DM_DonViImportComponent>,
@@ -39,7 +41,7 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 
 	ngOnInit() {
 		this.viewLoading = false;
-		this.apiService.data_import.subscribe(res => {
+		this.apiService.data_import.pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this._dataImport = [...res];
 		});
 		this.createForm();
@@ -49,6 +51,8 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 		if (this.componentSubscriptions) {
 			this.componentSubscriptions.unsubscribe();
 		}
+		this.destroy$.next();
+		this.destroy$.complete();
 		this.apiService.data_import.next([]);
 	}
 
@@ -80,7 +84,6 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 	}
 
 	FileSelected(evt: any) {
-		if (!this.itemForm) return;
 		if (evt.target.files && evt.target.files.length) {//Nếu có file
 			let file = evt.target.files[0]; // Ví dụ chỉ lấy file đầu tiên
 			let fileName = file.name;
@@ -104,10 +107,9 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 	}
 
 	checkDataIsValid(): boolean {
-		if (!this.itemForm) return false;
-		let p = document.getElementById("fileUploadExcel");
+		let p = document.getElementById("fileUploadExcel") as HTMLInputElement;
 		return this.itemForm.controls['FileDuLieu'] && this.itemForm.controls['FileDuLieu'].valid 
-		&& (p ? (p["type"] == 'file' ? p["files"]["length"] > 0 : false) : false);
+		&& (p && p.type === 'file' && p.files && p.files.length > 0 ? true : false);
 	}
 
 	DocDuLieu() {
@@ -125,16 +127,16 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 				var fileName = el.files[idx].name;
 				let reader = new FileReader();
 				reader.readAsDataURL(el.files[idx]);
-				reader.onload = function () {
-					let base64Str = reader.result as String;
+				reader.onload = () => {
+					let base64Str = reader.result as string;
 					var metaIdx = base64Str.indexOf(';base64,');
-					base64Str = base64Str.substr(metaIdx + 8); // Cắt meta data khỏi chuỗi base64
+					base64Str = base64Str.substring(metaIdx + 8); // Cắt meta data khỏi chuỗi base64
 					var data = {
 						fileName: fileName,
 						base64: base64Str,
 					};
 					service.lastFileUpload$.next(data);
-					service.uploadFile(data).subscribe(res => {
+					service.uploadFile(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 						if (res && res.status == 1) {
 							service.data_import.next(res.data);
 						}
@@ -155,8 +157,7 @@ export class DM_DonViImportComponent implements OnInit, OnDestroy {
 
 	luuImport() {
 		if (this._dataImport.length > 0) {
-			this.apiService.import(this._dataImport).subscribe(res => {
-				if (!this.itemForm) return;
+			this.apiService.import(this._dataImport).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.isChange = true;
 					this.itemForm.controls['FileDuLieu'].setValue('');

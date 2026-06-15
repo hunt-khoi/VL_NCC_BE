@@ -10,7 +10,6 @@
 		<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" color="accent" type="button">
 			<span translate="COMMON.CREATE"></span>
 		</button>
-
 		<kt-column-option [gridService]="gridService"></kt-column-option>
 	</ng-container>
 </kt-portlet-header>
@@ -20,7 +19,9 @@
 		<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" 
 			matSort #sort1="matSort" matSortActive="LoaiQuyetDinh" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
 			<ng-container matColumnDef="STT">
-				<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%"><span translate="COMMON.STT"></span></th>
+				<th mat-header-cell *matHeaderCellDef class="stt-cell mat-column-vinCode" column_name="STT" style="flex: 0 0 6%">
+					<span translate="COMMON.STT"></span>
+				</th>
 				<td mat-cell *matCellDef="let item; let vi = index" class="mat-column-vinCode" style="flex: 0 0 6%">{{vi + 1}}</td>
 			</ng-container>
 			<ng-container matColumnDef="LoaiQuyetDinh">

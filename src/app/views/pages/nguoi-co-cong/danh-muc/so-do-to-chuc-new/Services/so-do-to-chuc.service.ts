@@ -1,9 +1,9 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { Injectable } from '@angular/core';
+import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { UpdateThongTinChucVuModel, OrgChartModel, ChartStaffModel } from '../Model/so-do-to-chuc.model';
 import { environment } from '../../../../../../../environments/environment';
-import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/so-do-to-chuc';
 
@@ -66,8 +66,6 @@ export class OrgChartService {
 	GetOrganizationalChartById(idItem: any): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_PRODUCTS_URL}?jobtitleid=${idItem}`;
-		return this.http.get<QueryResultsModel>(url, {
-			headers: httpHeaders,
-		});
+		return this.http.get<QueryResultsModel>(url, { headers: httpHeaders });
 	}
 }

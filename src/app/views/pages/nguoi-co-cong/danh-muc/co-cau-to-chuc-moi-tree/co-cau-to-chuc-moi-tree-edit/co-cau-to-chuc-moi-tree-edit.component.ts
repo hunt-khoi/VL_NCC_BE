@@ -1,7 +1,9 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { OrgStructureModel } from '../Model/CoCauToChuc.model';
 import { cocautochucMoiTreeService } from '../Services/co-cau-to-chuc-moi-tree.service';
 import { CommonService } from '../../../services/common.service';
@@ -13,12 +15,12 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 	templateUrl: './co-cau-to-chuc-moi-tree-edit.component.html',
 })
 
-export class CoCauToChucEditComponent implements OnInit {
+export class CoCauToChucEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	filterprovinces: string = '';
 	item: OrgStructureModel = new OrgStructureModel();
 	oldItem: OrgStructureModel = new OrgStructureModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	NoiDung: string = "";
@@ -37,11 +39,11 @@ export class CoCauToChucEditComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -59,7 +61,7 @@ export class CoCauToChucEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 		})
 		this.reset();
@@ -74,10 +76,10 @@ export class CoCauToChucEditComponent implements OnInit {
 			this.viewLoading = false;
 		}
 		this.changeCap(this.item.Level);
-		this.danhMucChungService.GetListOrganizationalChartStructure().subscribe(res => {
+		this.danhMucChungService.GetListOrganizationalChartStructure().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listorgstructure = res.data;
 		});
-		this.danhMucChungService.GetListShift().subscribe(res => {
+		this.danhMucChungService.GetListShift().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listCheDoLamViec = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
@@ -88,13 +90,13 @@ export class CoCauToChucEditComponent implements OnInit {
 	changeCap(value: any) {
 		this.listDV = [];
 		if (value == 2)
-			this.danhMucChungService.GetListDistrictByProvinces(this.filterprovinces).subscribe(res => {
+			this.danhMucChungService.GetListDistrictByProvinces(this.filterprovinces).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1)
 					this.listDV = res.data;
 				this.changeDetectorRefs.detectChanges();
 			});
 		if (value == 3)
-			this.danhMucChungService.GetListWardByDistrict(this.ID_Goc_Pa).subscribe(res => {
+			this.danhMucChungService.GetListWardByDistrict(this.ID_Goc_Pa).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1)
 					this.listDV = res.data;
 				this.changeDetectorRefs.detectChanges();
@@ -126,7 +128,6 @@ export class CoCauToChucEditComponent implements OnInit {
 	}
 
 	prepare(): OrgStructureModel {
-		if (!this.itemForm) return new OrgStructureModel();
 		const controls = this.itemForm.controls;
 		const _item = new OrgStructureModel();
 		_item.RowID = this.item.RowID;
@@ -141,15 +142,12 @@ export class CoCauToChucEditComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		if (+this.itemForm.controls["Vitri"].value <= 0) {
@@ -170,7 +168,7 @@ export class CoCauToChucEditComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Updateorgstructure(item).subscribe(res => {
+		this.apiService.Updateorgstructure(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -196,7 +194,7 @@ export class CoCauToChucEditComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Createorgstructure(item).subscribe(res => {
+		this.apiService.Createorgstructure(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -222,8 +220,6 @@ export class CoCauToChucEditComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -239,5 +235,10 @@ export class CoCauToChucEditComponent implements OnInit {
 			|| e.keyCode == 8)) {
 			e.preventDefault();
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

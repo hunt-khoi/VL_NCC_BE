@@ -1,12 +1,11 @@
 import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -24,18 +23,11 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PhiSoLieuListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	dataSource: PhiSoLieuDataSource | undefined;
 	displayedColumns = ['STT', 'Id', 'PhiSoLieu', 'MoTa', 'Locked', 'Priority', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
-
-	// Filter fields
-	curUser: any = {};
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
-	haveFilter: boolean = false;
 
 	_name: string = "";
 	gridService: TableService | undefined;
@@ -161,17 +153,11 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
   	}
 	
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.gridService)
 			this.gridService.Clear();
 	}
@@ -209,7 +195,7 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.apiService.Delete(item.Id).subscribe(res => {
+			this.apiService.Delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -241,7 +227,7 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Lock(item.Id, islock).subscribe(res => {
+			this.apiService.Lock(item.Id, islock).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_message);
 				}
@@ -260,8 +246,7 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
   	}
   
   	Edit(_item: PhiSoLieuModel, allowEdit:boolean=true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, {name:this._name});
 		const dialogRef = this.dialog.open(PhiSoLieuDialogComponent, { data: { _item: _item, allowEdit: allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
@@ -269,7 +254,6 @@ export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
  	}
   

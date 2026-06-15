@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -23,17 +23,15 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class cachNhapListComponent implements OnInit {
+export class cachNhapListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: cachnhapDataSource | undefined;
 	displayedColumns = ['STT', 'cachnhap', 'MoTa', 'Locked', 'Priority', 'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
-	filterStatus = '';
-	filterCondition = '';
-	_name = "";
-
+	_name: string = "";
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
@@ -137,8 +135,13 @@ export class cachNhapListComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	LoadFilterGroupData() {
-		this.CommonService.liteLoaiSoLieu().subscribe(res => {
+		this.CommonService.liteLoaiSoLieu().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.gridService.model.filterGroupDataChecked.Id_LoaiSoLieu = res.data.map((x: any) => {
@@ -171,12 +174,6 @@ export class cachNhapListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-			filter.type = +this.filterCondition;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.CachNhap = this.gridService.model.filterText['CachNhap'];
 		}
@@ -192,7 +189,7 @@ export class cachNhapListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}

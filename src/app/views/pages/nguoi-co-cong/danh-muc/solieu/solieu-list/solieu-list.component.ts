@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
@@ -22,18 +22,15 @@ import { CookieService } from 'ngx-cookie-service';
 	templateUrl: './solieu-list.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-
-export class solieuListComponent implements OnInit {
+export class solieuListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: solieuDataSource | undefined;
 	displayedColumns = ['STT', 'solieu', 'MoTa', 'Locked', 'Priority', 'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
-	filterStatus = '';
-	filterCondition = '';
-	_name = "";
-
+	_name: string = "";
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
@@ -75,7 +72,6 @@ export class solieuListComponent implements OnInit {
 				value: 'False',
 			}
 		];
-
 		this.gridModel.filterGroupDataChecked['Locked'] = optionsTinhTrang.map(x => {
 			return {
 				name: x.name,
@@ -208,8 +204,13 @@ export class solieuListComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	LoadFilterGroupData() {
-		this.CommonService.liteLoaiSoLieu().subscribe(res => {
+		this.CommonService.liteLoaiSoLieu().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.gridService.model.filterGroupDataChecked.Id_LoaiSoLieu = res.data.map((x: any) => {
@@ -242,12 +243,6 @@ export class solieuListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-			filter.type = +this.filterCondition;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.SoLieu = this.gridService.model.filterText['SoLieu'];
 		}
@@ -263,7 +258,7 @@ export class solieuListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -296,7 +291,7 @@ export class solieuListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.update(item).subscribe(res => {
+			this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);

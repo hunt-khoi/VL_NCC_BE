@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -19,8 +18,8 @@ import { tongiaoEditDialogComponent } from '../tongiao-edit/tongiao-edit.dialog.
 	templateUrl: './tongiao-list.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-
-export class tongiaoListComponent implements OnInit {
+export class tongiaoListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: tongiaoDataSource | undefined;
 	displayedColumns = ['Id_row', 'Tentongiao','Priority','NguoiCapNhat','NgayCapNhat', 'actions'];
@@ -64,6 +63,11 @@ export class tongiaoListComponent implements OnInit {
 			}
 		});
 	}
+	
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource) return;
@@ -85,7 +89,7 @@ export class tongiaoListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Delete(item.Id_row).subscribe(res => {
+			this.apiService.Delete(item.Id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -103,9 +107,8 @@ export class tongiaoListComponent implements OnInit {
 		this.Update(tongiaoModels);
 	}
 
-	Update(_item: tongiaoModel, allowEdit:boolean=true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id_row > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+	Update(_item: tongiaoModel, allowEdit: boolean = true) {
+		let saveMessageTranslateParam = _item.Id_row > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(tongiaoEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {

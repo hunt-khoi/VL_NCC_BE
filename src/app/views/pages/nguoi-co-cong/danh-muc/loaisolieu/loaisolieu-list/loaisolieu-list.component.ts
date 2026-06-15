@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
@@ -23,19 +23,15 @@ import { CookieService } from 'ngx-cookie-service';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class loaisolieuListComponent implements OnInit {
+export class loaisolieuListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
     // Table fields
     dataSource: loaisolieuDataSource | undefined;
     displayedColumns = ['STT', 'LoaiSoLieu', 'MoTa', 'Locked', 'Priority', 'CreatedBy', 'CreatedDate', 'UpdatedBy', 'UpdatedDate', 'actions'];
 	@ViewChild(MatPaginator, {static:true}) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-    filterStatus = '';
-	filterCondition = '';
-    // Selection
-    selection = new SelectionModel<loaisolieuModel>(true, []);
-    productsResult: loaisolieuModel[] = [];
-    _name = "";
-    
+
+    _name: string = "";
     gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
@@ -87,7 +83,6 @@ export class loaisolieuListComponent implements OnInit {
 
         let availableColumns = [
 			{
-
 				stt: 1,
 				name: 'STT',
 				displayName: 'STT',
@@ -95,7 +90,6 @@ export class loaisolieuListComponent implements OnInit {
 				isShow: true
 			},
 			{
-
 				stt: 2,
 				name: 'LoaiSoLieu',
 				displayName: 'Loại số liệu',
@@ -103,7 +97,6 @@ export class loaisolieuListComponent implements OnInit {
 				isShow: true
             },
 			{
-
 				stt: 3,
 				name: 'MoTa',
 				displayName: 'Mô tả',
@@ -111,7 +104,6 @@ export class loaisolieuListComponent implements OnInit {
 				isShow: true
 			},
 			{
-
 				stt: 4,
 				name: 'Locked',
 				displayName: 'Tình trạng',
@@ -119,7 +111,6 @@ export class loaisolieuListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 5,
 				name: 'Priority',
 				displayName: 'Thứ tự',
@@ -127,7 +118,6 @@ export class loaisolieuListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 6,
 				name: 'CreatedBy',
 				displayName: 'Người tạo',
@@ -135,7 +125,6 @@ export class loaisolieuListComponent implements OnInit {
 				isShow: false
             },
             {
-
 				stt: 7,
 				name: 'CreatedDate',
 				displayName: 'Ngày tạo',
@@ -143,7 +132,6 @@ export class loaisolieuListComponent implements OnInit {
 				isShow: true
             },
             {
-
 				stt: 8,
 				name: 'UpdatedBy',
 				displayName: 'Người sửa',
@@ -151,7 +139,6 @@ export class loaisolieuListComponent implements OnInit {
 				isShow: false
             },
             {
-
 				stt: 9,
 				name: 'UpdatedDate',
 				displayName: 'Ngày sửa',
@@ -201,15 +188,12 @@ export class loaisolieuListComponent implements OnInit {
                 this.dataSource.loadList(queryParams);
             }
         });
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
     }
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
         if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
@@ -226,12 +210,6 @@ export class loaisolieuListComponent implements OnInit {
 
     filterConfiguration(): any {
         const filter: any = {};
-        if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-            filter.type = +this.filterCondition;
-        }
         if (this.gridService && this.gridService.model.filterText) {
             filter.LoaiSoLieu = this.gridService.model.filterText['LoaiSoLieu'];
         }
@@ -247,7 +225,7 @@ export class loaisolieuListComponent implements OnInit {
         dialogRef.afterClosed().subscribe(res => {
             if (!res) return;
             
-            this.apiService.delete(item.Id).subscribe(res => {
+            this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
                 }
@@ -281,7 +259,7 @@ export class loaisolieuListComponent implements OnInit {
                 this.loadDataList(); //để không biến mất ổ khóa
                 return;
             }
-		    this.apiService.update(item).subscribe(res => {
+		    this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 if (res && res.status === 1) {
                     const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -313,7 +291,6 @@ export class loaisolieuListComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_saveMessage);
                 this.loadDataList();
             }
-
         });
     }
 

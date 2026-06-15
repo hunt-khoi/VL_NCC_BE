@@ -1,21 +1,24 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { chucvuModel } from '../../chucvu/Model/chucvu.model';
 import { TranslateService } from '@ngx-translate/core';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { chucvuService } from '../Services/chucvu.service';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
 	selector: 'm-chucvu-edit-dialog',
 	templateUrl: './chucvu-edit.dialog.component.html',
 })
 
-export class chucvuEditDialogComponent implements OnInit {
+export class chucvuEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: chucvuModel = new chucvuModel();
 	oldItem: chucvuModel = new chucvuModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -25,17 +28,17 @@ export class chucvuEditDialogComponent implements OnInit {
 	allowEdit: boolean = true;
 	isZoomSize: boolean = false;
 	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
-	_name = "";
+	_name: string = "";
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -51,7 +54,6 @@ export class chucvuEditDialogComponent implements OnInit {
 		this._name = this.translate.instant("CHUC_VU.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.reset();
 		this.item = this.data._item;
@@ -61,7 +63,7 @@ export class chucvuEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id_row > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id_row).subscribe(res => {
+			this.apiService.getItem(this.item.Id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -73,9 +75,14 @@ export class chucvuEditDialogComponent implements OnInit {
 			});
 		}
 		//Load unit list
-		this.danhMucService.getAllChucdanh().subscribe(res => {
+		this.danhMucService.getAllChucdanh().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listchucdanh = res.data;
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -103,7 +110,6 @@ export class chucvuEditDialogComponent implements OnInit {
 	}
 
 	prepare(): chucvuModel {
-		if (!this.itemForm) return new chucvuModel();
 		const controls = this.itemForm.controls;
 		const _item = new chucvuModel();
 		_item.Id_row = this.item.Id_row;
@@ -116,7 +122,6 @@ export class chucvuEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -137,7 +142,7 @@ export class chucvuEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -161,7 +166,7 @@ export class chucvuEditDialogComponent implements OnInit {
 	Create(item: chucvuModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -186,7 +191,6 @@ export class chucvuEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

@@ -35,14 +35,15 @@
                         <button mat-raised-button style="padding: 0px 20px;" color="primary" (click)="selectFile()" type="button">
 							Chọn file
 						</button>
-                        <input placeholder="Chọn file" #fileUpload id="fileUploadExcel" type="file" name="fileUpload" accept=".xls,.xlsx" (change)="FileSelected($event)" style="display: none">
+                        <input placeholder="Chọn file" #fileUpload id="fileUploadExcel" type="file" name="fileUpload" accept=".xls,.xlsx" 
+                            (change)="FileSelected($event)" style="display: none">
                     </mat-form-field>
                 </div>
                 <div class="col-md-6 kt-margin-bottom-10-mobile" style="margin-top: 2%">
                     <button style="padding: 0px 20px;" type="button" color="primary" mat-raised-button (click)="luuImport()">
 						Import dữ liệu
 					</button>&nbsp;
-                    <button style="padding: 0px 20px;" type="button" mat-raised-button color="info" (click)="ImportFileMau()">
+                    <button style="padding: 0px 20px;" type="button" color="info" mat-raised-button (click)="ImportFileMau()">
 						Tải file mẫu
 					</button>&nbsp;
                 </div>

@@ -1,19 +1,17 @@
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
 import { LoaiQuyetDinhService } from '../Services/loai-quyet-dinh.service';
-import { loaiDieuDuongModel } from './../../loai-dieu-duong/Model/loaidieuduong.model';
 import { LoaiQuyetDinhDataSource } from './../Models/data-sources/loai-quyet-dinh.datasource';
 import { LoaiQuyetDinhDetailComponent } from './../loai-quyet-dinh-detail/loai-quyet-dinh-detail.component';
 import { CookieService } from 'ngx-cookie-service';
@@ -23,19 +21,14 @@ import { CookieService } from 'ngx-cookie-service';
 	templateUrl: './loai-quyet-dinh-list.component.html'
 })
 
-export class LoaiQuyetDinhListComponent implements OnInit {
+export class LoaiQuyetDinhListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	dataSource: LoaiQuyetDinhDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Selection
-	selection = new SelectionModel<loaiDieuDuongModel>(true, []);
-	productsResult: loaiDieuDuongModel[] = [];
 	haveFilter: boolean = false;
-
 	_name: string = "";
-	_listHoso: any;
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
@@ -120,17 +113,11 @@ export class LoaiQuyetDinhListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.gridService)
 			this.gridService.Clear();
 	}
@@ -184,7 +171,7 @@ export class LoaiQuyetDinhListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.loadDataList();
 					this.layoutUtilsService.showInfo(_deleteMessage);

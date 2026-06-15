@@ -1,10 +1,12 @@
-import { DienChinhHinhService } from './../Services/dien-chinh-hinh.service';
-import { DienChinhHinhModel } from './../Model/dien-chinh-hinh.model';
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { DienChinhHinhService } from './../Services/dien-chinh-hinh.service';
+import { DienChinhHinhModel } from './../Model/dien-chinh-hinh.model';
 
 @Component({
 	selector: 'kt-dien-chinh-hinh-edit',
@@ -12,10 +14,11 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DienChinhHinhEditDialogComponent implements OnInit {
+export class DienChinhHinhEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: DienChinhHinhModel = new DienChinhHinhModel();
 	oldItem: DienChinhHinhModel = new DienChinhHinhModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -29,11 +32,11 @@ export class DienChinhHinhEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -55,7 +58,7 @@ export class DienChinhHinhEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -66,6 +69,11 @@ export class DienChinhHinhEditDialogComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -96,7 +104,6 @@ export class DienChinhHinhEditDialogComponent implements OnInit {
 	}
 
 	prepare(): DienChinhHinhModel {
-		if (!this.itemForm) return new DienChinhHinhModel();
 		const controls = this.itemForm.controls;
 		const _item = new DienChinhHinhModel();
 		_item.Id = this.item.Id;
@@ -109,7 +116,6 @@ export class DienChinhHinhEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -135,7 +141,7 @@ export class DienChinhHinhEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -158,7 +164,7 @@ export class DienChinhHinhEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -182,7 +188,6 @@ export class DienChinhHinhEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

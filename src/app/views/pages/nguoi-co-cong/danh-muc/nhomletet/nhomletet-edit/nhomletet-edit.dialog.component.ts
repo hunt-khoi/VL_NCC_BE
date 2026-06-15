@@ -1,6 +1,8 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { nhomletetModel } from '../../nhomletet/Model/nhomletet.model';
 import { TranslateService } from '@ngx-translate/core';
 import { nhomletetService } from '../Services/nhomletet.service';
@@ -12,10 +14,11 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 	templateUrl: './nhomletet-edit.dialog.component.html',
 })
 
-export class nhomletetEditDialogComponent implements OnInit {
+export class nhomletetEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: nhomletetModel = new nhomletetModel();
 	oldItem: nhomletetModel = new nhomletetModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -32,11 +35,11 @@ export class nhomletetEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -58,7 +61,7 @@ export class nhomletetEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -69,17 +72,23 @@ export class nhomletetEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
-		this.danhMucService.liteMauQDTangQua().subscribe(res => {
+		this.danhMucService.liteMauQDTangQua().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listQD = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
 		this.itemForm = this.fb.group({
 			NhomLeTet: [this.item.NhomLeTet, Validators.required],
 			MoTa: [this.item.MoTa],
-			NgayKhaiBao: [''+this.item.NgayKhaiBao, [Validators.pattern("^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))"), Validators.maxLength(5), Validators.required]],
+			NgayKhaiBao: [''+this.item.NgayKhaiBao, 
+				[Validators.pattern("^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))"), Validators.maxLength(5), Validators.required]],
             Locked: ['' + this.item.Locked],
             Priority: ['' + this.item.Priority],
             MauQD: [this.item.MauQD, Validators.required]
@@ -104,7 +113,6 @@ export class nhomletetEditDialogComponent implements OnInit {
 	}
 
 	prepare(): nhomletetModel {
-		if (!this.itemForm) return new nhomletetModel();
 		const controls = this.itemForm.controls;
 		const _item = new nhomletetModel();
 		_item.Id = this.item.Id;
@@ -120,7 +128,6 @@ export class nhomletetEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -152,7 +159,7 @@ export class nhomletetEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -177,7 +184,7 @@ export class nhomletetEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

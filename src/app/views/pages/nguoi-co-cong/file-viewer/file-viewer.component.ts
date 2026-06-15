@@ -1,11 +1,11 @@
 import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, SecurityContext, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { CommonService } from '../services/common.service';
-import { LayoutUtilsService } from '../../../../core/_base/crud';
 import { DomSanitizer } from '@angular/platform-browser';
 import { take } from 'rxjs/operators';
 import { interval, Subscription } from 'rxjs';
+import { CommonService } from '../services/common.service';
+import { LayoutUtilsService } from '../../../../core/_base/crud';
 
 @Component({
 	selector: 'kt-file-viewer',

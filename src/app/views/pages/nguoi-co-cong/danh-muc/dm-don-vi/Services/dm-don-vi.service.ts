@@ -64,10 +64,6 @@ export class DM_DonViService {
 		return this.http.post<DM_DonViModel>(API_ROOT_URL + '/DM_DonVi_Update', item, { headers: httpHeaders });
 	}
 
-	getFilterGroup(column: string, url: string): Observable<any> {
-		return this.http.get<any>(environment.ApiRoot + url + `${column}`);
-	}
-
 	uploadFile(data: any): Observable<any> {
 		const url = API_ROOT_URL + '/DM_DonVi_UploadFile';
 		const httpHeaders = this.httpUtils.getHTTPHeaders();

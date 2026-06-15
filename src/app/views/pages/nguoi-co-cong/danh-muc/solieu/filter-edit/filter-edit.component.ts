@@ -1,6 +1,8 @@
-import { Component, OnInit, Inject, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { FilterModel, FilterDetailModel } from '../Model/filter.model';
@@ -14,11 +16,10 @@ import { CommonService } from '../../../services/common.service';
 	templateUrl: './filter-edit.component.html',
 })
 
-export class filterEditComponent implements OnInit {
-	oldItem: FilterModel = new FilterModel();
+export class filterEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: FilterModel = new FilterModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -53,11 +54,11 @@ export class filterEditComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -82,14 +83,14 @@ export class filterEditComponent implements OnInit {
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
 
-		this.apiService.GetListKey().subscribe(res => {
+		this.apiService.GetListKey().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.list_filter_key_goc = res.data;
 				this.list_filter_key = this.list_filter_key_goc.filter(x => x.table_name == this.item.bang);
 				this.changeDetectorRefs.detectChanges();
 			};
 		});
-		this.danhMucChungService.liteFilterOperator().subscribe(res => {
+		this.danhMucChungService.liteFilterOperator().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.list_pheptoan_goc = res.data;
 				this.list_pheptoan = this.list_pheptoan_goc.filter(x => x.data.table_name == this.item.bang);
@@ -97,7 +98,7 @@ export class filterEditComponent implements OnInit {
 			};
 		});
 		if (this.item.id_row > 0) {
-			this.apiService.Detail(this.item.id_row).subscribe(res => {
+			this.apiService.Detail(this.item.id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.item = res.data;
 					this.createForm();
@@ -142,6 +143,11 @@ export class filterEditComponent implements OnInit {
 		}
 		this.createForm();
 	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 	
 	createForm() {
 		this.itemForm = this.fb.group({
@@ -174,7 +180,6 @@ export class filterEditComponent implements OnInit {
 	}
 
 	prepare(): FilterModel {
-		if (!this.itemForm) return new FilterModel();
 		const controls = this.itemForm.controls;
 		const item = new FilterModel();
 		item.id_row = this.data._item.id_row;
@@ -251,9 +256,7 @@ export class filterEditComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		this.itemForm.controls['loai'].setValue(' ');
 		this.itemForm.controls['operators'].setValue(' ');
@@ -264,7 +267,6 @@ export class filterEditComponent implements OnInit {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const update = this.prepare();
@@ -279,7 +281,7 @@ export class filterEditComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -302,7 +304,7 @@ export class filterEditComponent implements OnInit {
 	Create(item: FilterModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.apiService.Insert(item).subscribe(res => {
+		this.apiService.Insert(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -322,10 +324,6 @@ export class filterEditComponent implements OnInit {
 		});
 	}
 
-	onAlertClose() {
-		this.hasFormErrors = false;
-	}
-
 	close() {
 		this.dialogRef.close();
 	}
@@ -333,8 +331,6 @@ export class filterEditComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -362,7 +358,6 @@ export class filterEditComponent implements OnInit {
 	}
 
 	addcot() {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let key = this.list_filter_key.find(x => x.id_row == this.filter_key);
 		if (!key) return;
@@ -376,7 +371,6 @@ export class filterEditComponent implements OnInit {
 		}
 		if (key.loai == 1) {
 			if (!this.filter_options) {
-				this.hasFormErrors = true;
 				this.layoutUtilsService.showError("Vui lòng chọn giá trị");
 				return;
 			}
@@ -389,14 +383,12 @@ export class filterEditComponent implements OnInit {
 			if (key.loai == 2) {
 				_filter.value = controls['title_input'].value;
 				if (!_filter.value) {
-					this.hasFormErrors = true;
 					this.layoutUtilsService.showError("Vui lòng nhập giá trị");
 					return;
 				}
 			}
 			else {
 				if (controls['time'].value == null) {
-					this.hasFormErrors = true;
 					this.layoutUtilsService.showError("Vui lòng chọn thời gian");
 					return;
 				}
@@ -450,7 +442,7 @@ export class filterEditComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Delete(this.item.id_row).subscribe(res => {
+			this.apiService.Delete(this.item.id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 					let _backUrl = `tasks`;

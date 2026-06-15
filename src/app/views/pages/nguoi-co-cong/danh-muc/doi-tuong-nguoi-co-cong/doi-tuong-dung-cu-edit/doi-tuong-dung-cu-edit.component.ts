@@ -1,22 +1,24 @@
-import { DoiTuongNguoiCoCongService } from '../Services/doi-tuong-nguoi-co-cong.service';
-import { DoiTuongDCCHModel } from '../Model/doi-tuong-nguoi-co-cong.model';
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { DoiTuongNguoiCoCongService } from '../Services/doi-tuong-nguoi-co-cong.service';
+import { DoiTuongDCCHModel } from '../Model/doi-tuong-nguoi-co-cong.model';
 import { ChonNhieuDungCuListComponent } from '../../../components';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'kt-doi-tuong-dung-cu-edit',
   templateUrl: './doi-tuong-dung-cu-edit.component.html',
 })
 
-export class DoiTuongDungCuEditComponent implements OnInit {
+export class DoiTuongDungCuEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
   	item: DoiTuongDCCHModel = new DoiTuongDCCHModel();
 	oldItem: DoiTuongDCCHModel = new DoiTuongDCCHModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -32,11 +34,11 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -59,7 +61,7 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItemDCCH(this.item.Id).subscribe(res => {
+			this.apiService.getItemDCCH(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -71,6 +73,11 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -111,7 +118,6 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 	}
 
 	prepare(): DoiTuongDCCHModel {
-		if (!this.itemForm) return new DoiTuongDCCHModel();
 		const controls = this.itemForm.controls;
 		const _item = new DoiTuongDCCHModel();
 		_item.Id = this.item.Id;
@@ -124,19 +130,15 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		if (controls.Priority.value < 0 || controls.Priority.value === '') {
-			this.hasFormErrors = true;
 			return;
 		}
 		const Edit = this.prepare();
@@ -151,7 +153,7 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateDoiTuongDCCH(item).subscribe(res => {
+		this.apiService.UpdateDoiTuongDCCH(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -174,7 +176,7 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.CreateDoiTuongDCCH(item).subscribe(res => {
+		this.apiService.CreateDoiTuongDCCH(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -197,8 +199,6 @@ export class DoiTuongDungCuEditComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -22,18 +22,14 @@ import { CookieService } from 'ngx-cookie-service';
   templateUrl: './doi-tuong-dung-cu-list.component.html',
 })
 
-export class DoiTuongDungCuListComponent implements OnInit {
+export class DoiTuongDungCuListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
     // Table fields
 	dataSource: DoiTuongDungCuChinhHinhDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
-	filterStatus = '';
-	filterType = '';
 	listLoai: any[] = [];
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 
 	_name = '';
 	_STT = '';
@@ -151,14 +147,14 @@ export class DoiTuongDungCuListComponent implements OnInit {
 				alwaysChecked: false,
 				isShow: true,
 			},
-
 			{
 				stt: 8,
 				name: 'MoTa',
 				displayName: this._MOTA,
 				alwaysChecked: false,
 				isShow: false,
-			}, {
+			}, 
+			{
 				stt: 9,
 				name: 'CreatedBy',
 				displayName: this._CREATEDBY,
@@ -230,14 +226,11 @@ export class DoiTuongDungCuListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -291,7 +284,7 @@ export class DoiTuongDungCuListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.DeleteDCCH(item.Id).subscribe(res => {
+			this.apiService.DeleteDCCH(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -341,7 +334,7 @@ export class DoiTuongDungCuListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.LockDCCH(item.Id, value).subscribe(res => {
+			this.apiService.LockDCCH(item.Id, value).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_message);
 				} else {

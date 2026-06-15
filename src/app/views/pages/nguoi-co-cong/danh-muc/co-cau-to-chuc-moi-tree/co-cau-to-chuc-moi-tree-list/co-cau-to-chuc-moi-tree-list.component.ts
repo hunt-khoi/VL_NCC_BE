@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { ArrayDataSource } from '@angular/cdk/collections';
-import { Observable, BehaviorSubject, of } from 'rxjs';
+import { Observable, BehaviorSubject, of, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { cocautochucMoiTreeService } from '../Services/co-cau-to-chuc-moi-tree.service';
 import { OrgStructureModel } from '../Model/CoCauToChuc.model';
 import { CoCauToChucEditComponent } from '../co-cau-to-chuc-moi-tree-edit/co-cau-to-chuc-moi-tree-edit.component';
@@ -27,8 +28,9 @@ interface TreeNode {
 	encapsulation: ViewEncapsulation.None
 })
 
-export class cocautochucmoitreeComponent implements OnInit {
+export class cocautochucmoitreeComponent implements OnInit, OnDestroy {
 
+	private destroy$ = new Subject<void>();
 	treeControl = new NestedTreeControl<TreeNode>(node => node.Children);
 	dataSource: any;
 	Title: string = "";
@@ -68,6 +70,11 @@ export class cocautochucmoitreeComponent implements OnInit {
 		await this.getTreeValue();
 	};
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	hasChild = (_: number, node: TreeNode) => !!node.Children && node.Children.length > 0;
 
 	getParent(data: TreeNode[] = [], node: TreeNode): any {
@@ -86,7 +93,7 @@ export class cocautochucmoitreeComponent implements OnInit {
 	//DEMO Treeview
 	async getTreeValue() {
 		this.loadingSubject.next(true);
-		this.apiService.Get_CoCauToChuc().subscribe(res => {
+		this.apiService.Get_CoCauToChuc().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			if (res.Visible != undefined)
 				this.Visible = res.Visible;
@@ -163,7 +170,7 @@ export class cocautochucmoitreeComponent implements OnInit {
 	handleDrop(event: any, node: any) {
 		event.preventDefault();
 		this._itemchart = new OrgStructureModel();
-		this.apiService.Get_CoCauToChuc().subscribe(res => {
+		this.apiService.Get_CoCauToChuc().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.dataSource.data = res.data;
 			if (!res.data.Visible) {
 				this.layoutUtilsService.showError('Bạn không có quyền thao tác');
@@ -181,14 +188,14 @@ export class cocautochucmoitreeComponent implements OnInit {
 
 		if (this.dragNodeExpandOverArea === 'above') { // update vị trí phía trên item chọn
 			this._itemchart.IsAbove = true;
-			this.apiService.handleDropLevel(this._itemchart).subscribe(_ => {
+			this.apiService.handleDropLevel(this._itemchart).pipe(takeUntil(this.destroy$)).subscribe(_ => {
 				this.treeControl.expandAll();
 			});
 		} 
 		else
 			if (this.dragNodeExpandOverArea === 'below') { // Update vị trí phía dưới item chọn
 				this._itemchart.IsAbove = false;
-				this.apiService.handleDropLevel(this._itemchart).subscribe(_ => {
+				this.apiService.handleDropLevel(this._itemchart).pipe(takeUntil(this.destroy$)).subscribe(_ => {
 					this.treeControl.expandAll();
 				});
 			}
@@ -199,7 +206,7 @@ export class cocautochucmoitreeComponent implements OnInit {
 				else
 					vitritieptheo = 1;
 				this._itemchart.level = '' + vitritieptheo;
-				this.apiService.handleDropParent(this._itemchart).subscribe(_ => {
+				this.apiService.handleDropParent(this._itemchart).pipe(takeUntil(this.destroy$)).subscribe(_ => {
 					this.treeControl.expandAll();
 				});
 				// newItem = this.database.copyPasteItem(this.flatNodeMap.get(this.dragNode), this.flatNodeMap.get(node));
@@ -263,7 +270,7 @@ export class cocautochucmoitreeComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Deleteorgstructure(item.RowID).subscribe(res => {
+			this.apiService.Deleteorgstructure(item.RowID).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}

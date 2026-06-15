@@ -5,8 +5,5 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 	templateUrl: './donvihanhchinh.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class donvihanhchinhComponent implements OnInit {
-	constructor() {}
 
-	ngOnInit() {}
-}
+export class donvihanhchinhComponent { }

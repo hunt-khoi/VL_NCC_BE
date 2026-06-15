@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Inject, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from 'app/core/_base/crud';
 import { DM_DonViService } from '../Services/dm-don-vi.service';
 import { DM_DonViModel, ListImageModel } from '../Model/dm-don-vi.model';
@@ -13,24 +14,23 @@ import { environment } from 'environments/environment';
 	templateUrl: './dm-don-vi-edit.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	// Public properties
 	DM_DonVi: DM_DonViModel = new DM_DonViModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	disabledBtn: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
 	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	isChange: boolean = false;
-	fixedPoint = 0;
 	isZoomSize: boolean = false;
 	lst_DanhMucDV: any;
 	parentDV: number = 0;
 	parentName: string = "";
 	isShowImage: boolean = false;
 	private componentSubscriptions: Subscription | undefined;
+	private destroy$ = new Subject<void>();
 	picLogo: ListImageModel[] = [];
 	imgvlLogo: any;
 
@@ -38,11 +38,11 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -69,7 +69,7 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 		this.DM_DonVi.clear();
 		this.createForm();
 		if (this.data.DM_DonVi && this.data.DM_DonVi.Id > 0) {
-			this.apiService.getById(this.data.DM_DonVi.Id).subscribe(res => {
+			this.apiService.getById(this.data.DM_DonVi.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.DM_DonVi = res.data;
@@ -99,6 +99,8 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 		if (this.componentSubscriptions) {
 			this.componentSubscriptions.unsubscribe();
 		}
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -109,7 +111,8 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 			parentName: [this.DM_DonVi.ParentName == null ? '' : this.DM_DonVi.ParentName],
 			loaiDonVi: [this.DM_DonVi.LoaiDonVi == 0 ? '' : this.DM_DonVi.LoaiDonVi, Validators.required],
 			sDT: [this.DM_DonVi.SDT, [Validators.pattern(/^([0-9|,]*)$/), Validators.minLength(9), Validators.maxLength(12)]],
-			email: [this.DM_DonVi.Email == null ? '' : this.DM_DonVi.Email, [Validators.pattern(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)]],
+			email: [this.DM_DonVi.Email == null ? '' : this.DM_DonVi.Email, 
+				[Validators.pattern(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)]],
 			diaChi: [this.DM_DonVi.DiaChi == null ? '' : this.DM_DonVi.DiaChi],
 			logo: [this.DM_DonVi.Logo == null ? '' : this.DM_DonVi.Logo],
 			priority: [this.DM_DonVi.Priority ? this.DM_DonVi.Priority : 1, [Validators.required, Validators.min(1)]],
@@ -130,7 +133,6 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 
 	onSubmit(type: boolean) {
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -152,7 +154,6 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	}
 
 	prepare(): DM_DonViModel {
-		if (!this.itemForm) return new DM_DonViModel();
 		const controls = this.itemForm.controls;
 		const _item = new DM_DonViModel();
 		_item.clear();
@@ -191,7 +192,7 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	}
 
 	add(item: DM_DonViModel, withBack: boolean = false) {
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = "Thêm thành công";
@@ -210,7 +211,7 @@ export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	}
 
 	update(item: DM_DonViModel) {
-		this.apiService.update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = "Cập nhật thành công";

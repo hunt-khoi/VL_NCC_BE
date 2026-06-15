@@ -1,8 +1,10 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { capquanlyModel } from '../../capquanly/Model/capquanly.model';
 import { TranslateService } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil, filter } from 'rxjs/operators';
+import { capquanlyModel } from '../../capquanly/Model/capquanly.model';
 import { capquanlyService } from '../Services/capquanly.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
@@ -10,11 +12,11 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 	selector: 'm-capquanly-edit-dialog',
 	templateUrl: './capquanly-edit.dialog.component.html',
 })
-export class capquanlyEditDialogComponent implements OnInit {
+export class capquanlyEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: capquanlyModel = new capquanlyModel();
 	oldItem: capquanlyModel = new capquanlyModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -28,11 +30,11 @@ export class capquanlyEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -55,10 +57,10 @@ export class capquanlyEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.RowID > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.RowID).subscribe(res => {
+			this.apiService.getItem(this.item.RowID).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
-				if (res && res.status == 1) {
+				if (res?.status == 1) {
 					this.item = res.data;
 					this.createForm();
 				}
@@ -67,6 +69,12 @@ export class capquanlyEditDialogComponent implements OnInit {
 			})
 		}
 	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 
 	createForm() {
 		this.itemForm = this.fb.group({
@@ -91,7 +99,6 @@ export class capquanlyEditDialogComponent implements OnInit {
 	}
 
 	prepare(): capquanlyModel {
-		if (!this.itemForm) return new capquanlyModel();
 		const controls = this.itemForm.controls;
 		const _item = new capquanlyModel();
 		_item.RowID = this.item.RowID;
@@ -102,15 +109,12 @@ export class capquanlyEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const Edit = this.prepare();
@@ -125,7 +129,7 @@ export class capquanlyEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.Update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -149,7 +153,7 @@ export class capquanlyEditDialogComponent implements OnInit {
 	Create(item: capquanlyModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.Create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -174,8 +178,6 @@ export class capquanlyEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

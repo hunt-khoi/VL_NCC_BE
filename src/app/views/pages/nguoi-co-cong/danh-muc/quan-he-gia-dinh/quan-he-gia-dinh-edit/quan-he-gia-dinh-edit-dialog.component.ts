@@ -1,6 +1,8 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { QuanHeGiaDinhService } from './../Services/quan-he-gia-dinh.service';
@@ -12,10 +14,11 @@ import { QuanHeGiaDinhModel } from './../Model/quan-he-gia-dinh.model';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class QuanHeGiaDinhEditDialogComponent implements OnInit {
+export class QuanHeGiaDinhEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: QuanHeGiaDinhModel = new QuanHeGiaDinhModel();
 	oldItem: QuanHeGiaDinhModel = new QuanHeGiaDinhModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -29,11 +32,11 @@ export class QuanHeGiaDinhEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -55,7 +58,7 @@ export class QuanHeGiaDinhEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.objectService.getItem(this.item.Id).subscribe(res => {
+			this.objectService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -66,6 +69,11 @@ export class QuanHeGiaDinhEditDialogComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -94,7 +102,6 @@ export class QuanHeGiaDinhEditDialogComponent implements OnInit {
 	}
 
 	prepare(): QuanHeGiaDinhModel {
-		if (!this.itemForm) return new QuanHeGiaDinhModel();
 		const controls = this.itemForm.controls;
 		const _item = new QuanHeGiaDinhModel();
 		_item.Id = this.item.Id;
@@ -109,7 +116,6 @@ export class QuanHeGiaDinhEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -134,7 +140,7 @@ export class QuanHeGiaDinhEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.update(item).subscribe(res => {
+		this.objectService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -157,7 +163,7 @@ export class QuanHeGiaDinhEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.create(item).subscribe(res => {
+		this.objectService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -181,7 +187,6 @@ export class QuanHeGiaDinhEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

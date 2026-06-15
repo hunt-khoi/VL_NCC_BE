@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -20,7 +19,8 @@ import { ChucDanhEditDialogComponent } from '../chucdanh-edit/chucdanh-edit.dial
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ChucDanhListComponent implements OnInit {
+export class ChucDanhListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: ChucDanhDataSource | undefined;
 	displayedColumns = ['STT', 'Id_CV', 'MaCV', 'TenCV', 'Cap'/*, 'IsManager'*/, 'NguoiCapNhat', 'NgayCapNhat', 'actions'];
@@ -68,6 +68,11 @@ export class ChucDanhListComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource) return;
 		const queryParams = new QueryParamsModel({},
@@ -88,7 +93,7 @@ export class ChucDanhListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Delete(item.Id_CV).subscribe(res => {
+			this.apiService.Delete(item.Id_CV).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 					this.loadDataList();
