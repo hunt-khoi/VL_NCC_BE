@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-import { DeXuatDuyetRefModule } from './de-xuat-duyet-ref.module';
+import { DeXuatRefModule } from '../de-xuat/de-xuat-ref.module';
 import { DeXuatDuyetService } from './Services/de-xuat-duyet.service';
 import { DeXuatDuyetComponent } from './de-xuat-duyet.component';
 import { DeXuatDuyetListComponent } from './de-xuat-duyet-list/de-xuat-duyet-list.component';
 import { DuyetDeXuatPageComponent } from './duyet-de-xuat-page/duyet-de-xuat-page.component';
 import { DeXuatTongHopDialogComponent } from './de-xuat-tong-hop/de-xuat-tong-hop.dialog.component';
+import { DeXuatDuyetDialogComponent } from './de-xuat-duyet/de-xuat-duyet.dialog.component';
 
 const routes: Routes = [
 	{
@@ -29,7 +30,7 @@ const routes: Routes = [
     imports: [
         RouterModule.forChild(routes),
         DPSCommonModule,
-        DeXuatDuyetRefModule,
+        DeXuatRefModule,
     ],
     providers: [
         DeXuatDuyetService
@@ -37,7 +38,9 @@ const routes: Routes = [
     declarations: [
         DeXuatDuyetComponent,
         DuyetDeXuatPageComponent,
-        DeXuatTongHopDialogComponent
+        DeXuatTongHopDialogComponent,
+        DeXuatDuyetListComponent,
+        DeXuatDuyetDialogComponent
     ]
 })
 

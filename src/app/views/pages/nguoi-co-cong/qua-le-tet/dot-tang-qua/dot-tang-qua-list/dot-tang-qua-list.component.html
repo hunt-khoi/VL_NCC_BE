@@ -8,7 +8,8 @@
 			</div>
 		</ng-container>
 		<ng-container ktPortletTools>
-			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" *ngIf="apiService.ReadOnlyControl" color="accent" type="button">
+			<button (click)="Add()" mat-raised-button matTooltip="{{ 'COMMON.CREATE' | translate }}" 
+				*ngIf="apiService.ReadOnlyControl" color="accent" type="button">
 				<span translate="COMMON.CREATE"></span>
 			</button>
 
@@ -43,7 +44,9 @@
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Locked" column_title="Tình trạng"></kt-column-filter>
 					</th>
 					<td mat-cell *matCellDef="let dottang" style="white-space: nowrap;">
-						<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide {{covertLockToColor(dottang.Locked)}}">{{covertLockToString(dottang.Locked)}}</span>
+						<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide {{covertLockToColor(dottang.Locked)}}">
+							{{covertLockToString(dottang.Locked)}}
+						</span>
 						<button (click)="Block(dottang)" mat-icon-button *ngIf="apiService.ReadOnlyControl" 
 							matTooltip="{{ covertToolTip(dottang.Locked) | translate }}" color="warn" type="button">
 							<mat-icon>{{covertLockButton(dottang.Locked)}}</mat-icon>

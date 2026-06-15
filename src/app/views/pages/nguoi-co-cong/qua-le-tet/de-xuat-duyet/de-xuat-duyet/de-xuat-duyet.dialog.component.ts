@@ -1,21 +1,22 @@
-import { Router } from '@angular/router';
-import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
 import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'm-de-xuat-duyet-dialog',
 	templateUrl: './de-xuat-duyet.dialog.component.html',
 })
 
-export class DeXuatDuyetDialogComponent implements OnInit {
+export class DeXuatDuyetDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	isDuyet: boolean = true;
 	isReturn: boolean = false;
@@ -25,18 +26,17 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 	allowDetail: boolean = false;
 	isZoomSize: boolean = false;
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
-	_name = "";
-	isShowNhacnho = false;
+	_name: string = "";
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		// duyệt
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		// lưu đóng
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
-		// ko duyệt
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		//lưu tiếp tục
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -44,14 +44,12 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 	constructor(public dialogRef: MatDialogRef<DeXuatDuyetDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
-		private router: Router,
 		private CommonService: CommonService,
 		public apiService: DeXuatDuyetService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 		this._name = this.translate.instant("DE_XUAT.NAME");
-		this.isShowNhacnho = this.CommonService.IsShowNhacnhoduyet(this.router.url);
 	}
 
 	ngOnInit() {
@@ -63,7 +61,7 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 		this.createForm();
 		if (!this.isReturn && this.item.Id > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -74,6 +72,11 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -101,7 +104,6 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 	}
 
 	prepareCustomer(): any {
-		if (!this.itemForm)	return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		_item.Id = this.item.Id;
@@ -117,32 +119,25 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 		var dataNoty: any = {};
 		dataNoty.To = this.item.NguoiDuyetDon;
 		dataNoty.url = 'duyet-ho-so/ho-so/' + this.item.Id;
-		this.CommonService.DeXuatDuyet(dataNoty).subscribe(res => {
-		});
+		this.CommonService.DeXuatDuyet(dataNoty).pipe(takeUntil(this.destroy$)).subscribe(res => { });
 	}
 
 	onSubmit(duyet: boolean) {
-		this.hasFormErrors = false;
-		this.loadingAfterSubmit = false;
 		const DuyetDot = this.prepareCustomer();
 		this.DuyetDotTangQua(DuyetDot, duyet)
 	}
 
 	traLai() {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm)	return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
-
 		const _item = this.prepareCustomer();
-		this.apiService.traLai(_item.Id, _item.note).subscribe(res => {
+		this.apiService.traLai(_item.Id, _item.note).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -162,7 +157,7 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 		item.value = value;
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
-		this.apiService.duyetDotTangQua(item).subscribe(res => {
+		this.apiService.duyetDotTangQua(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

@@ -1,6 +1,6 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { Injectable } from '@angular/core';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { DeXuatModel } from '../Model/de-xuat.model';
 import { environment } from '../../../../../../../environments/environment';
@@ -57,7 +57,7 @@ export class DeXuatService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL + "/clone", item, { headers: httpHeaders });
 	}
-
+	
 	BaoGiam(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL + "/bao-giam", item, { headers: httpHeaders });

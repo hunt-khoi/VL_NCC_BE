@@ -1,12 +1,12 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
@@ -27,13 +27,12 @@ import moment from 'moment';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DoiTuongNhanQuaListComponent implements OnInit {
+export class DoiTuongNhanQuaListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: DoiTuongNhanQuaDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterType = '';
 
 	// Selection
 	selection = new SelectionModel<any>(true, []);
@@ -81,11 +80,11 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
 		this.selection = new SelectionModel<any>(true, []);
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 			this.Capcocau = res.Capcocau;
 			if (res.Capcocau == 2) {
-				this.commonService.GetListWardByProvince(this.filterprovinces).subscribe(res => {
+				this.commonService.GetListWardByProvince(this.filterprovinces).pipe(takeUntil(this.destroy$)).subscribe(res => {
 					if (res && res.status == 1) {
 						this.listward = res.data;
 					}
@@ -93,7 +92,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 			}
 		})
 
-		this.commonService.GetAllProvinces().subscribe(res => {
+		this.commonService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listprovinces = res.data;
 		});
 
@@ -108,7 +107,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		this.gridModel.filterText.DoiTuong = '';
 
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
-		this.commonService.getStatusNCC().subscribe(res => {
+		this.commonService.getStatusNCC().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.lstStatus = res.data;
@@ -276,7 +275,6 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		// Init DataSource
 		this.dataSource = new DoiTuongNhanQuaDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
 		// Read from URL itemId, for restore previous state
 		this.route.queryParams.subscribe(_ => {
 			if (this.dataSource) {
@@ -294,6 +292,11 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 				}
 			}
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -345,7 +348,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.objectService.delete(item.Id).subscribe(res => {
+			this.objectService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -404,19 +407,18 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 	Import() {
 		const dialogRef = this.dialog.open(DoiTuongNhanQuaImportComponent, { width: '80%' });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.loadDataList();
+			if (res) 
+				this.loadDataList();
 		});
 	}
 
 	Export() {
 		if (!this.paginator || !this.sort || !this.gridService) return;
-		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
+		let gridService = this.gridService;
+		var cols = gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
-			var f = this.gridService.model.availableColumns.find(x => x.name == col);
+			var f = gridService.model.availableColumns.find(x => x.name == col);
 			headers.push(f.displayName);
 		});
 		const queryParams = new QueryParamsModel(
@@ -431,7 +433,7 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 			},
 			true
 		);
-		this.objectService.exportList(queryParams).subscribe(response => {
+		this.objectService.exportList(queryParams).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');
@@ -449,39 +451,39 @@ export class DoiTuongNhanQuaListComponent implements OnInit {
 	print: boolean = false;
 	printTicket(print_template: any) {
 		this.print = true;
-		this.changeDetectorRefs.detectChanges();
 		let documentPrint = document.getElementById(print_template);
 		if (!documentPrint) return;
 		let innerContents = documentPrint.innerHTML;
 		const popupWinindow = window.open();
 		if (!popupWinindow) return;
 		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+this._name+'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
-			@media print {
-				th:last-child,
-				td:last-child,
-				.hiden-print {
-					display: none !important;
-				}
-				td {
-					border-bottom: 1px solid #dee2e6;
-					padding: 10px;
-					font-size: 10pt;
-					text-align: left;
-				}
-				th {
-					padding: 10px;
-					font-size: 12pt;
-				}
-				table {
-					width: 100%;
-				}
+		// Gắn tiêu đề và nội dung HTML vào body
+		popupWinindow.document.title = this._name;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
+		@media print {
+			th:last-child,
+			td:last-child,
+			.hiden-print {
+				display: none !important;
 			}
-		</style>
-	  	`);
-	  	popupWinindow.document.close();
-		popupWinindow.onafterprint = window.close;
+			td {
+				border-bottom: 1px solid #dee2e6;
+				padding: 10px;
+				font-size: 10pt;
+			}
+			th {
+				padding: 10px;
+				font-size: 12pt;
+			}
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
 		this.print = false;
+		this.changeDetectorRefs.detectChanges();
 	}
 }

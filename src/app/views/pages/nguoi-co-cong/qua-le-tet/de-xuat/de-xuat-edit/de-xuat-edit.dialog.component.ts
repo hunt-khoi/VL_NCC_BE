@@ -21,8 +21,7 @@ import { DoiTuongNhanQuaEditDialogComponent } from '../../doi-tuong-nhan-qua/doi
 export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 
 	item: DeXuatModel = new DeXuatModel();
-	oldItem: DeXuatModel = new DeXuatModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	filterDonVi: string = '';
@@ -36,7 +35,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	treeNguoiNhan_Goc: any[] = [];
 	treeNguoiNhan: any[] = [];
 	treeNguoiNhanView: any[] = [];
-	_name = "";
+	_name: string = "";
 	showImport: boolean = false;
 	TongSo: number = 0;
 	TongTien: number = 0;
@@ -44,7 +43,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	tongSL: any[] = [];
 	tongSLNguon: number[] = [];
 	tongTienNguon: number[] = [];
-	addDeXuat = false;
+	addDeXuat: boolean = false;
 
 	lydos: any[] = []
 	Filter: string = "";
@@ -60,7 +59,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit();
 		}
 	}
@@ -106,7 +105,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	getDetail() {
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.getItem(this.item.Id, true).subscribe(res => {
+		this.apiService.getItem(this.item.Id, true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
@@ -223,11 +222,11 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	}
 
 	loadNhom() {
-		this.danhMucService.liteLyDoGiam().subscribe(res => {
+		this.danhMucService.liteLyDoGiam().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.lydos = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-		this.danhMucService.liteDotQua(true).subscribe(res => {
+		this.danhMucService.liteDotQua(true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listDotTangQua = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
@@ -236,7 +235,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	getNguoiNhan(id: number) { //id: Id đợt tặng quà
 		this.viewLoading = true;
 		this.tongMuc = [];
-		this.apiService.getNguoiNhanByDot(id).subscribe(res => {
+		this.apiService.getNguoiNhanByDot(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.treeNguoiNhan_Goc = res.data;
@@ -253,7 +252,6 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	}
 
 	loadImport() {
-		if (!this.itemForm) return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -262,7 +260,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 		this.viewLoading = true;
 		var data: any = files[0];
 		data.Id_DotTangQua = this.itemForm.controls["DotTangQua"].value;
-		this.apiService.import(data).subscribe(res => {
+		this.apiService.import(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.treeNguoiNhan_Goc = res.data;
@@ -301,9 +299,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 		return result;
 	}
 
-	prepareDeXuat(): DeXuatModel | null {
-		if (!this.itemForm) return null;
-
+	prepareDeXuat(): DeXuatModel {
 		const controls = this.itemForm.controls;
 		const _item = new DeXuatModel();
 		_item.Id = this.item.Id;
@@ -342,7 +338,6 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	onSubmit() {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -374,7 +369,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Clone(_item).subscribe(res => {
+		this.apiService.Clone(_item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -390,7 +385,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.update(_item).subscribe(res => {
+		this.apiService.update(_item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -406,7 +401,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.create(_item).subscribe(res => {
+		this.apiService.create(_item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -435,7 +430,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 		let temp = { Id: this.item.Id, IdGiam: item.Id, LyDo: item.LyDo, GhiChuGiam: item.GhiChuGiam }
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.UpdateGiam(temp).subscribe(res => {
+		this.apiService.UpdateGiam(temp).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
@@ -468,7 +463,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 			let temp = { Id: this.item.Id, DoiTuongGiam: [item] }
 			this.viewLoading = true;
 			this.disabledBtn = true;
-			this.apiService.BaoGiam(temp).subscribe(res => {
+			this.apiService.BaoGiam(temp).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.disabledBtn = false;
 				this.changeDetectorRefs.detectChanges();
@@ -482,7 +477,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 		} else {//hủy báo giảm
 			this.viewLoading = true;
 			this.disabledBtn = true;
-			this.apiService.HuyBaoGiam(item.Id).subscribe(res => {
+			this.apiService.HuyBaoGiam(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.disabledBtn = false;
 				this.changeDetectorRefs.detectChanges();
@@ -560,7 +555,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 		this.disabledBtn = true;
 		if ($event.checked) { //báo tăng
 			// let _item = { Id_NCC: item.Id_NCC, Id: this.item.Id, Id_NguonKinhPhi: item.Id_NguonKinhPhi }
-			this.apiService.BaoTang(this.item.Id, this.lstDTTang).subscribe(res => {
+			this.apiService.BaoTang(this.item.Id, this.lstDTTang).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.disabledBtn = false;
 				this.changeDetectorRefs.detectChanges();
@@ -585,7 +580,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 			var lst = this.findncc(item.Id_DoiTuongNCC, item.Id_NCC);
 			var ids: any[] = [];
 			lst.forEach(x => ids.push(x.Id));
-			this.apiService.HuyBaoTang(ids).subscribe(res => {
+			this.apiService.HuyBaoTang(ids).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.disabledBtn = false;
 				this.changeDetectorRefs.detectChanges();
@@ -644,7 +639,6 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 
 	//#region Import chi tiết đợt tặng quà
 	import() {
-		if (!this.itemForm) return;
 		let id = this.itemForm.controls["DotTangQua"].value;
 		if (!id) {
 			this.layoutUtilsService.showError("Vui lòng chọn đợt tặng quà");
@@ -662,13 +656,12 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	}
 
 	downFile() {
-		if (!this.itemForm) return;
 		let id = this.itemForm.controls["DotTangQua"].value;
 		if (!id) {
 			this.layoutUtilsService.showError("Vui lòng chọn đợt tặng quà");
 			return;
 		}
-		this.apiService.downloadTemplate(id).subscribe(res => {
+		this.apiService.downloadTemplate(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			var headers = res.headers;
 			let filename = headers.get('x-filename');
 			let type = headers.get('content-type')
@@ -860,7 +853,7 @@ export class DeXuatEditDialogComponent implements OnInit, OnDestroy {
 	}
 
 	export() {
-		this.apiService.exportExcelDeXuat(this.item.Id).subscribe(res => {
+		this.apiService.exportExcelDeXuat(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

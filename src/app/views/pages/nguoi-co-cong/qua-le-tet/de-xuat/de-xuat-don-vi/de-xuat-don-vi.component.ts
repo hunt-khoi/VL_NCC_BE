@@ -1,12 +1,12 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ReviewExportComponent } from '../../../components';
 import { CommonService } from '../../../services/common.service';
 import { DeXuatService } from '../Services/de-xuat.service';
-import moment from 'moment';
 
 @Component({
 	selector: 'kt-de-xuat-don-vi',
@@ -14,14 +14,15 @@ import moment from 'moment';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DeXuatDonViComponent implements OnInit {
+export class DeXuatDonViComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	donvi: any;
 	dataTreeDonVi: any[] = [];
 	lstDotTangQua: any[] = [];
 	CapCoCau: number = 0;
 	idParent: number = 0;
 	dot: number = 0;
-	nam: number;
+	nam: number = 0;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
@@ -34,7 +35,7 @@ export class DeXuatDonViComponent implements OnInit {
 		private layoutUtilsService: LayoutUtilsService) { }
 
 	ngOnInit() {
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.CapCoCau = res.Capcocau;
 			this.idParent = res.ID_Goc;
 			if (this.idParent == 0)
@@ -42,6 +43,11 @@ export class DeXuatDonViComponent implements OnInit {
 		})
 		this.GetTreeDonVi();
 		this.changeNam();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	changeNam() {
@@ -55,7 +61,7 @@ export class DeXuatDonViComponent implements OnInit {
 	GetTreeDonVi() {
 		this.loadingSubject.next(true);
 		this.dataTreeDonVi = [];
-		this.commonService.GetTreeDonViHC(0, this.idParent).subscribe(res => {
+		this.commonService.GetTreeDonViHC(0, this.idParent).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			let tree: any[] = [];
 			if (res.data) {
@@ -104,12 +110,11 @@ export class DeXuatDonViComponent implements OnInit {
 	}
 
 	In(mau = 1) {
-		this.apiService.previewDeXuatDot(this.dot, this.donvi.ID_Goc, mau).subscribe(res => {
+		this.apiService.previewDeXuatDot(this.dot, this.donvi.ID_Goc, mau).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.status == 0) {
 				this.layoutUtilsService.showError(res.error.message);
 				return;
 			}
-
 			let dialogRef;
 			if (mau > 1)
 				dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data, width: '1000px' });
@@ -119,7 +124,7 @@ export class DeXuatDonViComponent implements OnInit {
 			dialogRef.afterClosed().subscribe(res => {
 				if (!res) return;
 
-				this.apiService.exportDeXuatDot(this.dot, this.donvi.ID_Goc, mau, mau > 1, res.loai).subscribe(response => {
+				this.apiService.exportDeXuatDot(this.dot, this.donvi.ID_Goc, mau, mau > 1, res.loai).pipe(takeUntil(this.destroy$)).subscribe(response => {
 					if (response && response.body) {
 						const headers = response.headers;
 						const filename = headers.get('x-filename');

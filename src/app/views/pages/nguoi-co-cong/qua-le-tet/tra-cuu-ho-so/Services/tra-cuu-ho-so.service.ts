@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { environment } from '../../../../../../../environments/environment';
 
@@ -76,6 +76,7 @@ export class tracuuHoSoService {
 			observe: 'response'
 		});
 	}
+	
 	exportTKDoiTuongNew(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders()
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);

@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -14,23 +15,36 @@ import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.se
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class thongKeTheoDoiTuongComponent implements OnInit {
-	_name = "";
-	itemForm: FormGroup | undefined;
+export class thongKeTheoDoiTuongComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
+	_name: string = "";
+	itemForm: FormGroup = new FormGroup({});
 
-	dataThongKe1: any[] = [];
-	listTinh: any[] = []
-	listHuyen: any[] = []
+	dataThongKe: any[] = [];
+	listTinh: any[] = [];
+	listHuyen: any[] = [];
 
 	thongKe: number = 0;
 	display: boolean = false;
 	filterprovinces: number = 0;
 	viewLoading: boolean = false;
 	queryParams: QueryParamsModel = new QueryParamsModel({});
-	allowExport1 = false;
+	allowExport = false;
 	Capcocau: number = 0;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
+
+	style_print: any = {
+		td: {
+			'border-right': '1px solid #dee2e6',
+			'border-bottom': '1px solid #dee2e6',
+		},
+		th: {
+			'border-right': '1px solid #dee2e6',
+			'border-bottom': '1px solid #dee2e6',
+		},
+		table: { 'border': '1px solid #dee2e6' }
+	};
 
 	constructor(public apiService: tracuuHoSoService,
 		private CommonService: CommonService,
@@ -44,7 +58,7 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.Capcocau = res.Capcocau;
 			this.filterprovinces = res.IdTinh;
 			this.createForm();
@@ -52,20 +66,25 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 				this.loadHuyen();
 			}
 		})
-		this.CommonService.GetAllProvinces().subscribe(res => {
+		this.CommonService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listTinh = res.data
 		})
 	}
 
-	loadData(loai: boolean = false) {
-		this.queryParams = this.prepareQuery(loai);
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
+	loadData() {
+		this.queryParams = this.prepareQuery();
 		this.viewLoading = true;
 		this.display = false;
 		this.tracuu();
 	}
 
 	loadHuyen() {
-		this.CommonService.GetListDistrictByProvinces(this.filterprovinces).subscribe(res => {
+		this.CommonService.GetListDistrictByProvinces(this.filterprovinces).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listHuyen = res.data;
 			this.changeDetectorRefs.detectChanges();
 		})
@@ -78,13 +97,13 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 
 	tracuu() {
 		this.loadingSubject.next(true);
-		this.apiService.thongKeTheoDoiTuong(this.queryParams).subscribe(res => {
+		this.apiService.thongKeTheoDoiTuong(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.viewLoading = false;
 			this.display = true;
 			if (res && res.status == 1) {
-				this.dataThongKe1 = res.data
-				this.allowExport1 = true;
+				this.dataThongKe = res.data
+				this.allowExport = true;
 			}
 			else
 				this.layoutUtilsService.showError(res.error.message);
@@ -92,9 +111,9 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 		})
 	}
 
-	xuatDanhSach() {
+	export() {
 		this.loadingSubject.next(true);
-		this.apiService.exportTKDoiTuong(this.queryParams).subscribe(res => {
+		this.apiService.exportTKDoiTuong(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
@@ -110,21 +129,15 @@ export class thongKeTheoDoiTuongComponent implements OnInit {
 		});
 	}
 
-	prepareQuery(loai: boolean): QueryParamsModel {
-		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(loai),
-			'', '', 0, 10,
-		);
+	prepareQuery(): QueryParamsModel {
+		const queryParams = new QueryParamsModel(this.filter(),'', '', 0, 10);
 		return queryParams;
 	}
 
-	filterConfiguration(loai: boolean): any {
-		if (!this.itemForm) return;
+	filter(): any {
 		const filter: any = {};
-		if (loai)
-			filter.Id_Tinh = this.itemForm.controls.Tinh.value;
-		else
-			filter.Id_Huyen = this.itemForm.controls.Huyen.value;
+		filter.Id_Tinh = this.itemForm.controls.Tinh.value;
+		filter.Id_Huyen = this.itemForm.controls.Huyen.value;
 		filter.Nam = this.itemForm.controls.Nam.value;
 		return filter;
 	}

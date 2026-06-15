@@ -1,12 +1,12 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { ReplaySubject } from 'rxjs';
 import { dottangquaService } from '../Services/dot-tang-qua.service';
 import { dottangquaModel, dottangqua_NCCModel } from '../../dot-tang-qua/Model/dot-tang-qua.model';
 import { SoToTrinhEditDialogComponent } from '../so-to-trinh-edit/so-to-trinh-edit.dialog.component';
@@ -16,10 +16,11 @@ import { SoToTrinhEditDialogComponent } from '../so-to-trinh-edit/so-to-trinh-ed
 	templateUrl: './dot-tang-qua-edit.dialog.component.html',
 })
 
-export class dottangquaEditDialogComponent implements OnInit {
+export class dottangquaEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: dottangquaModel = new dottangquaModel();
 	oldItem: dottangquaModel = new dottangquaModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	listNhomLeTet: any[] = [];
@@ -33,7 +34,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 	tempXoa: dottangqua_NCCModel[] = [];
 	tempThem: dottangqua_NCCModel[] = [];
 
-	datasource: MatTableDataSource<any> | undefined;
+	datasource: MatTableDataSource<any> = new MatTableDataSource<any>();
 	count: number = 0;
 	details: any[] = [];
 	displayedColumns = ['STT', 'DoiTuong'];
@@ -46,17 +47,17 @@ export class dottangquaEditDialogComponent implements OnInit {
 	allowImport: boolean = false;
 	@ViewChild("focusInput", { static: true }) focusInput: ElementRef | undefined;
 	@ViewChild('fileUpload', { static: true }) fileUpload: any;
-	_name = "";
+	_name: string = "";
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -80,7 +81,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -98,19 +99,22 @@ export class dottangquaEditDialogComponent implements OnInit {
 		this.loadNhom();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadNhom() {
-		this.danhMucService.liteNhomLeTet().subscribe(res => {
+		this.danhMucService.liteNhomLeTet().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listNhomLeTet = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-
-		this.danhMucService.liteDoiTuongNhanQua(false, true).subscribe(res => {
+		this.danhMucService.liteDoiTuongNhanQua(false, true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listNCC = res.data;
 			this.changeDetectorRefs.detectChanges();
 			this.filter();
 		})
-
-		this.danhMucService.liteNguonKinhPhi().subscribe(res => {
+		this.danhMucService.liteNguonKinhPhi().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listNguon = res.data;
 			this.listNguon.forEach(x => { this.displayedColumns.push('Nguon' + x.id); this.displayedColumns1.push('Nguon' + x.id) });
 			this.displayedColumns1.push('action');
@@ -154,7 +158,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 	updateDe(row: any) {
 		let item = Object.assign({}, row);
 		item.Id_DotTangQua = this.item.Id;
-		this.apiService.editDoiTuongs(item).subscribe(res => {
+		this.apiService.editDoiTuongs(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.layoutUtilsService.showInfo("Cập nhật mức quà thành công");
 			else
@@ -186,7 +190,6 @@ export class dottangquaEditDialogComponent implements OnInit {
 
 	//Hai hàm phục vụ hiển thị chưa lưu xuống DB
 	addIntoTable() {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const _item = new dottangqua_NCCModel();
 		_item.Id_DotTangQua = this.item.Id;
@@ -235,8 +238,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	prepare(): dottangquaModel | null {
-		if (!this.itemForm) return null;
+	prepare(): dottangquaModel {
 		const controls = this.itemForm.controls;
 		const _item = new dottangquaModel();
 		_item.Id = this.item.Id;
@@ -295,7 +297,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 
 	saveTable() {
 		if (this.NCC_MQs.length < this.count) { //đang xóa một số đối tượng
-			this.tempXoa.forEach(i => this.apiService.deleteDoiTuongs(i.Id).subscribe(res => {
+			this.tempXoa.forEach(i => this.apiService.deleteDoiTuongs(i.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1)
 					this.ngOnInit(); //khởi tạo lại dialog
 				else
@@ -308,7 +310,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 		}
 
 		if (this.NCC_MQs.length > this.count) { //đang thêm một số đối tượng
-			this.apiService.addDoiTuongs(this.tempThem).subscribe(res => {
+			this.apiService.addDoiTuongs(this.tempThem).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1)
 					this.ngOnInit(); //khởi tạo lại dialog
 				else
@@ -321,16 +323,15 @@ export class dottangquaEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.update(item).subscribe(res => {
-			/* Server loading imitation. Remove this on real code */
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack) {  //lưu và đóng, withBack = true
+				if (withBack) {  
 					this.dialogRef.close({ item });
 				}
-				else { //lưu và thêm mới, withBack = false
-					this.ngOnInit(); //khởi tạo lại dialog
+				else { 
+					this.ngOnInit(); 
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
 					if (this.focusInput)
@@ -349,7 +350,7 @@ export class dottangquaEditDialogComponent implements OnInit {
 		this.viewLoading = true;
 		this.disabledBtn = true;
 		item.DoiTuongs = this.NCC_MQs;
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

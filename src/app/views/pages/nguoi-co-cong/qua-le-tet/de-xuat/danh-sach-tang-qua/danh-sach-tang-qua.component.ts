@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Location } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
 import { PhatQuaService } from './../Services/phat-qua.service';
@@ -14,24 +15,25 @@ import { TangQuaDialogComponent } from './../tang-qua-dialog/tang-qua-dialog.com
 	templateUrl: './danh-sach-tang-qua.component.html'
 })
 
-export class DanhSachTangQuaComponent implements OnInit {
+export class DanhSachTangQuaComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 
-	@ViewChild('tableWrapper') tableWrapper: ElementRef;
-	@ViewChild('tableHead') tableHead: ElementRef;
+	@ViewChild('tableWrapper') tableWrapper: ElementRef | undefined;
+	@ViewChild('tableHead') tableHead: ElementRef | undefined;
 
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
-	disabledBtn = false;
-	allowEdit = false;
+	disabledBtn: boolean = false;
+	allowEdit: boolean = false;
 	treeNguoiNhan: any[] = [];
-	_name = "";
+	_name: string = "";
 	tongMuc: any[] = [];
 	tienDaPhat: any[] = [];
 	tongNguon: any[] = [];
 	tienDaPhatNguon: any[] = [];
-	ID_qua_tang = 0;
+	ID_qua_tang: number = 0;
 	DanhSach: any[] = [];
 	TongSo: number = 0;
 	TongTien: number = 0;
@@ -58,6 +60,11 @@ export class DanhSachTangQuaComponent implements OnInit {
 
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	Back() {
 		// window.history.back();
 		this.location.back();
@@ -66,7 +73,7 @@ export class DanhSachTangQuaComponent implements OnInit {
 	LoadData() {
 		this.loadingSubject.next(true);
 		const query = new QueryParamsModel(this.filter());
-		this.apiService.ListNhanQua(this.ID_qua_tang, query).subscribe(res => {
+		this.apiService.ListNhanQua(this.ID_qua_tang, query).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			if (res && res.status == 1) {
 				this.DanhSach = res.data;
@@ -88,7 +95,7 @@ export class DanhSachTangQuaComponent implements OnInit {
 		});
 	}
 
-	TongPhat = 0;
+	TongPhat: number = 0;
 	tinhTongMuc() {
 		this.tongMuc = [];
 		this.TongSo = 0;

@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { BaoCaoTinhHinhService } from './Services/bao-cao-tinh-hinh.service';
@@ -11,14 +12,12 @@ import { BaoCaoTinhHinhService } from './Services/bao-cao-tinh-hinh.service';
 	templateUrl: './bao-cao-tinh-hinh.component.html',
 	encapsulation: ViewEncapsulation.None,
 })
-export class BaoCaoTinhHinhComponent implements OnInit {
-
+export class BaoCaoTinhHinhComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-	viewLoading: boolean = false;
 	isZoomSize: boolean = false;
-	disabledBtn: boolean = false;
-	IdDotTangQua: number=0;
+	IdDotTangQua: number = 0;
 	lstDot: any[] = [];
 	strHtml: any;
 
@@ -35,10 +34,15 @@ export class BaoCaoTinhHinhComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.commonService.liteDotQua(true).subscribe(res => {
+		this.commonService.liteDotQua(true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.lstDot = res.data;
 		})
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	view() {
@@ -48,7 +52,7 @@ export class BaoCaoTinhHinhComponent implements OnInit {
 		}
 		this.strHtml = "";
 		this.loadingSubject.next(true);
-		this.service.getItem(this.IdDotTangQua).subscribe(res => {
+		this.service.getItem(this.IdDotTangQua).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			if (res && res.status == 1) {
 				this.strHtml = this.sanitized.bypassSecurityTrustHtml(res.data);
@@ -58,9 +62,9 @@ export class BaoCaoTinhHinhComponent implements OnInit {
 		})
 	}
 
-	in() {
+	export() {
 		this.loadingSubject.next(true);
-		this.service.export(this.IdDotTangQua).subscribe(response => {
+		this.service.export(this.IdDotTangQua).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			this.loadingSubject.next(false);
 			const headers = response.headers;
 			const filename = headers.get('x-filename');

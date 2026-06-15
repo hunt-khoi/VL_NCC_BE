@@ -1,5 +1,7 @@
-import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
@@ -11,17 +13,16 @@ import { DeXuatService } from '../Services/de-xuat.service';
 	templateUrl: './dot-tang-qua-duyet.dialog.component.html',
 })
 
-export class DeXuatDuyetDialogComponent implements OnInit {
+export class DeXuatDuyetDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: DeXuatModel = new DeXuatModel();
-	oldItem: DeXuatModel = new DeXuatModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
     disabledBtn: boolean = false;
 	allowEdit: boolean = true; //cho phép sửa
 	isZoomSize: boolean = false;
-	_name = "";
+	_name: string = "";
 	
 	constructor(public dialogRef: MatDialogRef<DeXuatDuyetDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
@@ -38,7 +39,7 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) { 
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -49,6 +50,11 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -66,7 +72,6 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 	}
 
 	prepareCustomer(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Id = this.item.Id;
@@ -75,8 +80,6 @@ export class DeXuatDuyetDialogComponent implements OnInit {
 	}
 
 	onSubmit(duyet: boolean) {
-		this.hasFormErrors = false;
-		this.loadingAfterSubmit = false;
 		const DuyetDot = this.prepareCustomer();
 		this.DuyetDotTangQua(DuyetDot, duyet)
 	}
@@ -103,7 +106,7 @@ export class DeXuatDuyetDialogComponent implements OnInit {
         dialogRef.afterClosed().subscribe(res => {
             if (!res) return;
             
-			this.apiService.duyet(item.Id, value, item.note).subscribe(res => {
+			this.apiService.duyet(item.Id, value, item.note).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });

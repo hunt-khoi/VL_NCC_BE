@@ -1,8 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from 'app/core/_base/crud';
 import { DoiTuongNhanQuaService } from '../Services/doi-tuong-nhan-qua.service';
 import { DoiTuongNhanQuaModel } from '../Model/doi-tuong-nhan-qua.model';
@@ -13,10 +14,11 @@ import { DoiTuongNhanQuaModel } from '../Model/doi-tuong-nhan-qua.model';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DoiTuongNhanQuaImportComponent implements OnInit {
+export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Public properties
 	DoiTuongNhanQua: DoiTuongNhanQuaModel = new DoiTuongNhanQuaModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 
 	loadingSubject = new BehaviorSubject<boolean>(true);
@@ -30,7 +32,8 @@ export class DoiTuongNhanQuaImportComponent implements OnInit {
 	_dataImport: any[] = [];
 	HTMLStr = '';
 	isReview = false;
-	displayedColumns: string[] = ['STT', 'SoHoSo', 'HoTen', 'NgaySinh', 'GioiTinh', 'DoiTuong', 'DiaChi', 'KhomAp', 'Title', 'NguoiThoCungLietSy', 'QuanHeVoiLietSy', 'actions'];
+	displayedColumns: string[] = ['STT', 'SoHoSo', 'HoTen', 'NgaySinh', 'GioiTinh', 'DoiTuong', 'DiaChi', 
+		'KhomAp', 'Title', 'NguoiThoCungLietSy', 'QuanHeVoiLietSy', 'actions'];
 	newTemplate: boolean = true;
 	isError: boolean = false;
 
@@ -45,6 +48,11 @@ export class DoiTuongNhanQuaImportComponent implements OnInit {
 	ngOnInit() {
 		this.viewLoading = false;
 		this.createForm();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	filter($event: any) {
@@ -82,7 +90,6 @@ export class DoiTuongNhanQuaImportComponent implements OnInit {
 		this.lstNCC = [];
 		this.lstNCCError = [];
 		this.isError = false;
-		if (!this.itemForm)	return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -92,7 +99,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit {
 		var data: any = files[0];
 		let mau = 1;
 		if (this.newTemplate) mau = 2;
-		this.DoiTuongNhanQuaService.importFile(data, mau).subscribe(res => {
+		this.DoiTuongNhanQuaService.importFile(data, mau).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.lstNCC = res.data;
@@ -106,7 +113,6 @@ export class DoiTuongNhanQuaImportComponent implements OnInit {
 	}
 
 	luuImport() {
-		if (!this.itemForm)	return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -117,7 +123,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit {
 		data.review = false;
 		let mau = 1;
 		if (this.newTemplate) mau = 2;
-		this.DoiTuongNhanQuaService.importFile(data, mau).subscribe(res => {
+		this.DoiTuongNhanQuaService.importFile(data, mau).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.dialogRef.close(true);
@@ -132,7 +138,7 @@ export class DoiTuongNhanQuaImportComponent implements OnInit {
 	DownloadFileMau() {
 		let mau = 1;
 		if (this.newTemplate) mau = 2;
-		this.DoiTuongNhanQuaService.downloadTemplate(mau).subscribe(response => {
+		this.DoiTuongNhanQuaService.downloadTemplate(mau).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

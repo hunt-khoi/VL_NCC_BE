@@ -1,6 +1,5 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -9,16 +8,18 @@ import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { dottangquaService } from '../Services/dot-tang-qua.service';
 import { dottangquaModel, dottangqua_NCCModel } from '../../dot-tang-qua/Model/dot-tang-qua.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'm-dot-tang-qua-new-edit-dialog',
 	templateUrl: './dot-tang-qua-new-edit.dialog.component.html',
 })
 
-export class dottangquannewEditDialogComponent implements OnInit {
+export class dottangquannewEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: dottangquaModel = new dottangquaModel();
-	oldItem: dottangquaModel = new dottangquaModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	listNhomLeTet: any[] = [];
@@ -27,7 +28,7 @@ export class dottangquannewEditDialogComponent implements OnInit {
 	listNguon: any[] = [];
 
 	NCC_MQs: dottangqua_NCCModel[] = [];
-	datasource: MatTableDataSource<any> | undefined;
+	datasource: MatTableDataSource<any> = new MatTableDataSource();
 	count: number = 0;
 	displayedColumns = ['select', 'STT', 'DoiTuong'];
 
@@ -49,11 +50,11 @@ export class dottangquannewEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -79,7 +80,7 @@ export class dottangquannewEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) { //đang sửa hoặc xem
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id).subscribe(res => {
+			this.apiService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -97,13 +98,18 @@ export class dottangquannewEditDialogComponent implements OnInit {
 		this.loadNhom();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
+
 	loadNhom() {
-		this.danhMucService.liteNhomLeTet().subscribe(res => {
+		this.danhMucService.liteNhomLeTet().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listNhomLeTet = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-
-		this.danhMucService.liteDoiTuongNhanQua(false, true).subscribe(res => {
+		this.danhMucService.liteDoiTuongNhanQua(false, true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listNCC = res.data;
 			//if (this.item.Id == 0) {
 			this.NCC_MQs = res.data.map((x: any) => { return { Id_DoiTuongNCC: x.id, DoiTuong: x.title, MucQuas: x.data, selected: true }; });
@@ -112,13 +118,11 @@ export class dottangquannewEditDialogComponent implements OnInit {
 			this.datasource = new MatTableDataSource(this.NCC_MQs);
 			this.changeDetectorRefs.detectChanges();
 		})
-
-		this.danhMucService.liteMucQua().subscribe(res => {
+		this.danhMucService.liteMucQua().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listMucQua = res.data;
 			this.changeDetectorRefs.detectChanges();
 		})
-
-		this.danhMucService.liteNguonKinhPhi().subscribe(res => {
+		this.danhMucService.liteNguonKinhPhi().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listNguon = res.data;
 			this.listNguon.forEach(x => { this.displayedColumns.push('Nguon' + x.id) });
 			this.changeDetectorRefs.detectChanges();
@@ -173,7 +177,6 @@ export class dottangquannewEditDialogComponent implements OnInit {
 	}
 
 	prepare(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		_item.Id = this.item.Id;
@@ -198,9 +201,7 @@ export class dottangquannewEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -224,15 +225,15 @@ export class dottangquannewEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack) {  //lưu và đóng, withBack = true
+				if (withBack) {  
 					this.dialogRef.close({ item });
 				}
-				else { //lưu và thêm mới, withBack = false
-					this.ngOnInit(); //khởi tạo lại dialog
+				else { 
+					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
 					if (this.focusInput)
@@ -249,7 +250,7 @@ export class dottangquannewEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

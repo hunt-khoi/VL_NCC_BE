@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
@@ -13,14 +14,15 @@ import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.se
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class thongKeTongHopComponent implements OnInit {
-    _name = "";
+export class thongKeTongHopComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
+    _name: string = "";
     lstDot: any[] = [];
 
     dataThongKe: any[] = [];
-    listMQ: any[] = []
-    listCacCot: any[] = []
-    listTieuDe: any[] = []
+    listMQ: any[] = [];
+    listCacCot: any[] = [];
+    listTieuDe: any[] = [];
     display: boolean = false;
     hideEmptyRows: boolean = false;
 
@@ -29,7 +31,6 @@ export class thongKeTongHopComponent implements OnInit {
         return this.dataThongKe.filter(tk => +tk.TongTien1Xa !== 0);
     }
 
-    viewLoading: boolean = false;
     queryParams: QueryParamsModel = new QueryParamsModel({});
     allowExport = false;
     IdDotTangQua: number = 0;
@@ -60,14 +61,19 @@ export class thongKeTongHopComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.tokenStorage.getUserInfo().subscribe(res => {
+        this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
             this.Capcocau = res.Capcocau;
         })
-        this.CommonService.liteDotQua(true).subscribe(res => {
+        this.CommonService.liteDotQua(true).pipe(takeUntil(this.destroy$)).subscribe(res => {
             if (res && res.status == 1)
                 this.lstDot = res.data;
         })
     }
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
     loadData() {
         if (this.IdDotTangQua <= 0) {
@@ -75,16 +81,14 @@ export class thongKeTongHopComponent implements OnInit {
             return;
         }
         this.queryParams = this.prepareQuery();
-        this.viewLoading = true;
         this.tracuu();
     }
 
     tracuu() {
-        this.display = false
+        this.display = false;
         this.loadingSubject.next(true);
-        this.apiService.thongKeTongHop(this.queryParams).subscribe(res => {
+        this.apiService.thongKeTongHop(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
             this.loadingSubject.next(false);
-            this.viewLoading = false;
             if (res && res.status == 1) {
                 this.dataThongKe = res.data
                 this.allowExport = true;
@@ -114,7 +118,7 @@ export class thongKeTongHopComponent implements OnInit {
             return;
         }
         this.loadingSubject.next(true);
-        this.apiService.exportTKTongHop(this.queryParams).subscribe(res => {
+        this.apiService.exportTKTongHop(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
             this.loadingSubject.next(false);
             const headers = res.headers;
             const filename = headers.get('x-filename');

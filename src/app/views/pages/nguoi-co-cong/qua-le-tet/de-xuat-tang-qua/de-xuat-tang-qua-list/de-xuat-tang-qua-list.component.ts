@@ -1,17 +1,16 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, Input, OnChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from '../../../../../partials/table';
 import { TableService } from '../../../../../partials/table/table.service';
-import { DotTangQuaModel } from '../Model/de-xuat-tang-qua.model';
 import { DeXuatModel } from '../../de-xuat/Model/de-xuat.model';
 import { DeXuatTangQuaService } from '../Services/de-xuat-tang-qua.service';
 import { DeXuatTangQuaDataSource } from '../Model/data-sources/de-xuat-tang-qua.datasource';
@@ -24,7 +23,8 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class DeXuatTQListComponent implements OnInit, OnChanges {
+export class DeXuatTQListComponent implements OnInit, OnChanges, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: DeXuatTangQuaDataSource | undefined;
 	@Input() donvi: any;
@@ -33,14 +33,9 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 
-	filterStatus = '';
-	filterCondition = '';
 	// Selection
-	selection = new SelectionModel<DotTangQuaModel>(true, []);
-	productsResult: DotTangQuaModel[] = [];
-	lstStatus: any[] = [];
-	_name = "";
-	Capcocau = 3;
+	_name: string = "";
+	Capcocau: number = 3;
 
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
@@ -65,7 +60,7 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 	}
 
 	ngOnInit() {
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.Capcocau = res.Capcocau;
 		})
 
@@ -161,14 +156,11 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	ngOnChanges() {
@@ -179,7 +171,7 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(),
+			this.filter(),
 			this.sort.direction,
 			this.sort.active,
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
@@ -188,20 +180,12 @@ export class DeXuatTQListComponent implements OnInit, OnChanges {
 		this.dataSource.loadList(queryParams);
 	}
 
-	filterConfiguration(): any {
+	filter(): any {
 		const filter: any = {};
-		if (this.nam) {
+		if (this.nam) 
 			filter.Nam = this.nam;
-		}
-		if (this.dot > 0) {
+		if (this.dot > 0) 
 			filter.Id_DotTangQua = this.dot;
-		}
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-			filter.type = +this.filterCondition;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.DotTangQua = this.gridService.model.filterText['DotTangQua'];
 		}

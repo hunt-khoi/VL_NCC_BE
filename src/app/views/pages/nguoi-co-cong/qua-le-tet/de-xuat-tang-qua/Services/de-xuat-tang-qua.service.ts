@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { environment } from '../../../../../../../environments/environment';
 
@@ -9,10 +9,6 @@ const API_PRODUCTS_URL = environment.ApiRoot + '/de-xuat-dot-tang';
 @Injectable()
 export class DeXuatTangQuaService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 	ReadOnlyControl: boolean = false;
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }

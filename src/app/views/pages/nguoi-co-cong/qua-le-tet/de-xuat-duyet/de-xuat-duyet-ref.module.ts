@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
-
-import { DeXuatDuyetListComponent } from './de-xuat-duyet-list/de-xuat-duyet-list.component';
-import { DeXuatDuyetService } from './Services/de-xuat-duyet.service';
 import { DPSCommonModule } from '../../dps-common.module';
-import { DeXuatDuyetDialogComponent } from './de-xuat-duyet/de-xuat-duyet.dialog.component';
 import { DeXuatRefModule } from '../de-xuat/de-xuat-ref.module';
+import { DeXuatDuyetService } from './Services/de-xuat-duyet.service';
+import { DeXuatDuyetListComponent } from './de-xuat-duyet-list/de-xuat-duyet-list.component';
+import { DeXuatDuyetDialogComponent } from './de-xuat-duyet/de-xuat-duyet.dialog.component';
 
 @NgModule({
     imports: [
@@ -22,4 +21,5 @@ import { DeXuatRefModule } from '../de-xuat/de-xuat-ref.module';
         DeXuatDuyetListComponent,
     ]
 })
+
 export class DeXuatDuyetRefModule { }

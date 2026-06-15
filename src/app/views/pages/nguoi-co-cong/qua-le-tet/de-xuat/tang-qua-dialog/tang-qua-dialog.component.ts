@@ -1,6 +1,8 @@
 import { LayoutUtilsService } from 'app/core/_base/crud';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { PhatQuaModel } from './../Model/phat-qua.model';
 import { PhatQuaService } from './../Services/phat-qua.service';
 
@@ -8,7 +10,8 @@ import { PhatQuaService } from './../Services/phat-qua.service';
 	selector: 'kt-tang-qua-dialog',
 	templateUrl: './tang-qua-dialog.component.html',
 })
-export class TangQuaDialogComponent implements OnInit {
+export class TangQuaDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 
 	constructor(public dialogRef: MatDialogRef<TangQuaDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
@@ -19,7 +22,7 @@ export class TangQuaDialogComponent implements OnInit {
 
 	nguoinhan: string = '';
 	dataNhanqua: any;
-	sophieuchi = '';
+	sophieuchi: string = '';
 	disabledBtn: boolean = false;
 	
 	ngOnInit() {
@@ -28,11 +31,16 @@ export class TangQuaDialogComponent implements OnInit {
 		this.LoadPhieuChi();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	ThoiGianNhan: any;
 
 	LoadPhieuChi() {
 		this.ThoiGianNhan = new Date();
-		this.apiService.Get_NextGift(this.dataNhanqua.Id).subscribe(res => {
+		this.apiService.Get_NextGift(this.dataNhanqua.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.sophieuchi = res.data;
 			}
@@ -59,7 +67,7 @@ export class TangQuaDialogComponent implements OnInit {
 	}
 
 	CreatePhieu(data: any) {
-		this.apiService.Create(data).subscribe(res => {
+		this.apiService.Create(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) 
 				this.dialogRef.close(res.data);
 			else

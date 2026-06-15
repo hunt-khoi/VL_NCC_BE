@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
-import { merge, BehaviorSubject, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
@@ -13,7 +14,8 @@ import { InQuyetDinhService } from './Services/in-quyet-dinh.service';
 	encapsulation: ViewEncapsulation.None,
 })
 
-export class InQuyetDinhComponent implements OnInit {
+export class InQuyetDinhComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
@@ -44,21 +46,26 @@ export class InQuyetDinhComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.Capcocau = res.Capcocau;
 			if (res.Capcocau == 3) {
 				this.idHuyen = +res.ID_Goc;
 			}
-			this.commonService.GetListWardByProvince(res.IdTinh).subscribe(res => {
+			this.commonService.GetListWardByProvince(res.IdTinh).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.listXa = res.data;
 				this.listXaFiltered.next(res.data ? res.data.slice() : []);
 				this.changeDetect.detectChanges();
 			})
 		})
-		this.commonService.liteDotQua(true).subscribe(res => {
+		this.commonService.liteDotQua(true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.lstDot = res.data;
 		})
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	filterXa() {
@@ -82,7 +89,7 @@ export class InQuyetDinhComponent implements OnInit {
 			return;
 		}
 		if (this.idHuyen <= 0) {
-			this.layoutUtilsService.showError("Vui lòng chọn huyện");
+			this.layoutUtilsService.showError("Vui lòng chọn phường xã");
 			return;
 		}
 		if (this.idLoaiMau <= 0) {
@@ -91,7 +98,7 @@ export class InQuyetDinhComponent implements OnInit {
 		}
 		this.strHtml = "";
 		this.loadingSubject.next(true);
-		this.service.getItem(this.IdDotTangQua, this.idHuyen, this.idLoaiMau).subscribe(res => {
+		this.service.getItem(this.IdDotTangQua, this.idHuyen, this.idLoaiMau).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			if (res && res.status == 1) {
 				this.strHtml = this.sanitized.bypassSecurityTrustHtml(res.data);
@@ -101,13 +108,13 @@ export class InQuyetDinhComponent implements OnInit {
 		})
 	}
 
-	in(loai: number) {
+	export(loai: number) {
 		if (this.idLoaiMau <= 0) {
 			this.layoutUtilsService.showError("Vui lòng chọn loại mẫu in");
 			return;
 		}
 		this.loadingSubject.next(true);
-		this.service.export(this.IdDotTangQua, this.idHuyen, loai, this.idLoaiMau).subscribe(response => {
+		this.service.export(this.IdDotTangQua, this.idHuyen, loai, this.idLoaiMau).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			this.loadingSubject.next(false);
 			const headers = response.headers;
 			const filename = headers.get('x-filename');

@@ -45,6 +45,6 @@ export class dottangqua_NCCModel extends BaseModel {
     Id_DotTangQua: number = 0;
     HoTen: string = "";
     //MucQua: string;
-    Id = 0;
+    Id: number = 0;
 	MucQuas: any[] = [];
 }

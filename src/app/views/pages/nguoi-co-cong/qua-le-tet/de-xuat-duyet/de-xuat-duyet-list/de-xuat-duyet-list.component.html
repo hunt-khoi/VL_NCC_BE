@@ -50,7 +50,7 @@
 								</label>
 							</div>
 							<div class="kt-form__control kt-form__group--inline">
-								<ng-container *ngIf="selectedTab==0">
+								<ng-container *ngIf="selectedTab===0">
 									<button mat-raised-button color="primary" (click)="duyets(true)"
 										matTooltip="Duyệt đề xuất được chọn" class="mat-button-mt-4">
 										Duyệt
@@ -60,7 +60,7 @@
 										Không duyệt
 									</button>
 								</ng-container>
-								<!-- <button mat-raised-button color="primary" (click)="duyets(true, true)" *ngIf="selectedTab==1"
+								<!-- <button mat-raised-button color="primary" (click)="duyets(true, true)" *ngIf="selectedTab===1"
 									matTooltip="Duyệt đề xuất được chọn" class="mat-button-mt-4">
 									Tổng hợp và duyệt
 								</button> -->
@@ -79,10 +79,10 @@
 				<mat-tab label="Danh sách đề xuất">
 					<ng-template matTabContent></ng-template>
 				</mat-tab>
-				<mat-tab label="Tổng hợp đề xuất trong huyện" *ngIf="UserInfo.Capcocau==2">
+				<mat-tab label="Tổng hợp đề xuất trong huyện" *ngIf="UserInfo.Capcocau===2">
 					<ng-template matTabContent></ng-template>
 				</mat-tab>
-				<mat-tab label="Tổng hợp đề xuất trong tỉnh" *ngIf="UserInfo.Capcocau==1">
+				<mat-tab label="Tổng hợp đề xuất trong tỉnh" *ngIf="UserInfo.Capcocau===1">
 					<ng-template matTabContent></ng-template>
 				</mat-tab>
 			</mat-tab-group>
@@ -95,7 +95,7 @@
 							<input matInput [(ngModel)]="nam" placeholder="Năm" type="number" (change)="loadListDot()" />
 						</mat-form-field>
 					</div>
-					<div class="col-md-3 kt--margin-bottom-10-mobile" [hidden]="selectedTab!=0">
+					<div class="col-md-3 kt--margin-bottom-10-mobile" [hidden]="selectedTab!==0">
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="{{ 'WARD.NAME' | translate }}" [(value)]="filterward" (selectionChange)="loadDataList()">
 							<mat-option>
@@ -108,7 +108,7 @@
 							</mat-select>
 						</mat-form-field>
 					</div>
-					<div class="col-xl-3" [hidden]="selectedTab==0">
+					<div class="col-xl-3" [hidden]="selectedTab===0">
 						<mat-form-field class="mat-form-field-fluid">
 							<mat-select [(ngModel)]="dot" placeholder="Chọn đợt tặng quà" (selectionChange)="loadDataList(false)">
 								<mat-option [value]="0" disabled>--Chọn đợt tặng quà--</mat-option>
@@ -116,7 +116,7 @@
 							</mat-select>
 						</mat-form-field>
 					</div>
-					<div class="col-xl-3" [hidden]="selectedTab==0">
+					<div class="col-xl-3" [hidden]="selectedTab===0">
 						<button mat-raised-button color="primary" (click)="nhacnhos()" *ngIf="dot>0"
 							matTooltip="Nhắc nhở xã gửi đề xuất" class="mat-button-mt-4">
 							{{ 'COMMON.NHACNHO' | translate }}
@@ -126,7 +126,7 @@
 			</div>
 		</div>
 
-		<div [hidden]="selectedTab!=0 && dot==0">
+		<div [hidden]="selectedTab!==0 && dot===0">
 			<div class="mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}">
 				<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort #sort1='matSort' matSortActive="Deadline_Duyet"
 					style="width: 100%;" matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" cdkDropListGroup>
@@ -138,7 +138,7 @@
 						</th>
 						<td mat-cell *matCellDef="let row" class="mat-column-checkbox select-cell" style="padding-right: 20px;" [hidden]="IsEnable_Duyet">
 							<mat-checkbox (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" 
-								(click)="$event.stopPropagation()" [disabled]="row.IsEnable_Duyet || row.Id==null" [color]="'primary'" >
+								(click)="$event.stopPropagation()" [disabled]="row.IsEnable_Duyet || row.Id===null" [color]="'primary'" >
 							</mat-checkbox>
 						</td>
 					</ng-container>
@@ -153,10 +153,12 @@
 					<ng-container matColumnDef="Id_Xa">
 						<th mat-header-cell *matHeaderCellDef style="justify-content: center" mat-sort-header>Xã</th>
 						<td mat-cell *matCellDef="let item" style="justify-content: center; white-space: nowrap;">
-							<span *ngIf="selectedTab==0 || UserInfo.Capcocau!=1">{{item.Xa}}</span>
-							<ng-container *ngIf="selectedTab!=0 && UserInfo.Capcocau==1">
+							<span *ngIf="selectedTab===0 || UserInfo.Capcocau!==1">{{item.Xa}}</span>
+							<ng-container *ngIf="selectedTab!==0 && UserInfo.Capcocau===1">
 								<!-- <a href="javascript:;" (click)="showCanDuyet(item)">
-									<b title="Tổng số xã">{{item.Xa.sl}}</b> | <b style="color:green;" title="Số xã đã gửi">{{item.Xa.da_gui}}</b> | <b style="color:red;" title="Số xã cần duyệt">{{item.Xa.can_duyet}}</b>
+									<b title="Tổng số xã">{{item.Xa.sl}}</b> | 
+									<b style="color:green;" title="Số xã đã gửi">{{item.Xa.da_gui}}</b> | 
+									<b style="color:red;" title="Số xã cần duyệt">{{item.Xa.can_duyet}}</b>
 								</a> -->
 								{{item.Xa.Title}}
 							</ng-container>
@@ -259,12 +261,12 @@
 						</th>
 						<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">
 							<ng-container *ngIf="!IsEnable_Duyet">
-								<button mat-button (click)="nhacnho(item.Id_Xa)" [ngClass]="btnClass" *ngIf="item.Id==null && UserInfo.Capcocau==2" 
+								<button mat-button (click)="nhacnho(item.Id_Xa)" [ngClass]="btnClass" *ngIf="item.Id===null && UserInfo.Capcocau===2" 
 									matTooltip="Nhắc nhở xã" color="primary" type="button">
 									<mat-icon>notifications_active</mat-icon>
 									<span class="button-text">Nhắc nhở xã</span>
 								</button>
-								<ng-container *ngIf="item.Id == 0 && UserInfo.Capcocau==1">
+								<ng-container *ngIf="item.Id===0 && UserInfo.Capcocau===1">
 									<button mat-button (click)="detailTongHop({dv:item.Xa.RowID, ids:item.ids})" [ngClass]="btnClass" 
 										*ngIf="item.IsVisible_Duyet" [disabled]="item.IsEnable_Duyet" matTooltip="Duyệt" color="primary" type="button">
 										<mat-icon>done_outline</mat-icon>
@@ -299,7 +301,7 @@
 									<span class="button-text">Trả lại xã</span>
 								</button>
 							</ng-container>
-							<ng-container *ngIf="selectedTab==0 || UserInfo.Capcocau==2">
+							<ng-container *ngIf="selectedTab===0 || UserInfo.Capcocau===2">
 								<button mat-button (click)="DuyetDotTangQua(item, false)" [ngClass]="btnClass"   
 									matTooltip="Thảo luận" color="primary" type="button">
 									<mat-icon>insert_comment</mat-icon>
@@ -322,14 +324,15 @@
 				</div>
 			</div>
 
-			<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}" [hidden]="selectedTab!=0">
+			<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}" [hidden]="selectedTab!==0">
 				<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
 					<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
 				</div>
 				<div class="flt-page" style="width: 50%;">
 					<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
 					<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"
-						[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+						[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+					</mat-paginator>
 				</div>
 			</div>
 		</div>

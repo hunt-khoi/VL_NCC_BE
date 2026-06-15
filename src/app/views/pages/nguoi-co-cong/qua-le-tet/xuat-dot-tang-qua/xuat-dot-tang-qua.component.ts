@@ -1,8 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
@@ -14,9 +15,10 @@ import { xuatDotTangQuaService } from './Services/xuat-dot-tang-qua.service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class xuatDotTangQuaComponent implements OnInit {
+export class xuatDotTangQuaComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	_name = "";
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	dataThongKe: any[] = [];
 	lstNguon: any[] = [];
 	listTinh: any[] = [];
@@ -33,7 +35,7 @@ export class xuatDotTangQuaComponent implements OnInit {
 	display: boolean = false;
 
 	viewLoading: boolean = false;
-	queryParams: QueryParamsModel | undefined;
+	queryParams: QueryParamsModel = new QueryParamsModel({});
 	allowExport = false;
 	Capcocau: number = 0;
 	filterWard: number = 0;
@@ -52,11 +54,11 @@ export class xuatDotTangQuaComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.CommonService.liteDotQua(true).subscribe(res => {
+		this.CommonService.liteDotQua(true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listDotQua = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 			this.Capcocau = res.Capcocau;
 			if (res.Capcocau == 3) {//xã
@@ -66,7 +68,7 @@ export class xuatDotTangQuaComponent implements OnInit {
 					Ward: res.DonVi,
 					ID_Row: res.ID_Goc
 				}];
-				this.CommonService.GetListKhomApByWard2(this.filterWard).subscribe(res => {
+				this.CommonService.GetListKhomApByWard2(this.filterWard).pipe(takeUntil(this.destroy$)).subscribe(res => {
 					this.listAp = res.data;
 					this.changeDetectorRefs.detectChanges();
 				})
@@ -76,6 +78,11 @@ export class xuatDotTangQuaComponent implements OnInit {
 		})
 		this.createForm();
 		this.loadList();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -95,7 +102,7 @@ export class xuatDotTangQuaComponent implements OnInit {
 		this.viewLoading = true;
 		this.display = false;
 		this.loadingSubject.next(true);
-		this.apiService.thongKeTheoDotTangQua(this.queryParams).subscribe(res => {
+		this.apiService.thongKeTheoDotTangQua(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.viewLoading = false;
 			this.display = true;
@@ -110,11 +117,11 @@ export class xuatDotTangQuaComponent implements OnInit {
 		})
 	}
 
-	xuatDanhSach() {
+	export() {
 		this.queryParams = this.prepareQuery();
 		if (!this.queryParams) return;
 		this.loadingSubject.next(true);
-		this.apiService.exportDSDotQua(this.queryParams).subscribe(res => {
+		this.apiService.exportDSDotQua(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
@@ -188,9 +195,8 @@ export class xuatDotTangQuaComponent implements OnInit {
 	}
 
 	loadXa() {
-		if (!this.itemForm) return;
 		let id = this.itemForm.controls.Tinh.value
-		this.CommonService.GetListWardByProvince(id).subscribe(res => {
+		this.CommonService.GetListWardByProvince(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listXa = res.data;
 			this.listXaOpt = res.data;
 			this.listXaFiltered.next(res.data ? res.data.slice() : []);
@@ -214,9 +220,8 @@ export class xuatDotTangQuaComponent implements OnInit {
 	}
 
 	loadAp() {
-		if (!this.itemForm) return;
 		let id = this.itemForm.controls.Xa.value;
-		this.CommonService.GetListKhomApByWard2(id).subscribe(res => {
+		this.CommonService.GetListKhomApByWard2(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listAp = res.data;
 			this.changeDetectorRefs.detectChanges();
 		})

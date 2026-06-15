@@ -11,6 +11,14 @@
 	.row_muc {
 		background-color: #dee2e6;
 	}
+
+	.z-sticky {
+		white-space: nowrap; 
+		position: sticky; 
+		top: 0; 
+		z-index: 1; 
+		background-color: #fff;
+	}
 </style>
 <kt-portlet [options]="{headLarge: true}">
 	<div class="kt-portlet__head kt-portlet__head--lg">
@@ -49,7 +57,8 @@
 						</mat-form-field>
 					</div>
 					<div class="col-lg-12 m--margin-bottom-20-mobile">
-						<dl-image-control formControlName="FileDinhKem" [multiple]="false" nameButton="Chọn tệp đính kèm" [disabled]="disabledBtn">
+						<dl-image-control formControlName="FileDinhKem" [multiple]="false" 
+							nameButton="Chọn tệp đính kèm" [disabled]="disabledBtn">
 						</dl-image-control>
 					</div>
 					<div class="col-lg-12 m--margin-bottom-20-mobile" *ngIf="item.CurrentChecker">
@@ -94,64 +103,64 @@
 									<mat-tab label="{{ 'DE_XUAT.danhsachtang' | translate }}"></mat-tab>
 									<mat-tab label="{{ 'DE_XUAT.danhsachgiam' | translate }}"></mat-tab>
 								</mat-tab-group>
-								<div class="table-responsive" style="max-height:500px; overflow-y:auto;">
-									<table class="table-bordered table-sm " style="width:100%;">
+								<div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+									<table class="table-bordered table-sm" style="width: 100%;">
 										<thead>
 											<tr>
-												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Họ tên</th>
-												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Số hồ sơ</th>
-												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Cư trú</th>
-												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Họ tên liệt sỹ</th>
-												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Quan hệ với liệt sỹ</th>
-												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Số tiền</th>
-												<th class="text-center" style="white-space: nowrap; position: sticky; top: 0; z-index: 1; background-color: #fff;">Ghi chú</th>
+												<th class="text-center z-sticky">Họ tên</th>
+												<th class="text-center z-sticky">Số hồ sơ</th>
+												<th class="text-center z-sticky">Cư trú</th>
+												<th class="text-center z-sticky">Họ tên liệt sỹ</th>
+												<th class="text-center z-sticky">Quan hệ với liệt sỹ</th>
+												<th class="text-center z-sticky">Số tiền</th>
+												<th class="text-center z-sticky">Ghi chú</th>
 											</tr>
 										</thead>
 										<tbody>
-										<ng-container *ngFor="let ng of item.Details;let j=index;">
-											<tr class="row_nguon">
-												<td colspan="4">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
-												<td>Số lượng:<b>{{tongSLNguon[j]}}</b></td>
-												<td class="text-right"><b>{{tongNguon[j]}}</b></td>
-												<td></td>
-											</tr>
-											<ng-container *ngFor="let muc of ng.data; let i=index">
-												<tr class="row_muc">
-													<td colspan="4">
-														<b>Mức {{muc.MucQua | mask: 'separator':commonService.thousandSeparator}} vnđ</b>
-													</td>
-													<td>Số lượng:<b>{{tongSL[j][i]}}</b></td>
-													<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
+											<ng-container *ngFor="let ng of item.Details;let j=index;">
+												<tr class="row_nguon">
+													<td colspan="4">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+													<td>Số lượng:<b>{{tongSLNguon[j]}}</b></td>
+													<td class="text-right"><b>{{tongNguon[j]}}</b></td>
 													<td></td>
 												</tr>
-												<ng-container *ngFor="let dt of muc.DoiTuongs">
-													<tr>
-														<td colspan="7"><b><i>{{dt.DoiTuong}}</i></b></td>
+												<ng-container *ngFor="let muc of ng.data; let i=index">
+													<tr class="row_muc">
+														<td colspan="4">
+															<b>Mức {{muc.MucQua | mask: 'separator':commonService.thousandSeparator}} vnđ</b>
+														</td>
+														<td>Số lượng:<b>{{tongSL[j][i]}}</b></td>
+														<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
+														<td></td>
 													</tr>
-													<ng-container *ngFor="let ncc of dt.NCCs;">
-														<tr [ngClass]="{'row_tang':ncc.IsTang}" *ngIf="checkDisplay(ncc)">
-															<td>{{ncc.HoTen}}</td>
-															<td>{{ncc.SoHoSo}}</td>
-															<td>{{ncc.DiaChi}}</td>
-															<td>{{ncc.NguoiThoCungLietSy}}</td>
-															<td>{{ncc.QuanHeVoiLietSy}}</td>
-															<td class="text-right">{{ncc.SoTien}}</td>
-															<td>{{ncc.IsGiam ? ncc.GhiChuGiam: ncc.GhiChuTang}}</td>
+													<ng-container *ngFor="let dt of muc.DoiTuongs">
+														<tr>
+															<td colspan="7"><b><i>{{dt.DoiTuong}}</i></b></td>
 														</tr>
+														<ng-container *ngFor="let ncc of dt.NCCs;">
+															<tr [ngClass]="{'row_tang':ncc.IsTang}" *ngIf="checkDisplay(ncc)">
+																<td>{{ncc.HoTen}}</td>
+																<td>{{ncc.SoHoSo}}</td>
+																<td>{{ncc.DiaChi}}</td>
+																<td>{{ncc.NguoiThoCungLietSy}}</td>
+																<td>{{ncc.QuanHeVoiLietSy}}</td>
+																<td class="text-right">{{ncc.SoTien}}</td>
+																<td>{{ncc.IsGiam ? ncc.GhiChuGiam: ncc.GhiChuTang}}</td>
+															</tr>
+														</ng-container>
 													</ng-container>
 												</ng-container>
 											</ng-container>
-										</ng-container>
 										</tbody>
 										<tfoot>
-										<tr style="color: red; position: sticky; bottom: 0; z-index: 1; background-color: #fff;">
-											<td colspan="4"><b>Tổng số</b></td>
-											<td>Số lượng:<b>{{TongSo}}</b></td>
-											<td class="text-right">
-												<b>{{TongTien | mask: 'separator':commonService.thousandSeparator}}</b>
-											</td>
-											<td></td>
-										</tr>
+											<tr style="color: red; position: sticky; bottom: 0; z-index: 1; background-color: #fff;">
+												<td colspan="4"><b>Tổng số</b></td>
+												<td>Số lượng:<b>{{TongSo}}</b></td>
+												<td class="text-right">
+													<b>{{TongTien | mask: 'separator':commonService.thousandSeparator}}</b>
+												</td>
+												<td></td>
+											</tr>
 										</tfoot>
 									</table>
 								</div>

@@ -1,10 +1,11 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { DoiTuongNhanQuaService } from './../Services/doi-tuong-nhan-qua.service';
 import { DoiTuongNhanQuaModel } from '../../doi-tuong-nhan-qua/Model/doi-tuong-nhan-qua.model';
@@ -16,11 +17,11 @@ import moment from 'moment';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
+export class DoiTuongNhanQuaEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 
 	item: DoiTuongNhanQuaModel = new DoiTuongNhanQuaModel();
-	oldItem: DoiTuongNhanQuaModel = new DoiTuongNhanQuaModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -63,11 +64,11 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -92,11 +93,11 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 		if (this.data.IsReturn != undefined)
 			this.IsReturn = this.data.IsReturn;
 
-		this.commonService.GetAllProvinces().subscribe(res => {
+		this.commonService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listprovinces = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.item) return;
 			this.filterprovinces = res.IdTinh;
 			this.item.ProvinceID = this.filterprovinces;
@@ -119,7 +120,7 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id > 0) {
 			this.viewLoading = true;
-			this.objectService.getItem(this.item.Id).subscribe(res => {
+			this.objectService.getItem(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status === 1) {
@@ -134,6 +135,11 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -187,8 +193,7 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 			}
 		}
 	}
-	prepare(): DoiTuongNhanQuaModel | null {
-		if (!this.itemForm) return null;
+	prepare(): DoiTuongNhanQuaModel {
 		const controls = this.itemForm.controls;
 		const _item = new DoiTuongNhanQuaModel();
 		_item.Id = +this.item.Id;
@@ -212,7 +217,6 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -239,7 +243,7 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.update(item).subscribe(res => {
+		this.objectService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -276,7 +280,7 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.create(item).subscribe(res => {
+		this.objectService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -326,7 +330,7 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 	}
 
 	loadGetListWardByProvinces(idDistrict: any) {
-		this.commonService.GetListWardByProvince(idDistrict).subscribe(res => {
+		this.commonService.GetListWardByProvince(idDistrict).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listward = res.data;
 			this.listwardOpt = res.data;
 			this.listwardFiltered.next(res.data ? res.data.slice() : []);
@@ -380,27 +384,27 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 	}
 
 	loadKhomAp() {
-		this.commonService.GetListKhomApByWard2(this.filterward).subscribe(res => {
+		this.commonService.GetListKhomApByWard2(this.filterward).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listKhomAp = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
 
 	loadListGioiTinh() {
-		this.commonService.ListGioiTinh().subscribe(res => {
+		this.commonService.ListGioiTinh().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listgioitinh = res.data;
 		});
 	}
 
 	loadListDoiTuongNCC() {
-		this.commonService.liteDoiTuongNhanQua(false).subscribe(res => {
+		this.commonService.liteDoiTuongNhanQua(false).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listdoituongncc.next(res.data);
 			this.listOpt = res.data;
 		});
 	}
 
 	loadListQuanHeVoiLietSy() {
-		this.commonService.liteQHGiaDinhByQua().subscribe(res => {
+		this.commonService.liteQHGiaDinhByQua().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listOpt1 = res.data;
 			this.listquanhevoilietsy.next( res.data);
 		});
@@ -410,7 +414,6 @@ export class DoiTuongNhanQuaEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

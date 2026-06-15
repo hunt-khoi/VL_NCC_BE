@@ -1,7 +1,8 @@
-import { Component, OnInit, Inject, ViewEncapsulation, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ViewEncapsulation, HostListener, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DomSanitizer } from '@angular/platform-browser';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
@@ -13,8 +14,8 @@ import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 	encapsulation: ViewEncapsulation.None,
 })
 
-export class DeXuatTongHopDialogComponent implements OnInit {
-
+export class DeXuatTongHopDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	viewLoading: boolean = false;
@@ -31,7 +32,7 @@ export class DeXuatTongHopDialogComponent implements OnInit {
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.duyets();
 		}
 	}
@@ -55,13 +56,18 @@ export class DeXuatTongHopDialogComponent implements OnInit {
 	ngOnInit() {
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
-		this.apiService.tongHopDeXuatDot(this.data.data).subscribe(res => {
+		this.apiService.tongHopDeXuatDot(this.data.data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.treeNguoiNhan = res.data;
 				this.tinhTongMuc();
 			} else
 				this.layoutUtilsService.showError(res.error.message);
 		})
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	tinhTongMuc() {
@@ -123,7 +129,7 @@ export class DeXuatTongHopDialogComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Duyets(data).subscribe(res => {
+			this.apiService.Duyets(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					let str = " " + res.data.success + "/" + res.data.total;
 					this.layoutUtilsService.showInfo(_deleteMessage + str);

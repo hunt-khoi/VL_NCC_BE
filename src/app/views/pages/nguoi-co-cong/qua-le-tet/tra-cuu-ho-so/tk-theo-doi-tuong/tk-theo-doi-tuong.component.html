@@ -1,21 +1,21 @@
 <kt-portlet [ngClass]="{ 'kt-portlet--body-progress' : viewLoading }">
 	<kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
 		<ng-container ktPortletTools>
-			<ng-container *ngIf="thongKe==0">
-				<button (click)="loadData(true)" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
-				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport1" printTitle={{this._name}}
-					[printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>
-					In
-				</button>
-				<button (click)="xuatDanhSach(true)" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport1">Export</button>
-			</ng-container>
-			<ng-container *ngIf="thongKe==1">
+			<ng-container *ngIf="thongKe===0">
 				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
-				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport2" printTitle={{this._name}}
-					[printStyle]="{td : {'border-bottom': '1px solid #dee2e6'},th : {'border-bottom': '1px solid #dee2e6'}}" printSectionId="print-section" ngxPrint>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>
 					In
 				</button>
-				<button (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport2">Export</button>
+				<button (click)="export()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
+			</ng-container>
+			<ng-container *ngIf="thongKe===1">
+				<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">Xem thống kê</button>
+				<button mat-raised-button color="primary" matTooltip="In danh sách" *ngIf="allowExport" printTitle={{this._name}}
+					[printStyle]="style_print" printSectionId="print-section" ngxPrint>
+					In
+				</button>
+				<button (click)="export()" mat-raised-button color="info" matTooltip="Xuất danh sách" *ngIf="allowExport">Export</button>
 			</ng-container>
 		</ng-container>
 	</kt-portlet-header>
@@ -27,9 +27,9 @@
 						<input matInput placeholder="Năm" formControlName="Nam" />
 					</mat-form-field>
 				</div>
-				<div class="col-md-3 kt-margin-bottom-10-mobile" *ngIf="thongKe==1">
+				<div class="col-md-3 kt-margin-bottom-10-mobile" *ngIf="thongKe===1">
 					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="Chọn huyện thống kê" formControlName="Huyen" [disabled]="Capcocau == 2">
+						<mat-select placeholder="Chọn huyện thống kê" formControlName="Huyen" [disabled]="Capcocau === 2">
 							<mat-option [value]="list.ID_Row" *ngFor="let list of listHuyen">{{list.District}}</mat-option>
 						</mat-select>
 					</mat-form-field>
@@ -45,7 +45,7 @@
 							<th>Phường xã</th>
 							<th style="text-align: right;width:100px;">Chi trả</th>
 						</tr>
-						<ng-container *ngFor="let items of dataThongKe2">
+						<ng-container *ngFor="let items of dataThongKe">
 							<tr>
 								<td colspan="3"><b>{{items.DoiTuong}}</b></td>
 							</tr>
@@ -55,7 +55,7 @@
 								<td style="text-align: right;">{{dt.ChiTra}}</td>
 							</tr>
 						</ng-container>
-						<tr *ngIf="dataThongKe2.length==0">
+						<tr *ngIf="dataThongKe.length === 0">
 							<td colspan="3" class="text-center"><b>Không có dữ liệu</b></td>
 						</tr>
 					</table>

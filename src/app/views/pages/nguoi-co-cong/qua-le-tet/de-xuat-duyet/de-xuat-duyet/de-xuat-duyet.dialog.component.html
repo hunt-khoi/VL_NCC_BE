@@ -7,12 +7,12 @@
 <div class="kt-portlet"
 	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
 	<div class="kt-portlet__head kt-portlet__head__custom">
-		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
 			 style="margin-top: 20px;">
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
-		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" [hidden]="!isDuyet"
-			 style="margin-top: 10px; text-align: right;">
+		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" 
+			[hidden]="!isDuyet" style="margin-top: 10px; text-align: right;">
 			<!-- *ngIf="allowEdit" -->
 			<ng-container *ngIf="!isReturn">
 				<button mat-raised-button (click)="onSubmit(true)" color="primary" type="button" 
@@ -20,7 +20,7 @@
 					{{ 'COMMON.DUYET' | translate }}
 				</button>
 				<button mat-raised-button (click)="onSubmit(false)" color="warn" type="button" 
-					matTooltip="{{ 'COMMON.KODUYET' | translate }}"  [disabled]="!item.IsEnable_Duyet ||disabledBtn">
+					matTooltip="{{ 'COMMON.KODUYET' | translate }}" [disabled]="!item.IsEnable_Duyet ||disabledBtn">
 					{{ 'COMMON.KODUYET' | translate }}
 				</button>
 			</ng-container>
@@ -58,14 +58,14 @@
 				</div>
 			</div>
 			<div class="row" *ngIf="item.CurrentChecker">
-				<div class=" {{userId != item.NguoiDuyetDon?'col-lg-7':'col-lg-12'}}  m--margin-bottom-20-mobile">
+				<div class=" {{userId !== item.NguoiDuyetDon ? 'col-lg-7' : 'col-lg-12'}}  m--margin-bottom-20-mobile">
 					Đang trong quá trình duyệt của: <b>{{item.CurrentChecker}}</b><br />
 					<ng-container *ngIf="item.Deadline">
 						Thời hạn <b *ngIf="item.Deadline.IsTre" style="color:red;">{{item.Deadline.Ngay}}</b> 
 						<b *ngIf="!item.Deadline.IsTre">{{item.Deadline.Ngay}}</b>
 					</ng-container>
 				</div>
-				<div class="col-lg-5 m--margin-bottom-20-mobile" *ngIf="userId != item.NguoiDuyetDon && isShowNhacnho">
+				<div class="col-lg-5 m--margin-bottom-20-mobile" *ngIf="userId !== item.NguoiDuyetDon && isShowNhacnho">
 					<button [disabled]="guiduyet" class="btn btn-primary float-right" (click)="GuiDeXuatDuyet()">
 						{{ (!guiduyet ? 'COMMON.NHACNHO' : 'COMMON.DANHACNHO') | translate }}
 					</button>

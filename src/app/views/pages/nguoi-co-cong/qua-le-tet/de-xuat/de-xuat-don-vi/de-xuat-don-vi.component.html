@@ -1,6 +1,6 @@
 <kt-portlet>
 	<div class="row">
-		<div class="col-md-4" *ngIf="CapCoCau != 3">
+		<div class="col-md-4" *ngIf="CapCoCau !== 3">
 			<kt-portlet-header [sticky]="true" [title]="'Đơn vị hành chánh'" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
 			</kt-portlet-header>
 			<div class="row" style="padding-left: 20px;">
@@ -16,7 +16,9 @@
 					</mat-form-field>
 					<!-- chọn đợt + xã -->
 					<ng-container *ngIf="!checkAllowExport()">
-						<button mat-button mat-icon-button [matMenuTriggerFor]="menu" color="primary"><mat-icon>print</mat-icon></button>
+						<button mat-button mat-icon-button [matMenuTriggerFor]="menu" color="primary">
+							<mat-icon>print</mat-icon>
+						</button>
 						<mat-menu #menu="matMenu">
 							<button mat-menu-item (click)="In()" matTooltip="In đề xuất theo xã">
 								In đề xuất theo xã
@@ -38,7 +40,7 @@
 				[textFeildRoof]="'Tất cả'" [idRoleKey]="'IdGroup'" (NodeActiveChange)="treeDonViChanged($event)">
 			</m-tree-don-vi>
 		</div>
-		<div class="{{CapCoCau==3 ? 'col-md-12' : 'col-md-8'}}">
+		<div class="{{CapCoCau===3 ? 'col-md-12' : 'col-md-8'}}">
 			<m-de-xuat-list [donvi]="donvi" [nam]="nam" [dot]="dot" [cap]="CapCoCau"></m-de-xuat-list>
 		</div>
 	</div>

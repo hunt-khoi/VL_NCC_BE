@@ -1,15 +1,18 @@
-import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { dottangquaService } from '../Services/dot-tang-qua.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-so-to-trinh-edit',
 	templateUrl: './so-to-trinh-edit.dialog.component.html'
 })
-export class SoToTrinhEditDialogComponent implements OnInit {
+export class SoToTrinhEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -32,6 +35,7 @@ export class SoToTrinhEditDialogComponent implements OnInit {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
+		
 		this.service.list_sott(this.item.Id).toPromise().then(res => {
 			if (res && res.status == 1) {
 				this.lstNhom = res.data;
@@ -49,6 +53,11 @@ export class SoToTrinhEditDialogComponent implements OnInit {
 		return this.translate.instant('DOT_TANG_QUA.updatetotrinh');
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	onSubmit(item: any) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
@@ -62,7 +71,7 @@ export class SoToTrinhEditDialogComponent implements OnInit {
 		else
 			_item.NgayTT = null;
 
-		this.service.update_Sott(_item).subscribe(res => {
+		this.service.update_Sott(_item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

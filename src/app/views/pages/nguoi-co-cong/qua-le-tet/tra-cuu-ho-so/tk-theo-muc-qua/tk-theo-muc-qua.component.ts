@@ -1,6 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
@@ -12,11 +13,11 @@ import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.se
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class thongKeTheoMucQuaComponent implements OnInit {
+export class thongKeTheoMucQuaComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
     _name = "";
 	lstDot: any[] = [];
     dataThongKe: any[] = [];
-    viewLoading: boolean = false;
     display: boolean = false;
     queryParams: QueryParamsModel = new QueryParamsModel({}); 
     allowExport = false;
@@ -46,11 +47,16 @@ export class thongKeTheoMucQuaComponent implements OnInit {
     }
 
 	ngOnInit() {
-		this.CommonService.liteDotQua(true).subscribe(res => {
+		this.CommonService.liteDotQua(true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.lstDot = res.data;
 		})
     }
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
     loadData() {
         if (this.IdDotTangQua <= 0) {
@@ -58,16 +64,14 @@ export class thongKeTheoMucQuaComponent implements OnInit {
 			return;
 		}
         this.queryParams = this.prepareQuery();
-        this.viewLoading = true;
         this.tracuu();
     }
 
 	tracuu() {
 		this.display = false;
 		this.loadingSubject.next(true);
-		this.apiService.thongKeTheoMucQua(this.queryParams).subscribe(res => {
+		this.apiService.thongKeTheoMucQua(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
-			this.viewLoading = false;
 			this.display = true;
             if (res && res.status == 1) {
                 this.dataThongKe = res.data
@@ -75,7 +79,7 @@ export class thongKeTheoMucQuaComponent implements OnInit {
             }
             else {
                 this.layoutUtilsService.showError(res.error.message);
-                this.dataThongKe = []
+                this.dataThongKe = [];
             }
             this.changeDetectorRefs.detectChanges();
         })
@@ -87,7 +91,7 @@ export class thongKeTheoMucQuaComponent implements OnInit {
 			return;
 		}
 		this.loadingSubject.next(true);
-		this.apiService.exportTKMucQua(this.queryParams).subscribe(res => {
+		this.apiService.exportTKMucQua(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			const headers = res.headers;
 			const filename = headers.get('x-filename');

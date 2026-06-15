@@ -10,7 +10,6 @@ import { TangQuaDialogComponent } from './tang-qua-dialog/tang-qua-dialog.compon
 import { DeXuatDuyetDialogComponent } from './dot-tang-qua-duyet/dot-tang-qua-duyet.dialog.component';
 import { dottangquaImportDialogComponent } from './dot-tang-qua-import/dot-tang-qua-import.dialog.component';
 
-
 const routes: Routes = [
 	{ path: '', component: DanhSachTangQuaComponent }
 ];

@@ -13,6 +13,7 @@
 		overflow: hidden !important;
 		text-overflow: ellipsis;
 		-webkit-line-clamp: 1;
+		line-clamp: 1;
 	}
 
 	.d-revert {
@@ -31,7 +32,7 @@
 							</mat-form-field>
 						</div>
 						<div class="col-md-2 kt-margin-bottom-10-mobile">
-							<mat-form-field class="mat-form-field-fluid " *ngIf="Capcocau ==3">
+							<mat-form-field class="mat-form-field-fluid " *ngIf="Capcocau === 3">
 								<mat-select placeholder="Chọn xã thống kê" [(ngModel)]="idXa" disabled>
 								<mat-option>
 									<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'"
@@ -43,12 +44,14 @@
 							</mat-form-field>
 						</div>
 						<div class="col-md-9 kt-margin-bottom-10-mobile text-right">
-							<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">{{ 'COMMON.XEMTK' | translate }}</button>&nbsp;
+							<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê các năm">
+								{{ 'COMMON.XEMTK' | translate }}
+							</button>&nbsp;
 							<button mat-raised-button color="info" matTooltip="Xuất danh sách" [matMenuTriggerFor]="menu">Export</button>&nbsp;
 							<mat-menu #menu="matMenu">
-								<button mat-menu-item (click)="exportExcel(3)">PDF</button>
-								<button mat-menu-item (click)="exportExcel(1)">Word</button>
-								<button mat-menu-item (click)="exportExcel(2)">Excel</button>
+								<button mat-menu-item (click)="export(3)">PDF</button>
+								<button mat-menu-item (click)="export(1)">Word</button>
+								<button mat-menu-item (click)="export(2)">Excel</button>
 							</mat-menu>
 							<button mat-raised-button color="info" matTooltip="In" *ngIf="data.length>0"
 								[printStyle]="{td : {'border-bottom': '1px solid #dee2e6','border-right': '1px solid #dee2e6'},
@@ -78,7 +81,7 @@
 									<td style="width: 56px; text-align: center;"><strong>Quan hệ với Liệt sĩ</strong></td>
 									<td style="width: 52px; text-align: center;"><strong>Ghi chú</strong></td>
 								</tr>
-								<tr *ngIf="data.length==0">
+								<tr *ngIf="data.length === 0">
 									<td colspan="13" class="text-center">Không có dữ liệu</td>
 								</tr>
 								<ng-container *ngFor="let g of data">
@@ -156,25 +159,5 @@
 				</div>
 			</ng-template>
 		</mat-tab>
-		<!--<mat-tab label="Qua các năm">
-			<ng-template matTabContent>
-				<m-tk-qua-cac-nam></m-tk-qua-cac-nam>
-			</ng-template>
-		</mat-tab>
-		<mat-tab label="Qua các năm theo nhóm lễ">
-			<ng-template matTabContent>
-				<m-tk-qua-cac-nam-theo-nhom></m-tk-qua-cac-nam-theo-nhom>
-			</ng-template>
-		</mat-tab>
-		<mat-tab label="Số người nhận quà qua các năm">
-			<ng-template matTabContent>
-				<m-tk-sln-qua-cac-nam></m-tk-sln-qua-cac-nam>
-			</ng-template>
-		</mat-tab>
-		<mat-tab label="Số người nhận quà qua các năm theo nhóm lễ">
-			<ng-template matTabContent>
-				<m-tk-slnhan-qua-cac-nam-theo-nhom></m-tk-slnhan-qua-cac-nam-theo-nhom>
-			</ng-template>
-		</mat-tab>-->
 	</mat-tab-group>
 </kt-portlet>

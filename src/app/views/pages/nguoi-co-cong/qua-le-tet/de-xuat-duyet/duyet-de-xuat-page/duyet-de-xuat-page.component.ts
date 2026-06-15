@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 
 @Component({
@@ -12,10 +14,10 @@ import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DuyetDeXuatPageComponent implements OnInit {
+export class DuyetDeXuatPageComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any = {};
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
@@ -51,7 +53,7 @@ export class DuyetDeXuatPageComponent implements OnInit {
 		this.item.Id = this.id;
 		this.item.IsVisible_Duyet = true;
 		this.item.IsEnable_Duyet = false;
-		this.objectService.getItem(this.id, true).subscribe(res => {
+		this.objectService.getItem(this.id, true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.item = res.data;
 				this.tinhTongMuc();
@@ -65,6 +67,11 @@ export class DuyetDeXuatPageComponent implements OnInit {
 		this.createForm();
 		this.viewLoading = false;
 		this.changeDetectorRefs.detectChanges();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	tinhTongMuc() {
@@ -121,14 +128,10 @@ export class DuyetDeXuatPageComponent implements OnInit {
 	}
 
 	prepareData(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
-		let Id: number;
-		let note: string;
-		Id = this.id;
-		note = controls.note.value;
-		_item = { Id, note };
+		_item.Id = this.id;
+		_item.note = controls.note.value;
 		let file = controls.FileDinhKem.value;
 		if (file && file.length > 0)
 			_item.FileDinhKem = file[0];
@@ -136,18 +139,14 @@ export class DuyetDeXuatPageComponent implements OnInit {
 	}
 
 	onSubmit(value: boolean) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
-		
 		const _item = this.prepareData();
 		if (value === true) {
 			const _Message = this.translate.instant('OBJECT.DUYET.MESSAGE', { name: this._NAME });
@@ -156,7 +155,6 @@ export class DuyetDeXuatPageComponent implements OnInit {
 			const _Message = this.translate.instant('OBJECT.KHONGDUYET.MESSAGE', { name: this._NAME });
 			this.Duyet(_item, value, _Message);
 		}
-
 	}
 
 	Duyet(_item: any, value: boolean, _Message: string) {
@@ -164,7 +162,7 @@ export class DuyetDeXuatPageComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.duyetDotTangQua(_item).subscribe(res => {
+		this.objectService.duyetDotTangQua(_item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingAfterSubmit = false;
 			this.viewLoading = false;
 			this.disabledBtn = false;
@@ -184,8 +182,6 @@ export class DuyetDeXuatPageComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -214,7 +210,7 @@ export class DuyetDeXuatPageComponent implements OnInit {
 	}
 	
 	export() {
-		this.objectService.exportExcelDeXuat(this.item.Id).subscribe(res => {
+		this.objectService.exportExcelDeXuat(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

@@ -5,7 +5,6 @@
 				<h3 class="kt-portlet__head-title">{{ 'QUA_TET.tinhhinh' | translate }}</h3>
 			</div>
 		</ng-container>
-
 		<ng-container ktPortletTools>
 			<button class="show-view-sm" mat-raised-button [matMenuTriggerFor]="chucnang" color="primary" >
 				{{ 'COMMON.CHUCNANG' | translate }}
@@ -20,7 +19,7 @@
 					</mat-form-field>
 				</button>
 				<button type="button" mat-menu-item color="primary" (click)="view()">{{ 'COMMON.DETAIL' | translate }}</button>
-				<button type="button" mat-menu-item color="primary" (click)="in()">{{ 'COMMON.TAIVE' | translate }}</button>
+				<button type="button" mat-menu-item color="primary" (click)="export()">{{ 'COMMON.TAIVE' | translate }}</button>
 				<button type="button" mat-menu-item color="primary" printSectionId="print-section" ngxPrint>{{ 'COMMON.PRINT' | translate }}</button>
 			</mat-menu>
 			<!-- view nhỏ hơn 768 bị ẩn -->
@@ -32,7 +31,7 @@
 					</mat-select>
 				</mat-form-field>
 				<button type="button" mat-raised-button color="primary" (click)="view()">{{ 'COMMON.DETAIL' | translate }}</button>
-				<button type="button" mat-raised-button color="primary" (click)="in()">{{ 'COMMON.TAIVE' | translate }}</button>
+				<button type="button" mat-raised-button color="primary" (click)="export()">{{ 'COMMON.TAIVE' | translate }}</button>
 				<button type="button" mat-raised-button color="primary" printSectionId="print-section" ngxPrint>{{ 'COMMON.PRINT' | translate }}</button>
 			</div>	
 		</ng-container>

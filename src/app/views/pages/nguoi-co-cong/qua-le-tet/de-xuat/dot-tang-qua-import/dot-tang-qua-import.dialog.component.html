@@ -24,8 +24,8 @@
                 </div>
                 <div class="col-md-8 kt-margin-bottom-10-mobile">
                     <mat-form-field class="mat-form-field-fluid">
-                        <input matInput placeholder="Chọn file dữ liệu*" formControlName="FileDuLieu" readonly
-                            type="text">
+                        <input matInput placeholder="Chọn file dữ liệu*" formControlName="FileDuLieu" 
+                            readonly type="text">
                     </mat-form-field>
                 </div>
 
@@ -47,9 +47,8 @@
                 </div>
 
                 <div class="col-md-6 kt-margin-bottom-10-mobile" style="margin-top: 2%">
-                    <button mat-raised-button (click)="luuImport()" style="padding: 0px 20px;" type="button"
-                        color="primary"
-                        *ngIf="itemForm.controls['ErrorMessage'].value=='' && itemForm.controls['FileDuLieu'].value!='' && allowImport">
+                    <button mat-raised-button (click)="luuImport()" style="padding: 0px 20px;" type="button" color="primary"
+                        *ngIf="itemForm.controls['ErrorMessage'].value==='' && itemForm.controls['FileDuLieu'].value!=='' && allowImport">
                         Import dữ liệu
                     </button>&nbsp;
                 </div>

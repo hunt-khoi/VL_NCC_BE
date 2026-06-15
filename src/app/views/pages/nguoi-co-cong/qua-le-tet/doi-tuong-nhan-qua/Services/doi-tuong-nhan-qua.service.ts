@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { DoiTuongNhanQuaModel } from './../Model/doi-tuong-nhan-qua.model';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/doi-tuong-nhan-qua';
 
@@ -54,7 +54,7 @@ export class DoiTuongNhanQuaService {
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
-	importFile(item: any, mau=1): Observable<any> {
+	importFile(item: any, mau: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		let url = API_URL + '/import';
 		if (mau == 2)
@@ -73,7 +73,7 @@ export class DoiTuongNhanQuaService {
 		});
 	}
 
-	downloadTemplate(mau=1): Observable<any> {
+	downloadTemplate(mau: number = 1): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get(API_URL + `/download-template?mau=${mau}`, {
 			headers: httpHeaders,

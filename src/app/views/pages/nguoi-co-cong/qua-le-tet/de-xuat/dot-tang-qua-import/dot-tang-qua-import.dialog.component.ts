@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, Inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from 'app/core/_base/crud';
 import { DeXuatModel } from '../Model/de-xuat.model';
 import { DeXuatService } from '../Services/de-xuat.service';
@@ -13,11 +14,11 @@ import { DeXuatService } from '../Services/de-xuat.service';
 })
 
 export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 
 	@ViewChild('fileUpload', { static: true }) fileUpload: any;
 	dottangquaModel: DeXuatModel = new DeXuatModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	loadingSubject = new BehaviorSubject<boolean>(true);
 	loading$: Observable<boolean> | undefined;
 	viewLoading: boolean = false;
@@ -40,13 +41,15 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
 	ngOnInit() {
         this.viewLoading = false;
         this.id = this.data;
-		this.apiService.data_import.subscribe(res => {
+		this.apiService.data_import.pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this._dataImport = [...res];
 		});
 		this.createForm();
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.componentSubscriptions) {
 			this.componentSubscriptions.unsubscribe();
 		}
@@ -65,7 +68,6 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
     }
     
 	selectFile() {
-		if (!this.itemForm) return;
 		this.itemForm.controls['ErrorMessage'].setValue('');
 		let el: HTMLInputElement = this.fileUpload.nativeElement as HTMLInputElement;
 		el.type = "text";
@@ -75,33 +77,29 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
     
     //kiểm tra định dạng file và gán lại tên file cho control
 	FileSelected(evt: any) {
-		if (!this.itemForm) return;
 		if (evt.target.files && evt.target.files.length) {//Nếu có file
 			let file = evt.target.files[0]; // Ví dụ chỉ lấy file đầu tiên
 			let fileName = file.name;
 			var res = fileName.match(/.xls$|.xlsx$/g);
-			if (res) {
-				if (!res["includes"]('.xlsx') && !res["includes"]('.xls')) {
-					this.layoutUtilsService.showError('File không hợp lệ.');
-					return;
-				}
-				else {
-					this.itemForm.controls['FileDuLieu'].patchValue(fileName);
-					// this.checkDataIsValid();
-				}
-			}
-			else {
+			if (!res) {
 				this.layoutUtilsService.showError('File không hợp lệ');
 				return;
 			}
+			if (!res["includes"]('.xlsx') && !res["includes"]('.xls')) {
+				this.layoutUtilsService.showError('File không hợp lệ.');
+				return;
+			}
+			else {
+				this.itemForm.controls['FileDuLieu'].patchValue(fileName);
+				// this.checkDataIsValid();
+			}
 		}
-		else {//Không có file
+		else { //Không có file
 			this.itemForm.controls['FileDuLieu'].patchValue('');
 		}
     }
 
 	checkDataIsValid(): boolean {
-		if (!this.itemForm) return false;
 		// Kiểm tra Form Control 'FileDuLieu' có tồn tại và hợp lệ không
 		const fileControl = this.itemForm.controls['FileDuLieu'];
 		const isControlValid = fileControl && fileControl.valid;
@@ -117,7 +115,6 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
 	}
 
 	reviewFile() {	
-		if (!this.itemForm) return;
 		let el: any = this.fileUpload.nativeElement;
 		var service = this.apiService;
 		var useBase64: boolean = true;
@@ -128,6 +125,7 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
                 let id = this.id; //id đợt tặng quà
 				var a = this.itemForm.controls['FileDuLieu'];
 				var b = this.itemForm.controls['ErrorMessage'];
+				let self = this;
 				reader.readAsDataURL(el.files[idx]);
 				reader.onload = function () {
 					let base64Str = reader.result as String;
@@ -139,14 +137,14 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
                         Id_DotTangQua: id   //truyền id
 					};
 					service.lastFileUpload$.next(data);
-					service.import(data).subscribe(res => {
+					service.import(data).pipe(takeUntil(self.destroy$)).subscribe(res => {
 						if (res && res.status == 1) {
                             let i = 1;
                             for (const pt of res.data){
                                 if(pt.isError == true) {
-                                    a.setValue('') //mất file đã load lên
-                                    b.setValue('Lỗi dòng '+i+" : "+pt.message)
-                                    return
+                                    a.setValue(''); //mất file đã load lên
+                                    b.setValue('Lỗi dòng '+i+' : '+pt.message);
+                                    return;
                                 }
                                 i = i+1;
                             }
@@ -167,7 +165,6 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
     }
 
 	luuImport() {
-		if (!this.itemForm) return;
         let el: any = this.fileUpload.nativeElement;
 		var service = this.apiService;
         var useBase64: boolean = true;
@@ -180,6 +177,7 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
 				var b = this.itemForm.controls['ErrorMessage'];
 				let isChange = this.isChange;
 				const show = this.layoutUtilsService;
+				let self = this;
 				reader.readAsDataURL(el.files[idx]);
 				reader.onload = function () {
 					let base64Str = reader.result as String;
@@ -192,7 +190,7 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
                         review: false   //import ko review nữa
 					};
 					service.lastFileUpload$.next(data);
-					service.import(data).subscribe(res => {
+					service.import(data).pipe(takeUntil(self.destroy$)).subscribe(res => {
 						if (res && res.status == 1) {
 							isChange = true;
 							a.setValue('');
@@ -206,7 +204,6 @@ export class dottangquaImportDialogComponent implements OnInit, OnDestroy {
 						}
 					});
                 };
-                
 			}
         }
 	}

@@ -119,7 +119,7 @@
 						<mat-icon>visibility</mat-icon>
 						<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 					</button>
-					<button mat-button [ngClass]="btnClass" [matMenuTriggerFor]="menu" *ngIf="item.Status==2" 
+					<button mat-button [ngClass]="btnClass" [matMenuTriggerFor]="menu" *ngIf="item.Status===2" 
 						matTooltip="{{ 'COMMON.PRINT' | translate }}" color="info" type="button">
 						<mat-icon>print</mat-icon>
 						<span class="button-text">{{ 'COMMON.PRINT' | translate }}</span>
@@ -147,7 +147,7 @@
 							<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
 						</button>
 					</ng-container>
-					<ng-container *ngIf="item.Status==2 && apiService.ReadOnlyControl">
+					<ng-container *ngIf="item.Status===2 && apiService.ReadOnlyControl">
 						<a mat-button [routerLink]="['./',item.Id]" [ngClass]="btnClass"
 						   	matTooltip="Phát quà" color="primary">
 							<mat-icon>card_giftcard</mat-icon>
@@ -155,7 +155,7 @@
 						</a>
 					</ng-container>
 					<button mat-button (click)="GuiDuyet(item)" [ngClass]="btnClass" *ngIf="item.visibleGuiDuyet"
-						matTooltip="Gửi duyệt" color="primary"  type="button">
+						matTooltip="Gửi duyệt" color="primary" type="button">
 						<mat-icon>send</mat-icon>
 						<span class="button-text">Gửi duyệt</span>
 					</button>

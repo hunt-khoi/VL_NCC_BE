@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, Input, OnChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, Input, OnChanges, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { TranslateService } from '@ngx-translate/core';
@@ -6,14 +6,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { tap } from 'rxjs/operators';
-import { merge, ReplaySubject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, ReplaySubject, Subject } from 'rxjs';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from '../../../../../partials/table';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-import { DisplayHtmlContentComponent, SettingProcessComponent } from '../../../components';
+import { SettingProcessComponent } from '../../../components';
 import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 import { DeXuatDuyetDataSource } from '../Model/data-sources/de-xuat-duyet.datasource';
 import { DeXuatDuyetDialogComponent } from '../de-xuat-duyet/de-xuat-duyet.dialog.component';
@@ -35,7 +35,8 @@ import moment from 'moment';
 	],
 })
 
-export class DeXuatDuyetListComponent implements OnInit, OnChanges {
+export class DeXuatDuyetListComponent implements OnInit, OnChanges, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: DeXuatDuyetDataSource | undefined;
 	@Input() donvi: any;
@@ -44,8 +45,6 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
 
-	filterStatus = '';
-	filterCondition = '';
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
@@ -96,12 +95,12 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 			if (data.IsEnable_Duyet != undefined)
 				this.IsEnable_Duyet = data.IsEnable_Duyet;
 		})
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.UserInfo = res;
 			this.filterprovinces = res.IdTinh;
 			this.loadGetListWardByProvinces(this.filterprovinces);
 		})
-		this.CommonService.liteDotQua(true, this.nam).subscribe(res => {
+		this.CommonService.liteDotQua(true, this.nam).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.lstDot = res.data;
 		})
 		this.gridModel = new TableModel();
@@ -308,9 +307,14 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		this.ShowDialog();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadGetListWardByProvinces(idProvince: any) {
 		this.filterward = '';
-		this.CommonService.GetListWardByProvince(idProvince).subscribe(res => {
+		this.CommonService.GetListWardByProvince(idProvince).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listward = res.data;
 			this.listwardFiltered.next(res.data ? res.data.slice() : []);
 			this.changeDetectorRefs.detectChanges();
@@ -337,7 +341,7 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		this.selection.clear();
 		if (this.dataSource)
 			this.dataSource.entitySubject.next([]);
-		this.CommonService.liteDotQua(true, this.nam).subscribe(res => {
+		this.CommonService.liteDotQua(true, this.nam).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.lstDot = res.data;
 		})
 		if (this.selectedTab == 0)
@@ -363,7 +367,7 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 	}
 
 	LoadFilterGroupData() {
-		this.CommonService.liteNhomLeTet().subscribe(res => {
+		this.CommonService.liteNhomLeTet().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.gridService.model.filterGroupDataChecked.Id_NhomLeTet = res.data.map((x: any) => {
@@ -395,7 +399,7 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(),
+			this.filter(),
 			this.sort.direction,
 			this.sort.active,
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
@@ -407,7 +411,7 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		this.dataSource.loadList(queryParams, this.selectedTab == 0 ? 3 : this.UserInfo.Capcocau);
 	}
 
-	filterConfiguration(): any {
+	filter(): any {
 		const filter: any = {};
 		filter.IsEnable_Duyet = this.IsEnable_Duyet;
 		if (this.selectedTab == 1) {
@@ -415,18 +419,10 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 			// filter.id_huyen = this.UserInfo.ID_Goc_Cha;
 			return filter;
 		}
-		if (this.nam) {
+		if (this.nam) 
 			filter.Nam = this.nam;
-		}
-		if (this.dot > 0) {
+		if (this.dot > 0) 
 			filter.Id_DotTangQua = this.dot;
-		}
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-			filter.type = +this.filterCondition;
-		}
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.DotTangQua = this.gridService.model.filterText['DotTangQua'];
 			filter.MoTa = this.gridService.model.filterText['MoTa'];
@@ -444,9 +440,8 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(DeXuatDuyetDialogComponent, { data: { _item, isDuyet } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (res) {
+			if (res) 
 				this.loadDataList();
-			}
 		});
 	}
 
@@ -560,7 +555,7 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.Duyets(data).subscribe(res => {
+			this.apiService.Duyets(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					let str = " " + res.data.success + "/" + res.data.total;
 					this.layoutUtilsService.showInfo(_deleteMessage + str);
@@ -583,7 +578,7 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 			dot: this.dot,
 			ids: ids
 		}
-		this.apiService.nhacNho(data).subscribe(res => {
+		this.apiService.nhacNho(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.layoutUtilsService.showInfo("Nhắc nhở thành công")
 			} else {
@@ -598,7 +593,7 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 			dot: this.dot,
 			ids: [id_xa]
 		}
-		this.apiService.nhacNho(data).subscribe(res => {
+		this.apiService.nhacNho(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.layoutUtilsService.showInfo("Nhắc nhở thành công")
 			} else {
@@ -617,9 +612,8 @@ export class DeXuatDuyetListComponent implements OnInit, OnChanges {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(DeXuatDuyetDialogComponent, { data: { _item, isDuyet: true, isReturn: true } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (res) {
+			if (res) 
 				this.loadDataList();
-			}
 		});
 	}
 }

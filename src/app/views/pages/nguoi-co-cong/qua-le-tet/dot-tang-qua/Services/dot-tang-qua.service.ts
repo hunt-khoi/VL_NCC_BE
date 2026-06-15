@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { dottangquaModel, dottangqua_NCCModel } from '../Model/dot-tang-qua.model';
 import { environment } from '../../../../../../../environments/environment';
@@ -154,7 +154,6 @@ export class dottangquaService {
 			headers: httpHeaders,
 		});
 	}
-
 
 	//API Export 
 	exportDSGiam(queryParams: QueryParamsModel): Observable<any> {

@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, Input, OnChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
 // RXJS
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, fromEvent, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 // Services
 import { DeXuatEditDialogComponent } from '../de-xuat-edit/de-xuat-edit.dialog.component';
@@ -26,7 +26,8 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class DeXuatListComponent implements OnInit, OnChanges {
+export class DeXuatListComponent implements OnInit, OnChanges, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: DeXuatDataSource | undefined;
 	@Input() donvi: any;
@@ -245,13 +246,18 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	ngOnChanges() {
 		if (this.dataSource)
 			this.loadDataList();
 	}
 
 	LoadFilterGroupData() {
-		this.CommonService.liteNhomLeTet().subscribe(res => {
+		this.CommonService.liteNhomLeTet().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.gridService.model.filterGroupDataChecked.Id_NhomLeTet = res.data.map((x: any) => {
@@ -268,7 +274,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 			this.gridService.model.filterGroupDataCheckedFake = Object.assign({}, this.gridService.model.filterGroupDataChecked);
 		});
 
-		this.CommonService.getStatusDotTangQua().subscribe(res => {
+		this.CommonService.getStatusDotTangQua().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.lstStatus = res.data;
@@ -336,7 +342,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -357,7 +363,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.guiDuyet(item.Id).subscribe(res => {
+			this.apiService.guiDuyet(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -377,7 +383,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.thuHoi(item.Id).subscribe(res => {
+			this.apiService.thuHoi(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.loadDataList();
 					this.layoutUtilsService.showInfo(_deleteMessage);
@@ -418,7 +424,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 	}
 
 	In(id: number, mau = 1) {
-		this.apiService.previewDeXuat(id, mau).subscribe(res => {
+		this.apiService.previewDeXuat(id, mau).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				let dialogRef;
 				if (mau > 1)
@@ -428,7 +434,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 
 				dialogRef.afterClosed().subscribe(res => {
 					if (!res) return;
-					this.apiService.exportDeXuat(id, mau, mau > 1, res.loai).subscribe(response => {
+					this.apiService.exportDeXuat(id, mau, mau > 1, res.loai).pipe(takeUntil(this.destroy$)).subscribe(response => {
 						if (response && response.body) {
 							const headers = response.headers;
 							const filename = headers.get('x-filename');
@@ -448,7 +454,7 @@ export class DeXuatListComponent implements OnInit, OnChanges {
 	}
 
 	export(item: any) {
-		this.apiService.exportExcelDeXuat(item.Id).subscribe(res => {
+		this.apiService.exportExcelDeXuat(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

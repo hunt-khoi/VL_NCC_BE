@@ -90,7 +90,7 @@ export class thongkeComponent implements OnInit {
 		return 0;
 	}
 
-	exportExcel(loai: number) {
+	export(loai: number) {
 		this.apiService.exportTKTangGiam(this.nam, this.idXa, true, loai).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');

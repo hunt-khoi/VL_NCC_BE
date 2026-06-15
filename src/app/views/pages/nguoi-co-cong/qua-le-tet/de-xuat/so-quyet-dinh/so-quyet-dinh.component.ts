@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { merge, BehaviorSubject } from 'rxjs';
+import { merge, BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { DeXuatService } from '../Services/de-xuat.service';
@@ -12,13 +13,14 @@ import { DeXuatService } from '../Services/de-xuat.service';
     encapsulation: ViewEncapsulation.None,
 })
 
-export class SoQuyetDinhComponent implements OnInit {
+export class SoQuyetDinhComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     loadingSubject = new BehaviorSubject<boolean>(false);
     loading$ = this.loadingSubject.asObservable();
     viewLoading: boolean = false;
     isZoomSize: boolean = false;
     disabledBtn: boolean = false;
-    itemForm: FormGroup | undefined;
+    itemForm: FormGroup = new FormGroup({});
     item: any = {};
 
     constructor(
@@ -33,12 +35,17 @@ export class SoQuyetDinhComponent implements OnInit {
 
     ngOnInit() {
         this.createForm();
-        this.apiService.detailHuyen(this.data.Id_DotTangQua, this.data.Id_Huyen).subscribe(res => {
+        this.apiService.detailHuyen(this.data.Id_DotTangQua, this.data.Id_Huyen).pipe(takeUntil(this.destroy$)).subscribe(res => {
             if (res && res.status == 1) {
                 this.item = res.data;
                 this.createForm();
             }
         })
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     createForm() {
@@ -58,7 +65,6 @@ export class SoQuyetDinhComponent implements OnInit {
     }
 
     onSubmit(withBack: boolean = false) {
-        if (!this.itemForm) return;
         const controls = this.itemForm.controls;
         let _item: any = {};
         _item.Id = this.item.Id;
@@ -75,7 +81,7 @@ export class SoQuyetDinhComponent implements OnInit {
             _item.NgayTT = this.commonService.f_convertDate(controls.NgayTT.value);
 
         if (!this.item.Id) {
-            this.apiService.createHuyen(_item).subscribe(res => {
+            this.apiService.createHuyen(_item).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 this.disabledBtn = false;
                 this.changeDetect.detectChanges();
                 if (res && res.status === 1) {
@@ -93,7 +99,7 @@ export class SoQuyetDinhComponent implements OnInit {
                 }
             });
         } else {
-            this.apiService.updateHuyen(_item).subscribe(res => {
+            this.apiService.updateHuyen(_item).pipe(takeUntil(this.destroy$)).subscribe(res => {
                 this.disabledBtn = false;
                 this.changeDetect.detectChanges();
                 if (res && res.status === 1) {

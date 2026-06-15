@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -6,11 +6,9 @@ import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
 import { TableModel } from '../../../../../partials/table';
 import { TableService } from '../../../../../partials/table/table.service';
-// RXJS
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-// Services
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { dottangquaDataSource } from '../Model/data-sources/dot-tang-qua.datasource';
@@ -26,19 +24,14 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class dottangquaListComponent implements OnInit {
+export class dottangquaListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: dottangquaDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
-	filterStatus = '';
-	filterCondition = '';
-	// Selection
-	selection = new SelectionModel<dottangquaModel>(true, []);
-	productsResult: dottangquaModel[] = [];
-	_name = "";
-
+	_name: string = "";
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
@@ -94,9 +87,8 @@ export class dottangquaListComponent implements OnInit {
 				checked: false
 			}
 		});
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
-		this.CommonService.liteNhomLeTet().subscribe(res => {
+		this.CommonService.liteNhomLeTet().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			this.gridService.model.filterGroupDataChecked['Id_NhomLeTet'] = res.data.map((x: any) => {
 				return {
@@ -211,7 +203,6 @@ export class dottangquaListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_dtq'
-
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_dtq'));
 		this.LoadFilterGroupData(); //load group
@@ -237,18 +228,10 @@ export class dottangquaListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult  && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	LoadFilterGroupData() {
-		this.CommonService.liteNhomLeTet().subscribe(res => {
+		this.CommonService.liteNhomLeTet().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.gridService.model.filterGroupDataChecked.Id_NhomLeTet = res.data.map((x: any) => {
@@ -266,10 +249,15 @@ export class dottangquaListComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(),
+			this.filter(),
 			this.sort.direction,
 			this.sort.active,
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
@@ -279,14 +267,8 @@ export class dottangquaListComponent implements OnInit {
 		this.dataSource.loadList(queryParams);
 	}
 
-	filterConfiguration(): any {
+	filter(): any {
 		const filter: any = {};
-		if (this.filterStatus && this.filterStatus.length > 0) {
-			filter.status = +this.filterStatus;
-		}
-		if (this.filterCondition && this.filterCondition.length > 0) {
-			filter.type = +this.filterCondition;
-		}
 		if (this.gridService &&  this.gridService.model.filterText) {
 			filter.DotTangQua = this.gridService.model.filterText['DotTangQua'];
 			filter.MoTa = this.gridService.model.filterText['MoTa'];
@@ -305,7 +287,7 @@ export class dottangquaListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.Id).subscribe(res => {
+			this.apiService.delete(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -342,7 +324,7 @@ export class dottangquaListComponent implements OnInit {
 				this.loadDataList(); //để không biến mất ổ khóa
 				return;
 			}
-			this.apiService.lock(item.Id, Locked).subscribe(res => {
+			this.apiService.lock(item.Id, Locked).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -356,13 +338,12 @@ export class dottangquaListComponent implements OnInit {
 	}
 
 	Add() {
-		const dottangquaModels = new dottangquaModel();
-		dottangquaModels.clear(); // Set all defaults fields
-		this.Edit(dottangquaModels);
+		const dataModel = new dottangquaModel();
+		dataModel.clear();
+		this.Edit(dataModel);
 	}
 
 	Edit(_item: dottangquaModel, allowEdit: boolean = true) {
-		//câu thông báo khi thực hiện trong tác vụ
 		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		let dialogRef;
@@ -379,7 +360,6 @@ export class dottangquaListComponent implements OnInit {
 	}
 
 	Nhanban(_item: dottangquaModel, allowEdit: boolean = true) {
-		//câu thông báo khi thực hiện trong tác vụ
 		let saveMessageTranslateParam = 'OBJECT.EDIT.DUPLICATE';
 		let nhanban = true;
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });

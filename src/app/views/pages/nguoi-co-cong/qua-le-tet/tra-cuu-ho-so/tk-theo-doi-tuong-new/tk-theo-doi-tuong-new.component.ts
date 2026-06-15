@@ -1,7 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
@@ -13,7 +14,8 @@ import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.se
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class thongKeTheoDoiTuongNewComponent implements OnInit {
+export class thongKeTheoDoiTuongNewComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	_name = "";
 	dataThongKe: any = { DoiTuongs: [], data: [] };
 	thongKe: number = 0;
@@ -29,7 +31,6 @@ export class thongKeTheoDoiTuongNewComponent implements OnInit {
 	filterProvince: number = 0;
 	filterWard: number = 0;
 
-	viewLoading: boolean = false;
 	queryParams: QueryParamsModel = new QueryParamsModel({});
 	allowExport = false;
 	Capcocau: number = 0;
@@ -61,17 +62,22 @@ export class thongKeTheoDoiTuongNewComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.Capcocau = res.Capcocau;
 			this.filterProvince = res.IdTinh;
 			if (res.Capcocau == 3) { //xã
 				this.filterWard = +res.ID_Goc;
 			}
 		})
-		this.CommonService.liteDotQua(true).subscribe(res => {
+		this.CommonService.liteDotQua(true).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.lstDot = res.data;
 		})
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadData() {
@@ -80,16 +86,15 @@ export class thongKeTheoDoiTuongNewComponent implements OnInit {
 			return;
 		}
 		this.queryParams = this.prepareQuery();
-		this.viewLoading = true;
 		this.display = false;
 		this.tracuu();
 	}
 
 	tracuu() {
+		this.display = false;
 		this.loadingSubject.next(true);
-		this.apiService.thongKeTheoDoiTuongnew(this.queryParams).subscribe(res => {
+		this.apiService.thongKeTheoDoiTuongnew(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
-			this.viewLoading = false;
 			this.display = true;
 			if (res && res.status == 1) {
 				this.dataThongKe = res.data
@@ -118,7 +123,7 @@ export class thongKeTheoDoiTuongNewComponent implements OnInit {
 			return;
 		}
 		this.loadingSubject.next(true);
-		this.apiService.exportTKDoiTuongNew(this.queryParams).subscribe(res => {
+		this.apiService.exportTKDoiTuongNew(this.queryParams).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
