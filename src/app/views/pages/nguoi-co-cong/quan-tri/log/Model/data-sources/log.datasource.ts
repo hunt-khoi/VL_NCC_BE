@@ -1,22 +1,22 @@
-import { BaseDataSource, QueryParamsModel, QueryResultsModel } from 'app/core/_base/crud';
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
+import { BaseDataSource, QueryParamsModel, QueryResultsModel } from 'app/core/_base/crud';
 import { LogService } from '../../Services/log.service';
 
 export class LogDataSource extends BaseDataSource {
-	constructor(private productsService: LogService) {
+	constructor(private apiService: LogService) {
 		super();
 	}
 
 	loadLogs(queryParams: QueryParamsModel) {
-		this.productsService.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
         this.loadingSubject.next(true);
-		this.productsService.getData(queryParams)
+		this.apiService.getData(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					if (resultFromServer && resultFromServer.status ==1) {
-						this.entitySubject.next(resultFromServer.data);
-						this.paginatorTotalSubject.next(resultFromServer.page.TotalCount);
+				tap(res => {
+					if (res && res.status ==1) {
+						this.entitySubject.next(res.data);
+						this.paginatorTotalSubject.next(res.page.TotalCount);
 					} else {
 						this.entitySubject.next([]);
 						this.paginatorTotalSubject.next(0);
@@ -28,14 +28,14 @@ export class LogDataSource extends BaseDataSource {
 	}
 	
 	loadListFile(queryParams: QueryParamsModel) {
-		this.productsService.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
         this.loadingSubject.next(true);
-		this.productsService.getFileLogs(queryParams)
+		this.apiService.getFileLogs(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					if (resultFromServer && resultFromServer.status ==1) {
-						this.entitySubject.next(resultFromServer.data);
-						this.paginatorTotalSubject.next(resultFromServer.page.TotalCount);
+				tap(res => {
+					if (res && res.status ==1) {
+						this.entitySubject.next(res.data);
+						this.paginatorTotalSubject.next(res.page.TotalCount);
 					} else {
 						this.entitySubject.next([]);
 						this.paginatorTotalSubject.next(0);

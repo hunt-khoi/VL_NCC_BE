@@ -1,9 +1,9 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
 import { HttpUtilsService } from '../../../../../../core/_base/crud/utils/http-utils.service';
 import { QueryParamsModel, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_ROOT_URL = environment.ApiRoot + '/quy-trinh-duyet';
 
@@ -31,8 +31,8 @@ export class QuaTrinhKhongCoNguoiDuyetService {
 		return this.http.get<any>(API_ROOT_URL + '/GetListLoai', { headers: httpHeaders });
 	}
 
-	GetListNextChecker(id_quatrinh: number, nguoi_gui: number) {
+	GetListNextChecker(id: number, sender: number) {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get<any>(API_ROOT_URL + `/GetListNextChecker?id_quatrinh=${id_quatrinh}&IdNguoiGui=${nguoi_gui}`, { headers: httpHeaders });
+		return this.http.get<any>(API_ROOT_URL + `/GetListNextChecker?id_quatrinh=${id}&IdNguoiGui=${sender}`, { headers: httpHeaders });
 	}
 }

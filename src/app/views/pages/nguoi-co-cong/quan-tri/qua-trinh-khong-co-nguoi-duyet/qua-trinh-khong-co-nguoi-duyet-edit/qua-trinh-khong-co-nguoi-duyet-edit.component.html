@@ -10,8 +10,8 @@
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
 		<div class="col-md-5 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;">
-			<button *ngIf="!data.isThaoluan" type="button" mat-raised-button color="primary" (click)="onSubmit()"
-				[disabled]="disabledBtn">
+			<button mat-raised-button (click)="onSubmit()" *ngIf="!data.isThaoluan" [disabled]="disabledBtn"
+				color="primary" type="button">
 				Lưu
 			</button>
 		</div>
@@ -19,8 +19,7 @@
 
 	<form class="kt-form" [formGroup]="itemForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true"
-				(close)="onAlertClose()">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [duration]="0" [showCloseButton]="true" (close)="onAlertClose()">
 				Không thể lưu, vui lòng kiểm tra lại thông tin!
 			</kt-alert>
 
@@ -60,7 +59,7 @@
 					</div>
 				</ng-container>
 				<div class="col-md-12 form-group kt-margin-bottom-10-mobile" *ngIf="isShowNhacnho 
-					&& ((ListNguoiDuyet.length > 0) || (nguoiduyet.NguoiDuyetDon && userId != nguoiduyet.NguoiDuyetDon))">
+					&& ((ListNguoiDuyet.length > 0) || (nguoiduyet.NguoiDuyetDon && userId !== nguoiduyet.NguoiDuyetDon))">
 					<button [disabled]="guiduyet" class="btn btn-primary" (click)="GuiDeXuatDuyet()">
 						{{ !guiduyet ? 'Nhắc nhở' : 'Đã nhắc nhở'}}
 					</button>

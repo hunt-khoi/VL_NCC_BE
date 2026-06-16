@@ -1,12 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ApplicationRef, OnDestroy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, BehaviorSubject, Subject } from 'rxjs';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table';
@@ -24,12 +23,12 @@ import { QuaTrinhKhongCoNguoiDuyetEditComponent } from '../qua-trinh-khong-co-ng
 	providers: [DatePipe]
 })
 
-export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
+export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: QuaTrinhKhongCoNguoiDuyetDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	dataResult: any[] = [];
@@ -43,6 +42,7 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 	gridModel: TableModel = new TableModel();
 	trangthaiduyet: boolean = false;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		public dataService: QuaTrinhKhongCoNguoiDuyetService,
@@ -54,7 +54,9 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-		this.dataService.GetListLoai().subscribe(res => {
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+		
+		this.dataService.GetListLoai().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.data) 
 				this.listLoai = res.data;
 			else
@@ -154,7 +156,7 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 
 		// Init DataSource
 		this.dataSource = new QuaTrinhKhongCoNguoiDuyetDataSource(this.dataService);
-		this.dataSource.entitySubject.subscribe(res => {
+		this.dataSource.entitySubject.pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.dataResult = res
 			this.tmpdataResult = []
 			if (this.dataResult && this.paginator) {
@@ -167,6 +169,11 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 				}
 			}
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadList(holdCurrentPage: boolean = true) {
@@ -214,20 +221,22 @@ export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit {
 	/* UI */
 	edit(QuaTrinhKhongCoNguoiDuyet: any, isThaoluan = false) {
 		var loaiphieu = this.listLoai.find(x => x.id == this.selectedLoai);
-		const dialogRef = this.dialog.open(QuaTrinhKhongCoNguoiDuyetEditComponent, { data: { QuaTrinhKhongCoNguoiDuyet, isThaoluan, loai: this.selectedLoai, urlTo: loaiphieu.urlTo } });
+		const dialogRef = this.dialog.open(QuaTrinhKhongCoNguoiDuyetEditComponent, { 
+			data: { QuaTrinhKhongCoNguoiDuyet, isThaoluan, loai: this.selectedLoai, urlTo: loaiphieu.urlTo } 
+		});
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) return;
-			this.loadList();
+			if (res) 
+				this.loadList();
 		});
 	}
 
 	timeline(QuaTrinhKhongCoNguoiDuyet: any) {
-		const dialogRef = this.dialog.open(SettingProcessComponent, { data: { data: QuaTrinhKhongCoNguoiDuyet, Type: QuaTrinhKhongCoNguoiDuyet.id_loai } });
+		const dialogRef = this.dialog.open(SettingProcessComponent, { data:
+			{ data: QuaTrinhKhongCoNguoiDuyet, Type: QuaTrinhKhongCoNguoiDuyet.id_loai } 
+		});
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.loadList();
+			if (res) 
+				this.loadList();
 		});
 	}
 	

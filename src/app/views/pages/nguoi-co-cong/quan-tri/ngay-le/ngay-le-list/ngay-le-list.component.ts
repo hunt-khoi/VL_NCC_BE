@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { HolidaysService } from '../Services/ngay-le.service';
 import { HolidaysEditDialogComponent} from '../ngay-le-edit/ngay-le-edit.dialog.component';
@@ -20,7 +19,8 @@ import { CommonService } from '../../../services/common.service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class HolidaysListComponent implements OnInit {
+export class HolidaysListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: HolidaysDataSource | undefined;
 	displayedColumns = ['STT', 'Title', 'Ngay','GhiChu','UpdatedDate','UpdatedBy', 'actions'];
@@ -28,6 +28,7 @@ export class HolidaysListComponent implements OnInit {
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	_name: string = "";
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(public apiService: HolidaysService,
 		public dialog: MatDialog,
@@ -39,6 +40,8 @@ export class HolidaysListComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		if (this.sort && this.paginator) {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
@@ -62,6 +65,11 @@ export class HolidaysListComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource) return;
 		const queryParams = new QueryParamsModel({},
@@ -82,7 +90,7 @@ export class HolidaysListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.deleteItem(item.Id_row).subscribe(res => {
+			this.apiService.deleteItem(item.Id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -101,8 +109,7 @@ export class HolidaysListComponent implements OnInit {
 	}
 
 	Edit(_item: HolidaysModel, allowEdit: boolean = true) {
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id_row > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id_row > 0 ?  'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, {name:this._name});
 		const dialogRef = this.dialog.open(HolidaysEditDialogComponent, { data: { _item, allowEdit} });
 		dialogRef.afterClosed().subscribe(res => {

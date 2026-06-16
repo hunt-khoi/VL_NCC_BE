@@ -1,11 +1,9 @@
-// Angular
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-//Component
+import { EmailHistoryService } from './Services/email-history.service';
 import { EmailHistoryComponent } from './email-history.component';
 import { EmailHistoryListComponent } from './email-history-list/email-history-list.component';
-import { EmailHistoryService } from './Services/email-history.service';
 
 const routes: Routes = [
 	{
@@ -28,11 +26,10 @@ const routes: Routes = [
 	providers: [
 		EmailHistoryService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		EmailHistoryComponent,
 		EmailHistoryListComponent,
 	]
 })
+
 export class EmailHistoryModule {}

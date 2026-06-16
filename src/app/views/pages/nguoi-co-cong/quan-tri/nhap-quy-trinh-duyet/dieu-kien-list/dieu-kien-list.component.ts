@@ -1,16 +1,15 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, Input, OnChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
-import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
-import { NhapCapQuanLyDuyetModel, NhapQuyTrinhDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
+import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
+import { NhapQuyTrinhDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
+import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
 import { DieuKienEditDialogComponent } from '../dieu-kien-edit/dieu-kien-edit.dialog.component';
 
 @Component({
@@ -19,34 +18,26 @@ import { DieuKienEditDialogComponent } from '../dieu-kien-edit/dieu-kien-edit.di
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class DieuKienListComponent implements OnInit, OnChanges {
+export class DieuKienListComponent implements OnInit, OnChanges, OnDestroy {
+	private destroy$ = new Subject<void>();
+	// eslint-disable-next-line @angular-eslint/no-input-rename
 	@Input('Id_QuyTrinh') idqt: number | undefined;
+	item: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-	//==========================
-	loadingControl = new BehaviorSubject<boolean>(false);
-	item: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
-	oldItem: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
-	hasFormErrors: boolean = false;
-	//==========================
-	showButton: boolean = false;
-	showvitri: boolean = true;
-	showPQ: boolean = true;
 	//==========================
 	dataSource: NhapQuyTrinhDuyetDataSource | undefined;
 	displayedColumns = ['#', 'DieuKien', 'DoiTuong', /*'title', 'value', */'actions'];
 	@ViewChild('paginator_tab2', { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort2', { static: true }) sort: MatSort | undefined;
-	// Selection
-	selection = new SelectionModel<NhapCapQuanLyDuyetModel>(true, []);
-	productsResult: NhapCapQuanLyDuyetModel[] = [];
+
 	viewLoading: boolean = false;
 	allowEdit: boolean = true;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
-		public nhapQuyTrinhDuyetService: NhapQuyTrinhDuyetService,
-		private commonService: CommonService,
+		public apiService: NhapQuyTrinhDuyetService,
 		private activatedRoute: ActivatedRoute,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
@@ -54,6 +45,7 @@ export class DieuKienListComponent implements OnInit, OnChanges {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		this.viewLoading = true;
 		this.loadingSubject.next(true);
 
@@ -69,23 +61,20 @@ export class DieuKienListComponent implements OnInit, OnChanges {
 				).subscribe();
 		}
 
-		this.dataSource = new NhapQuyTrinhDuyetDataSource(this.nhapQuyTrinhDuyetService);
+		this.dataSource = new NhapQuyTrinhDuyetDataSource(this.apiService);
 		this.activatedRoute.params.subscribe(_ => {
 			if (this.dataSource) {
-				let queryParams = this.nhapQuyTrinhDuyetService.lastFilter1$.getValue();
+				let queryParams = this.apiService.lastFilter1$.getValue();
 				if (this.idqt)
 					queryParams.filter.ID_QuyTrinh = this.idqt;
 				this.dataSource.loadListDieuKien(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	ngOnChanges() {
@@ -142,7 +131,7 @@ export class DieuKienListComponent implements OnInit, OnChanges {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.nhapQuyTrinhDuyetService.deleteDieuKien(row.Id).subscribe(res => {
+			this.apiService.deleteDieuKien(row.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}

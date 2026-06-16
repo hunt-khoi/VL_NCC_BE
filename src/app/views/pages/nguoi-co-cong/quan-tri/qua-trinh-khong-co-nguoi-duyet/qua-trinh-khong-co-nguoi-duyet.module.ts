@@ -2,10 +2,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-//Component
-import { QuaTrinhKhongCoNguoiDuyetComponent } from './qua-trinh-khong-co-nguoi-duyet.component';
-import { QuaTrinhKhongCoNguoiDuyetListComponent } from './qua-trinh-khong-co-nguoi-duyet-list/qua-trinh-khong-co-nguoi-duyet-list.component';
-import { QuaTrinhKhongCoNguoiDuyetEditComponent } from './qua-trinh-khong-co-nguoi-duyet-edit/qua-trinh-khong-co-nguoi-duyet-edit.component';
 //Service
 import { QuaTrinhKhongCoNguoiDuyetService } from './Services/qua-trinh-khong-co-nguoi-duyet.service';
 import { NhapSoLieuDuyetService } from './../../quan-ly-mau-so-lieu/nhap-so-lieu-duyet/services/nhap-so-lieu-duyet.service';
@@ -15,6 +11,10 @@ import { NhapBaoHiemDuyetService } from '../../bao-hiem-y-te/nhap-bao-hiem-duyet
 import { HoSoNhaOService } from '../../ho-tro-nha-o/ho-so-nha-o/Services/ho-so-nha-o.service';
 import { NienHanService } from '../../nien-han-dung-cu/nien-han/Services/nien-han.service';
 import { HoTroService } from '../../quy-den-on-dap-nghia/ho-tro/Services/ho-tro.service';
+//Component
+import { QuaTrinhKhongCoNguoiDuyetComponent } from './qua-trinh-khong-co-nguoi-duyet.component';
+import { QuaTrinhKhongCoNguoiDuyetListComponent } from './qua-trinh-khong-co-nguoi-duyet-list/qua-trinh-khong-co-nguoi-duyet-list.component';
+import { QuaTrinhKhongCoNguoiDuyetEditComponent } from './qua-trinh-khong-co-nguoi-duyet-edit/qua-trinh-khong-co-nguoi-duyet-edit.component';
 
 const routes: Routes = [
 	{

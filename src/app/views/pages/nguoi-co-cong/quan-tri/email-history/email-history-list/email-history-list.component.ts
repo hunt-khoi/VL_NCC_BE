@@ -1,20 +1,19 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, ApplicationRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { EmailHistoryDataSource } from '../Model/data-sources/email-history.datasource';
 import { EmailHistoryService } from '../Services/email-history.service';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
-import { TableService } from '../../../../../partials/table/table.service';
-import { TableModel } from '../../../../../partials/table';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -25,13 +24,12 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class EmailHistoryListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: EmailHistoryDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Filter fields
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	EmailHistorysResult: any[] = [];
@@ -64,7 +62,6 @@ export class EmailHistoryListComponent implements OnInit, OnDestroy {
 		private ref: ApplicationRef,
 		private commonService: CommonService) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		//#region ***Filter***
 		this.getTreeDonVi();
@@ -76,7 +73,6 @@ export class EmailHistoryListComponent implements OnInit, OnDestroy {
 		this.girdModel.filterText['Username'] = "";
 		this.girdModel.filterText['Message'] = "";
 		this.girdModel.disableButtonFilter['Locked'] = true;
-		//TH1: #filter
 		this.girdModel.filterGroupDataChecked = {
 			"TrangThai": [
 				{
@@ -222,12 +218,14 @@ export class EmailHistoryListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.gridService)
 			this.gridService.Clear();
 	}
 
 	getTreeDonVi() {
-		this.commonService.TreeDonVi().subscribe(res => {
+		this.commonService.TreeDonVi().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.datatreeDonVi.next(res.data);
 			}
@@ -290,22 +288,18 @@ export class EmailHistoryListComponent implements OnInit, OnDestroy {
 		this.loadEmailHistorysList();
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		const filter: any = {};
-		//#filter
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.Brandname = this.gridService.model.filterText['Brandname'];
 			filter.SDT = this.gridService.model.filterText['SDT'];
 			filter.Username = this.gridService.model.filterText['Username'];
 			filter.Message = this.gridService.model.filterText['Message'];
 		}
-		if (this.BatDau_tungay != '') {
+		if (this.BatDau_tungay != '') 
 			filter.tungay = this.BatDau_tungay;
-		}
-		if (this.BatDau_denngay != '') {
+		if (this.BatDau_denngay != '') 
 			filter.denngay = this.BatDau_denngay;
-		}
 		filter.IdDonVi = this.IdDonVi;
 		filter.Loai = this.Loai;
 		return filter;
@@ -320,7 +314,7 @@ export class EmailHistoryListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.IdEmail).subscribe(res => {
+			this.apiService.delete(item.IdEmail).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -345,8 +339,7 @@ export class EmailHistoryListComponent implements OnInit, OnDestroy {
 			for (let i = 0; i < this.selection.selected.length; i++) {
 				idsForDeletion.push(this.selection.selected[i].IdEmail);
 			}
-			this.apiService.deletes(idsForDeletion).subscribe(() => {
-				
+			this.apiService.deletes(idsForDeletion).pipe(takeUntil(this.destroy$)).subscribe(() => {
 				this.layoutUtilsService.showInfo(_deleteMessage);
 				this.loadEmailHistorysList(true);
 				this.selection.clear();

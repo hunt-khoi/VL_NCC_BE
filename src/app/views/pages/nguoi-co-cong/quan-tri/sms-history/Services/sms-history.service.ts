@@ -1,10 +1,10 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { environment } from 'environments/environment';
 import { HttpUtilsService } from 'app/core/_base/crud/utils/http-utils.service';
 import { QueryParamsModel, QueryResultsModel } from 'app/core/_base/crud';
 import { SMSHistoryModel } from '../Model/sms-history.model';
+import { environment } from 'environments/environment';
 
 const API_ROOT_URL = environment.ApiRoot + '/smshistory';
 
@@ -49,7 +49,7 @@ export class SMSHistoryService {
 		return this.http.post<SMSHistoryModel>(API_ROOT_URL + '/update', item, { headers: httpHeaders });
 	}
 
-	LockNUnLock(itemId: any, value: boolean) {
+	lock(itemId: any, value: boolean) {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_ROOT_URL}/LockAndUnLock?id=${itemId}&Value=${value}`;
 		return this.http.get<any>(url, { headers: httpHeaders });

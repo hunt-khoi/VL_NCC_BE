@@ -1,21 +1,18 @@
-import { Component, OnInit, Injectable } from '@angular/core';
-import { LogService } from './Services/log.service';
+import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
+import { LogService } from './Services/log.service';
 
 @Component({
-    selector: 'kt-log',
-    templateUrl: './log.component.html',
+  selector: 'kt-log',
+  templateUrl: './log.component.html',
 })
-@Injectable()
 export class LogComponent implements OnInit {
 
-  constructor(
-		private LogService : LogService
-	) {}
+  constructor(private apiService: LogService) { }
 
   ngOnInit() {
-    if (this.LogService != undefined)
-		this.LogService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'desc', 'CreatedDate', 0, 10));
+    if (this.apiService != undefined)
+      this.apiService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'desc', 'CreatedDate', 0, 10));
   }
 }

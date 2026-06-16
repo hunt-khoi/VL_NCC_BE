@@ -31,12 +31,12 @@ export class HolidaysService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	Create(item): Observable<any> {
+	create(item: HolidaysModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_PRODUCTS_URL, item, { headers: httpHeaders });
 	}
 
-	Update(item: HolidaysModel): Observable<any> {
+	update(item: HolidaysModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_PRODUCTS_URL, item, { headers: httpHeaders });
 	}

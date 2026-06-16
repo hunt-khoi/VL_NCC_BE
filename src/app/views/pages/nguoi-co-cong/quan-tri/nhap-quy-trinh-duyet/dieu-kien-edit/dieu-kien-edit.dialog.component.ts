@@ -1,6 +1,8 @@
-import { Component, OnInit, Inject, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
@@ -11,10 +13,10 @@ import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.servi
 	templateUrl: './dieu-kien-edit.dialog.component.html',
 })
 
-export class DieuKienEditDialogComponent implements OnInit {
+export class DieuKienEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -26,11 +28,11 @@ export class DieuKienEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -45,20 +47,19 @@ export class DieuKienEditDialogComponent implements OnInit {
 		private danhMucChungService: CommonService) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
 
-		this.danhMucChungService.liteConstLoaiHoSo().subscribe(res => {
+		this.danhMucChungService.liteConstLoaiHoSo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.listDT = res.data;
 				this.changeDetectorRefs.detectChanges();
 			};
 		});
 		if (this.item.Id > 0) {
-			this._service.get_ChiTietDieuKien(this.item.Id).subscribe(res => {
+			this._service.get_ChiTietDieuKien(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.item = res.data;
 					this.createForm();
@@ -75,6 +76,11 @@ export class DieuKienEditDialogComponent implements OnInit {
 		this.createForm();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	createForm() {
 		this.itemForm = this.fb.group({
 			title: [this.item.DieuKien, Validators.required],
@@ -82,7 +88,7 @@ export class DieuKienEditDialogComponent implements OnInit {
 			tgxa: [this.item.TGXuLyXa]
 		});
 		if (this.item.Id == 0) {
-			this._service.findAllCapQuanLy(this.item.Id_QuyTrinh).subscribe(res => {
+			this._service.findAllCapQuanLy(this.item.Id_QuyTrinh).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.item.CapQL = res.data.map((x: any) => {
 						return {
@@ -105,21 +111,14 @@ export class DieuKienEditDialogComponent implements OnInit {
 	}
 
 	getTitle(): string {
-		let result = "Thêm mới";
-		if (!this.item || !this.item.Id) {
-			return result;
-		}
-		if (!this.allowEdit) {
-			result = 'Chi tiết';
-			return result;
-		}
-		result = 'Cập nhật';
-		return result;
+		if (!this.item || !this.item.Id) 
+			return 'Thếm mới';
+		if (!this.allowEdit)
+			return 'Chi tiết';
+		return 'Cập nhật';
 	}
 
-	/** ACTIONS */
 	prepare(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		const item: any = {};
 		item.Id = this.item.Id;
@@ -133,39 +132,33 @@ export class DieuKienEditDialogComponent implements OnInit {
 	}
 	
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
-		const updated= this.prepare();
-		if (updated.Id > 0) {
+
+		const updated = this.prepare();
+		if (updated.Id > 0) 
 			this.Update(updated);
-		} else {
+		else 
 			this.Create(updated, withBack);
-		}
 	}
 
 	Update(item: any) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this._service.CreateDieuKien(item).subscribe(res => {
+		this._service.CreateDieuKien(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: "Quy trình theo đối tượng" });
 				this.layoutUtilsService.showInfo(_messageType);
-				this.dialogRef.close({
-					item
-				});
+				this.dialogRef.close({ item });
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -176,16 +169,14 @@ export class DieuKienEditDialogComponent implements OnInit {
 	Create(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.disabledBtn = true;
-		this._service.CreateDieuKien(item).subscribe(res => {
+		this._service.CreateDieuKien(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: "Quy trình theo đối tượng" });
 				this.layoutUtilsService.showInfo(_messageType);
 				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.item = {
@@ -209,8 +200,6 @@ export class DieuKienEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

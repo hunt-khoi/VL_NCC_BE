@@ -1,55 +1,47 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
+import { merge, BehaviorSubject, Subject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, QueryParamsModel, MessageType } from '../../../../../../core/_base/crud';
-import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
-import { NhapQuyTrinhDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
-import { NhapQuyTrinhDuyetEditComponent } from '../nhap-quy-trinh-duyet-edit/nhap-quy-trinh-duyet-edit.component';
-import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
 import { CommonService } from '../../../services/common.service';
+import { NhapQuyTrinhDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
+import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
+import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
+import { NhapQuyTrinhDuyetEditComponent } from '../nhap-quy-trinh-duyet-edit/nhap-quy-trinh-duyet-edit.component';
 
 @Component({
 	selector: 'm-nhap-quy-trinh-duyet-list',
 	templateUrl: './nhap-quy-trinh-duyet-list.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush
-
 })
-
-export class NhapQuyTrinhDuyetListComponent implements OnInit {
+export class NhapQuyTrinhDuyetListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
-
 	dataSource: NhapQuyTrinhDuyetDataSource | undefined;
 	displayedColumns = ['#', 'TieuDe', 'MoTa', 'Loai', 'NhanMailKhiDuyetDon', 'NhanMailKhiKhongDuyetDon', 'NhanMailKhiKhongTimThayNguoiDuyetDon', 'actions'];
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Selection
-	selection = new SelectionModel<NhapQuyTrinhDuyetModel>(true, []);
-	productsResult: NhapQuyTrinhDuyetModel[] = [];
-	// Filter fields
+
 	//List các danh sách email
 	listKhiDuyetDon: any[] = [];
 	listKhiKhongDuyetDon: any[] = [];
 	listKhiKhongThayNguoiDuyetDon: any[] = [];
 	//==========================
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	loadingControl = new BehaviorSubject<boolean>(false);
 	item: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
-	oldItem: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
 	hasFormErrors: boolean = false;
 	//==========================
 	showButton: boolean = false;
 	showvitri: boolean = true;
 	//==========================
-	showTruyCapNhanh: boolean = true;
-	id_menu: number = 371;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		public nhapQuyTrinhDuyetService: NhapQuyTrinhDuyetService,
@@ -59,6 +51,7 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		this.loadingSubject.next(true);
 
 		if (this.sort && this.paginator) {
@@ -73,15 +66,12 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 				).subscribe();
 		}
 		this.dataSource = new NhapQuyTrinhDuyetDataSource(this.nhapQuyTrinhDuyetService);
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 		this.loadDataList();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	//------------Load data-------------------------
@@ -103,27 +93,23 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 		this.showButton = true;
 		this.item.ID_QuyTrinh = row.ID_Row;
 		this.item.TenQuyTrinh = row.TieuDe;
-		if (row.data_NhanMailKhiDuyetDon.length > 0) {
+		if (row.data_NhanMailKhiDuyetDon.length > 0) 
 			this.listKhiDuyetDon = row.data_NhanMailKhiDuyetDon;
-		}
-		else {
+		else 
 			this.listKhiDuyetDon = [];
-		}
-		if (row.data_NhanMailKhiKhongDuyetDon.length > 0) {
+
+		if (row.data_NhanMailKhiKhongDuyetDon.length > 0) 
 			this.listKhiKhongDuyetDon = row.data_NhanMailKhiKhongDuyetDon;
-		} else {
+		else 
 			this.listKhiKhongDuyetDon = [];
-		}
-		if (row.data_NhanMailKhiKhongTimThayNguoiDuyetDon.length > 0) {
+		
+		if (row.data_NhanMailKhiKhongTimThayNguoiDuyetDon.length > 0) 
 			this.listKhiKhongThayNguoiDuyetDon = row.data_NhanMailKhiKhongTimThayNguoiDuyetDon;
-		}
-		else {
+		else 
 			this.listKhiKhongThayNguoiDuyetDon = [];
-		}
-		if (this.itemForm) {
-			this.itemForm.controls['tenQuyTrinh'].setValue(row.TieuDe);
-			this.itemForm.controls['moTa'].setValue(row.MoTa);
-		}
+
+		this.itemForm.controls['tenQuyTrinh'].setValue(row.TieuDe);
+		this.itemForm.controls['moTa'].setValue(row.MoTa);
 		this.changeDetectorRefs.detectChanges();
 	}
 	//===Button xóa trên lưới===========
@@ -136,7 +122,7 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.nhapQuyTrinhDuyetService.deleteQuyTrinhDuyet(row.ID_QuyTrinh, row.TenQuyTrinh).subscribe(res => {
+			this.nhapQuyTrinhDuyetService.deleteQuyTrinhDuyet(row.ID_QuyTrinh, row.TenQuyTrinh).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showActionNotification(_deleteMessage, MessageType.Delete, 5000, true, false);
 				}
@@ -147,7 +133,8 @@ export class NhapQuyTrinhDuyetListComponent implements OnInit {
 			});
 		});
 	}
-	//============Goi Popup=================
+
+	//============Gọi Popup=================
 	AddQuyTrinhDuyet() {
 		const quytrinhModel = new NhapQuyTrinhDuyetModel();
 		quytrinhModel.clear(); // Set all defaults fields

@@ -6,18 +6,17 @@
 <div class="row">
 	<div class="col-md-12">
 		<button mat-stroked-button color="primary" (click)="load('theochucnang')" 
-			[ngClass]="{'selected-button':folder=='theochucnang'}">Theo chức năng
+			[ngClass]="{'selected-button':folder==='theochucnang'}">Theo chức năng
 		</button>&nbsp;
 		<button mat-stroked-button color="accent" (click)="load('theongay')"
-			[ngClass]="{'selected-button':folder=='theongay'}">Theo thời gian
+			[ngClass]="{'selected-button':folder==='theongay'}">Theo thời gian
 		</button>&nbsp;
 		<button mat-stroked-button color="info" (click)="load('theonguoidung')" 
-			[ngClass]="{'selected-button':folder=='theonguoidung'}">Theo người dùng
+			[ngClass]="{'selected-button':folder==='theonguoidung'}">Theo người dùng
 		</button>
 	</div>
 </div>
 <div class="mat-table__wrapper">
-	<!-- Checkbox Column -->
 	<table mat-table [dataSource]="dataSource" matSort #sort1="matSort" matSortActive="Name" matSortDirection="desc"
 		   matSortDisableClear cdkDropListGroup>
 		<ng-container matColumnDef="STT">
@@ -40,14 +39,14 @@
 			<th mat-header-cell *matHeaderCellDef style="width: 100px;">
 				<span translate="COMMON.TACVU"></span>
 			</th>
-			<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">
-				<a href="viewer/file-dinh-kem/0?path={{item.path}}" target="_blank" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
+			<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button ? 'list-button' : ''">
+				<a href="viewer/file-dinh-kem/0?path={{item.path}}" target="_blank" mat-button [ngClass]="btnClass"
 				   matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" type="button">
 					<mat-icon>visibility</mat-icon>
 					<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 				</a>
-				<button (click)="Download(item)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button"
-						matTooltip="{{ 'COMMON.DOWNLOAD' | translate }}" color="info" type="button">
+				<button (click)="Download(item)" mat-button [ngClass]="btnClass"
+					matTooltip="{{ 'COMMON.DOWNLOAD' | translate }}" color="info" type="button">
 					<mat-icon>cloud_download</mat-icon>
 					<span class="button-text">{{ 'COMMON.DOWNLOAD' | translate }}</span>
 				</button>
@@ -56,13 +55,11 @@
 
 		<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
 		<tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="row.highlighted = !row.highlighted"
-			[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true"
-			(mouseout)="row.hovered = false"></tr>
+			[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
+		</tr>
 	</table>
 
-	<div class="mat-table__message" *ngIf="!dataSource.hasItems">
-		<span translate="COMMON.NO_RECORD_FOUND"></span>
-	</div>
+	<div class="mat-table__message" *ngIf="!dataSource.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
 </div>
 
 <div class="mat-table__bottom" style="margin-top: 1px;">

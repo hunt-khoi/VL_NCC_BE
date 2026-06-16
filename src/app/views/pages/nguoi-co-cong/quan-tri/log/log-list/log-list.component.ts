@@ -1,24 +1,21 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, OnDestroy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
-import { LogDataSource } from '../Model/data-sources/log.datasource';
-//Service
-import { LogService } from '../Services/log.service';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-//Model
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { LogModel } from '../Model/log.model';
-import { TableService } from '../../../../../partials/table/table.service';
-import { TableModel } from '../../../../../partials/table';
-import moment from 'moment';
+import { LogService } from '../Services/log.service';
+import { LogDataSource } from '../Model/data-sources/log.datasource';
 import { CookieService } from 'ngx-cookie-service';
+import moment from 'moment';
 
 @Component({
 	selector: 'm-log-list',
@@ -28,20 +25,17 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class LogListComponent implements OnInit, OnDestroy {
-
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: LogDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Filter fields
 	// Selection
 	selection = new SelectionModel<LogModel>(true, []);
 	LogsResult: LogModel[] = [];
 	tmpLogsResult: LogModel[] = [];
 
-	haveFilter: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
@@ -59,6 +53,7 @@ export class LogListComponent implements OnInit, OnDestroy {
 	displayedColumns1 = ['STT', 'Name', 'actions'];
 	listFile: any[] = [];
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		private apiService: LogService,
@@ -69,18 +64,17 @@ export class LogListComponent implements OnInit, OnDestroy {
 		private ref: ApplicationRef,
 		private commonService: CommonService) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		this.route.paramMap.subscribe(params => {
 			this.LoaiDoiTuong = params.get('loai') || '0';
 			const id = params.get('id');
 			this.IdDoiTuong = id ? +id : 0;
 		});
-		
+
 		if (this.IdDoiTuong == 0) {
-			// let now = moment();
-			// let from = now.set("date", 1)
 			this.tungay = moment().subtract(1, 'days');
 			this.denngay = moment();
 		}
@@ -96,7 +90,6 @@ export class LogListComponent implements OnInit, OnDestroy {
 		this.girdModel.filterText['HanhDong'] = "";
 		this.girdModel.filterText['NoiDung'] = "";
 		this.girdModel.disableButtonFilter['Locked'] = true;
-		//TH1: #filter
 		this.girdModel.filterGroupDataChecked = {
 			"Locked": [
 				{
@@ -253,23 +246,26 @@ export class LogListComponent implements OnInit, OnDestroy {
 				}
 			}
 		});
-		this.apiService.getFileLogs(new QueryParamsModel({})).subscribe(res => {
+		this.apiService.getFileLogs(new QueryParamsModel({})).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listFile = res.data;
 		})
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.gridService)
 			this.gridService.Clear();
 	}
 
 	GetAllLoaiDoiTuong() {
-		this.commonService.Log_LoaiLog().subscribe(res => {
+		this.commonService.Log_LoaiLog().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.ListLoaiDoiTuong = res.data;
 		})
 	}
+
 	GetAllLoaiHanhDong() {
-		this.commonService.Log_HanhDong().subscribe(res => {
+		this.commonService.Log_HanhDong().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.ListLoaiHanhDong = res.data;
 		})
 	}
@@ -288,7 +284,6 @@ export class LogListComponent implements OnInit, OnDestroy {
 		this.dataSource.loadLogs(queryParams);
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		const filter: any = {};
 		if (this.gridService && this.gridService.model.filterText) {
@@ -322,7 +317,7 @@ export class LogListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.IdRow).subscribe(res => {
+			this.apiService.delete(item.IdRow).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -347,7 +342,7 @@ export class LogListComponent implements OnInit, OnDestroy {
 			for (let i = 0; i < this.selection.selected.length; i++) {
 				idsForDeletion.push(this.selection.selected[i].Id);
 			}
-			this.apiService.deletes(idsForDeletion).subscribe(() => {
+			this.apiService.deletes(idsForDeletion).pipe(takeUntil(this.destroy$)).subscribe(() => {
 				this.layoutUtilsService.showInfo(_deleteMessage);
 				this.loadLogsList(true);
 				this.selection.clear();

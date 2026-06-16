@@ -1,17 +1,13 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Inject, ViewChild, HostListener } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Inject, HostListener, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
-import { BehaviorSubject } from 'rxjs';
-import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
-import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
-import { NhapCapQuanLyDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
-import { ChonNhieuNhanVienListComponent, ChonNhieuNhanVienListModel } from '../../../components';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
+import { ChonNhieuNhanVienListComponent, ChonNhieuNhanVienListModel } from '../../../components';
+import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
+import { NhapCapQuanLyDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
 
 @Component({
 	selector: 'm-nhap-cap-quan-ly-duyet-edit',
@@ -19,23 +15,12 @@ import { CommonService } from '../../../services/common.service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class NhapCapQuanLyDuyetEditComponent implements OnInit {
-
-	// Table fields
-	loadingSubject = new BehaviorSubject<boolean>(false);
-	dataSource: NhapQuyTrinhDuyetDataSource | undefined;
-	displayedColumns = ['#', 'TieuDe', 'ViTri', 'CapQuanLy', 'NguoiNhanMail', 'GhiChu', 'actions'];
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
-	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-
-	// Selection
-	selection = new SelectionModel<NhapCapQuanLyDuyetModel>(true, []);
-	productsResult: NhapCapQuanLyDuyetModel[] = [];
-	// Filter fields
+export class NhapCapQuanLyDuyetEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	//List các danh sách email
 	listNguoiNhanEmail: any[] = [];
 	//==========================
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	loadingControl = new BehaviorSubject<boolean>(false);
 	item: NhapCapQuanLyDuyetModel = new NhapCapQuanLyDuyetModel();
 	oldItem: NhapCapQuanLyDuyetModel = new NhapCapQuanLyDuyetModel();
@@ -84,11 +69,12 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		{ icon: "chat", name: "Kết quả thu hồi" }
 	];
 	allowEdit: boolean = true;
+	loadingSubject = new BehaviorSubject<boolean>(false);
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.luuvacapnhat(true);
 		}
 	}
@@ -116,7 +102,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		this.getTreeValue();
 		this.loadListData();
 		if (this.item.ID_CapQuanLy > 0) {
-			this.nhapQuyTrinhDuyetService.get_ChiTietCapQuanLy(this.item.ID_CapQuanLy).subscribe(res => {
+			this.nhapQuyTrinhDuyetService.get_ChiTietCapQuanLy(this.item.ID_CapQuanLy).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				if (res.ID_CapQuanLy == -2) {
 					const message = `Lỗi! ` + res.ID_CapQuanLy;
@@ -147,8 +133,13 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		}, 100);
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	getTreeValue() {
-		this.commonService.Get_CoCauToChuc().subscribe(res => {
+		this.commonService.Get_CoCauToChuc().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.data && res.data.length > 0) {
 				this.datatree.next(res.data);
 				if (+this.item.StructureID > 0) {
@@ -158,8 +149,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 				}
 				this.loadListChucVu();
 				this.loadPermission();
-				if (this.itemForm)
-					this.itemForm.controls['drp'].setValue(this.ID_Struct);
+				this.itemForm.controls['drp'].setValue(this.ID_Struct);
 				this.changeDetectorRefs.detectChanges();
 			}
 		});
@@ -193,9 +183,9 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			temp.icon = [this.item.ID_CapQuanLy > 0 ? this.item.Icon : 'description', Validators.required];
 		if (this.item.Processmethod == '2')
 			temp.id_back = [this.item.ID_Back + '', Validators.required];
+
 		this.itemForm = this.itemFB.group(temp);
 		this.changeDetectorRefs.detectChanges();
-
 		if (!this.allowEdit)
 			this.itemForm.disable();
 	}
@@ -203,16 +193,14 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		this.item = Object.assign({}, this.oldItem);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
 
-
 	//============Hàm load chức vụ=================
 	loadListCapBack(IdQuyTrinh: number, IdCap: number, ViTri: number) {
-		this.nhapQuyTrinhDuyetService.GetListCapBack(IdQuyTrinh, IdCap, ViTri).subscribe(res => {
+		this.nhapQuyTrinhDuyetService.GetListCapBack(IdQuyTrinh, IdCap, ViTri).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listCapDuyetQT = res.data;
 			}
@@ -223,7 +211,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		});
 	}
 	loadListChucVu() {
-		this.commonService.GetListPositionbyStructure(this.ID_Struct).subscribe(res => {
+		this.commonService.GetListPositionbyStructure(this.ID_Struct).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listChucDanh = res.data;
 			} else {
@@ -233,20 +221,18 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			if (this.item.ID_ChucDanh > 0)
 				this.id_cd = '' + this.item.ID_ChucDanh;
 			else {
-				if (res.data.length > 0) {
+				if (res.data.length > 0) 
 					this.id_cd = '' + res.data[0].ID;
-				} else {
+				else 
 					this.id_cd = '';
-				}
 			}
-			this.commonService.GetListJobtitleByStructure(this.id_cd, this.ID_Struct).subscribe(res => {
+			this.commonService.GetListJobtitleByStructure(this.id_cd, this.ID_Struct).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.listChucVu = res.data;
 				} else {
 					this.listChucVu = [];
 					this.layoutUtilsService.showError(res.error.message);
 				}
-				if (!this.itemForm) return;
 				if (this.item.ID_ChucVu == 0) {
 					if (this.id_capduyet == "-2") {
 						if (res.data.length > 0) {
@@ -263,7 +249,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	}
 
 	loadPermission() {
-		this.nhapQuyTrinhDuyetService.GetListPermission().subscribe(res => {
+		this.nhapQuyTrinhDuyetService.GetListPermission().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listNhomQuyen = res.data;
 				this.setListQuyen(this.item.Permission_CodeGroup);
@@ -290,9 +276,8 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	}
 
 	loadListData() {
-		this.commonService.GetListPosition().subscribe(res => {
+		this.commonService.GetListPosition().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listChucDanhLite = res.data;
-			if (!this.itemForm) return;
 			if (res.data.length > 0) {
 				if (this.item.ID_ChucVu > 0)
 					this.itemForm.controls['chucDanh'].setValue('' + this.item.ID_ChucVu);
@@ -303,7 +288,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			}
 			this.changeDetectorRefs.detectChanges();
 		});
-		this.nhapQuyTrinhDuyetService.GetListApprovalLevel().subscribe(res => {
+		this.nhapQuyTrinhDuyetService.GetListApprovalLevel().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				if (!this.item.AllowDevChecker)
 					res.data.splice(0, 2);
@@ -318,7 +303,7 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			}
 			this.changeDetectorRefs.detectChanges();
 		});
-		this.nhapQuyTrinhDuyetService.GetListApprovalLevel_Max().subscribe(res => {
+		this.nhapQuyTrinhDuyetService.GetListApprovalLevel_Max().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listCapDuyetMax = res.data;
 			} else {
@@ -331,10 +316,9 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 
 	loadChucDanhChange(idcd: any) {
 		let id_st = this.ID_Struct;
-		this.commonService.GetListJobtitleByStructure(idcd, id_st).subscribe(res => {
+		this.commonService.GetListJobtitleByStructure(idcd, id_st).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listChucVu = res.data;
-				if (!this.itemForm) return;
 				if (this.listChucVu.length > 0) 
 					this.itemForm.controls['chucVu'].setValue('' + res.data[0].ID);
 				else 
@@ -348,7 +332,6 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	}
 
 	loadChange(val: any) {
-		if (!this.itemForm) return;
 		this.itemForm.controls['chucVu'].setValue(" ");
 		this.itemForm.controls['chucDanh'].setValue(" ");
 		this.itemForm.controls["quyen"].setValue(" ");
@@ -450,7 +433,8 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.nhapQuyTrinhDuyetService.deleteCapQuanLy(row.ID_CapQuanLy, this.tenquytrinh, row.TenCapDuyet).subscribe(res => {
+			this.nhapQuyTrinhDuyetService.deleteCapQuanLy(row.ID_CapQuanLy, this.tenquytrinh, row.TenCapDuyet)
+				.pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showError(_deleteMessage);
 				}
@@ -472,12 +456,10 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			this.showCapQuanLyMax = false;
 			this.showChucVu = false;
 			this.showQuyen = true;
-			if (this.itemForm) {
-				this.itemForm.controls['chucVu'].setValue(" ");
-				this.itemForm.controls['nhomQuyen'].setValue(row.Permission_CodeGroup);
-				this.itemForm.controls['quyen'].setValue(row.Permission_Code);
-			}
-			this.nhapQuyTrinhDuyetService.GetListPermission().subscribe(res => {
+			this.itemForm.controls['chucVu'].setValue(" ");
+			this.itemForm.controls['nhomQuyen'].setValue(row.Permission_CodeGroup);
+			this.itemForm.controls['quyen'].setValue(row.Permission_Code);
+			this.nhapQuyTrinhDuyetService.GetListPermission().pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.listNhomQuyen = res.data;
 					if (res.data.length > 0) {
@@ -496,15 +478,14 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 			if (row.ID_CapDuyet == -2) {
 				this.showCapQuanLyMax = false;
 				this.showChucVu = true;
-				this.commonService.GetListPositionbyStructure(this.ID_Struct).subscribe(res => {
+				this.commonService.GetListPositionbyStructure(this.ID_Struct).pipe(takeUntil(this.destroy$)).subscribe(res => {
 					this.listChucDanh = res.data;
 					if (res.data.length > 0) {
 						this.id_cd = '' + row.ID_ChucDanh;
-						this.commonService.GetListJobtitleByStructure(this.id_cd, this.ID_Struct).subscribe(res => {
+						this.commonService.GetListJobtitleByStructure(this.id_cd, this.ID_Struct).pipe(takeUntil(this.destroy$)).subscribe(res => {
 							this.listChucVu = res.data;
-							if (this.itemForm && res.data.length > 0) {
+							if (res.data.length > 0) 
 								this.itemForm.controls['chucVu'].setValue('' + row.ID_ChucVu);
-							}
 							this.changeDetectorRefs.detectChanges();
 						});
 					}
@@ -514,14 +495,12 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 				this.showCapQuanLyMax = true;
 				this.showChucVu = false;
 				this.id_capduyetmax = '' + row.ID_CapDuyetLonNhat;
-				if (this.itemForm) 
-					this.itemForm.controls['chucVu'].setValue(" ");
+				this.itemForm.controls['chucVu'].setValue(" ");
 			}
 			else {
 				this.showCapQuanLyMax = false;
 				this.showChucVu = false;
-				if (this.itemForm) 
-					this.itemForm.controls['chucVu'].setValue(" ");
+				this.itemForm.controls['chucVu'].setValue(" ");
 			}
 		}
 		if (row.data_NguoiNhanMail.length > 0) {
@@ -532,7 +511,6 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 	//===========Button lưu và cập nhật
 	luuvacapnhat(withBack: boolean = false) {
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -545,8 +523,8 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		if (edited)
 			this.CreateCapQuanLy(edited, withBack);
 	}
+
 	prepare(): NhapCapQuanLyDuyetModel | null {
-		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
 		const _item = new NhapCapQuanLyDuyetModel();
 		_item.clear();
@@ -585,10 +563,11 @@ export class NhapCapQuanLyDuyetEditComponent implements OnInit {
 		}
 		return _item;
 	}
+
 	CreateCapQuanLy(item: NhapCapQuanLyDuyetModel, withBack: boolean = false) {
 		this.loadingSubject.next(true);
 		this.disabledBtn = true;
-		this.nhapQuyTrinhDuyetService.CreateCapQuanLy(item).subscribe(res => {
+		this.nhapQuyTrinhDuyetService.CreateCapQuanLy(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();

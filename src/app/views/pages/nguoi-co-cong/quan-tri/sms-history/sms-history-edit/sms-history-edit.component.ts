@@ -2,11 +2,12 @@ import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRe
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../../app/core/_base/crud';
-import { SMSHistoryService } from '../Services/sms-history.service';
 import { CommonService } from '../../../services/common.service';
 import { SMSHistoryModel } from '../Model/sms-history.model';
+import { SMSHistoryService } from '../Services/sms-history.service';
 
 @Component({
 	selector: 'kt-sms-history-edit',
@@ -15,9 +16,10 @@ import { SMSHistoryModel } from '../Model/sms-history.model';
 })
 
 export class SMSHistoryEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Public properties
-	ItemData: any;
-	FormControls: FormGroup | undefined;
+	item: any;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	disabledBtn: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
@@ -42,14 +44,14 @@ export class SMSHistoryEditComponent implements OnInit, OnDestroy {
 	ngOnInit() {
 		this.commonService.fixedPoint = 0;
 		this.viewLoading = true;
-		this.ItemData = new SMSHistoryModel();
-		this.ItemData.clear();
+		this.item = new SMSHistoryModel();
+		this.item.clear();
 		if (this.data.SMSHistory && this.data.SMSHistory.IdSMS > 0) {
-			this.apiService.getById(this.data.SMSHistory.IdSMS).subscribe(res => {
+			this.apiService.getById(this.data.SMSHistory.IdSMS).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
-					this.ItemData = res.data;
-					this.datasource = new MatTableDataSource(this.ItemData);
+					this.item = res.data;
+					this.datasource = new MatTableDataSource(this.item);
 				}
 				else {
 					this.layoutUtilsService.showError(res.error.message);
@@ -63,35 +65,28 @@ export class SMSHistoryEditComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.componentSubscriptions) {
 			this.componentSubscriptions.unsubscribe();
 		}
 	}
 
 	createForm() {
-		this.FormControls = this.FormControlFB.group({
+		this.itemForm = this.FormControlFB.group({
 		});
 		if (this.data.SMSHistory.View)
-			this.FormControls.disable();
+			this.itemForm.disable();
 	}
 
 	getTitle(): string {
 		return `Xem chi tiết lịch sử SMS`;
 	}
 
-	isControlInvalid(controlName: string): boolean {
-		if (!this.FormControls) return false;
-		const control = this.FormControls.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
-	}
-
 	onSubmit(type: boolean) {
 		this.hasFormErrors = false;
-		if (!this.FormControls) return;
-		const controls = this.FormControls.controls;
-		/** check form */
-		if (this.FormControls.invalid) {
+		const controls = this.itemForm.controls;
+		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
@@ -103,7 +98,7 @@ export class SMSHistoryEditComponent implements OnInit, OnDestroy {
 		}
 		this.disabledBtn = true;
 		let edited = this.prepare();
-		if (this.ItemData.Id > 0) {
+		if (this.item.Id > 0) {
 			this.update(edited)
 			return;
 		}
@@ -111,28 +106,26 @@ export class SMSHistoryEditComponent implements OnInit, OnDestroy {
 	}
 
 	prepare(): any {
-		if (!this.FormControls) return;
-		const controls = this.FormControls.controls;
+		const controls = this.itemForm.controls;
 		const _item: any = {};
 		_item.Cast_BDNghi = controls['bDNghi'].value.split('T')[0];
 		_item.Cast_KTNghi = controls['kTNghi'].value.split('T')[0];
 		_item.DotNghiRQ = controls['dotNghi'].value;
 		_item.MoTa = controls['moTa'].value;
-		//gán lại giá trị id 
-		if (this.ItemData.Id > 0) {
-			_item.Id = this.ItemData.Id;
+		if (this.item.Id > 0) {
+			_item.Id = this.item.Id;
 		}
 		return _item;
 	}
 
 	add(item: SMSHistoryModel, withBack: boolean = false) {
-		this.apiService.create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Thêm thành công`;
 				this.layoutUtilsService.showInfo(message);
-				if (this.FormControls) 
-					this.FormControls.reset();
+				if (this.itemForm) 
+					this.itemForm.reset();
 				if (withBack)
 					this.dialogRef.close(this.isChange);
 			}
@@ -145,7 +138,7 @@ export class SMSHistoryEditComponent implements OnInit, OnDestroy {
 	}
 
 	update(item: SMSHistoryModel) {
-		this.apiService.update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Cập nhật thành công`;

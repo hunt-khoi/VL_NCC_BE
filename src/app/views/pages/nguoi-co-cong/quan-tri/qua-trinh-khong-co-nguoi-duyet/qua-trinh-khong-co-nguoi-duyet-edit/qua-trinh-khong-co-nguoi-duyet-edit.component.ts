@@ -2,11 +2,12 @@ import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRe
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { Observable, BehaviorSubject, Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { QuaTrinhKhongCoNguoiDuyetService } from '../Services/qua-trinh-khong-co-nguoi-duyet.service';
 import { CommonService } from '../../../services/common.service';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
+import { QuaTrinhKhongCoNguoiDuyetService } from '../Services/qua-trinh-khong-co-nguoi-duyet.service';
 import { NhapSoLieuDuyetService } from './../../../quan-ly-mau-so-lieu/nhap-so-lieu-duyet/services/nhap-so-lieu-duyet.service';
 import { DeXuatService } from './../../../qua-le-tet/de-xuat/Services/de-xuat.service';
 import { HoSoNCCDuyetService } from './../../../ho-so-nguoi-co-cong/ho-so-ncc-duyet/Services/ho-so-ncc-duyet.service';
@@ -22,9 +23,10 @@ import { HoSoNCCDuyetService } from './../../../ho-so-nguoi-co-cong/ho-so-ncc-du
 })
 
 export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Public properties
 	item: any;
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(true);
 	loading$: Observable<boolean> | undefined;
@@ -34,12 +36,12 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 	disabledBtn: boolean = false;
 	iddonvi: number = 0;
 	ListNguoiDuyet: any[] = [];
-	LoaiPhieu = 0;
-	IdPhieu = 0;
-	isShowNhacnho = false;
+	LoaiPhieu: number = 0;
+	IdPhieu: number = 0;
+	isShowNhacnho: boolean = false;
 	nguoiduyet: any = [];
-	urlTo = "";
-	isThaoluan: any = false;
+	urlTo: string = "";
+	isThaoluan: boolean = false;
 	userId: number = 0;
 	private componentSubscriptions: Subscription | undefined;
 
@@ -76,7 +78,7 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 	guiduyet = false;
 	async ngOnInit() {
 		this.viewLoading = true
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.iddonvi = res.IdDonVi;
 			this.userId = res.id;
 		})
@@ -86,7 +88,7 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 		this.isThaoluan = this.data.isThaoluan;
 		this.IdPhieu = this.item.checker.IdPhieu;
 		this.GetNguoidangduyet(this.LoaiPhieu);
-		this.service.GetListNextChecker(this.item.id_quatrinh, this.item.nguoi_gui).subscribe(res => {
+		this.service.GetListNextChecker(this.item.id_quatrinh, this.item.nguoi_gui).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status == 1) {
 				this.listNV.next(res.data);
@@ -101,19 +103,20 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 	GetNguoidangduyet(loai: number) {
 		// 1: đề xuất tặng quà - 2: hồ sơ ncc - 3: số liệu - 4: bảo hiểm - 5: nhà ở - 6, 7: niên hạn - 8: quỹ
 		if (loai == 1) {
-			this.DeXuatService.getItem(this.IdPhieu).subscribe(res => {
+			this.DeXuatService.getItem(this.IdPhieu).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
 					this.nguoiduyet.NguoiDuyetDon = res.data.NguoiDuyetDon;
 					this.nguoiduyet.Hoten = res.data.CurrentChecker;
 				}
-				else
+				else {
 					this.layoutUtilsService.showError(res.error.message);
+				}
 			});
 		}
 		if (loai == 2) {
-			this.objectService.detail(this.IdPhieu).subscribe(res => {
+			this.objectService.detail(this.IdPhieu).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.nguoiduyet.NguoiDuyetDon = res.data.NguoiDuyetDon;
 					this.nguoiduyet.Hoten = res.data.CurrentChecker;
@@ -124,7 +127,7 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 			})
 		}
 		if (loai == 3) {
-			this.NhapSoLieuDuyetService.detail(this.IdPhieu).subscribe(res => {
+			this.NhapSoLieuDuyetService.detail(this.IdPhieu).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.nguoiduyet.NguoiDuyetDon = res.data.NguoiDuyetDon;
 					this.nguoiduyet.Hoten = res.data.CurrentChecker;
@@ -181,6 +184,8 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.componentSubscriptions) 
 			this.componentSubscriptions.unsubscribe();
 	}
@@ -239,7 +244,7 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 		// }
 
 		dataNoty.content = content
-		this.CommonService.DeXuatDuyet(dataNoty).subscribe(_ => {
+		this.CommonService.DeXuatDuyet(dataNoty).pipe(takeUntil(this.destroy$)).subscribe(_ => {
 			this.layoutUtilsService.showInfo("Nhắc nhở duyệt thành công");
 		});
 	}
@@ -283,9 +288,7 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 
 	onSubmit() {
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/** check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -299,7 +302,6 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 	}
 
 	prepare(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		var item: any = {}
 		item.Checkers = controls['nhanVien'].value.join();
@@ -308,7 +310,7 @@ export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy
 
 	update(item: any) {
 		this.disabledBtn = true;
-		this.service.updateQuaTrinhKhongCoNguoiDuyet(item).subscribe(res => {
+		this.service.updateQuaTrinhKhongCoNguoiDuyet(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			if (res.status == 1) {
 				this.isChange = true;

@@ -1,22 +1,21 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { tap } from 'rxjs/operators';
-import { merge, BehaviorSubject } from 'rxjs';
-import { SMSHistoryDataSource } from '../Model/data-sources/sms-history.datasource';
-import { SMSHistoryService } from '../Services/sms-history.service';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
-import { SMSHistoryEditComponent } from '../sms-history-edit/sms-history-edit.component';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { SMSHistoryModel } from '../Model/sms-history.model';
-import { TableService } from '../../../../../partials/table/table.service';
-import { TableModel } from '../../../../../partials/table';
+import { SMSHistoryService } from '../Services/sms-history.service';
+import { SMSHistoryDataSource } from '../Model/data-sources/sms-history.datasource';
+import { SMSHistoryEditComponent } from '../sms-history-edit/sms-history-edit.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -27,20 +26,17 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class SMSHistoryListComponent implements OnInit, OnDestroy {
-
+	private destroy$ = new Subject<void>();
 	// Table fields
 	dataSource: SMSHistoryDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild('sort1', { static: true }) sort: MatSort | undefined;
-	@ViewChild('trigger', { static: true }) _trigger: MatMenuTrigger | undefined;
 
-	// Filter fields
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	SMSHistorysResult: any[] = [];
 	tmpSMSHistorysResult: any[] = [];
 
-	haveFilter: boolean = false;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 
@@ -52,7 +48,6 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 	IdDonVi: string = '';
 	Loai: string = '0';
 	public datatreeDonVi: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-
 	gridService: TableService | undefined;
 	girdModel: TableModel = new TableModel();
 
@@ -67,11 +62,9 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 		private ref: ApplicationRef,
 		private commonService: CommonService) { }
 
-	/** LOAD DATA */
 	ngOnInit() {
 		//#region ***Filter***
 		this.getTreeDonVi();
-
 		this.girdModel.haveFilter = true;
 		this.girdModel.tmpfilterText = Object.assign({}, this.girdModel.filterText);
 		this.girdModel.filterText['Brandname'] = "";
@@ -79,7 +72,6 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 		this.girdModel.filterText['Username'] = "";
 		this.girdModel.filterText['Message'] = "";
 		this.girdModel.disableButtonFilter['Locked'] = true;
-		//TH1: #filter
 		this.girdModel.filterGroupDataChecked = {
 			"TrangThai": [
 				{
@@ -194,7 +186,7 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
 				.pipe(
 					tap(() => {
-						this.loadSMSHistorysList(true);
+						this.loadDataList(true);
 					})
 				).subscribe();
 		}
@@ -213,7 +205,7 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 			this.tmpSMSHistorysResult = [];
 			if (this.SMSHistorysResult && this.paginator) {
 				if (this.SMSHistorysResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadSMSHistorysList();
+					this.loadDataList();
 				} else {
 					for (let i = 0; i < this.SMSHistorysResult.length; i++) {
 						let tmpElement = new SMSHistoryModel();
@@ -226,12 +218,14 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 		if (this.gridService)
 			this.gridService.Clear();
 	}
 
 	getTreeDonVi() {
-		this.commonService.TreeDonVi().subscribe(res => {
+		this.commonService.TreeDonVi().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.datatreeDonVi.next(res.data);
 			}
@@ -242,7 +236,7 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 		})
 	}
 
-	loadSMSHistorysList(holdCurrentPage: boolean = false) {
+	loadDataList(holdCurrentPage: boolean = false) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
@@ -290,13 +284,11 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 				}
 			}
 		}
-		this.loadSMSHistorysList();
+		this.loadDataList();
 	}
 
-	/** FILTRATION */
 	filterConfiguration(): any {
 		const filter: any = {};
-		//#filter
 		if (this.gridService && this.gridService.model.filterText) {
 			filter.Brandname = this.gridService.model.filterText['Brandname'];
 			filter.SDT = this.gridService.model.filterText['SDT'];
@@ -323,14 +315,14 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.apiService.delete(item.IdSMS).subscribe(res => {
+			this.apiService.delete(item.IdSMS).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
 				else {
 					this.layoutUtilsService.showError(res.error.message);
 				}
-				this.loadSMSHistorysList(true);
+				this.loadDataList(true);
 			});
 		});
 	}
@@ -348,9 +340,9 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 			for (let i = 0; i < this.selection.selected.length; i++) {
 				idsForDeletion.push(this.selection.selected[i].IdSMS);
 			}
-			this.apiService.deletes(idsForDeletion).subscribe(() => {
+			this.apiService.deletes(idsForDeletion).pipe(takeUntil(this.destroy$)).subscribe(() => {
 				this.layoutUtilsService.showInfo(_deleteMessage);
-				this.loadSMSHistorysList(true);
+				this.loadDataList(true);
 				this.selection.clear();
 			});
 		});
@@ -403,24 +395,24 @@ export class SMSHistoryListComponent implements OnInit, OnDestroy {
 		const dialogRef = this.dialog.open(SMSHistoryEditComponent, { data: { SMSHistory } });
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
-			this.loadSMSHistorysList(true);
+			this.loadDataList(true);
 		});
 	}
 
 	DonViChanged(e: any) {
 		this.IdDonVi = e.id;
-		this.loadSMSHistorysList();
+		this.loadDataList();
 	}
 
 	LockAndUnLock(item: any) {
-		this.apiService.LockNUnLock(item.Id, item.Locked).subscribe(res => {
+		this.apiService.lock(item.Id, item.Locked).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.layoutUtilsService.showInfo(item.Locked ? 'Mở khóa thành công' : 'Khóa thành công');
 			}
 			else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
-			this.loadSMSHistorysList(true);
+			this.loadDataList(true);
 		})
 	}
 }

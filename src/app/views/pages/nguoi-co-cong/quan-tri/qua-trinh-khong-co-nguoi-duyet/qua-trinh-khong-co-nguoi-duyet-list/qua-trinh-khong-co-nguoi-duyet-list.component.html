@@ -28,12 +28,12 @@
 				</div>
 			</div>
 		</div>
-
 		<div class="mat-table__wrapper d-block" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}">
-			<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" matSort #sort1="matSort" matSortActive="so_phieu" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
+			<table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" 
+				matSort #sort1="matSort" matSortActive="so_phieu" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
 				<ng-container matColumnDef="#">
 					<th mat-header-cell *matHeaderCellDef class="stt-cell" style="width:100px">STT</th>
-					<td mat-cell *matCellDef="let item;let i=index" class="stt-cell">{{i + 1}}</td>
+					<td mat-cell *matCellDef="let i=index" class="stt-cell">{{i + 1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="ten_phieu">
 					<th mat-header-cell *matHeaderCellDef>
@@ -49,9 +49,7 @@
 				</ng-container>
 				<ng-container matColumnDef="ngay_tao">
 					<th mat-header-cell *matHeaderCellDef mat-sort-header>Ngày gửi</th>
-					<td mat-cell class="m--padding-10" *matCellDef="let item">
-						{{item.ngay_tao}}
-					</td>
+					<td mat-cell class="m--padding-10" *matCellDef="let item">{{item.ngay_tao}}</td>
 				</ng-container>
 				<ng-container matColumnDef="nguoi_tao">
 					<th mat-header-cell *matHeaderCellDef>
@@ -61,17 +59,13 @@
 				</ng-container>
 				<ng-container matColumnDef="checker">
 					<th mat-header-cell *matHeaderCellDef>Người xử lý</th>
-					<td mat-cell class="m--padding-10" *matCellDef="let item">
-						{{item.checker.strChecker}}
-					</td>
+					<td mat-cell class="m--padding-10" *matCellDef="let item">{{item.checker.strChecker}}</td>
 				</ng-container>
 				<ng-container matColumnDef="tinh_trang">
 					<th mat-header-cell *matHeaderCellDef>
 						<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="tinh_trang" column_title="Tình trạng"></kt-column-filter>
 					</th>
-					<td mat-cell class="m--padding-10" *matCellDef="let item">
-						{{item.ten_tinh_trang}}
-					</td>
+					<td mat-cell class="m--padding-10" *matCellDef="let item">{{item.ten_tinh_trang}}</td>
 				</ng-container>
 				<ng-container matColumnDef="Deadline">
 					<th mat-header-cell *matHeaderCellDef>Thời hạn</th>
@@ -79,24 +73,23 @@
 				</ng-container>
 
 				<ng-container matColumnDef="actions">
-					<th mat-header-cell *matHeaderCellDef style="width:100px;">Thao tác</th>
+					<th mat-header-cell *matHeaderCellDef style="width: 100px;">Thao tác</th>
 					<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button?'list-button':''">
-						<button *ngIf="dataService.ReadOnlyControl && item.checker.strChecker==''" type="button" (click)="edit(item)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary" matTooltip="Thêm người duyệt">
+						<button mat-button (click)="edit(item)" [ngClass]="btnClass" *ngIf="dataService.ReadOnlyControl && item.checker.strChecker===''"
+						 	matTooltip="Thêm người duyệt" color="primary" type="button">
 							<mat-icon>create</mat-icon>
 							<span class="button-text">Thêm người duyệt</span>
 						</button>
-						<button type="button" (click)="edit(item,true)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="info" matTooltip="Thảo luận">
+						<button mat-button (click)="edit(item, true)" [ngClass]="btnClass" 
+							matTooltip="Thảo luận" color="info" type="button">
 							<mat-icon>message</mat-icon>
 							<span class="button-text">Thảo luận</span>
 						</button>
-						<button type="button" (click)="timeline(item)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary" matTooltip="Xem sơ đồ">
+						<button mat-button (click)="timeline(item)" [ngClass]="btnClass" 
+							matTooltip="Xem sơ đồ" color="primary" type="button">
 							<mat-icon>timeline</mat-icon>
 							<span class="button-text">Sơ đồ</span>
 						</button>
-						<!-- <button type="button" (click)="log(item)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="info" matTooltip="Xem sơ đồ">
-							<mat-icon>history</mat-icon>
-							<span class="button-text">Xem log</span>
-						</button> -->
 					</td>
 				</ng-container>
 				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
@@ -105,32 +98,16 @@
 			<div class="mat-table__message" *ngIf="!dataSource.hasItems">Không có dữ liệu</div>
 		</div>
 		
-		<!-- start: BOTTOM -->
 		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 			<div class="flt-selected" *ngIf="gridService.model.haveFilter">
-				<mat-chip-list>
-					<ng-container *ngFor="let chip of gridService.model.lstChip">
-						<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
-							{{chip.title}}: {{chip.data}}
-							<mat-icon matChipRemove>cancel</mat-icon>
-						</mat-chip>
-						<ng-container *ngIf="chip.type==1">
-							<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
-								{{chip.title}}: {{item.name}}
-								<mat-icon matChipRemove>cancel</mat-icon>
-							</mat-chip>
-						</ng-container>
-					</ng-container>
-					<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
-						Đặt lại
-					</mat-chip>
-				</mat-chip-list>
+				<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
 			</div>
 			<div class="flt-page">
 				<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-				<mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+				<mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize" 
+					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+				</mat-paginator>
 			</div>
 		</div>
 	</kt-portlet-body>
-	<!-- end::Body -->
 </kt-portlet>

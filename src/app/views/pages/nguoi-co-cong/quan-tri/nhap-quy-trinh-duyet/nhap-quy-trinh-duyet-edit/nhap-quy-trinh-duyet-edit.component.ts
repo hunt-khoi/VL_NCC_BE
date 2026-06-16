@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -6,15 +6,15 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { SelectionModel } from '@angular/cdk/collections';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
-import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
-import { NhapCapQuanLyDuyetModel, PriorityAddData, NhapQuyTrinhDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
-import { NhapCapQuanLyDuyetEditComponent } from '../nhap-cap-quan-ly-duyet-edit/nhap-cap-quan-ly-duyet-edit.component';
-import { ChonNhieuNhanVienListComponent, ChonNhieuNhanVienListModel } from '../../../components';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
+import { ChonNhieuNhanVienListComponent, ChonNhieuNhanVienListModel } from '../../../components';
+import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
+import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trinh-duyet.datasource';
+import { NhapCapQuanLyDuyetModel, PriorityAddData, NhapQuyTrinhDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
+import { NhapCapQuanLyDuyetEditComponent } from '../nhap-cap-quan-ly-duyet-edit/nhap-cap-quan-ly-duyet-edit.component';
 
 @Component({
 	selector: 'm-nhap-quy-trinh-duyet-edit',
@@ -22,7 +22,8 @@ import { CommonService } from '../../../services/common.service';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class NhapQuyTrinhDuyetEditComponent implements OnInit {
+export class NhapQuyTrinhDuyetEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
@@ -32,10 +33,10 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	listKhiKhongDuyetDon: any[] = [];
 	listKhiKhongThayNguoiDuyetDon: any[] = [];
 	//==========================
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	loadingControl = new BehaviorSubject<boolean>(false);
-	item: NhapQuyTrinhDuyetModel;
-	oldItem: NhapQuyTrinhDuyetModel;
+	item: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
+	oldItem: NhapQuyTrinhDuyetModel = new NhapQuyTrinhDuyetModel();
 	hasFormErrors: boolean = false;
 	//==========================
 	showButton: boolean = false;
@@ -84,6 +85,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	listCapDuyet: any[] = [];
 	allowEdit: boolean = true;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	link_img = 'https://img.icons8.com/color/96/000000/plus.png';
 
@@ -106,6 +108,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		this.viewLoading = true;
 		this.loadingSubject.next(true);
 
@@ -113,7 +116,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		newProduct.clear();
 		this.item = newProduct;
 		this.createForm();
-		this.activatedRoute.data.subscribe(res => {
+		this.activatedRoute.data.pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.allowEdit != undefined)
 				this.allowEdit = res.allowEdit;
 		})
@@ -131,7 +134,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		}
 
 		this.dataSource = new NhapQuyTrinhDuyetDataSource(this.nhapQuyTrinhDuyetService);
-		this.activatedRoute.params.subscribe(params => {
+		this.activatedRoute.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
 			this.idqt = params.id;
 			if (this.dataSource) {
 				let queryParams = this.nhapQuyTrinhDuyetService.lastFilter$.getValue();
@@ -139,7 +142,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
+		this.dataSource.entitySubject.pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.showBtViTri = true;
 			this.productsResult = res;
 			if (this.productsResult && this.paginator) {
@@ -149,20 +152,20 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			}
 		});
 		//#endregion
-		this.nhapQuyTrinhDuyetService.GetListLoai().subscribe(res => {
+		this.nhapQuyTrinhDuyetService.GetListLoai().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.listLoaiPhieu = res.data;
 			else
 				this.layoutUtilsService.showError(res.error.message);
 		});
-		this.nhapQuyTrinhDuyetService.GetListProcessMethod().subscribe(res => {
+		this.nhapQuyTrinhDuyetService.GetListProcessMethod().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.listProcessMethod = res.data;
 			else
 				this.layoutUtilsService.showError(res.error.message);
 		});
 		if (this.idqt) {
-			this.nhapQuyTrinhDuyetService.get_ChiTietQuyTrinhDuyet(+this.idqt).subscribe(res => {
+			this.nhapQuyTrinhDuyetService.get_ChiTietQuyTrinhDuyet(+this.idqt).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = true;
 				if (res.ID_QuyTrinh == -2) {
 					const message = `Lỗi! ` + res.TenQuyTrinh;
@@ -183,7 +186,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 				this.listKhiKhongDuyetDon = this.item.data_NhanMailKhiKhongDuyetDon;
 				this.listKhiKhongThayNguoiDuyetDon = this.item.data_NhanMailKhiKhongTimThayNguoiDuyetDon;
 				this.init();
-				this.nhapQuyTrinhDuyetService.GetListApprovalLevel().subscribe(res => {
+				this.nhapQuyTrinhDuyetService.GetListApprovalLevel().pipe(takeUntil(this.destroy$)).subscribe(res => {
 					if (res && res.status == 1) {
 						this.listCapDuyet = res.data;
 						if (res.data.length > 0 && this.item.IdCapquanly == 0) {
@@ -196,15 +199,13 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 					}
 					this.changeDetectorRefs.detectChanges();
 				});
-				this.commonService.Get_CoCauToChuc().subscribe(res => {
-					if (!this.itemForm) return;
+				this.commonService.Get_CoCauToChuc().pipe(takeUntil(this.destroy$)).subscribe(res => {
 					if (res.data && res.data.length > 0) {
 						this.datatree.next(res.data);
-						if (this.item.StructureID > 0) {
+						if (this.item.StructureID && this.item.StructureID > 0) 
 							this.ID_Struct = '' + this.item.StructureID;
-						} else {
+						else 
 							this.ID_Struct = '' + res.data[0].id;
-						}
 						this.itemForm.controls['drp'].setValue(this.ID_Struct);
 						this.loadListChucVu();
 						this.changeDetectorRefs.detectChanges();
@@ -216,6 +217,10 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		}
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
 	/** ACTIONS */
 	init() {
@@ -248,9 +253,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			});
 		}
 		const dialogRef = this.dialog.open(ChonNhieuNhanVienListComponent, {
-			data: {
-				idnv: id.substring(1),
-			},
+			data: { idnv: id.substring(1) },
 			disableClose: false
 		});
 		dialogRef.afterClosed().subscribe(res => {
@@ -289,9 +292,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			});
 		}
 		const dialogRef = this.dialog.open(ChonNhieuNhanVienListComponent, {
-			data: {
-				idnv: id.substring(1),
-			},
+			data: { idnv: id.substring(1) },
 			disableClose: false
 		});
 		dialogRef.afterClosed().subscribe(res => {
@@ -314,7 +315,6 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			}
 		});
 	}
-
 	removenguoinhankhikoduyet(item: any): void {
 		const index = this.listKhiKhongDuyetDon.indexOf(item);
 		if (index >= 0) {
@@ -331,9 +331,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			});
 		}
 		const dialogRef = this.dialog.open(ChonNhieuNhanVienListComponent, {
-			data: {
-				idnv: id.substring(1),
-			},
+			data: { idnv: id.substring(1) },
 			disableClose: false
 		});
 		dialogRef.afterClosed().subscribe(res => {
@@ -356,7 +354,6 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 			}
 		});
 	}
-
 	removenguoinhankhikothaynguoiduyet(item: any): void {
 		const index = this.listKhiKhongThayNguoiDuyetDon.indexOf(item);
 		if (index >= 0) {
@@ -372,27 +369,23 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		this.showButton = true;
 		this.item.ID_QuyTrinh = row.ID_Row;
 		this.item.TenQuyTrinh = row.TieuDe;
-		if (this.itemForm) { 
-			this.itemForm.controls['tenQuyTrinh'].setValue(row.TieuDe);
-			this.itemForm.controls['moTa'].setValue(row.MoTa);
-		}
-		if (row.data_NhanMailKhiDuyetDon.length > 0) {
+		this.itemForm.controls['tenQuyTrinh'].setValue(row.TieuDe);
+		this.itemForm.controls['moTa'].setValue(row.MoTa);
+		
+		if (row.data_NhanMailKhiDuyetDon.length > 0) 
 			this.listKhiDuyetDon = row.data_NhanMailKhiDuyetDon;
-		}
-		else {
+		else 
 			this.listKhiDuyetDon = [];
-		}
-		if (row.data_NhanMailKhiKhongDuyetDon.length > 0) {
+
+		if (row.data_NhanMailKhiKhongDuyetDon.length > 0) 
 			this.listKhiKhongDuyetDon = row.data_NhanMailKhiKhongDuyetDon;
-		} else {
+		else 
 			this.listKhiKhongDuyetDon = [];
-		}
-		if (row.data_NhanMailKhiKhongTimThayNguoiDuyetDon.length > 0) {
+
+		if (row.data_NhanMailKhiKhongTimThayNguoiDuyetDon.length > 0) 
 			this.listKhiKhongThayNguoiDuyetDon = row.data_NhanMailKhiKhongTimThayNguoiDuyetDon;
-		}
-		else {
+		else 
 			this.listKhiKhongThayNguoiDuyetDon = [];
-		}
 		this.changeDetectorRefs.detectChanges();
 	}
 
@@ -404,22 +397,18 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		this.listKhiDuyetDon = [];
 		this.listKhiKhongDuyetDon = [];
 		this.listKhiKhongThayNguoiDuyetDon = [];
-		if (this.itemForm) { 
-			this.itemForm.controls['tenQuyTrinh'].setValue('');
-			this.itemForm.controls['moTa'].setValue('');
-		}
+		this.itemForm.controls['tenQuyTrinh'].setValue('');
+		this.itemForm.controls['moTa'].setValue('');
 		this.changeDetectorRefs.detectChanges();
 	}
 	//===Button lưu và tiếp tục============
 	luuvatieptuc(withBack: boolean = false) {
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -435,8 +424,8 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		if (edited)
 			this.CreateQuyTrinhDuyet(edited, withBack);
 	}
-	prepare(): NhapQuyTrinhDuyetModel | null {
-		if (!this.itemForm) return null;
+
+	prepare(): NhapQuyTrinhDuyetModel {
 		const controls = this.itemForm.controls;
 		const _item = new NhapQuyTrinhDuyetModel();
 		_item.ID_QuyTrinh = this.item.ID_QuyTrinh;
@@ -467,19 +456,18 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		}
 		if (this.id_capduyet) {
 			_item.IdCapquanly = +this.id_capduyet;
-			if (this.id_capduyet == '-3') {
+			if (this.id_capduyet == '-3') 
 				_item.Code = this.item.Code;
-			}
-			if (this.id_capduyet == '-2') {
+			if (this.id_capduyet == '-2') 
 				_item.IdChucdanh = +this.id_cd;
-			}
 		}
 		return _item;
 	}
+
 	CreateQuyTrinhDuyet(item: NhapQuyTrinhDuyetModel, withBack: boolean = false) {
 		this.loadingSubject.next(true);
 		this.disabledBtn = true;
-		this.nhapQuyTrinhDuyetService.CreateQuyTrinhDuyet(item).subscribe(res => {
+		this.nhapQuyTrinhDuyetService.CreateQuyTrinhDuyet(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
@@ -524,11 +512,10 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		if (!this.allowEdit)
 			return 'Xem chi tiết';
 		let result = '';
-		if (+this.idqt > 0) {
+		if (+this.idqt > 0) 
 			result = "Cập nhật quy trình";
-		} else {
+		else 
 			result = "Thêm mới quy trình";
-		}
 		return result;
 	}
 	//==============================================================================
@@ -536,7 +523,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	onLinkClick(eventTab: MatTabChangeEvent) {
 		if (eventTab.index == 0) {
 			this.selectedTab = 0;
-			this.nhapQuyTrinhDuyetService.get_ChiTietQuyTrinhDuyet(+this.idqt).subscribe(res => {
+			this.nhapQuyTrinhDuyetService.get_ChiTietQuyTrinhDuyet(+this.idqt).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res.ID_QuyTrinh == -2) {
 					const message = `Lỗi! ` + res.TenQuyTrinh;
 					this.layoutUtilsService.showError(message);
@@ -603,15 +590,14 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		_item.ID_QuyTrinh = this.item.ID_QuyTrinh;
 		const dialogRef = this.dialog.open(NhapCapQuanLyDuyetEditComponent, { data: { _item, idqt: this.idqt, tenqt: this.tenqt, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (res) {
+			if (res) 
 				this.loadDataList();
-			}
 		});
 	}
 
 	trolai() {
 		this.selectedTab = 0;
-		this.nhapQuyTrinhDuyetService.get_ChiTietQuyTrinhDuyet(+this.idqt).subscribe(res => {
+		this.nhapQuyTrinhDuyetService.get_ChiTietQuyTrinhDuyet(+this.idqt).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res.ID_QuyTrinh == -2) {
 				const message = `Lỗi! ` + res.TenQuyTrinh;
 				this.layoutUtilsService.showError(message);
@@ -639,7 +625,8 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 					row.ViTri = val.target.value;
 					if (this.item.ProcessMethod == '2') {
 						this.disabledBtn = true;
-						this.nhapQuyTrinhDuyetService.GetListCapBack(this.item.ID_QuyTrinh, row.ID_CapQuanLy, val.target.value).subscribe(res => {
+						this.nhapQuyTrinhDuyetService.GetListCapBack(this.item.ID_QuyTrinh, row.ID_CapQuanLy, val.target.value)
+							.pipe(takeUntil(this.destroy$)).subscribe(res => {
 							this.disabledBtn = false;
 							if (res && res.status == 1)
 								row.listCapDuyetQT = res.data;
@@ -691,7 +678,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	updateViTri(item: any[]) {
 		this.loadingSubject.next(true);
 		this.disabledBtn = true;
-		this.nhapQuyTrinhDuyetService.updateViTri(item).subscribe(res => {
+		this.nhapQuyTrinhDuyetService.updateViTri(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
@@ -715,7 +702,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.nhapQuyTrinhDuyetService.deleteCapQuanLy(row.ID_CapQuanLy, this.idqt, row.TenCapDuyet).subscribe(res => {
+			this.nhapQuyTrinhDuyetService.deleteCapQuanLy(row.ID_CapQuanLy, this.idqt, row.TenCapDuyet).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -745,7 +732,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	}
 
 	loadListChucVu() {
-		this.commonService.GetListPositionbyStructure(this.ID_Struct).subscribe(res => {
+		this.commonService.GetListPositionbyStructure(this.ID_Struct).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listChucDanh = res.data;
 			} else {
@@ -760,9 +747,11 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 					this.id_cv = '';
 					this.id_cd = '';
 				}
-			} else
+			} else {
 				this.id_cv = '' + this.item.ID_ChucVu;
-			this.commonService.GetListJobtitleByStructure(this.id_cv, this.ID_Struct).subscribe(res => {
+			}
+
+			this.commonService.GetListJobtitleByStructure(this.id_cv, this.ID_Struct).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.listChucVu = res.data;
 				} else {
@@ -770,19 +759,20 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 				}
 				if (this.item.IdChucdanh == null) {
-					if (res.data.length > 0) {
+					if (res.data.length > 0) 
 						this.id_cd = '' + res.data[0].ID;
-					} else
+					else
 						this.id_cd = '';
-				} else
+				} else {
 					this.id_cd = '' + this.item.IdChucdanh;
+				}
 				this.changeDetectorRefs.detectChanges();
 			});
 		});
 	}
 
 	loadPermission() {
-		this.nhapQuyTrinhDuyetService.GetListPermission().subscribe(res => {
+		this.nhapQuyTrinhDuyetService.GetListPermission().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listNhomQuyen = res.data;
 				this.setListQuyen(this.item.Permission_CodeGroup);
@@ -799,7 +789,6 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	}
 
 	setListQuyen(val: any) {
-		if (!val) return;
 		var find = this.listNhomQuyen.find(x => x.Code == val);
 		if (find)
 			this.listQuyen = find.PqPermission;
@@ -809,7 +798,7 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 	}
 
 	loadListData() {
-		this.nhapQuyTrinhDuyetService.GetListApprovalLevel().subscribe(res => {
+		this.nhapQuyTrinhDuyetService.GetListApprovalLevel().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listCapDuyet = res.data;
 				if (res.data.length > 0 && this.item.IdCapquanly == 0) {
@@ -826,15 +815,13 @@ export class NhapQuyTrinhDuyetEditComponent implements OnInit {
 
 	loadChucDanhChange(idcd: any) {
 		let id_st = +this.ID_Struct;
-		this.commonService.GetListJobtitleByStructure(idcd, id_st).subscribe(res => {
+		this.commonService.GetListJobtitleByStructure(idcd, id_st).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listChucVu = res.data;
-				if (this.listChucVu.length > 0) {
+				if (this.listChucVu.length > 0) 
 					this.id_cd = '' + res.data[0].ID;
-				}
-				else {
+				else 
 					this.id_cd = '';
-				}
 			} else {
 				this.listChucVu = [];
 				this.layoutUtilsService.showError(res.error.message);

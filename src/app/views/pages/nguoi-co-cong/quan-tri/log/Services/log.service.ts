@@ -1,6 +1,6 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
 import { HttpUtilsService } from '../../../../../../core/_base/crud/utils/http-utils.service';
 import { QueryParamsModel, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { LogModel } from '../Model/log.model';
@@ -55,7 +55,7 @@ export class LogService {
 		return this.http.post<LogModel>(API_ROOT_URL + '/update', item, { headers: httpHeaders });
 	}
 
-	LockNUnLock(itemId: any, value: boolean) {
+	lock(itemId: any, value: boolean) {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_ROOT_URL}/LockAndUnLock?id=${itemId}&Value=${value}`;
 		return this.http.get<any>(url, { headers: httpHeaders });

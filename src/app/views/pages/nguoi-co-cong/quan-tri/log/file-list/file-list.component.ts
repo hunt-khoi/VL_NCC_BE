@@ -3,14 +3,12 @@ import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
-import { LogService } from '../Services/log.service';
-import { LogDataSource } from '../Model/data-sources/log.datasource';
 import { CommonService } from '../../../services/common.service';
 import { QueryParamsModel } from '../../../../../../core/_base/crud';
+import { LogService } from '../Services/log.service';
+import { LogDataSource } from '../Model/data-sources/log.datasource';
 
 @Component({
 	selector: 'm-file-list',
@@ -26,15 +24,17 @@ export class FileListComponent implements OnInit {
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	folder: string = 'theochucnang';
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(public apiService: LogService,
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
-		private translate: TranslateService) {
+		private route: ActivatedRoute) {
 	}
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		if (this.sort && this.paginator) {
 			this.sort.sortChange.subscribe(() => {
 				if (this.paginator) this.paginator.pageIndex = 0
@@ -66,7 +66,7 @@ export class FileListComponent implements OnInit {
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource) return;
 		const queryParams = new QueryParamsModel(
-			this.filterConfiguration(),
+			this.filter(),
 			this.sort.direction,
 			this.sort.active,
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
@@ -75,7 +75,7 @@ export class FileListComponent implements OnInit {
 		this.dataSource.loadListFile(queryParams);
 	}
 
-	filterConfiguration(): any {
+	filter(): any {
 		const filter: any = { folder: this.folder };
 		return filter;
 	}

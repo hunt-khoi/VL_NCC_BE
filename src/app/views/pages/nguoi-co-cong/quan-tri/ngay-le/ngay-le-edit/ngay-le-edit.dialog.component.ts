@@ -1,20 +1,22 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { HolidaysModel } from '../../ngay-le/Model/ngay-le.model';
 import { TranslateService } from '@ngx-translate/core';
-import { HolidaysService } from '../Services/ngay-le.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { HolidaysModel } from '../../ngay-le/Model/ngay-le.model';
+import { HolidaysService } from '../Services/ngay-le.service';
+
 @Component({
 	selector: 'm-ngay-le-edit-dialog',
 	templateUrl: './ngay-le-edit.dialog.component.html',
 })
 
-export class HolidaysEditDialogComponent implements OnInit {
+export class HolidaysEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: HolidaysModel = new HolidaysModel();
-	oldItem: HolidaysModel = new HolidaysModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors: boolean = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
@@ -28,11 +30,11 @@ export class HolidaysEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -47,7 +49,6 @@ export class HolidaysEditDialogComponent implements OnInit {
 		this._name = this.translate.instant("CAP_QL.NAME");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
@@ -56,7 +57,7 @@ export class HolidaysEditDialogComponent implements OnInit {
 		this.createForm();
 		if (this.item.Id_row > 0) {
 			this.viewLoading = true;
-			this.apiService.getItem(this.item.Id_row).subscribe(res => {
+			this.apiService.getItem(this.item.Id_row).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				this.changeDetectorRefs.detectChanges();
 				if (res && res.status == 1) {
@@ -67,6 +68,11 @@ export class HolidaysEditDialogComponent implements OnInit {
 					this.layoutUtilsService.showError(res.error.message);
 			})
 		}
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -90,8 +96,7 @@ export class HolidaysEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepareCustomer(): HolidaysModel {
+	prepare(): HolidaysModel {
 		const controls = this.itemForm.controls;
 		const _item = new HolidaysModel();
 		_item.Id_row = this.item.Id_row;
@@ -102,38 +107,31 @@ export class HolidaysEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
-		const EditCapQuanLy = this.prepareCustomer();
-		if (EditCapQuanLy.Id_row > 0) {
-			this.Update(EditCapQuanLy, withBack);
-		} else {
-			this.Create(EditCapQuanLy, withBack);
-		}
+		const Edit = this.prepare();
+		if (Edit.Id_row > 0) 
+			this.Update(Edit, withBack);
+		else 
+			this.Create(Edit, withBack);
 	}
 
 	Update(item: HolidaysModel, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Update(item).subscribe(res => {
+		this.apiService.update(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.ngOnInit();
@@ -153,14 +151,12 @@ export class HolidaysEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.apiService.Create(item).subscribe(res => {
+		this.apiService.create(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+					this.dialogRef.close({ item });
 				}
 				else {
 					this.change = true;
@@ -181,15 +177,9 @@ export class HolidaysEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
-	}
-
-	onAlertClose() {
-		this.hasFormErrors = false;
 	}
 
 	close() {

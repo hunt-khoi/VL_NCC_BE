@@ -1,11 +1,12 @@
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { HttpUtilsService } from '../../../../../../../app/core/_base/crud/utils/http-utils.service';
 import { QueryParamsModel, QueryResultsModel } from '../../../../../../../app/core/_base/crud';
 import { PriorityAddData, NhapQuyTrinhDuyetModel, NhapCapQuanLyDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
-import { map } from 'rxjs/operators';
+import { environment } from '../../../../../../../environments/environment';
+
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/quy-trinh-duyet';
 

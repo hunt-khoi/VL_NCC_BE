@@ -5,65 +5,63 @@ import { NhapQuyTrinhDuyetService } from '../../Services/nhap-quy-trinh-duyet.se
 
 
 export class NhapQuyTrinhDuyetDataSource extends BaseDataSource {
-	constructor(private nhapQuyTrinhDuyetService: NhapQuyTrinhDuyetService) {
+	constructor(private apiService: NhapQuyTrinhDuyetService) {
 		super();
 	}
 
 	loadList(queryParams: QueryParamsModel) {
-		this.nhapQuyTrinhDuyetService.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
 		this.loadingSubject.next(true);
-		this.nhapQuyTrinhDuyetService.findData(queryParams)
+		this.apiService.findData(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					this.entitySubject.next(res.data);
+					var totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 					this.paginatorTotalSubject.next(totalCount);
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),
 				finalize(() => this.loadingSubject.next(false))
 			).subscribe(
 				res => {
-					this.nhapQuyTrinhDuyetService.VisibleQTD = res.Visible;
+					this.apiService.VisibleQTD = res.Visible;
 				}
 			);
 	}
 
 	loadListCapQuanLy(queryParams: QueryParamsModel) {
-		this.nhapQuyTrinhDuyetService.lastFilter$.next(queryParams);
+		this.apiService.lastFilter$.next(queryParams);
 		this.loadingSubject.next(true);
-		this.nhapQuyTrinhDuyetService.findDataCapQuanLy(queryParams)
+		this.apiService.findDataCapQuanLy(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					this.entitySubject.next(res.data);
+					var totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 					this.paginatorTotalSubject.next(totalCount);
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),
 				finalize(() => this.loadingSubject.next(false))
 			).subscribe(
 				res => {
-					 
-					this.nhapQuyTrinhDuyetService.VisibleCQL = res.Visible;
+					this.apiService.VisibleCQL = res.Visible;
 				}
 			);
 	}
 
 	loadListDieuKien(queryParams: QueryParamsModel) {
-		this.nhapQuyTrinhDuyetService.lastFilter1$.next(queryParams);
+		this.apiService.lastFilter1$.next(queryParams);
 		this.loadingSubject.next(true);
-		this.nhapQuyTrinhDuyetService.findDataDieuKien(queryParams)
+		this.apiService.findDataDieuKien(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					var totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					this.entitySubject.next(res.data);
+					var totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 					this.paginatorTotalSubject.next(totalCount);
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),
 				finalize(() => this.loadingSubject.next(false))
 			).subscribe(
 				res => {
-					 
-					this.nhapQuyTrinhDuyetService.VisibleCQL = res.Visible;
+					this.apiService.VisibleCQL = res.Visible;
 				}
 			);
 	}

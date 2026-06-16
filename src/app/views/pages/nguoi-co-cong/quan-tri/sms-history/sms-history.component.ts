@@ -1,22 +1,18 @@
-import { Component, OnInit, Injectable } from '@angular/core';
-import { SMSHistoryService } from './Services/sms-history.service';
+import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from 'app/core/_base/crud';
+import { SMSHistoryService } from './Services/sms-history.service';
 
 @Component({
-    selector: 'kt-sms-history',
-    templateUrl: './sms-history.component.html',
+  selector: 'kt-sms-history',
+  templateUrl: './sms-history.component.html',
 })
-
-@Injectable()
 export class SMSHistoryComponent implements OnInit {
 
-  constructor(
-		private SMSHistoryService : SMSHistoryService
-	) {}
+  constructor(private SMSHistoryService: SMSHistoryService) { }
 
   ngOnInit() {
     if (this.SMSHistoryService != undefined)
-		this.SMSHistoryService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'DanhMuc', 0, 10));
+      this.SMSHistoryService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'DanhMuc', 0, 10));
   }
 }
