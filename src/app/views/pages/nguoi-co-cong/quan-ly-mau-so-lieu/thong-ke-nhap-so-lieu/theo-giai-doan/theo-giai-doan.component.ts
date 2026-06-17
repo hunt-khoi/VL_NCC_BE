@@ -1,35 +1,31 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ThongKeNhapSoLieuService } from '../Services/thong-ke-nhap-so-lieu.service';
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
 
 @Component({
 	selector: 'kt-theo-giai-doan',
 	templateUrl: './theo-giai-doan.component.html',
 })
-export class TheoGiaiDoanComponent implements OnInit {
+export class TheoGiaiDoanComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 
-	hasFormErrors = false;
-	viewLoading = false;
 	listDetail: any[] = [];
 	listNhapSoLieuDetail: any[] = [];
 	listNhapSoLieuDetailChild: any[] = [];
-	loadingAfterSubmit = false;
 	disabledBtn = false;
 	listCachNhap: any[] = [];
-	allowEdit = false; // cho phép sửa
-	allowDetail = false;
-	isZoomSize = false;
 	mauSoLieuSelected: number = 0;
 	Nams: any[] = [];
-	_name = '';
+	_name: string = '';
 	allowExport = false;
 	isTrongPhamVi = true;
-	nam1: number;
-	nam2: number;
+	nam1: number = 0;
+	nam2: number = 0;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	dv: number = 0;
@@ -54,7 +50,7 @@ export class TheoGiaiDoanComponent implements OnInit {
 		private translate: TranslateService) {
 		this._name = this.translate.instant('MAU_SO_LIEU.nhapsl');
 	}
-	/** LOAD DATA */
+
 	ngOnInit() {
 		this.loadListCachNhap();
 		this.nam2 = new Date().getFullYear();
@@ -62,10 +58,13 @@ export class TheoGiaiDoanComponent implements OnInit {
 		this.change();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	filter() {
-		if (!this.listMauSoLieu) {
-			return;
-		}
+		if (!this.listMauSoLieu) return;
 		let search = this.FilterCtrl_mau;
 		if (!search) {
 			this.listMauSL$.next(this.listMauSoLieu.slice());
@@ -81,9 +80,7 @@ export class TheoGiaiDoanComponent implements OnInit {
 	}
 
 	filter1() {
-		if (!this.lstDV) {
-			return;
-		}
+		if (!this.lstDV) return;
 		let search = this.FilterCtrl_mau;
 		if (!search) {
 			this.lstDV$.next(this.lstDV.slice());
@@ -100,8 +97,7 @@ export class TheoGiaiDoanComponent implements OnInit {
 
 	change() {
 		this.mauSoLieuSelected = 0;
-		this.commonService.liteMauSoLieu(true, this.IsMauTheoPhong).subscribe(res => {
-			this.viewLoading = false;
+		this.commonService.liteMauSoLieu(true, this.IsMauTheoPhong).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listMauSoLieu = res.data;
 				this.listMauSL$.next(this.listMauSoLieu);
@@ -121,7 +117,7 @@ export class TheoGiaiDoanComponent implements OnInit {
 		this.listDetail = [];
 		this.dv = 0;
 		this.lstDV = [];
-		this.objectService.getDV(this.filterConfiguration()).subscribe(res => {
+		this.objectService.getDV(this.filterConfigution()).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstDV = res.data;
 				this.lstDV$.next(this.lstDV);
@@ -129,7 +125,7 @@ export class TheoGiaiDoanComponent implements OnInit {
 		})
 	}
 
-	filterConfiguration(): any {
+	filterConfigution(): any {
 		const filter: any = { id: this.mauSoLieuSelected, dv: this.dv, ChuaDuyet: this.ChuaDuyet ? "1" : "0" };
 		filter["TuNgay"] = "01/01/" + this.nam1;
 		filter["DenNgay"] = "31/12/" + this.nam2;
@@ -140,7 +136,7 @@ export class TheoGiaiDoanComponent implements OnInit {
 	}
 
 	loadListCachNhap() {
-		this.commonService.liteCachNhap().subscribe(res => {
+		this.commonService.liteCachNhap().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listCachNhap = res.data;
 			this.changeDetectorRefs.detectChanges()
 		});
@@ -152,58 +148,37 @@ export class TheoGiaiDoanComponent implements OnInit {
 				return cn.title;
 			}
 		}
+		return '';
 	}
 
 	loadData() {
-		if (this.nam1 <= 0 || this.nam1 == undefined) {
+		if (!this.nam1 || this.nam1 <= 0 || !this.nam2 || this.nam2 <= 0) {
 			this.layoutUtilsService.showError("Vui lòng nhập năm chính xác");
 			return;
 		}
-
-		if (this.nam2 <= 0 || this.nam2 == undefined) {
-			this.layoutUtilsService.showError("Vui lòng nhập năm chính xác");
-			return;
-		}
-
 		if (this.nam1 >= this.nam2) {
 			this.layoutUtilsService.showError("Năm phía sau không thể nhỏ hơn năm phía trước, vui lòng nhập lại");
 			return;
 		}
-
 		if (this.mauSoLieuSelected == 0) {
 			this.layoutUtilsService.showError("Vui lòng chọn mẫu số liệu");
 			return;
 		}
+
 		this.loadingSubject.next(true);
-		let filter = this.filterConfiguration();
-		if (this.IsDefault) {
-			this.objectService.MauTheoGiaiDoan(filter).subscribe(res => {
-				this.loadingSubject.next(false);
-				this.viewLoading = false;
-				if (res && res.status == 1) {
-					this.listDetail = res.data.SoLieu;
-					this.Nams = res.data.Nams;
-					this.allowExport = true;
-				} else {
-					this.layoutUtilsService.showError(res.error.message);
-				}
-				this.changeDetectorRefs.detectChanges();
-			});
-		}
-		else {
-			this.objectService.theoGiaiDoan(filter).subscribe(res => {
-				this.loadingSubject.next(false);
-				this.viewLoading = false;
-				if (res && res.status == 1) {
-					this.listDetail = res.data.SoLieu;
-					this.Nams = res.data.Nams;
-					this.allowExport = true;
-				} else {
-					this.layoutUtilsService.showError(res.error.message);
-				}
-				this.changeDetectorRefs.detectChanges();
-			});
-		}
+		let filter = this.filter();
+		const request$ = this.IsDefault ? this.objectService.MauTheoGiaiDoan(filter) : this.objectService.theoGiaiDoan(filter);
+		request$.pipe(takeUntil(this.destroy$)).subscribe(res => {
+			this.loadingSubject.next(false);
+			if (res && res.status == 1) {
+				this.listDetail = res.data.SoLieu;
+				this.Nams = res.data.Nams;
+				this.allowExport = true;
+			} else {
+				this.layoutUtilsService.showError(res.error.message);
+			}
+			this.changeDetectorRefs.detectChanges();
+		});
 	}
 
 	in() {
@@ -211,11 +186,7 @@ export class TheoGiaiDoanComponent implements OnInit {
 			this.layoutUtilsService.showError("Vui lòng chọn mẫu số liệu");
 			return;
 		}
-		if (this.nam1 < 0) {
-			this.layoutUtilsService.showError("Vui lòng nhập năm");
-			return;
-		}
-		if (this.nam2 < 0) {
+		if (!this.nam1 || this.nam1 < 0 || !this.nam2 || this.nam2 < 0) {
 			this.layoutUtilsService.showError("Vui lòng nhập năm");
 			return;
 		}
@@ -225,37 +196,22 @@ export class TheoGiaiDoanComponent implements OnInit {
 		}
 
 		this.loadingSubject.next(true);
-		let filter = this.filterConfiguration();
-		if (this.IsDefault) {
-			this.objectService.xuatMauTheoGiaiDoan(filter).subscribe(res => {
-				this.loadingSubject.next(false);
-				const headers = res.headers;
-				const filename = headers.get('x-filename');
-				const type = headers.get('content-type');
-				const blob = new Blob([res.body], { type });
-				const fileURL = URL.createObjectURL(blob);
-				const link = document.createElement('a');
-				link.href = fileURL;
-				link.download = filename;
-				link.click();
-			}, err => {
-				this.layoutUtilsService.showError("Xuất thống kê báo cáo thất bại");
-			});
-		} else {
-			this.objectService.xuatTheoGiaiDoan(filter).subscribe(res => {
-				this.loadingSubject.next(false);
-				const headers = res.headers;
-				const filename = headers.get('x-filename');
-				const type = headers.get('content-type');
-				const blob = new Blob([res.body], { type });
-				const fileURL = URL.createObjectURL(blob);
-				const link = document.createElement('a');
-				link.href = fileURL;
-				link.download = filename;
-				link.click();
-			}, err => {
-				this.layoutUtilsService.showError("Xuất thống kê báo cáo thất bại");
-			});
-		}
+		let filter = this.filter();
+		const request$ = this.IsDefault ? this.objectService.xuatMauTheoGiaiDoan(filter) : this.objectService.xuatTheoGiaiDoan(filter);
+		request$.pipe(takeUntil(this.destroy$)).subscribe(res => {
+			this.loadingSubject.next(false);
+			const headers = res.headers;
+			const filename = headers.get('x-filename');
+			const type = headers.get('content-type');
+			const blob = new Blob([res.body], { type });
+			const fileURL = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = fileURL;
+			link.download = filename;
+			link.click();
+		}, err => {
+			this.loadingSubject.next(false);
+			this.layoutUtilsService.showError("Xuất thống kê báo cáo thất bại");
+		});
 	}
 }

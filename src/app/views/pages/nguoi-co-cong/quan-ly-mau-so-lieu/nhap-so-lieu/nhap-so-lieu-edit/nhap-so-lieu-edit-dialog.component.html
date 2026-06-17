@@ -13,23 +13,21 @@
 				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
 				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>
-			<!--<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
-				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
-			</button>-->
 		</div>
 		<div class="col-md-3 kt-margin-bottom-10-mobile">
-			<button style="margin: 10px 10px 0 0; float: right" (click)="xuatDanhSach()" mat-raised-button color="info" matTooltip="Xuất danh sách">Export</button>
+			<button mat-raised-button (click)="xuatDanhSach()" color="info" 
+				matTooltip="Xuất danh sách" style="margin: 10px 10px 0 0; float: right">Export
+			</button>
 		</div>
 	</div>
 
 	<form class="kt-form" #nhapSoLieuForm="ngForm">
 		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
 				Không thể lưu, vui lòng nhập đủ thông tin!
 			</kt-alert>
-
 			<div class="form-group kt-form__group row">
-				<ng-container *ngIf="data._item.Id <= 0 && newNhapSoLieu == false">
+				<ng-container *ngIf="data._item.Id <= 0 && !newNhapSoLieu">
 					<div class="col-lg-12 kt--margin-bottom-20-mobile">
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="Danh sách mẫu số liệu" name="getIdDonvi" 
@@ -39,10 +37,11 @@
 						</mat-form-field>
 					</div>
 				</ng-container>
-				<ng-container *ngIf="isCreateForm == true">
+				<ng-container *ngIf="isCreateForm">
 					<div class="col-lg-12 m--margin-bottom-20-mobile">
 						<mat-form-field class="mat-form-field-fluid ">
-							<input type="text" matInput placeholder="{{ 'MAU_SO_LIEU.NAME' | translate }}" name="MauSoLieu" [(ngModel)]="mauSoLieuEdit.MauSoLieu" [disabled]="true" />
+							<input type="text" matInput placeholder="{{ 'MAU_SO_LIEU.NAME' | translate }}" name="MauSoLieu" 
+								[(ngModel)]="mauSoLieuEdit.MauSoLieu" [disabled]="true" />
 						</mat-form-field>
 					</div>
 					<div class="col-lg-2 m--margin-bottom-20-mobile">
@@ -52,7 +51,8 @@
 					</div>
 					<div class="col-lg-4 m--margin-bottom-20-mobile">
 						<mat-form-field class="mat-form-field-fluid ">
-							<input type="text" matInput placeholder="Thời gian" name="ThoiGian" type="text" [matDatepicker]="picker" [(ngModel)]="mauSoLieuEdit.ThoiGian" [disabled]="true">
+							<input type="text" matInput placeholder="Thời gian" name="ThoiGian" type="text" [matDatepicker]="picker" 
+								[(ngModel)]="mauSoLieuEdit.ThoiGian" [disabled]="true">
 							<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
 							<mat-datepicker #picker></mat-datepicker>
 						</mat-form-field>
@@ -78,10 +78,11 @@
 									<tr>
 										<td class="text-center">{{vi + 1 }}</td>
 										<td>{{object.SoLieu}}</td>
-										<td>{{object.default | mask:'separator':commonService.thousandSeparator}}</td>
+										<td>{{object.default | mask:'separator':tsSeparator}}</td>
 										<td>
 											<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
-												<input matInput type="text" required [name]="'value'+vi" [(ngModel)]="object.NhapSoLieu.Value" (input)="toggleMask($event,object)" [disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
+												<input matInput type="text" required [name]="'value'+vi" [(ngModel)]="object.NhapSoLieu.Value" 
+												(input)="toggleMask($event,object)" [disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{tsSeparator}}" />
 											</mat-form-field>
 										</td>
 										<td>
@@ -91,72 +92,64 @@
 										</td>
 									</tr>
 									<!-- Object detail -->
-									<ng-container *ngIf="object.Detail.length > 0;">
-										<ng-container *ngFor="let ch of object.Detail; let inx = index">
-											<tr>
-												<td colspan="1"> </td>
-												<!-- <td colspan="1"><i>{{ch.PhiSoLieu + ' (' + getStrCachNhap(ch.CachNhap) +')'}}</i> </td> -->
-												<td colspan="1"><i>{{ch.PhiSoLieu + ' (' + ch.CachNhap +')'}}</i> </td>
-												<td>{{ch.default|mask:'separator':commonService.thousandSeparator}}</td>
-												<td>
-													<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
-														<input type="text" matInput [(ngModel)]="ch.NhapSoLieu.Value" (input)="toggleMask($event,ch)" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
-													</mat-form-field>
-												</td>
-												<td>
-													<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
-														<input type="text" matInput [(ngModel)]="ch.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
-													</mat-form-field>
-												</td>
-											</tr>
-										</ng-container>
-									</ng-container>
+									<tr *ngFor="let ch of object?.Detail; let inx = index">
+										<td colspan="1"> </td>
+										<!-- <td colspan="1"><i>{{ch.PhiSoLieu + ' (' + getStrCachNhap(ch.CachNhap) +')'}}</i> </td> -->
+										<td colspan="1"><i>{{ch.PhiSoLieu + ' (' + ch.CachNhap +')'}}</i> </td>
+										<td>{{ch.default | mask:'separator':tsSeparator}}</td>
+										<td>
+											<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+												<input type="text" matInput [(ngModel)]="ch.NhapSoLieu.Value" (input)="toggleMask($event,ch)" [ngModelOptions]="{standalone: true}" 
+													[disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{tsSeparator}}" />
+											</mat-form-field>
+										</td>
+										<td>
+											<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
+												<input type="text" matInput [(ngModel)]="ch.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit"/>
+											</mat-form-field>
+										</td>
+									</tr>
 									<!-- Số liệu con -->
-									<ng-container *ngIf="object.SoLieuCon.length > 0;">
-										<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
-											<tr>
-												<td colspan="1"> </td>
-												<td colspan="1"><b>{{de.SoLieu}} </b></td>
-												<td>{{de.default|mask:'separator':commonService.thousandSeparator}}</td>
-												<td>
-													<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
-														<input type="text" matInput required [name]="'valueDetail'+i" [(ngModel)]="de.NhapSoLieu.Value" (input)="toggleMask($event,de)" 
-															[disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
-													</mat-form-field>
-												</td>
-												<td>
-													<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
-														<input type="text" matInput [(ngModel)]="de.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
-													</mat-form-field>
-												</td>
-											</tr>
-											<ng-container *ngFor="let child of de.Detail; let pos = index">
-												<tr>
-													<td colspan="1"> </td>
-													<!-- <td colspan="1"><i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i> </td> -->
-													<td colspan="1"><i>{{child.PhiSoLieu + ' (' + child.CachNhap +')'}}</i> </td>
-													<td>{{child.default|mask:'separator':commonService.thousandSeparator}}</td>
-													<td>
-														<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
-															<input type="text" matInput [name]="'valueChild'+pos+i" [(ngModel)]="child.NhapSoLieu.Value" (input)="toggleMask($event,child)" 
-																[disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
-														</mat-form-field>
-													</td>
-													<td>
-														<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
-															<input type="text" matInput [(ngModel)]="child.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
-														</mat-form-field>
-													</td>
-												</tr>
-											</ng-container>
-										</ng-container>
+									<ng-container *ngFor="let de of object?.SoLieuCon; let i = index">
+										<tr>
+											<td colspan="1"> </td>
+											<td colspan="1"><b>{{de.SoLieu}} </b></td>
+											<td>{{de.default | mask:'separator':tsSeparator}}</td>
+											<td>
+												<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+													<input type="text" matInput required [name]="'valueDetail'+i" [(ngModel)]="de.NhapSoLieu.Value" 
+													(input)="toggleMask($event,de)" [disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{tsSeparator}}" />
+												</mat-form-field>
+											</td>
+											<td>
+												<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
+													<input type="text" matInput [(ngModel)]="de.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
+												</mat-form-field>
+											</td>
+										</tr>
+										<tr *ngFor="let child of de.Detail; let pos = index">
+											<td colspan="1"> </td>
+											<!-- <td colspan="1"><i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i> </td> -->
+											<td colspan="1"><i>{{child.PhiSoLieu + ' (' + child.CachNhap +')'}}</i> </td>
+											<td>{{child.default|mask:'separator':tsSeparator}}</td>
+											<td>
+												<mat-form-field class="mat-form-field-fluid" style=" width: 100px;">
+													<input type="text" matInput [name]="'valueChild'+pos+i" [(ngModel)]="child.NhapSoLieu.Value" 
+													(input)="toggleMask($event,child)" [disabled]="!allowEdit" mask="separator,3" thousandSeparator="{{tsSeparator}}" />
+												</mat-form-field>
+											</td>
+											<td>
+												<mat-form-field class="mat-form-field-fluid" style=" width: 200px;">
+													<input type="text" matInput [(ngModel)]="child.NhapSoLieu.Note" [ngModelOptions]="{standalone: true}" [disabled]="!allowEdit" />
+												</mat-form-field>
+											</td>
+										</tr>
 									</ng-container>
 								</ng-container>
 							</table>
 						</div>
 					</div>
 				</ng-container>
-
 			</div>
 		</div>
 	</form>

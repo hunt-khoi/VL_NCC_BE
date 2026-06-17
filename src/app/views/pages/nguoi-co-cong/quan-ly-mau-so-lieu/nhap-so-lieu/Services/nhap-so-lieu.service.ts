@@ -1,23 +1,21 @@
-import { NhapSoLieuModel } from '../Model/nhap-so-lieu.model';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { NhapSoLieuModel } from '../Model/nhap-so-lieu.model';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/nhap-so-lieu';
 
 @Injectable()
 export class NhapSoLieuService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
 	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
 	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
-	// READ
+
 	getAllItems(): Observable<NhapSoLieuModel[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<NhapSoLieuModel[]>(API_URL + '?more=true', { headers: httpHeaders });
@@ -49,21 +47,18 @@ export class NhapSoLieuService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	// CREATE =>  POST: add a new oduct to the server
 	CreateData(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
-	// DELETE => delete the product from the server
+
 	deleteItem(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/${itemId}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
 	UpdateData(item: any): Observable<any> {
-		// Note: Add headers if needed (tokens/bearer)
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_URL + `/${item.NhapSoLieuModel.Id}`, item, { headers: httpHeaders });
 	}
@@ -80,7 +75,7 @@ export class NhapSoLieuService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	getListMauSoLieuDetailByIdMauSoLieu(itemId: number, nam, Id_DonVi: number = 0): Observable<any> {
+	getListMauSoLieuDetailByIdMauSoLieu(itemId: number, nam: number, Id_DonVi: number = 0): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/detail/${itemId}/${nam}/${Id_DonVi}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
@@ -131,7 +126,7 @@ export class NhapSoLieuService {
 			observe: 'response'
 		});
 	}
-	exportChiTiet(itemId: number, nam, Id_DonVi: number = 0): Observable<any> {
+	exportChiTiet(itemId: number, nam: number, Id_DonVi: number = 0): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders()
 		const url = `${API_URL}/export-chi-tiet/${itemId}/${nam}/${Id_DonVi}`;
 		return this.http.get(url, {

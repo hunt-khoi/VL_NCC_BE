@@ -1,18 +1,16 @@
 import { BaseModel } from '../../../../../../core/_base/crud/models/_base.model';
 
 export class FromBodyModel extends BaseModel {
-
-	NhapSoLieuModel: NhapSoLieuModel;
+	NhapSoLieuModel: NhapSoLieuModel = new NhapSoLieuModel();
 	ListNhapSoLieuDetail: NhapSoLieuDetail[] = [];
 	ListNhapSoLieuChild: NhapSoLieuChild[] = [];
-
 }
 
 export class NhapSoLieuModel extends BaseModel {
-	Id: number;
-	Id_MauSoLieu_DonVi: number;
-	Id_DonVi: number;
-	Id_MauSoLieu: number;
+	Id: number = 0;
+	Id_MauSoLieu_DonVi: number = 0;
+	Id_DonVi: number = 0;
+	Id_MauSoLieu: number = -1;
 
 	clear() {
 		this.Id = 0;
@@ -23,11 +21,11 @@ export class NhapSoLieuModel extends BaseModel {
 }
 
 export class NhapSoLieuDetail extends BaseModel {
-	Id: number;
-	Id_NhapSoLieu: number;
-	Id_Detail: number;
-	Value: number;
-	Note: string;
+	Id: number = 0;
+	Id_NhapSoLieu: number = 0;
+	Id_Detail: number = 0;
+	Value: number = -1;
+	Note: string = "";
 
 	clear() {
 		this.Id = 0;
@@ -39,11 +37,11 @@ export class NhapSoLieuDetail extends BaseModel {
 }
 
 export class NhapSoLieuChild extends BaseModel {
-	Id: number;
-	Id_Detail_Child: number;
-	Id_Detail: number;
-	Value: number;
-	Note: string;
+	Id: number = 0;
+	Id_Detail_Child: number = 0;
+	Id_Detail: number = 0;
+	Value: number = -1;
+	Note: string = "";
 
 	clear() {
 		this.Id = 0;

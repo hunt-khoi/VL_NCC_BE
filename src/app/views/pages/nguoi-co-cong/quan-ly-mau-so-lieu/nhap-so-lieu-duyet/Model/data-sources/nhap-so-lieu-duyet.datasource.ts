@@ -1,4 +1,4 @@
-import { NhapSoLieuDuyetService } from '../../services/nhap-so-lieu-duyet.service';
+import { NhapSoLieuDuyetService } from '../../Services/nhap-so-lieu-duyet.service';
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../../../../../core/_base/crud';

@@ -5,8 +5,8 @@ export class FormDonVi {
 	ListDonVi: DonVi[] = [];
 }
 export class DonVi {
-	id: number;
-	title: string;
+	id: number = 0;
+	title: string = '';
 
 	clear() {
 		this.id = 0;
@@ -15,20 +15,20 @@ export class DonVi {
 }
 
 export class FormNhapSoLieuModel extends BaseModel {
-	NhapSoLieuModel: NhapSoLieuModel;
+	NhapSoLieuModel: NhapSoLieuModel = new NhapSoLieuModel();
 	ListFormNhapSoLieuDetailModel: FormNhapSoLieuDetailModel[] = [];
 
 	clear() {
 		this.NhapSoLieuModel = new NhapSoLieuModel();
 		this.ListFormNhapSoLieuDetailModel = [];
 	}
-
 }
+
 export class FormNhapSoLieuDetailModel extends BaseModel {
-	Id: number;
-	Id_NhapSoLieu: number;
-	Id_Detail: number;
-	Value: number;
+	Id: number = 0;
+	Id_NhapSoLieu: number = 0;
+	Id_Detail: number = 0;
+	Value: number = 0;
 	SoLieuCon: FormNhapSoLieuConModel[] = [];
 
 	clear() {
@@ -42,10 +42,10 @@ export class FormNhapSoLieuDetailModel extends BaseModel {
 }
 
 export class FormNhapSoLieuConModel extends BaseModel {
-	Id: number;
-	Id_NhapSoLieu: number;
-	Id_Detail: number;
-	Value: number;
+	Id: number = 0;
+	Id_NhapSoLieu: number = 0;
+	Id_Detail: number = 0;
+	Value: number = 0;
 	Detail: FormDetailModel[] = [];
 
 	clear() {
@@ -59,10 +59,10 @@ export class FormNhapSoLieuConModel extends BaseModel {
 }
 
 export class FormDetailModel extends BaseModel {
-	Id: number;
-	Id_Detail: number;
-	Id_Detail_child: number;
-	Value: number;
+	Id: number = 0;
+	Id_Detail: number = 0;
+	Id_Detail_child: number = 0;
+	Value: number = 0;
 	
 	clear() {
 		this.Id = 0;

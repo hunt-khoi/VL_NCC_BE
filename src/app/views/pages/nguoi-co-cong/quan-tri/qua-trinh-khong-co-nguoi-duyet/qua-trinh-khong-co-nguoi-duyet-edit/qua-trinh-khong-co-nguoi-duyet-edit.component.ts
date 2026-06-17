@@ -8,7 +8,7 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { QuaTrinhKhongCoNguoiDuyetService } from '../Services/qua-trinh-khong-co-nguoi-duyet.service';
-import { NhapSoLieuDuyetService } from './../../../quan-ly-mau-so-lieu/nhap-so-lieu-duyet/services/nhap-so-lieu-duyet.service';
+import { NhapSoLieuDuyetService } from '../../../quan-ly-mau-so-lieu/nhap-so-lieu-duyet/Services/nhap-so-lieu-duyet.service';
 import { DeXuatService } from './../../../qua-le-tet/de-xuat/Services/de-xuat.service';
 import { HoSoNCCDuyetService } from './../../../ho-so-nguoi-co-cong/ho-so-ncc-duyet/Services/ho-so-ncc-duyet.service';
 // import { NhapBaoHiemDuyetService } from '../../../bao-hiem-y-te/nhap-bao-hiem-duyet/Services/nhap-bao-hiem-duyet.service';

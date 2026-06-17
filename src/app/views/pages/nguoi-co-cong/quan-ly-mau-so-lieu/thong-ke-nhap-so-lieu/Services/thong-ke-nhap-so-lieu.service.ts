@@ -1,20 +1,15 @@
-import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/thong-ke-so-lieu';
 
 @Injectable()
 export class ThongKeNhapSoLieuService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
@@ -23,7 +18,8 @@ export class ThongKeNhapSoLieuService {
 		const url = `${API_URL}/nam`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	getDV(filter): Observable<any> {
+
+	getDV(filter: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(filter);
 		const url = `${API_URL}/get-dv`;
@@ -42,7 +38,8 @@ export class ThongKeNhapSoLieuService {
 			params: httpParams
 		});
 	}
-	tongHop(filter): Observable<any> {
+	
+	tongHop(filter: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(filter);
 		const url = API_URL + '/tong-hop';
@@ -52,7 +49,7 @@ export class ThongKeNhapSoLieuService {
 		});
 	}
 
-	xuatTongHop(filter): Observable<any> {
+	xuatTongHop(filter: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(filter);
 		const url = API_URL + '/xuat-thong-ke-th';
@@ -64,8 +61,7 @@ export class ThongKeNhapSoLieuService {
 		});
 	}
 
-
-	theoGiaiDoan(filter): Observable<any> {
+	theoGiaiDoan(filter: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(filter);
 		const url = `${API_URL}/theo-giai-doan`;
@@ -74,7 +70,8 @@ export class ThongKeNhapSoLieuService {
 			params: httpParams
 		});
 	}
-	xuatTheoGiaiDoan(filter): Observable<any> {
+
+	xuatTheoGiaiDoan(filter: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(filter);
 		const url = `${API_URL}/xuat-thong-ke-giai-doan`;
@@ -85,7 +82,8 @@ export class ThongKeNhapSoLieuService {
 			observe: 'response'
 		});
 	}
-	MauTheoGiaiDoan(filter): Observable<any> {
+
+	MauTheoGiaiDoan(filter: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(filter);
 		const url = `${API_URL}/mau-theo-giai-doan`;
@@ -94,7 +92,8 @@ export class ThongKeNhapSoLieuService {
 			params: httpParams
 		});
 	}
-	xuatMauTheoGiaiDoan(filter): Observable<any> {
+	
+	xuatMauTheoGiaiDoan(filter: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.parseFilter(filter);
 		const url = `${API_URL}/xuat-thong-ke-mau-giai-doan`;

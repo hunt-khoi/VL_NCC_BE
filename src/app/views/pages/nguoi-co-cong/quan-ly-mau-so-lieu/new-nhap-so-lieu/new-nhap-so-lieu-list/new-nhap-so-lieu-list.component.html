@@ -16,7 +16,7 @@
 				matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
 				<ng-container matColumnDef="STT">
 					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell"><span translate="COMMON.STT"></span></th>
-					<td mat-cell *matCellDef="let object;let vi = index" class="mat-column-vinCode">{{vi + 1}}</td>
+					<td mat-cell *matCellDef="let vi = index" class="mat-column-vinCode">{{vi + 1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="MauSoLieu">
 					<th mat-header-cell *matHeaderCellDef>
@@ -63,45 +63,31 @@
 						<span translate="COMMON.TACVU"></span>
 					</th>
 					<td mat-cell *matCellDef="let object" style="width: 100px;">
-						<button (click)="AddWorkplace(object)" mat-raised-button matTooltip="Nhập" *ngIf="objectService.ReadOnlyControl" color="accent" type="button">
+						<button (click)="AddWorkplace(object)" mat-raised-button color="accent" type="button"
+							matTooltip="Nhập" *ngIf="objectService.ReadOnlyControl">
 							<span translate="COMMON.NHAP"></span>
 						</button>
 					</td>
 				</ng-container>
 
 				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
-				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" 
+					[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
+				</tr>
 			</table>
-
-			<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
+			<div class="mat-table__message" *ngIf="!dataSource.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
 		</div>
 
-		<!-- start: BOTTOM -->
 		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 			<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
-				<mat-chip-list>
-					<ng-container *ngFor="let chip of gridService.model.lstChip">
-						<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
-							{{chip.title}}: {{chip.data}}
-							<mat-icon matChipRemove>cancel</mat-icon>
-						</mat-chip>
-						<ng-container *ngIf="chip.type==1">
-							<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
-								{{chip.title}}: {{item.name}}
-								<mat-icon matChipRemove>cancel</mat-icon>
-							</mat-chip>
-						</ng-container>
-					</ng-container>
-					<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
-						Đặt lại
-					</mat-chip>
-				</mat-chip-list>
+				<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
 			</div>
 			<div class="flt-page" style="width: 50%;">
 				<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" 
+					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+				</mat-paginator>
 			</div>
 		</div>
-		<!-- end: BOTTOM -->
 	</div>
 </kt-portlet>

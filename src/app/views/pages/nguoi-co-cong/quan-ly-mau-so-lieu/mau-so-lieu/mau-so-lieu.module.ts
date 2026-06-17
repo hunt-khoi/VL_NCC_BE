@@ -1,10 +1,10 @@
-import { MauSoLieuService } from './Services/mau-so-lieu.service';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-import { MauSoLieuListComponent } from './mau-so-lieu-list/mau-so-lieu-list.component';
+import { MauSoLieuService } from './Services/mau-so-lieu.service';
 import { MauSoLieuRefModule } from './mau-so-lieu-ref.module';
 import { MauSoLieuComponent } from './mau-so-lieu.component';
+import { MauSoLieuListComponent } from './mau-so-lieu-list/mau-so-lieu-list.component';
 import { solieuService } from '../../danh-muc/solieu/Services/solieu.service';
 
 const routes: Routes = [
@@ -38,4 +38,5 @@ const routes: Routes = [
         MauSoLieuComponent
     ]
 })
+
 export class MauSoLieuModule { }

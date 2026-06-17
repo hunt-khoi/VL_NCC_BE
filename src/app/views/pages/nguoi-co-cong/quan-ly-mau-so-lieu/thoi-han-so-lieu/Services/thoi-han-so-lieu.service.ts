@@ -1,7 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 
@@ -10,14 +9,10 @@ const API_URL = environment.ApiRoot + '/thong-ke-so-lieu';
 @Injectable()
 export class ThoiHanSoLieuService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	// READ
 	getAllItems(): Observable<any[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any[]>(API_URL + '/list-thoi-han?more=true', { headers: httpHeaders });

@@ -8,8 +8,9 @@
 		<div class="col-md-4 kt-margin-bottom-10-mobile" style="margin-top: 20px;">
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
-		<div class="col-md-8 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right; " *ngIf="allowEdit">
-			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+		<div class="col-md-8 kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" 
+				matTooltip="{{'COMMON.LUU_DONG' | translate}}">
 				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
 				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>
@@ -21,19 +22,18 @@
 		</div>
 	</div>
 	<form class="kt-form" [formGroup]="itemForm">
-		<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose($event)">
+		<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
 			Không thể lưu, vui lòng nhập đủ thông tin!
 		</kt-alert>
-
 		<div class="kt-portlet__body">
 			<div class="form-group kt-form__group row">
 				<div class="col-md-8 m--margin-bottom-20-mobile">
-					<ng-container *ngIf="item.IdSoLieu != 0">
+					<ng-container *ngIf="item.IdSoLieu !== 0">
 						<mat-form-field class="mat-form-field-fluid ">
 							<input matInput placeholder="{{ 'SO_LIEU.NAME' | translate }}" formControlName="SoLieuInp" class="require" />
 						</mat-form-field>
 					</ng-container>
-					<ng-container *ngIf="item.IdSoLieu == 0">
+					<ng-container *ngIf="item.IdSoLieu === 0">
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="{{ 'SO_LIEU.NAME' | translate }}" formControlName="SoLieu" class="require" 
 								(selectionChange)="getLoaiSoLieu(filterSoLieu)" [(ngModel)]="filterSoLieu" required>
@@ -47,10 +47,10 @@
 						</mat-form-field>
 					</ng-container>
 				</div>
-
 				<div class="col-md-4 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<input [value]="titleLoaiSoLieu" matInput placeholder="{{ 'LOAI_SO_LIEU.NAME' | translate }}" formControlName="LoaiSoLieu" class="require" />
+						<input [value]="titleLoaiSoLieu" matInput placeholder="{{ 'LOAI_SO_LIEU.NAME' | translate }}" 
+							formControlName="LoaiSoLieu" class="require" />
 					</mat-form-field>
 				</div>
 				<div class="col-md-4 m--margin-bottom-20-mobile" style="display:none">
@@ -59,7 +59,6 @@
 							mask="separator,3" thousandSeparator="{{commonService.thousandSeparator}}" />
 					</mat-form-field>
 				</div>
-
 				<div class="col-md-12 m--margin-bottom-20-mobile">
 					<button type="button" color="primary" *ngIf="filterSoLieu > 0 || showBtnAddPhiSoLieu" 
 						(click)="EditObject(soLieuisSelected, true)" mat-raised-button matTooltip="{{ 'MAU_SO_LIEU.themnhapsl' | translate }}">
@@ -71,11 +70,13 @@
 				<ng-container *ngFor="let dec of soLieuisSelected.Detail; let pos = index;">
 					<div class="col-md-10 m--margin-bottom-20-mobile">
 						<mat-form-field class="mat-form-field-fluid " style="padding-left: 1.5rem;">
-							<input value="{{dec.PhiSoLieu + ' (' + getStrCachNhap(dec.CachNhap) +')'}}" matInput placeholder="{{ 'MAU_SO_LIEU.nhapsolieu' | translate }}" disabled />
+							<input value="{{dec.PhiSoLieu + ' (' + getStrCachNhap(dec.CachNhap) +')'}}" matInput 
+								placeholder="{{ 'MAU_SO_LIEU.nhapsolieu' | translate }}" disabled />
 						</mat-form-field>
 					</div>
 					<div *ngIf="allowEdit" class="col-md-2 m--margin-bottom-20-mobile" style=" float: right;">
-						<button (click)="DeletePhiSoLieuIsSelected(soLieuisSelected, dec, pos)" color="warn" mat-icon-button style="float: right;" type="button" matTooltip="Xóa">
+						<button (click)="DeletePhiSoLieuIsSelected(soLieuisSelected, dec, pos)" color="warn" mat-icon-button 
+							style="float: right;" type="button" matTooltip="Xóa">
 							<mat-icon>delete</mat-icon>
 						</button>
 					</div>

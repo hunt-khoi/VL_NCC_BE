@@ -17,7 +17,7 @@
 		<div class="kt-form__filtration">
 			<div class="row align-items-center">
 				<div class="col-lg-3 kt--margin-bottom-20-mobile">		
-					<mat-form-field class="mat-form-field-fluid ">
+					<mat-form-field class="mat-form-field-fluid">
 						<mat-select (selectionChange)="bindNgay()" disableOptionCentering placeholder="Danh sách mẫu số liệu" 
 							name="getIdDonvi" [(ngModel)]="mauSoLieuSelected">
 							<mat-option>
@@ -31,18 +31,18 @@
 					</mat-form-field>
 				</div>
 				<div class="col-lg-1 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
+					<mat-form-field class="mat-form-field-fluid">
 						<input type="number" matInput placeholder="Năm" name="Nam1" [(ngModel)]="nam1" (ngModelChange)="bindNgay()" />
 					</mat-form-field>
 				</div>
 				<div class="col-lg-1 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
+					<mat-form-field class="mat-form-field-fluid">
 						<input type="number" matInput placeholder="Năm" name="Nam2" [(ngModel)]="nam2" (ngModelChange)="bindNgay()" />
 					</mat-form-field>
 				</div>
 				<ng-container *ngIf="!IsDefault">
 					<div class="col-lg-2 kt--margin-bottom-20-mobile" [hidden]="!isTrongPhamVi">
-						<mat-form-field class="mat-form-field-fluid ">
+						<mat-form-field class="mat-form-field-fluid">
 							<mat-select disableOptionCentering placeholder="Đơn vị được giao" [(ngModel)]="dv">
 								<mat-option>
 									<ngx-mat-select-search  [placeholderLabel]="'Tìm kiếm...'" [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" 
@@ -73,7 +73,6 @@
 				</th>
 				<th style="width: 100px;text-align:center;">Giai đoạn</th>
 			</tr>
-
 			<ng-container *ngFor="let object of listDetail; let vi = index">
 				<tr>
 					<td class="sticky-body-col0 text-center">{{vi + 1}}</td>
@@ -83,49 +82,38 @@
 					</td>
 					<td style="text-align:center;">{{object.Tong}}</td>
 				</tr>
-				<ng-container *ngIf="object.Detail.length > 0;">
-					<ng-container *ngFor="let child of object.Detail; let pos = index">
-						<tr>
-							<td class="sticky-body-col0"> </td>
-							<td class="sticky-body-col0">
-								<i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i>
-							</td>
-							<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
-								{{child.Nam[c]}}
-							</td>
-							<td style="text-align:center;">{{child.Tong}}</td>
-						</tr>
-					</ng-container>
-				</ng-container>
-				
+				<tr *ngFor="let child of object.Detail; let pos = index">
+					<td class="sticky-body-col0"> </td>
+					<td class="sticky-body-col0">
+						<i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i>
+					</td>
+					<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
+						{{child.Nam[c]}}
+					</td>
+					<td style="text-align:center;">{{child.Tong}}</td>
+				</tr>
 				<!-- Số liệu con -->
-				<ng-container *ngIf="object.SoLieuCon.length > 0;">
-					<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
-						<tr>
-							<td class="sticky-body-col0"> </td>
-							<td class="sticky-body-col0"><b>{{de.SoLieu}} </b></td>
-							<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
-								{{de.Nam[c]}}
-							</td>
-							<td style="text-align:center;">{{de.Tong}}</td>
-						</tr>
-						<ng-container *ngFor="let child of de.Detail; let pos = index">
-							<tr>
-								<td class="sticky-body-col0"> </td>
-								<td class="sticky-body-col0">
-									<i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i>
-								</td>
-								<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
-									{{child.Nam[c]}}
-								</td>
-								<td style="text-align:center;">{{child.Tong}}</td>
-							</tr>
-						</ng-container>
-					</ng-container>
+				<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
+					<tr>
+						<td class="sticky-body-col0"> </td>
+						<td class="sticky-body-col0"><b>{{de.SoLieu}} </b></td>
+						<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
+							{{de.Nam[c]}}
+						</td>
+						<td style="text-align:center;">{{de.Tong}}</td>
+					</tr>
+					<tr *ngFor="let child of de.Detail; let pos = index">
+						<td class="sticky-body-col0"> </td>
+						<td class="sticky-body-col0">
+							<i>{{child.PhiSoLieu + ' (' + getStrCachNhap(child.CachNhap) +')'}}</i>
+						</td>
+						<td style="text-align:center;" *ngFor="let col of Nams; let c=index">
+							{{child.Nam[c]}}
+						</td>
+						<td style="text-align:center;">{{child.Tong}}</td>
+					</tr>
 				</ng-container>
-
 			</ng-container>
 		</table>
-
 	</div>
 </kt-portlet-body>

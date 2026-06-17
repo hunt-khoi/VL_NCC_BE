@@ -1,12 +1,13 @@
-import { ActivatedRoute, Router } from '@angular/router';
-import { NhapSoLieuDuyetService } from '../services/nhap-so-lieu-duyet.service';
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { NhapSoLieuDuyetService } from '../Services/nhap-so-lieu-duyet.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-nhap-so-lieu-duyet',
@@ -14,33 +15,33 @@ import * as moment from 'moment';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class NhapSoLieuDuyetDialogComponent implements OnInit {
+export class NhapSoLieuDuyetDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	itemForm: FormGroup;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
 	isZoomSize: boolean = false;
 	isDuyet: boolean = true;
-	require = '';
-	id = 0;
-	idDuyet = 0;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
-	_NAME = '';
-	guiduyet = false;
-	isShowNhacnho = false;
+	require: string = '';
+	id: number = 0;
+	idDuyet: number = 0;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
+	_NAME: string = '';
+	guiduyet: boolean = false;
+	isShowNhacnho: boolean = false;
 	isReturn: boolean = false;
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		// duyệt
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		// lưu đóng
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
-		// ko duyệt
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		//lưu tiếp tục
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -52,15 +53,12 @@ export class NhapSoLieuDuyetDialogComponent implements OnInit {
 		private router: Router,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private CommonService: CommonService,
-		private route: ActivatedRoute,
 		private translate: TranslateService) {
 			this._NAME = this.translate.instant("MAU_SO_LIEU.nhapsl");
 			this.isShowNhacnho = this.CommonService.IsShowNhacnhoduyet(this.router.url);
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.isDuyet != undefined)
@@ -71,7 +69,7 @@ export class NhapSoLieuDuyetDialogComponent implements OnInit {
 		this.item.IsVisible_Duyet = true;
 		this.item.IsEnable_Duyet = false;
 		if (!this.isReturn && this.item.Id > 0) {
-			this.objectService.detail(this.item.Id).subscribe(res => {
+			this.objectService.detail(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.item = res.data;
 					this.createForm();
@@ -84,6 +82,11 @@ export class NhapSoLieuDuyetDialogComponent implements OnInit {
 		this.createForm();
 		this.viewLoading = false;
 		this.changeDetectorRefs.detectChanges();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
@@ -101,7 +104,6 @@ export class NhapSoLieuDuyetDialogComponent implements OnInit {
 		}
 		if (this.focusInput)
 			this.focusInput.nativeElement.focus();
-
 	}
 
 	/** UI */
@@ -114,7 +116,6 @@ export class NhapSoLieuDuyetDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
 	prepareData(): any {
 		const controls = this.itemForm.controls;
 		let _item: any = {};
@@ -130,16 +131,12 @@ export class NhapSoLieuDuyetDialogComponent implements OnInit {
 	}
 
 	onSubmit(value: boolean) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
-			this.hasFormErrors = true;
 			return;
 		}
 		const _item = this.prepareData();
@@ -152,21 +149,19 @@ export class NhapSoLieuDuyetDialogComponent implements OnInit {
 		}
 	}
 
-	Duyet(_item: any, value: boolean, _Message: string) {
-		_item.value = value;
+	Duyet(item: any, value: boolean, message: string) {
+		item.value = value;
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Duyet(_item).subscribe(res => {
+		this.objectService.Duyet(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingAfterSubmit = false;
 			this.viewLoading = false;
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.layoutUtilsService.showInfo(_Message);
-				this.dialogRef.close({
-					_item
-				});
+				this.layoutUtilsService.showInfo(message);
+				this.dialogRef.close({ item });
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
@@ -178,41 +173,33 @@ export class NhapSoLieuDuyetDialogComponent implements OnInit {
 		var dataNoty: any = {};
 		dataNoty.To = this.item.NguoiDuyetDon;
 		dataNoty.url = 'duyet-ho-so/ho-so/' + this.item.Id;
-		this.CommonService.DeXuatDuyet(dataNoty).subscribe(res => {
+		this.CommonService.DeXuatDuyet(dataNoty).pipe(takeUntil(this.destroy$)).subscribe(res => {
 		});
 	}
 
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
 	}
-	onAlertClose($event) {
-		this.hasFormErrors = false;
-	}
+
 	close() {
 		this.dialogRef.close();
 	}
 
 	traLai() {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
-			this.hasFormErrors = true;
 			return;
 		}
-
-		const _item = this.prepareData();
-		this.objectService.traLai(_item.Id, _item.note).subscribe(res => {
+		const item = this.prepareData();
+		this.objectService.traLai(item.Id, item.note).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {

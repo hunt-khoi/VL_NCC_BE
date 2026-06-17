@@ -1,23 +1,22 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { Moment } from 'moment';
-import * as moment from 'moment';
 import { CommonService } from '../../../services/common.service';
 import { ThoiHanSoLieuService } from '../Services/thoi-han-so-lieu.service';
 import { ThoiHanSoLieuDataSource } from '../Model/data-sources/thoi-han-so-lieu.datasource';
 import { NhapSoLieuEditDialogComponent } from '../../nhap-so-lieu/nhap-so-lieu-edit/nhap-so-lieu-edit-dialog.component';
 import { CookieService } from 'ngx-cookie-service';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-thoi-han-so-lieu-list',
@@ -25,23 +24,18 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class ThoiHanSoLieuListComponent implements OnInit {
+export class ThoiHanSoLieuListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
-	dataSource: ThoiHanSoLieuDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
-	// Filter fields
-	filterType = '';
+	dataSource: ThoiHanSoLieuDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
 	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	lstStatus: any[] = [];
-	// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-	_name = '';
+	_name: string = '';
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict: number = 0;
 	listdistrict: any[] = [];
@@ -49,37 +43,33 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 	listward: any[] = [];
 
 	IsTre: string = '-1';
-	Capcocau: number;
+	Capcocau: number = 0;
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
 
 	now = new Date();
-	to: Moment;
-	from: Moment;
+	to: Moment = moment(new Date());
+	from: Moment = moment(new Date());
 
 	constructor(
 		public objectService: ThoiHanSoLieuService,
 		public dialog: MatDialog,
-		private route: ActivatedRoute,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private cookieService: CookieService,
 		private ref: ApplicationRef,
 		private commonService: CommonService,
 		private translate: TranslateService,
-		private tokenStorage: TokenStorage,
-		private router: Router) {
+		private tokenStorage: TokenStorage) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		let tmp = moment();
 		let y = tmp.get("year");
 		this.from = moment(new Date(y, 0, 1));
 		this.to = moment(new Date(y, 11, 31));
-		this.selection = new SelectionModel<any>(true, []);
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.Capcocau = res.Capcocau;
 			this.filterprovinces = res.IdTinh;
 			this.loadGetListDistrictByProvinces(this.filterprovinces);
@@ -91,10 +81,10 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 			this.objectService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'SoHoSo', 0, 10));
 		}
 
-		this.commonService.GetAllProvinces().subscribe(res => {
+		this.commonService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listprovinces = res.data;
 		});
-		this.commonService.getStatusNCC().subscribe(res => {
+		this.commonService.getStatusNCC().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstStatus = res.data;
 			}
@@ -190,15 +180,9 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -212,35 +196,29 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_thsl'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new ThoiHanSoLieuDataSource(this.objectService);
+	}
 
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult != null) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
-		this.selection.clear();
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -255,7 +233,7 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 	filterDistrictID(id: any) {
 		this.filterdistrict = id;
 		this.filterward = '';
-		this.commonService.GetListWardByDistrict(id).subscribe(res => {
+		this.commonService.GetListWardByDistrict(id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1)
 				this.listward = res.data;
 		})
@@ -298,30 +276,20 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 		if (this.filterward)
 			filter.Id_Xa = +this.filterward;
 
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 		}
-
 		return filter;
 	}
 
 	loadGetListDistrictByProvinces(idProvince: any) {
-		this.commonService.GetListDistrictByProvinces(idProvince).subscribe(res => {
+		this.commonService.GetListDistrictByProvinces(idProvince).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listdistrict = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
-	getStatusString(status) {
+	getStatusString(status: any) {
 		var f = this.lstStatus.find(x => x.id == status);
 		if (!f)
 			return "";
@@ -329,10 +297,12 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 	}
 
 	export() {
-		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'actions');
+		if (!this.gridService || !this.sort || !this.paginator) return;
+		let gridService = this.gridService;
+		var cols = gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
-			var f = this.gridService.model.availableColumns.find(x => x.name == col);
+			var f = gridService.model.availableColumns.find(x => x.name == col);
 			headers.push(f.displayName);
 		});
 		const queryParams = new QueryParamsModel(
@@ -347,7 +317,7 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 			},
 			true
 		);
-		this.objectService.exportList(queryParams).subscribe(response => {
+		this.objectService.exportList(queryParams).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');
@@ -361,63 +331,66 @@ export class ThoiHanSoLieuListComponent implements OnInit {
 			this.layoutUtilsService.showError("Xuất thống kê báo cáo thất bại");
 		});
 	}
+
 	EditObject(_item: any, allowEdit: boolean = true) {
-		let saveMessageTranslateParam = '';
-		// câu thông báo khi thực hiện trong tác vụ
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(NhapSoLieuEditDialogComponent, { data: { _item, allowEdit, duyetSoLieu: true } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
-	print: boolean = false;
-	printTicket(print_template) {
-		this.print = true;
-		this.changeDetectorRefs.detectChanges();
 
-		let innerContents = document.getElementById(print_template).innerHTML;
+	print: boolean = false;
+	printTicket(print_template: any) {
+		this.print = true;
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
+		const popupWinindow = window.open();
+		if (!popupWinindow) return;
+		popupWinindow.document.open();
+		// Gắn tiêu đề và nội dung HTML vào body
 		let substr = '<button class="mat-sort-header-button" type="button" aria-label="Change sorting for Deadline">Thời hạn</button>';
 		let newstr = '<span aria-label="Change sorting for Deadline">Thời hạn</span>';
 		innerContents = innerContents.replace(substr, newstr);
-		let title = 'Danh sách số liệu đúng hạn, trễ hạn';
 		substr = '<button class="mat-sort-header-button" type="button" aria-label="Change sorting for Nam">Năm</button>';
 		newstr = '<span aria-label="Change sorting for Nam">Năm</span>';
 		innerContents = innerContents.replace(substr, newstr);
-		const popupWinindow = window.open();
-		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+title+'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
+		let title = 'Danh sách số liệu đúng hạn, trễ hạn';
+		popupWinindow.document.title = title;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
 		@media print {
 			th:last-child,
 			td:last-child,
 			.hiden-print {
 				display: none !important;
 			}
-			td{
+			td {
 				border-bottom: 1px solid #dee2e6;
 				padding: 10px;
 				font-size: 10pt;
 				text-align: center;
 			}
-			th{
+			th {
 				padding: 10px;
 				font-size: 12pt;
 			}
-			table{
+			table {
 				width: 100%;
 			}
-		}
-		</style>
-	  `);
-	  	popupWinindow.document.close();
-		popupWinindow.onafterprint = window.close;
-		  this.print = false;
-	 }
-
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
+		this.print = false;
+		this.changeDetectorRefs.detectChanges();
+	}
 }

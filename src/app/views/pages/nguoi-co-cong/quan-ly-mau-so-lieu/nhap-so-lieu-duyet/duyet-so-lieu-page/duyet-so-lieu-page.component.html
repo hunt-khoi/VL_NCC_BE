@@ -9,6 +9,7 @@
 		overflow: hidden !important;
 		text-overflow: ellipsis;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		max-width: 200px;
 	}
 </style>
@@ -19,7 +20,7 @@
 		</div>
 		<div class="kt-portlet__head-toolbar">
 			<button type="button" mat-raised-button (click)="close()" matTooltip="Quay lại">
-				<span>Quay lại</span>
+				Quay lại
 			</button>
 		</div>
 	</div>
@@ -32,11 +33,13 @@
 						<h3>{{getTitle()}}</h3>
 					</div>
 					<div class="col-md-6 m--margin-bottom-20-mobile {{getWidth() > 767?'text-right':''}}" *ngIf="item.IsEnable_Duyet">
-						<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)" matTooltip="{{ 'COMMON.DUYET' | translate }}" [disabled]="disabledBtn">
-							<span>{{ 'COMMON.DUYET' | translate }}</span>
+						<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)" 
+							matTooltip="{{ 'COMMON.DUYET' | translate }}" [disabled]="disabledBtn">
+							{{ 'COMMON.DUYET' | translate }}
 						</button>&nbsp;
-						<button type="button" mat-raised-button color="warn" (click)="onSubmit(false)" matTooltip="{{ 'COMMON.KODUYET' | translate }}" [disabled]="disabledBtn">
-							<span>{{ 'COMMON.KODUYET' | translate }}</span>
+						<button type="button" mat-raised-button color="warn" (click)="onSubmit(false)" 
+							matTooltip="{{ 'COMMON.KODUYET' | translate }}" [disabled]="disabledBtn">
+							{{ 'COMMON.KODUYET' | translate }}
 						</button>
 					</div>
 				</div>
@@ -88,7 +91,6 @@
 										<th class="text-center" style="width: 100px;">Số liệu<br />thay đổi</th>
 										<th class="text-center" style="width: 150px;">Ghi chú</th>
 									</tr>
-
 									<ng-container *ngFor="let object of item.Detail; let vi = index">
 										<tr>
 											<td><b>{{vi + 1 }}</b></td>
@@ -102,56 +104,48 @@
 											</td>
 										</tr>
 										<!-- Số liệu con -->
-										<ng-container *ngIf="object.SoLieuCon.length > 0;">
-											<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
-												<tr>
-													<td></td>
-													<td><b>{{de.SoLieu}}</b></td>
-													<td>{{de.default| mask:'separator': commonService.thousandSeparator}}</td>
-													<td style="color:rgb(255, 67, 67)">
-														{{de.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
-													</td>
-													<td>
-														<span class="overflow-gc" title="{{de.NhapSoLieu.Note}}">
-															{{de.NhapSoLieu.Note}}
-														</span>
-													</td>
-												</tr>
-												<ng-container *ngFor="let child of de.Detail; let pos = index">
-													<tr>
-														<td></td>
-														<td>{{child.PhiSoLieu}} ({{child.CachNhap}})</td>
-														<td>{{child.default| mask:'separator': commonService.thousandSeparator}}</td>
-														<td style="color:rgb(255, 67, 67)">
-															{{child.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
-														</td>
-														<td>
-															<span class="overflow-gc" title="{{child.NhapSoLieu.Note}}">
-																{{child.NhapSoLieu.Note}}
-															</span>
-														</td>
-													</tr>
-												</ng-container>
-											</ng-container>
+										<ng-container *ngFor="let de of object.SoLieuCon; let i = index">
+											<tr>
+												<td></td>
+												<td><b>{{de.SoLieu}}</b></td>
+												<td>{{de.default| mask:'separator': commonService.thousandSeparator}}</td>
+												<td style="color:rgb(255, 67, 67)">
+													{{de.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
+												</td>
+												<td>
+													<span class="overflow-gc" title="{{de.NhapSoLieu.Note}}">
+														{{de.NhapSoLieu.Note}}
+													</span>
+												</td>
+											</tr>
+											<tr *ngFor="let child of de.Detail; let pos = index">
+												<td></td>
+												<td>{{child.PhiSoLieu}} ({{child.CachNhap}})</td>
+												<td>{{child.default| mask:'separator': commonService.thousandSeparator}}</td>
+												<td style="color:rgb(255, 67, 67)">
+													{{child.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
+												</td>
+												<td>
+													<span class="overflow-gc" title="{{child.NhapSoLieu.Note}}">
+														{{child.NhapSoLieu.Note}}
+													</span>
+												</td>
+											</tr>
 										</ng-container>
 
-										<ng-container *ngIf="object.Detail.length > 0;">
-											<ng-container *ngFor="let child of object.Detail; let pos = index">
-												<tr>
-													<td></td>
-													<td>{{child.PhiSoLieu}} ({{child.CachNhap}})</td>
-													<td>{{child.default| mask:'separator': commonService.thousandSeparator}}</td>
-													<td style="color:red">
-														{{child.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
-													</td>
-													<td>
-														<span class="overflow-gc" title="{{child.NhapSoLieu.Note}}">
-															{{child.NhapSoLieu.Note}}
-														</span>
-													</td>
-												</tr>
-											</ng-container>
-										</ng-container>
+										<tr *ngFor="let child of object.Detail; let pos = index">
+											<td></td>
+											<td>{{child.PhiSoLieu}} ({{child.CachNhap}})</td>
+											<td>{{child.default| mask:'separator': commonService.thousandSeparator}}</td>
+											<td style="color:red">
+												{{child.NhapSoLieu.Value| mask:'separator': commonService.thousandSeparator}}
+											</td>
+											<td>
+												<span class="overflow-gc" title="{{child.NhapSoLieu.Note}}">
+													{{child.NhapSoLieu.Note}}
+												</span>
+											</td>
+										</tr>
 									</ng-container>
 								</table>
 							</div>

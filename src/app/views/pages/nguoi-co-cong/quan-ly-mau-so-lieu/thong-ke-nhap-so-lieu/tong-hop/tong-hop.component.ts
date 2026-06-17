@@ -1,41 +1,36 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { ThongKeNhapSoLieuService } from '../Services/thong-ke-nhap-so-lieu.service';
-import { BehaviorSubject, ReplaySubject } from 'rxjs';
-import * as moment from 'moment';
-import { Moment } from 'moment'
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
+import { ThongKeNhapSoLieuService } from '../Services/thong-ke-nhap-so-lieu.service';
+import moment from 'moment';
+import { Moment } from 'moment'
 
 @Component({
 	selector: 'kt-tong-hop',
 	templateUrl: './tong-hop.component.html',
 })
+export class TongHopComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 
-export class TongHopComponent implements OnInit {
-
-	hasFormErrors = false;
-	viewLoading = false;
 	listDetail: any[] = [];
 	listNhapSoLieuDetail: any[] = [];
 	listNhapSoLieuDetailChild: any[] = [];
-	loadingAfterSubmit = false;
 	disabledBtn = false;
-	allowEdit = false; // cho phép sửa
-	allowDetail = false;
-	isZoomSize = false;
 	mauSoLieuSelected: number = 0;
 	DonVis: any[] = [];
 	_name = '';
 	allowExport = false;
 	theo: number = 3;
-	thang: number;
-	quy: number;
-	nam: number;
-	to: Moment;
-	from: Moment;
+	thang: number = 0;
+	quy: number = 0;
+	nam: number = 0;
+	to: Moment = moment();
+	from: Moment = moment()	;
 	loadingSubject = new BehaviorSubject<boolean>(false);
 	loading$ = this.loadingSubject.asObservable();
 	dv: number = 0;
@@ -43,7 +38,7 @@ export class TongHopComponent implements OnInit {
 	ChuaDuyet: boolean = false;
 	IsMauTheoPhong: boolean = false;
 	IsDefault: boolean = false;
-	Capcocau: number;
+	Capcocau: number = 0;
 	IsDVPhong: boolean = false;
 
 	FilterCtrl_mau: string = '';
@@ -64,9 +59,9 @@ export class TongHopComponent implements OnInit {
 		private translate: TranslateService) {
 		this._name = this.translate.instant('MAU_SO_LIEU.nhapsl');
 	}
-	/** LOAD DATA */
+
 	ngOnInit() {
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.Capcocau = res.Capcocau;
 		})
 		this.loadListCachNhap();
@@ -74,15 +69,17 @@ export class TongHopComponent implements OnInit {
 		this.nam = tmp.get("year");
 		this.thang = new Date().getMonth() + 1;
 		this.quy = tmp.quarter();
-
 		this.change();
 		this.bindNgay();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	filter() {
-		if (!this.listMauSoLieu) {
-			return;
-		}
+		if (!this.listMauSoLieu) return;
 		let search = this.FilterCtrl_mau;
 		if (!search) {
 			this.listMauSL$.next(this.listMauSoLieu.slice());
@@ -98,9 +95,7 @@ export class TongHopComponent implements OnInit {
 	}
 
 	filter1() {
-		if (!this.lstDV) {
-			return;
-		}
+		if (!this.lstDV) return;
 		let search = this.FilterCtrl_mau;
 		if (!search) {
 			this.lstDV$.next(this.lstDV.slice());
@@ -116,7 +111,7 @@ export class TongHopComponent implements OnInit {
 	}
 
 	loadListCachNhap() {
-		this.commonService.liteCachNhap().subscribe(res => {
+		this.commonService.liteCachNhap().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listCachNhap = res.data;
 			this.changeDetectorRefs.detectChanges()
 		});
@@ -128,12 +123,12 @@ export class TongHopComponent implements OnInit {
 				return cn.title;
 			}
 		}
+		return '';
 	}
 
 	change() {
 		this.mauSoLieuSelected = 0;
-		this.commonService.liteMauSoLieu(true, this.IsMauTheoPhong).subscribe(res => {
-			this.viewLoading = false;
+		this.commonService.liteMauSoLieu(true, this.IsMauTheoPhong).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.listMauSoLieu = res.data;
 				this.listMauSL$.next(this.listMauSoLieu);
@@ -154,7 +149,7 @@ export class TongHopComponent implements OnInit {
 		}
 		if (this.theo == 2) {
 			//quý
-			let thang1, thang2;
+			let thang1: number = 0, thang2: number = 0;
 			switch (this.quy) {
 				case 1: thang1 = 0; thang2 = 2; break;
 				case 2: thang1 = 3; thang2 = 5; break;
@@ -172,7 +167,7 @@ export class TongHopComponent implements OnInit {
 		this.listDetail = [];
 		this.lstDV = [];
 		if (!this.IsDefault) {
-			this.objectService.getDV(this.filterConfiguration()).subscribe(res => {
+			this.objectService.getDV(this.filterConfiguration()).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status == 1) {
 					this.lstDV = res.data;
 					this.lstDV$.next(this.lstDV);
@@ -210,11 +205,9 @@ export class TongHopComponent implements OnInit {
 			this.layoutUtilsService.showError("Vui lòng nhập năm");
 			return;
 		}
-
 		this.loadingSubject.next(true);
-		this.objectService.tongHop(this.filterConfiguration()).subscribe(res => {
+		this.objectService.tongHop(this.filterConfiguration()).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
-			this.viewLoading = false;
 			if (res && res.status == 1) {
 				this.listDetail = res.data.SoLieu;
 				this.DonVis = res.data.DonVis;
@@ -236,7 +229,7 @@ export class TongHopComponent implements OnInit {
 			return;
 		}
 		this.loadingSubject.next(true);
-		this.objectService.xuatTongHop(this.filterConfiguration()).subscribe(res => {
+		this.objectService.xuatTongHop(this.filterConfiguration()).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.loadingSubject.next(false);
 			const headers = res.headers;
 			const filename = headers.get('x-filename');

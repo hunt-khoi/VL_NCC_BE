@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
+import { ThoiHanSoLieuService } from './Services/thoi-han-so-lieu.service';
 import { ThoiHanSoLieuComponent } from './thoi-han-so-lieu.component';
 import { ThoiHanSoLieuListComponent } from './thoi-han-so-lieu-list/thoi-han-so-lieu-list.component';
-import { ThoiHanSoLieuRefModule } from './thoi-han-so-lieu-ref.module';
-import { ThoiHanSoLieuService } from './Services/thoi-han-so-lieu.service';
+import { NhapSoLieuRefModule } from '../nhap-so-lieu/nhap-so-lieu-ref.module';
 
 const routes: Routes = [
 	{
@@ -23,13 +23,14 @@ const routes: Routes = [
     imports: [
         RouterModule.forChild(routes),
         DPSCommonModule,
-        ThoiHanSoLieuRefModule,
+        NhapSoLieuRefModule,
     ],
     providers: [
         ThoiHanSoLieuService,
     ],
     declarations: [
         ThoiHanSoLieuComponent,
+        ThoiHanSoLieuListComponent,
     ]
 })
 

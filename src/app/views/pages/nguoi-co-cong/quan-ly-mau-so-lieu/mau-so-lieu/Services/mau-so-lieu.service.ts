@@ -1,26 +1,19 @@
-import { FormDonVi } from './../Model/detail-list.model';
-import { MauSoLieuModel } from './../Model/mau-so-lieu.model';
-import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, BehaviorSubject, of } from 'rxjs';
-import { map, retry } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { MauSoLieuModel } from './../Model/mau-so-lieu.model';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/mau-so-lieu';
 
 @Injectable()
 export class MauSoLieuService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
-	ReadOnlyControl: boolean;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ReadOnlyControl: boolean = false;
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	// READ
 	getAllItems(): Observable<MauSoLieuModel[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<MauSoLieuModel[]>(API_URL + '?more=true', { headers: httpHeaders });
@@ -48,55 +41,45 @@ export class MauSoLieuService {
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
-	// CREATE =>  POST: add a new oduct to the server
-	CreateData(item): Observable<any> {
+	CreateData(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
 	deleteItem(itemId: number, Force: boolean = false): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/${itemId}?Force=${Force}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
-	// UPDATE => PUT: update the product on the server
-	UpdateData(Id, item: any): Observable<any> {
-		// Note: Add headers if needed (tokens/bearer)
+	UpdateData(Id: number, item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_URL + `/${Id}`, item, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
 	deleteDetailChild(itemId: number, force: boolean = false): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/deleteChild/${itemId}?Force=${force}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
-	// DELETE => delete the product from the server
 	DeleteDetail(itemId: number, force: boolean = false): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/deleteDetail/${itemId}?Force=${force}`;
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
-	// CREATE =>  POST: add a new oduct to the server
-	CreateDetail(idMauSoLieu: number, item): Observable<any> {
+	CreateDetail(idMauSoLieu: number, item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL + `/createDetail/${idMauSoLieu}`, item, { headers: httpHeaders });
 	}
 
-
-	// CREATE =>  POST: add a new oduct to the server
-	CreateSoLieuCon(idMauSoLieu: number, item): Observable<any> {
+	CreateSoLieuCon(idMauSoLieu: number, item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL + `/createSoLieuCon/${idMauSoLieu}`, item, { headers: httpHeaders });
 	}
 
-	// CREATE =>  POST: add a new oduct to the server
-	CreateDetailChild(idDetail: number, item): Observable<any> {
+	CreateDetailChild(idDetail: number, item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL + `/CreateDetailChild/${idDetail}`, item, { headers: httpHeaders });
 	}
@@ -132,7 +115,7 @@ export class MauSoLieuService {
 	}
 
 	// DELETE => DELETE DETAIL PARENT
-	DeleteDetailParent(item): Observable<any> {
+	DeleteDetailParent(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL + `/deleteDetailParent/`, item, { headers: httpHeaders });
 	}

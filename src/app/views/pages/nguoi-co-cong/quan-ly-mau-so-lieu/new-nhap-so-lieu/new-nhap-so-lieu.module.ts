@@ -39,4 +39,5 @@ const routes: Routes = [
         NhapSoLieuComponent
     ]
 })
+
 export class NhapSoLieuModule { }

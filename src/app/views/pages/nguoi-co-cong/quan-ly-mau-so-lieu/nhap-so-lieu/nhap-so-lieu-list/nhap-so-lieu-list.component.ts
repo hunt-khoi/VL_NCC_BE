@@ -1,16 +1,15 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
-
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
 import { NhapSoLieuModel } from '../Model/nhap-so-lieu.model';
 import { NhapSoLieuService } from '../Services/nhap-so-lieu.service';
@@ -25,24 +24,23 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class NhapSoLieuListComponent implements OnInit {
+export class NhapSoLieuListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
-	dataSource: NhapSoLieuDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
+	dataSource: NhapSoLieuDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Filter fields
-	filterStatus: number;
+	filterStatus: number = 0;
 	filterType = '';
 
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
 	lstStatus: any[] = [];
-	// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-	_name = '';
+	_name: string = '';
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	filterdistrict: number = 0;
 	filterDonVi: number = 0;
 	listprovinces: any[] = [];
@@ -50,15 +48,16 @@ export class NhapSoLieuListComponent implements OnInit {
 	listDonViTheoMauSoLieu: any[] = [];
 	listDonVi: any[] = [];
 	//Duyệt - thu hồi
-	visibleGuiDuyet: boolean;
-	visibleThuHoi: boolean;
-	IsVisible_Duyet: boolean;
-	IsEnable_Duyet: boolean;
+	visibleGuiDuyet: boolean = false;
+	visibleThuHoi: boolean = false;
+	IsVisible_Duyet: boolean = false;
+	IsEnable_Duyet: boolean = false;
 	thaotac: number = 0;
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-	list_button: boolean;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		public objectService: NhapSoLieuService,
@@ -73,12 +72,11 @@ export class NhapSoLieuListComponent implements OnInit {
 			this._name = 'Nhập số liệu';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		this.selection = new SelectionModel<any>(true, []);
-		this.route.data.subscribe(data => {
+		this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
 			if (data.Status)
 				this.filterStatus = data.Status;
 		})
@@ -86,11 +84,10 @@ export class NhapSoLieuListComponent implements OnInit {
 			this.objectService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'MauSoLieu', 0, 10));
 		}
 
-		this.commonService.GetAllProvinces().subscribe(res => {
+		this.commonService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listprovinces = res.data;
 		});
-
-		this.commonService.liteMauSoLieuTheoDonVi().subscribe(res => {
+		this.commonService.liteMauSoLieuTheoDonVi().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listDonViTheoMauSoLieu = res.data;
 			const tempList = this.listDonViTheoMauSoLieu.map(data => data.data);
 			this.listDonVi = Array.from(new Set(tempList.map(dv => dv.Id_DonVi)))
@@ -109,9 +106,9 @@ export class NhapSoLieuListComponent implements OnInit {
 		this.gridModel.filterText.Locked = '';
 		this.gridModel.filterText.DistrictID = this.filterdistrict;
 		this.gridModel.filterText.Id_DonVi = this.filterDonVi;
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
-		this.commonService.getStatusNhapSoLieu().subscribe(res => {
+		this.commonService.getStatusNhapSoLieu().pipe(takeUntil(this.destroy$)).subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.lstStatus = res.data;
 				// if (this.filterStatus)
@@ -237,15 +234,8 @@ export class NhapSoLieuListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
-		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -254,38 +244,35 @@ export class NhapSoLieuListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_dsnNsl'
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_dsnNsl'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new NhapSoLieuDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
 		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(params => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
+		this.dataSource.entitySubject.pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -293,7 +280,13 @@ export class NhapSoLieuListComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -312,13 +305,12 @@ export class NhapSoLieuListComponent implements OnInit {
 		else
 			filter.DaDuyet = "0";
 
-		if (this.filterdistrict > 0) {
+		if (this.filterdistrict > 0) 
 			filter.DistrictID = +this.filterdistrict;
-		}
-		if (this.filterDonVi > 0) {
+		if (this.filterDonVi > 0) 
 			filter.Id_DonVi = +this.filterDonVi;
-		}
-		if (this.gridService.model.filterText) {
+		
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.MauSoLieu = this.gridService.model.filterText.MauSoLieu;
 		}
 		return filter;
@@ -338,14 +330,11 @@ export class NhapSoLieuListComponent implements OnInit {
 		const _description = this.translate.instant('OBJECT.GUIDUYET.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.GUIDUYET.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.GUIDUYET.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.GuiDuyet(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.GuiDuyet(_item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -362,19 +351,18 @@ export class NhapSoLieuListComponent implements OnInit {
 			data = this.selection.selected.filter(x => x.visibleGuiDuyet).map(x => x.Id);
 		else
 			data = this.selection.selected.filter(x => x.visibleThuHoi).map(x => x.Id);
+
 		var title = gui ? 'GUIDUYET' : 'THUHOI';
 		const _title = this.translate.instant('OBJECT.' + title + '.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.' + title + '.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.' + title + '.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.' + title + '.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
+			
 			if (gui)
-				this.objectService.GuiDuyets(data).subscribe(res => {
+				this.objectService.GuiDuyets(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 					if (res && res.status === 1) {
 						let str = " " + res.data.success + "/" + res.data.total;
 						this.layoutUtilsService.showInfo(_deleteMessage + str);
@@ -384,7 +372,7 @@ export class NhapSoLieuListComponent implements OnInit {
 					}
 				});
 			else
-				this.objectService.ThuHois(data).subscribe(res => {
+				this.objectService.ThuHois(data).pipe(takeUntil(this.destroy$)).subscribe(res => {
 					if (res && res.status === 1) {
 						let str = " " + res.data.success + "/" + res.data.total;
 						this.layoutUtilsService.showInfo(_deleteMessage + str);
@@ -396,19 +384,16 @@ export class NhapSoLieuListComponent implements OnInit {
 		});
 	}
 
-	ThuHoi(_item: any) {
+	ThuHoi(item: any) {
 		const _title = this.translate.instant('OBJECT.THUHOI.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.THUHOI.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.THUHOI.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.THUHOI.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.ThuHoi(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.ThuHoi(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -423,14 +408,12 @@ export class NhapSoLieuListComponent implements OnInit {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(NhapSoLieuDuyetDialogComponent, { data: { _item, isDuyet } });
 		dialogRef.afterClosed().subscribe((res) => {
-			if (!res) {
-			} else {
+			if (res) 
 				this.loadDataList();
-			}
 		});
 	}
-	/** Delete */
-	DeleteWorkplace(_item: NhapSoLieuModel) {
+
+	DeleteWorkplace(item: NhapSoLieuModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
@@ -438,11 +421,9 @@ export class NhapSoLieuListComponent implements OnInit {
 
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.deleteItem(item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -458,15 +439,14 @@ export class NhapSoLieuListComponent implements OnInit {
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(NhapSoLieuEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
 		});
 	}
 
-	getStatusString(status) {
+	getStatusString(status: any) {
 		var f = this.lstStatus.find(x => x.id == status);
 		if (!f)
 			return "";
@@ -496,10 +476,12 @@ export class NhapSoLieuListComponent implements OnInit {
 	}
 
 	Export() {
-		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
+		if (!this.gridService || !this.paginator || !this.sort) return;
+		let gridService = this.gridService;
+		var cols = gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
-			var f = this.gridService.model.availableColumns.find(x => x.name == col);
+			var f = gridService.model.availableColumns.find(x => x.name == col);
 			headers.push(f.displayName);
 		});
 		const queryParams = new QueryParamsModel(
@@ -514,7 +496,7 @@ export class NhapSoLieuListComponent implements OnInit {
 			},
 			true
 		);
-		this.objectService.exportList(queryParams).subscribe(response => {
+		this.objectService.exportList(queryParams).pipe(takeUntil(this.destroy$)).subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');
@@ -548,7 +530,7 @@ export class NhapSoLieuListComponent implements OnInit {
 	}
 
 	loadGetListDistrictByProvinces(idProvince: any) {
-		this.commonService.GetListDistrictByProvinces(idProvince).subscribe(res => {
+		this.commonService.GetListDistrictByProvinces(idProvince).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listdistrict = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});

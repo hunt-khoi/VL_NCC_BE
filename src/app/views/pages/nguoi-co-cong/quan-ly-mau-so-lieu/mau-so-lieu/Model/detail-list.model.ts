@@ -1,11 +1,11 @@
-import { MauSoLieuModel } from './mau-so-lieu.model';
 import { BaseModel } from '../../../../../../core/_base/crud/models/_base.model';
+import { MauSoLieuModel } from './mau-so-lieu.model';
 
 export class FormDonVi {
-	Id: number;
-	Id_MauSoLieu: number;
+	Id: number = 0;
+	Id_MauSoLieu: number = 0;
 	ListDonVi: DonVi[] = [];
-	ThoiGian: string;
+	ThoiGian: string = '';
 
 	clear() {
 		this.Id = 0;
@@ -16,10 +16,10 @@ export class FormDonVi {
 }
 
 export class DonVi extends BaseModel {
-	id: number;
-	title: string;
-	Id_DonVi: number;
-	IsNhap: boolean;
+	id: number = 0;
+	title: string = '';
+	Id_DonVi: number = 0;
+	IsNhap: boolean = false;
 
 	clear() {
 		this.id = 0;
@@ -30,18 +30,18 @@ export class DonVi extends BaseModel {
 }
 
 export class FromBodyData extends BaseModel {
-	MauSoLieu: MauSoLieuModel;
+	MauSoLieu: MauSoLieuModel = new MauSoLieuModel();
 	ListFormMauSoLieuDetailModel: FormMauSoLieuDetailModel[] = [];
 
 }
 
 export class FormMauSoLieuDetailModel extends BaseModel {
-	Id_Detail: number;
-	IdSoLieu: number;
-	LoaiSoLieu: string;
-	MoTa: string;
-	Priority: number;
-	SoLieu: string;
+	Id_Detail: number = 0;
+	IdSoLieu: number = 0;
+	LoaiSoLieu: string = '';
+	MoTa: string = '';
+	Priority: number = 0;
+	SoLieu: string = '';
 	Detail: FormDetail[] = [];
 	SoLieuCon: FormSoLieuConModel[] = [];
 
@@ -58,12 +58,12 @@ export class FormMauSoLieuDetailModel extends BaseModel {
 }
 
 export class FormSoLieuConModel extends BaseModel {
-	IdSoLieu: number;
-	SoLieu: string;
-	Id_Detail: number;
-	LoaiSoLieu: string;
-	Priority: number;
-	MoTa: string;
+	IdSoLieu: number = 0;
+	SoLieu: string = '';
+	Id_Detail: number = 0;
+	LoaiSoLieu: string = '';
+	Priority: number = 0;
+	MoTa: string = '';
 	Detail: FormDetail[] = [];
 
 	clear() {
@@ -78,17 +78,19 @@ export class FormSoLieuConModel extends BaseModel {
 }
 
 export class FormDetail extends BaseModel {
-	Id_Detail_child: number;
-	Id_Detail: number;
-	IdPhiSoLieu: number;
-	PhiSoLieu: string;
-	CachNhap: number;
-	MoTa: string;
+	Id_Detail_child: number = 0;
+	Id_Detail: number = 0;
+	IdPhiSoLieu: number = 0;
+	PhiSoLieu: string = '';
+	CachNhap: number = 0;
+	MoTa: string = '';
+
 	clear() {
 		this.Id_Detail_child = 0;
 		this.Id_Detail = 0;
 		this.IdPhiSoLieu = 0;
 		this.PhiSoLieu = '';
 		this.CachNhap = 0;
+		this.MoTa = '';
 	}
 }

@@ -1,13 +1,11 @@
-// Angular
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { ReplaySubject } from 'rxjs';
-// Service
+import { ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../../services/common.service';
 import { MauSoLieuService } from '../Services/mau-so-lieu.service';
 import { MauSoLieuModel } from '../Model/mau-so-lieu.model';
@@ -20,19 +18,18 @@ import moment from 'moment';
 	selector: 'kt-mau-so-lieu-edit-dialog',
 	templateUrl: './mau-so-lieu-edit-dialog.component.html',
 })
-
-export class MauSoLieuEditDialogComponent implements OnInit {
-
-	item: MauSoLieuModel;
+export class MauSoLieuEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
+	item: MauSoLieuModel = new MauSoLieuModel();
 	oldItem: any;
 	oldItemV: any;
-	itemForm: FormGroup;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	listDetail: any[] = [];
 	listCachNhap: any[] = [];
 	selected: any[] = [];
-	datasource: MatTableDataSource<any>;
+	datasource: MatTableDataSource<any> = new MatTableDataSource<any>();
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 	allowEdit = false; // cho phép sửa
@@ -40,19 +37,19 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 	IsMauTheoPhong = false;
 	lstVer: any[] = [];
 	phienban: number = 0;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-	_name = '';
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
+	_name: string = '';
+	tsSeparator: string = '';
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -69,8 +66,8 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 			this._name = this.translate.instant('MAU_SO_LIEU.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
+		this.tsSeparator = this.commonService.thousandSeparator;
 		this.item = this.data._item;
 		this.loadListSoLieu();
 		this.loadListCachNhap()
@@ -88,6 +85,11 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		this.createForm();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	changeVer() {
 		if (this.phienban == 0) {
 			this.loadListDetail(); //load lại detail
@@ -95,11 +97,11 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		else {
 			let f = this.lstVer.find(x => x.id == this.phienban);
 			this.oldItemV = Object.assign({}, f.data);
-			this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.phienban).subscribe(res => {
+			this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.phienban).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				if (res && res.status == 1) {
 					this.listDetail = res.data;
-					this.oldItemV.Details = res.data.map(x => Object.assign({}, x));
+					this.oldItemV.Details = res.data.map((x: any) => Object.assign({}, x));
 					this.createForm();
 				} else {
 					this.layoutUtilsService.showError(res.error.message);
@@ -110,12 +112,12 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 	}
 
 	loadListDetail() {
-		this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.oldItem.Id).subscribe(res => {
+		this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.oldItem.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status == 1) {
 				this.lstVer = res.dataExtra;
 				this.listDetail = res.data;
-				this.oldItem.Details = res.data.map(x => Object.assign({}, x));
+				this.oldItem.Details = res.data.map((x: any) => Object.assign({}, x));
 				this.createForm();
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -124,7 +126,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 	}
 
 	loadListCachNhap() {
-		this.commonService.liteCachNhap().subscribe(res => {
+		this.commonService.liteCachNhap().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listCachNhap = res.data;
 			this.changeDetectorRefs.detectChanges()
 		});
@@ -134,7 +136,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 	listSoLieu: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 	tempListSoLieu: any[] = [];
 	loadListSoLieu() {
-		this.commonService.liteSoLieuParentIsNull().subscribe(res => {
+		this.commonService.liteSoLieuParentIsNull().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listSoLieu.next(res.data);
 			this.listOpt = res.data;
 			this.tempListSoLieu = this.getListSoLieuTruocDo();
@@ -156,7 +158,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 	}
 
 	FilterCtrl: string = '';
-	filterSoLieu: number;
+	filterSoLieu: number = 0;
 	titleLoaiSoLieu = '';
 	titleSoLieu = '';
 	listSoLieuChild: any = [];
@@ -165,7 +167,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 	getLoaiSoLieu(filterSoLieu: number) {
 		this.listSoLieuChild = [];
 		let soLieu: any = [];
-		this.objectService.getSoLieu(filterSoLieu).subscribe(data => {
+		this.objectService.getSoLieu(filterSoLieu).pipe(takeUntil(this.destroy$)).subscribe(data => {
 			soLieu = data.data;
 			this.soLieuisSelected = soLieu;
 			this.soLieuisSelected.Detail = [];
@@ -180,9 +182,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 	}
 
 	filter() {
-		if (!this.listOpt) {
-			return;
-		}
+		if (!this.listOpt) return;
 		let search = this.FilterCtrl;
 		if (!search) {
 			this.listSoLieu.next(this.listOpt.slice());
@@ -202,11 +202,9 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef2 = this.dialog.open(PhiSoLieuEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef2.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
-				if (edit) {
+			if (res) {
+				if (edit) 
 					this.changeVer();
-				}
 				this.layoutUtilsService.showInfo(_saveMessage);
 				return;
 			}
@@ -252,7 +250,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		this.viewLoading = true;
 		this.disabledBtn = true;
 		let res = await this.objectService.CreateDetail(idMauSoLieu, object).toPromise();
-		if(res) {
+		if (res) {
 			this.disabledBtn = false;
 			this.viewLoading = false;
 			this.changeDetectorRefs.detectChanges();
@@ -262,16 +260,16 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				if (res.error.allowForce) {
 					const dialogRef = this.layoutUtilsService.deleteElement("Cảnh báo", res.error.message, 'Yêu cầu đang được xử lý');
 					dialogRef.afterClosed().subscribe(res => {
-						if (!res) {
-							return;
-						}
+						if (!res) return;
+						
 						let object1: any = Object.assign({}, object)
 						object1.Force = true;
 						this.CreateMauSoLieuDetail(idMauSoLieu, object1);
 					});
 
-				} else
+				} else {
 					this.layoutUtilsService.showError(res.error.message);
+				}
 			}
 		};
 	}
@@ -280,30 +278,26 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		sl.Detail.splice(pos, 1);
 	}
 
-	DeletePhiSoLieuIsSelected(soLieuisSelected, dec, pos) {
+	DeletePhiSoLieuIsSelected(soLieuisSelected: any, dec: any, pos: number) {
 		if (soLieuisSelected.Id_Detail > 0) {
 			const _name1 = 'phí số liệu';
 			const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: _name1.toLowerCase() });
 			const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: _name1.toLowerCase() });
 			const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: _name1.toLowerCase() });
-
 			const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 			dialogRef.afterClosed().subscribe(res => {
-				if (!res) {
-					return;
-				}
-				this.xoa2(soLieuisSelected, dec, pos);
+				if (res) 
+					this.xoa2(soLieuisSelected, dec, pos);
 			});
 		} else {
 			soLieuisSelected.Detail.splice(pos, 1);
 		}
 	}
 
-	xoa2(soLieuisSelected, dec, pos, force: boolean = false) {
+	xoa2(soLieuisSelected: any, dec: any, pos: number, force: boolean = false) {
 		const _name1 = 'phí số liệu';
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: _name1 });
-
-		this.objectService.deleteDetailChild(dec.Id_Detail_child, force).subscribe(res => {
+		this.objectService.deleteDetailChild(dec.Id_Detail_child, force).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				soLieuisSelected.Detail.splice(pos, 1);
 				this.layoutUtilsService.showInfo(_deleteMessage);
@@ -311,14 +305,13 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				if (res.error.allowForce) {
 					const dialogRef = this.layoutUtilsService.deleteElement("Cảnh báo", res.error.message, 'Yêu cầu đang được xử lý');
 					dialogRef.afterClosed().subscribe(res => {
-						if (!res) {
-							return;
-						}
-						this.xoa2(soLieuisSelected, dec, pos, true);
+						if (res) 
+							this.xoa2(soLieuisSelected, dec, pos, true);
 					});
 
-				} else
+				} else {
 					this.layoutUtilsService.showError(res.error.message);
+				}
 			}
 		});
 	}
@@ -328,24 +321,21 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: _name1.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: _name1.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: _name1.toLowerCase() });
-
 		if (sl.Id_Detail > 0) {
 			const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 			dialogRef.afterClosed().subscribe(res => {
-				if (!res) {
-					return;
-				}
-				this.xoa3(sl.Id_Detail, object, i);
+				if (res) 
+					this.xoa3(sl.Id_Detail, object, i);
 			});
 		} else {
 			object.SoLieuCon.splice(i, 1);
 		}
 	}
 
-	xoa3(Id_Detail, object, i: number, force: boolean = false) {
+	xoa3(Id_Detail: number, object: any, i: number) {
 		const _name1 = 'số liệu con';
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: _name1 });
-		this.objectService.DeleteDetail(Id_Detail).subscribe(res => {
+		this.objectService.DeleteDetail(Id_Detail).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_deleteMessage);
 				object.SoLieuCon.splice(i, 1);
@@ -353,14 +343,13 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				if (res.error.allowForce) {
 					const dialogRef = this.layoutUtilsService.deleteElement("Cảnh báo", res.error.message, 'Yêu cầu đang được xử lý');
 					dialogRef.afterClosed().subscribe(res => {
-						if (!res) {
-							return;
-						}
-						this.xoa3(Id_Detail, object, i, true);
+						if (res) 
+							this.xoa3(Id_Detail, object, i);
 					});
 
-				} else
+				} else {
 					this.layoutUtilsService.showError(res.error.message);
+				}
 			}
 		});
 	}
@@ -382,14 +371,13 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 			default: [''],
 		});
 
-		this.focusInput.nativeElement.focus();
+		if (this.focusInput)
+			this.focusInput.nativeElement.focus();
 		this.itemForm.controls.LoaiSoLieu.disable();
-		if (!this.allowEdit) { // false thì không cho sửa
+		if (!this.allowEdit) 
 			this.itemForm.disable();
-		}
 	}
 
-	/** ACTIONS */
 	prepareData(): any {
 		const controls = this.itemForm.controls;
 		const _item = new MauSoLieuModel();
@@ -416,18 +404,15 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				return cn.title;
 			}
 		}
+		return '';
 	}
 
 	EditObject(_item: any, _listDetail: any, allowEdit: boolean = true, allowCreate: boolean = false, idMauSoLieu: number = 0) {
-		let saveMessageTranslateParam = '';
-		// câu thông báo khi thực hiện trong tác vụ
-		saveMessageTranslateParam += _item.Id || _item.Id_Detail > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id || _item.Id_Detail > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef2 = this.dialog.open(MauSoLieuDetailEditDialogComponent, { data: { _item, idMauSoLieu, _listDetail, allowEdit, allowCreate } });
 		dialogRef2.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			} else {
+			if (res) {
 				if (this.item.Id > 0) {
 					this.layoutUtilsService.showInfo(_saveMessage);
 					this.changeVer();
@@ -445,10 +430,8 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 			const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: _name1.toLowerCase() });
 			const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 			dialogRef.afterClosed().subscribe(res => {
-				if (!res) {
-					return;
-				}
-				this.xoa(object, index);
+				if (res) 
+					this.xoa(object, index);
 			});
 
 		} else {
@@ -459,7 +442,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 	xoa(object: any, index: number) {
 		const _name1 = 'Số liệu';
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: _name1 });
-		this.objectService.DeleteDetailParent(object).subscribe(res => {
+		this.objectService.DeleteDetailParent(object).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_deleteMessage);
 				this.listDetail.splice(index, 1);
@@ -467,16 +450,16 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				if (res.error.allowForce) {
 					const dialogRef = this.layoutUtilsService.deleteElement("Cảnh báo", res.error.message, 'Yêu cầu đang được xử lý');
 					dialogRef.afterClosed().subscribe(res => {
-						if (!res) {
-							return;
-						}
+						if (!res) return;
+						
 						let object1 = Object.assign({}, object);
 						object1.Force = true;
 						this.xoa(object1, index);
 					});
 
-				} else
+				} else {
 					this.layoutUtilsService.showError(res.error.message);
+				}
 			}
 		});
 	}
@@ -497,7 +480,6 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		if (this.item.Id < 1) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE')
 		return result;
 	}
@@ -507,12 +489,10 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -531,11 +511,10 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				EditObject.Id = f.id;
 			}
 		}
-		if (EditObject.Id > 0) {
+		if (EditObject.Id > 0) 
 			this.Update(EditObject, withBack);
-		} else {
+		else 
 			this.Create(EditObject, this.listDetail, withBack);
-		}
 	}
 
 
@@ -550,7 +529,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 			dataUp.data_old = this.oldItem;
 		else
 			dataUp.data_old = this.oldItemV;
-		this.objectService.UpdateData(_item.Id, dataUp).subscribe(res => {
+		this.objectService.UpdateData(_item.Id, dataUp).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -559,23 +538,23 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				} else {
 					this.changeVer();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				if (res.error.allowForce) {
 					const dialogRef = this.layoutUtilsService.deleteElement("Cảnh báo", res.error.message, 'Yêu cầu đang được xử lý');
 					dialogRef.afterClosed().subscribe(res => {
-						if (!res) {
-							return;
-						}
+						if (!res) return;
+						
 						let object1: any = Object.assign({}, _item)
 						object1.Force = true;
 						this.Update(object1, withBack);
 					});
-
-				} else
+				} else {
 					this.layoutUtilsService.showError(res.error.message);
+				}
 			}
 		});
 	}
@@ -588,7 +567,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.CreateData(object).subscribe(res => {
+		this.objectService.CreateData(object).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -597,7 +576,8 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					if (this.focusInput)
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -611,7 +591,7 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -657,19 +637,20 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		}
 		const dialogRef = this.dialog.open(MauSoLieuEditDialogComponent, { data: { _item, allowEdit: true, IsMauTheoPhong: true } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo("Tạo phiên bản thành công");
 				this.ngOnInit();
 			}
 		});
 	}
-	toggleMask($event, object) {
+
+	toggleMask($event: any, object: any) {
 		if ($event.target.value == "")
 			object.default = null;
 	}
+
 	xuatChiTiet(){
-		this.objectService.exportChiTiet(this.item.Id).subscribe(res => {
+		this.objectService.exportChiTiet(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');
@@ -689,7 +670,6 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		let _description = '';
 		let _waitDesciption = '';
 		let _title = '';
-
 		let islock: boolean;
 		if(!_item.Locked) { 
 			_description = 'Bạn có chắc chắn muốn khóa mẫu số liệu này không ??';
@@ -703,13 +683,11 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 			_title = 'Mở khóa mẫu số liệu';
 			islock = false;
 		}
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-			this.objectService.Lock(_item.Id, islock).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.Lock(_item.Id, islock).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -720,7 +698,6 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 				this.close();
 			});
 		});
-
 	}
 
     covertToolTip(lock:boolean): string {
@@ -737,14 +714,11 @@ export class MauSoLieuEditDialogComponent implements OnInit {
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteItem(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.deleteItem(_item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {

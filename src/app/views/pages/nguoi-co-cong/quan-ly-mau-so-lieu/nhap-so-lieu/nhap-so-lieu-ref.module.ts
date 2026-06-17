@@ -18,5 +18,4 @@ import { NhapSoLieuEditDialogComponent } from './nhap-so-lieu-edit/nhap-so-lieu-
     exports: [NhapSoLieuEditDialogComponent]
 })
 
-
 export class NhapSoLieuRefModule { }

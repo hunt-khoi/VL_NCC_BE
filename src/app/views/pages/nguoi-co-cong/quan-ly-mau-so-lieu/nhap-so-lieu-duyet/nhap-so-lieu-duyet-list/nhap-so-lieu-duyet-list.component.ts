@@ -1,21 +1,20 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectionStrategy, ApplicationRef, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { ActivatedRoute, Router } from '@angular/router';
+import { tap, takeUntil } from 'rxjs/operators';
+import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { TableService } from '../../../../../partials/table/table.service';
-import { TableModel } from '../../../../../partials/table/table.model';
-import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-
 import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
+import { TableModel } from './../../../../../partials/table/table.model';
+import { TableService } from './../../../../../partials/table/table.service';
 import { SettingProcessComponent } from '../../../components';
 import { NhapSoLieuModel } from '../../nhap-so-lieu/Model/nhap-so-lieu.model';
-import { NhapSoLieuDuyetService } from './../services/nhap-so-lieu-duyet.service';
+import { NhapSoLieuDuyetService } from '../Services/nhap-so-lieu-duyet.service';
 import { NhapSoLieuDuyetDataSource } from '../Model/data-sources/nhap-so-lieu-duyet.datasource';
 import { NhapSoLieuDuyetDialogComponent } from '../nhap-so-lieu-duyet/nhap-so-lieu-duyet-dialog.component';
 import { NhapSoLieuEditDialogComponent } from '../../nhap-so-lieu/nhap-so-lieu-edit/nhap-so-lieu-edit-dialog.component';
@@ -27,23 +26,19 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class NhapSoLieuDuyetListComponent implements OnInit {
+export class NhapSoLieuDuyetListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
-	dataSource: NhapSoLieuDuyetDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
+	dataSource: NhapSoLieuDuyetDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
-	// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-	_name = '';
+	_name: string = '';
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	filterdistrict: number = 0;
 	filterDonVi: number = 0;
 	listprovinces: any[] = [];
@@ -51,17 +46,17 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 	listDonViTheoMauSoLieu: any[] = [];
 	listDonVi: any[] = [];
 
-	visibleGuiDuyet: boolean;
-	visibleThuHoi: boolean;
-	IsVisible_Duyet: boolean;
-	IsEnable_Duyet: boolean;
+	visibleGuiDuyet: boolean = false;
+	visibleThuHoi: boolean = false;
+	IsVisible_Duyet: boolean = false;
+	IsEnable_Duyet: boolean = false;
 
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
-
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
 	idCommentShowDialog = 0;
-	list_button: boolean;
+	list_button: boolean  = false;
+	btnClass: string = "";
 
 	constructor(
 		private objectService: NhapSoLieuDuyetService,
@@ -73,23 +68,23 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 		private ref: ApplicationRef,
 		private commonService: CommonService,
 		private translate: TranslateService,
-		private tokenStorage: TokenStorage,
-		private router: Router) {
+		private tokenStorage: TokenStorage) {
 			this._name = this.translate.instant('MAU_SO_LIEU.nhapsl');
-			this.route.queryParams.subscribe((params) => {
+			this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
 				this.idCommentShowDialog = +params['showcmt'];
 			});
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-		this.route.data.subscribe(data => {
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
+		this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
 			if (data.IsEnable_Duyet != undefined)
 				this.IsEnable_Duyet = data.IsEnable_Duyet;
 		})
 		this.selection = new SelectionModel<any>(true, []);
-		this.tokenStorage.getUserInfo().subscribe((res) => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe((res) => {
 			this.filterprovinces = res.IdTinh;
 			this.loadGetListDistrictByProvinces(this.filterprovinces);
 		});
@@ -97,7 +92,7 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 			this.objectService.lastFilter$ = new BehaviorSubject(new QueryParamsModel({}, 'asc', 'SoHoSo', 0, 10));
 		}
 
-		this.commonService.GetAllProvinces().subscribe((res) => {
+		this.commonService.GetAllProvinces().pipe(takeUntil(this.destroy$)).subscribe((res) => {
 			this.listprovinces = res.data;
 		});
 
@@ -144,7 +139,6 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 				checked: false,
 			},
 		];
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 
 		// create availableColumns
@@ -249,8 +243,6 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 			},
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-
-		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
@@ -260,39 +252,35 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 			this.cookieService
 		);
 		this.gridService.cookieName = 'displayedColumns_nsldl'
-
 		// apply gridService
 		this.gridService.showColumnsInTable();
 		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_nsldl'));
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new NhapSoLieuDuyetDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe((params) => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			queryParams.filter.IsEnable_Duyet = this.IsEnable_Duyet;
-			// First load
-			this.dataSource.loadList(queryParams);
+		this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilter$.getValue();
+				queryParams.filter.IsEnable_Duyet = this.IsEnable_Duyet;
+				this.dataSource.loadList(queryParams);
+			}
 		});
-		this.dataSource.entitySubject.subscribe((res) => {
+		this.dataSource.entitySubject.pipe(takeUntil(this.destroy$)).subscribe((res) => {
 			this.productsResult = res;
-			if (this.productsResult != null) {
+			if (this.productsResult && this.paginator) {
 				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList(false);
 				}
@@ -300,6 +288,11 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 		});
 		this.loadGetListDonViCoMauSoLieu();
 		this.ShowDialog();
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	ShowDialog() {
@@ -311,6 +304,7 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
@@ -336,14 +330,12 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 		const filter: any = {};
 		filter.IsEnable_Duyet = this.IsEnable_Duyet;
 
-		if (this.filterdistrict > 0) {
+		if (this.filterdistrict > 0) 
 			filter.DistrictID = +this.filterdistrict;
-		}
-		if (this.filterDonVi > 0) {
+		if (this.filterDonVi > 0) 
 			filter.Id_DonVi = +this.filterDonVi;
-		}
 
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.MauSoLieu = this.gridService.model.filterText.MauSoLieu;
 		}
 		return filter;
@@ -368,15 +360,16 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 		}
 	}
 	loadGetListDistrictByProvinces(idProvince: any) {
-		this.commonService.GetListDistrictByProvinces(idProvince).subscribe((res) => {
+		this.commonService.GetListDistrictByProvinces(idProvince).pipe(takeUntil(this.destroy$)).subscribe((res) => {
 			this.listdistrict = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
 
 	loadGetListDonViCoMauSoLieu() {
-		this.dataSource.entitySubject.subscribe((res) => {
-			res.forEach((item) => {
+		if (!this.dataSource) return;
+		this.dataSource.entitySubject.pipe(takeUntil(this.destroy$)).subscribe((res) => {
+			res.forEach((item: any) => {
 				let check: boolean = false;
 				for (const dv of this.listDonVi) {
 					if (dv.Id_DonVi == item.Id_DonVi) {
@@ -384,33 +377,23 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 						break;
 					}
 				}
-				if (!check) {
+				if (!check) 
 					this.listDonVi.push(item);
-				}
 			});
 		});
-	}
-
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
 	}
 
 	Duyet(item: any, isDuyet: boolean = true) {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(NhapSoLieuDuyetDialogComponent, { data: { _item, isDuyet } });
 		dialogRef.afterClosed().subscribe((res) => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.loadDataList();
 			}
 		});
 	}
-	duyets(duyet = true) {
+
+	duyets(duyet: boolean = true) {
 		let ids = this.selection.selected.filter((x) => !x.IsEnable_Duyet).map((x) => x.Id);
 		if (ids.length == 0) {
 			this.layoutUtilsService.showInfo('Số liệu được chọn đã được duyêt/không duyệt trước đó');
@@ -425,14 +408,13 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 		const _description = this.translate.instant('OBJECT.' + tt + '.DESCRIPTION', { name: this._name.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.' + tt + '.WAIT_DESCRIPTION', { name: this._name.toLowerCase() });
 		const _deleteMessage = this.translate.instant('OBJECT.' + tt + '.MESSAGE', { name: this._name });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe((res) => {
 			if (!res) {
 				return;
 			}
 
-			this.objectService.Duyets(data).subscribe((res) => {
+			this.objectService.Duyets(data).pipe(takeUntil(this.destroy$)).subscribe((res) => {
 				if (res && res.status === 1) {
 					let str = ' ' + res.data.success + '/' + res.data.total;
 					this.layoutUtilsService.showInfo(_deleteMessage + str);
@@ -443,6 +425,7 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 			});
 		});
 	}
+
 	/** SELECTION */
 	isAllSelected() {
 		const numSelected = this.selection.selected.length;
@@ -463,30 +446,21 @@ export class NhapSoLieuDuyetListComponent implements OnInit {
 
 	EditObject(_item: NhapSoLieuModel, allowEdit: boolean = true, duyetSoLieu: boolean = true) {
 		const dialogRef = this.dialog.open(NhapSoLieuEditDialogComponent, { data: { _item, allowEdit, duyetSoLieu } });
-		dialogRef.afterClosed().subscribe((res) => {
-			if (!res) {
-			} else {
-			}
-		});
+		dialogRef.afterClosed().subscribe((res) => { });
 	}
+
 	timeline(QuaTrinhKhongCoNguoiDuyet: any) {
 		var data = { id_phieu: QuaTrinhKhongCoNguoiDuyet.Id };
 		const dialogRef = this.dialog.open(SettingProcessComponent, { data: { data: data, Type: 3 } });
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
+
 	TraLai(item: any) {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(NhapSoLieuDuyetDialogComponent, { data: { _item, isDuyet: true, isReturn: true } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			}
-			else {
+			if (res) 
 				this.loadDataList();
-			}
 		});
 	}
 }

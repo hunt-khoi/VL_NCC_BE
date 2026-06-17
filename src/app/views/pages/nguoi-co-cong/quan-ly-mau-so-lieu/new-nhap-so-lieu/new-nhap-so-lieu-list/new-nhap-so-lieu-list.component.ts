@@ -1,18 +1,15 @@
-// Angular
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
 import { TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
-// Service
+import { BehaviorSubject, merge, Subject } from 'rxjs';
+import { tap, takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
-import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
 import { NhapSoLieuModel } from '../Model/new-nhap-so-lieu.model';
 import { NhapSoLieuService } from '../../nhap-so-lieu/Services/nhap-so-lieu.service';
 import { NhapSoLieuDataSource } from '../Model/data-sources/new-nhap-so-lieu.datasource';
@@ -25,26 +22,19 @@ import { CookieService } from 'ngx-cookie-service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class NhapSoLieuListComponent implements OnInit {
+export class NhapSoLieuListComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	// Table fields
-	dataSource: NhapSoLieuDataSource;
-
-	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-	@ViewChild(MatSort, { static: true }) sort: MatSort;
-	// Filter fields
-	filterStatus: number;
-	filterType = '';
-
+	dataSource: NhapSoLieuDataSource | undefined;
+	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
+	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	lstStatus: any[] = [];
-	// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
-	_name = '';
-
+	_name: string = '';
 	// khoi tao grildModel
-	gridModel: TableModel;
-	gridService: TableService;
+	gridModel: TableModel | undefined;
+	gridService: TableService | undefined;
+	filterStatus: any;
 
 	constructor(
 		public objectService: NhapSoLieuService,
@@ -57,10 +47,8 @@ export class NhapSoLieuListComponent implements OnInit {
 			this._name = this.translate.instant("MAU_SO_LIEU.cannhap");
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
-		this.selection = new SelectionModel<any>(true, []);
-		this.route.data.subscribe(data => {
+		this.route.data.pipe(takeUntil(this.destroy$)).subscribe(data => {
 			if (data.Status)
 				this.filterStatus = data.Status;
 		})
@@ -158,15 +146,9 @@ export class NhapSoLieuListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -176,48 +158,33 @@ export class NhapSoLieuListComponent implements OnInit {
 		);
 		this.gridService.cookieName = 'displayedColumns_nsl'
 
-		// apply gridService
-		this.gridService.showColumnsInTable();
-		this.gridService.applySelectedColumnsV2(this.cookieService.check('displayedColumns_nsl'));
+		if (this.sort && this.paginator) {
+			this.sort.sortChange.subscribe(() => {
+				if (this.paginator) this.paginator.pageIndex = 0
+			});
+			merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
+				.pipe(
+					tap(() => {
+						this.loadDataList();
+					})
+				).subscribe();
+		}
 
-		// If the user changes the sort order, reset back to the first page.
-		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-		/* Data load will be triggered in two cases:
-		- when a pagination event occurs => this.paginator.page
-		- when a sort event occurs => this.sort.sortChange
-		**/
-		merge(this.sort.sortChange, this.paginator.page, this.gridService.result)
-			.pipe(
-				tap(() => {
-					this.loadDataList();
-				})
-			)
-			.subscribe();
 		// Init DataSource
 		this.dataSource = new NhapSoLieuDataSource(this.objectService);
 		let queryParams = new QueryParamsModel({});
-
-		// Read from URL itemId, for restore previous state
-		this.route.queryParams.subscribe(() => {
-			queryParams = this.objectService.lastFilter$.getValue();
-			// First load
-			this.dataSource.loadList(queryParams);
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult != null) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
+		this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(() => {
+			if (this.dataSource) {
+				queryParams = this.objectService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
 			}
 		});
 
 		// mở popup thêm từ thông báo
-		this.route.params.subscribe(params => {
+		this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
 			const id = params['id'];
 			if (id && id > 0) {
-				this.objectService.getDetailMauNhap(id).subscribe(res => { 
+				this.objectService.getDetailMauNhap(id).pipe(takeUntil(this.destroy$)).subscribe(res => { 
 					if (res.status == 1 && res.data) {
 						let data = res.data
 						let objectModel: any = {};
@@ -233,7 +200,13 @@ export class NhapSoLieuListComponent implements OnInit {
 		});
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	loadDataList(holdCurrentPage: boolean = true) {
+		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -247,11 +220,10 @@ export class NhapSoLieuListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.gridService.model.filterText) {
+		if (this.gridService && this.gridService.model.filterText) {
 			filter.MauSoLieu = this.gridService.model.filterText.MauSoLieu;
 			filter.Nam = this.gridService.model.filterText.Nam;
 		}
-
 		return filter;
 	}
 
@@ -269,15 +241,14 @@ export class NhapSoLieuListComponent implements OnInit {
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(NhapSoLieuEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
 		});
 	}
 
-	getStatusString(status) {
+	getStatusString(status: any) {
 		var f = this.lstStatus.find(x => x.id == status);
 		if (!f)
 			return "";
@@ -321,5 +292,4 @@ export class NhapSoLieuListComponent implements OnInit {
 			return tmp_height + 'px';
 		}
 	}
-
 }

@@ -1,35 +1,39 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
-import { DonVi, FormDonVi } from '../Model/detail-list.model';
-import { MauSoLieuModel } from './../Model/mau-so-lieu.model';
-import { MauSoLieuService } from '../Services/mau-so-lieu.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { MauSoLieuDonViDialogComponent } from '../mau-so-lieu-don-vi/mau-so-lieu-don-vi-dialog.component';
-import { SoLuongGiaoDialogComponent } from '../so-luong-giao/so-luong-giao-dialog.component';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
+import { FormDonVi } from '../Model/detail-list.model';
+import { MauSoLieuModel } from './../Model/mau-so-lieu.model';
+import { MauSoLieuService } from '../Services/mau-so-lieu.service';
+import { SoLuongGiaoDialogComponent } from '../so-luong-giao/so-luong-giao-dialog.component';
+import { MauSoLieuDonViDialogComponent } from '../mau-so-lieu-don-vi/mau-so-lieu-don-vi-dialog.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-mau-so-lieu-giao-dialog',
 	templateUrl: './mau-so-lieu-giao-dialog.component.html',
 })
 
-export class MauSoLieuGiaoDialogComponent implements OnInit {
+export class MauSoLieuGiaoDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 	isZoomSize = false;
 	ListGiao: Array<any> = [];
-	IdDonVi: number;
-	list_button: boolean;
+	IdDonVi: number = 0;
+	list_button: boolean = false;
 	Capcocau : number = 0;
+	btnClass: string = "";
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.giao();
 		}
 	}
@@ -45,16 +49,22 @@ export class MauSoLieuGiaoDialogComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		this.item = this.data._item;
-		this.objectService.listGiao(this.item.Id).subscribe(res => {
+		this.objectService.listGiao(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status == 1) {
 				this.IdDonVi = res.dataExtra.IdDonVi;
 				this.ListGiao = res.data;
 			}
 		})
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.Capcocau = res.Capcocau;
 		})
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	/** UI */
@@ -62,27 +72,29 @@ export class MauSoLieuGiaoDialogComponent implements OnInit {
 		return this.translate.instant('MAU_SO_LIEU.caclangiao') + ' - ' + this.item.MauSoLieu;
 	}
 
-	/** ACTIONS */
 	giao() {
 		let item: FormDonVi = new FormDonVi();
 		item.clear();
 		item.Id_MauSoLieu = this.item.Id;
-		this.EditObject(item, true);
+		this.EditObject(item);
 	}
 
-	EditObject(object, isCreate: boolean = false) {
-		const dialogRef = this.dialog.open(MauSoLieuDonViDialogComponent, { data: { _item: object, IdDonVi: this.IdDonVi, IsMauTheoPhong: this.item.IsMauTheoPhong } });
+	EditObject(object: any) {
+		const dialogRef = this.dialog.open(MauSoLieuDonViDialogComponent, { data: 
+			{ _item: object, IdDonVi: this.IdDonVi, IsMauTheoPhong: this.item.IsMauTheoPhong } 
+		});
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) { }
-			else
+			if (res)
 				this.ngOnInit();
 		});
 	}
-	viewGiao(object, isCreate: boolean = false) {
-		const dialogRef = this.dialog.open(SoLuongGiaoDialogComponent, { data: { _item: object, IdDonVi: this.IdDonVi, IsMauTheoPhong: this.item.IsMauTheoPhong } });
+
+	viewGiao(object: any) {
+		const dialogRef = this.dialog.open(SoLuongGiaoDialogComponent, { data: 
+			{ _item: object, IdDonVi: this.IdDonVi, IsMauTheoPhong: this.item.IsMauTheoPhong } 
+		});
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) { }
-			else
+			if (res)
 				this.ngOnInit();
 		});
 	}
@@ -92,14 +104,11 @@ export class MauSoLieuGiaoDialogComponent implements OnInit {
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: "lần giao" });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: "lần giao" });
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: "Lần giao" });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.objectService.deleteGiao(_item.Id).subscribe(res => {
+			if (!res) return;
+			
+			this.objectService.deleteGiao(_item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -111,8 +120,8 @@ export class MauSoLieuGiaoDialogComponent implements OnInit {
 	}
 
 	NhacNho(_item: any) {
-		let lstDV = _item.ListDonVi.filter(x => !x.IsNhap).map(x => x.Id);
-		this.objectService.nhacNhoNhap(_item.Id, lstDV).subscribe(res => {
+		let lstDV = _item.ListDonVi.filter((x: any) => !x.IsNhap).map((x: any) => x.Id);
+		this.objectService.nhacNhoNhap(_item.Id, lstDV).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo("Nhắc nhở nhập số liệu thành công");
 			} else {
@@ -140,27 +149,20 @@ export class MauSoLieuGiaoDialogComponent implements OnInit {
 	}
 
 	getColorProgressBar(pt: number) {
-		if (pt < 30) {
+		if (pt < 30) 
 			return 'danger';
-		}
-		else if (pt >= 30 && pt < 80) {
+		else if (pt >= 30 && pt < 80) 
 			return 'warning';
-		}
-		else {
+		else 
 			return 'success';
-		}
 	}
 
 	getColor(pt: number) {
-		if (pt < 30) {
+		if (pt < 30) 
 			return 'red';
-		}
-		else if (pt >= 30 && pt < 80) {
+		else if (pt >= 30 && pt < 80) 
 			return 'orange';
-		}
-		else {
+		else 
 			return 'green';
-		}
 	}
-
 }

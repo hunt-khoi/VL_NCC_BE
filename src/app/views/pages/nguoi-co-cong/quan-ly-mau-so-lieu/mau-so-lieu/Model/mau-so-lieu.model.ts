@@ -2,16 +2,16 @@ import { BaseModel } from '../../../../../../core/_base/crud/models/_base.model'
 import { DonVi } from './detail-list.model';
 
 export class MauSoLieuModel extends BaseModel {
-	Id: number;
-	MauSoLieu: string;
-	MoTa: string;
-	Locked: boolean;
-	IsMauTheoPhong: boolean;
-	Priority: number;
-	IdParent: number;
-	Nam: number;
-	ListDonVi: DonVi[];
-	SLGiao: number;
+	Id: number = 0;
+	MauSoLieu: string = '';
+	MoTa: string = '';
+	Locked: boolean = false;
+	IsMauTheoPhong: boolean = false;
+	Priority: number = 0;
+	IdParent: number | null = null;
+	Nam: number | null = null;
+	ListDonVi: DonVi[] = [];
+	SLGiao: number = 0;
 
 	clear() {
 		this.Id = 0;

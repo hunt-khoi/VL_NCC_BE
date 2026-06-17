@@ -1,28 +1,23 @@
-// Angular
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-// Service
 import { NhapSoLieuChild, NhapSoLieuDetail } from './../Model/nhap-so-lieu.model';
-import { MauSoLieuService } from './../../mau-so-lieu/Services/mau-so-lieu.service';
 import { NhapSoLieuService } from '../Services/nhap-so-lieu.service';
 import { FromBodyModel } from '../Model/nhap-so-lieu.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-nhap-so-lieu-edit-dialog',
 	templateUrl: './nhap-so-lieu-edit-dialog.component.html',
 })
 
-export class NhapSoLieuEditDialogComponent implements OnInit {
-
+export class NhapSoLieuEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	oldItem: any;
-	itemForm: FormGroup;
 	hasFormErrors = false;
 	viewLoading = false;
 	listDetail: any[] = [];
@@ -30,7 +25,7 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 	listNhapSoLieuDetailChild: any[] = [];
 	selectedDonVi: any;
 	selected: any[] = [];
-	datasource: MatTableDataSource<any>;
+	datasource: MatTableDataSource<any> = new MatTableDataSource<any>();
 	oldListDonVi: any[] = [];
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -46,15 +41,14 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 	mauSoLieuSelected: any;
 	newNhapSoLieu: boolean = false;
 	duyetSoLieu: boolean = false;
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
-	@ViewChild('sort1', { static: true }) sort: MatSort;
-
-	_name = '';
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
+	_name: string = '';
+	tsSeparator: string = '';
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 	}
@@ -64,15 +58,14 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 		public dialog: MatDialog,
 		public commonService: CommonService,
 		private objectService: NhapSoLieuService,
-		private mauSoLieuService: MauSoLieuService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private layoutUtilsService: LayoutUtilsService,
 		private translate: TranslateService) {
 			this._name = this.translate.instant('PHI_SO_LIEU.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
+		this.tsSeparator = this.commonService.thousandSeparator;
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
 		this.newNhapSoLieu = this.data.newNhapSoLieu == undefined ? false : this.data.newNhapSoLieu;
@@ -87,10 +80,9 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 		// 		Nam: this.item.Nam,
 		// 		ThoiGian: "",
 		// 	};
-
 		this.loadListCachNhap();
 		if (this.duyetSoLieu == true) {
-			this.objectService.getListMauSoLieu().subscribe(res => {
+			this.objectService.getListMauSoLieu().pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				if (res && res.status == 1) {
 					this.listMauSoLieu = res.data;
@@ -101,19 +93,19 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 			});
 
 			if (this.item.Id_MauSoLieu > 0) {
-				this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id_MauSoLieu, this.item.Nam, this.item.Id_DonVi).subscribe(res => {
+				this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id_MauSoLieu, this.item.Nam, this.item.Id_DonVi)
+					.pipe(takeUntil(this.destroy$)).subscribe(res => {
 					this.viewLoading = false;
 					if (res && res.status == 1) {
 						this.listDetail = res.data;
 						this.mauSoLieuEdit = res.data[0] == undefined ?
 							this.listMauSoLieu.find(msl => msl.Id_MauSoLieu == this.item.Id_MauSoLieu) :
 							res.data[0].MauSoLieu[0];
-						this.listDetail = this.createNhapSoLieu(this.listDetail);
 
+						this.listDetail = this.createNhapSoLieu(this.listDetail);
 						//trường hợp create nhập số liệu
-						if (this.newNhapSoLieu) {
+						if (this.newNhapSoLieu) 
 							this.initNhapSL();
-						}
 						this.isCreateForm = true;
 					} else {
 						this.layoutUtilsService.showError(res.error.message);
@@ -126,7 +118,7 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 			}
 
 		} else {
-			this.objectService.getListMauSoLieu().subscribe(res => {
+			this.objectService.getListMauSoLieu().pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				if (res && res.status == 1) {
 					this.listMauSoLieu = res.data;
@@ -139,19 +131,19 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 			});
 
 			if (this.item.Id_MauSoLieu > 0) {
-				this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id_MauSoLieu, this.item.Nam).subscribe(res => {
+				this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id_MauSoLieu, this.item.Nam)
+					.pipe(takeUntil(this.destroy$)).subscribe(res => {
 					this.viewLoading = false;
 					if (res && res.status == 1) {
 						this.listDetail = res.data;
 						this.mauSoLieuEdit = res.data[0] == undefined ?
 							this.listMauSoLieu.find(msl => msl.Id_MauSoLieu == this.item.Id_MauSoLieu) :
 							res.data[0].MauSoLieu[0];
+
 						this.listDetail = this.createNhapSoLieu(this.listDetail);
-						
 						//trường hợp create nhập số liệu
-						if (this.newNhapSoLieu) {
+						if (this.newNhapSoLieu) 
 							this.initNhapSL();
-						}
 						this.isCreateForm = true;
 					} else {
 						this.layoutUtilsService.showError(res.error.message);
@@ -163,14 +155,18 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 				this.listDetail = [];
 			}
 		}
-
 	}
 
 	loadListCachNhap() {
-		this.commonService.liteCachNhap().subscribe(res => {
+		this.commonService.liteCachNhap().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listCachNhap = res.data;
 			this.changeDetectorRefs.detectChanges()
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	initNhapSL() {
@@ -205,7 +201,6 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 		}
 	}
 
-	/** ACTIONS */
 	prepareData(): FromBodyModel {
 		const _item = new FromBodyModel();
 		_item.NhapSoLieuModel = this.item;
@@ -331,7 +326,6 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 					item.Value = this.newNhapSoLieu ? object.NhapSoLieu.Value : +de.NhapSoLieu.Value;
 					item.Note = de.NhapSoLieu.Note;
 					_item.ListNhapSoLieuDetail.push(item);
-
 					for (let dec of de.Detail) {
 						let item = new NhapSoLieuChild();
 						item.clear();
@@ -358,7 +352,6 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 		if (this.item.Id < 1) {
 			return result;
 		}
-
 		result = this.translate.instant('COMMON.UPDATE');
 		return result;
 	}
@@ -366,26 +359,22 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 
 	onSubmit(withBack: boolean = false) {
 		const EditObject = this.prepareData();
-
-		if (EditObject.NhapSoLieuModel.Id > 0) {
+		if (EditObject.NhapSoLieuModel.Id > 0) 
 			this.Update(EditObject, withBack);
-		} else {
+		else 
 			this.Create(EditObject, withBack);
-		}
 	}
 
-	createNhapSoLieu(listdetail): any[] {
+	createNhapSoLieu(listdetail: any[]): any[] {
 		for (const object of listdetail) {
 			if (object.NhapSoLieu == null || object.NhapSoLieu == undefined) {
 				object.NhapSoLieu = [];
 			}
-
 			for (const dec of object.Detail) {
 				if (dec.NhapSoLieu == null || dec.NhapSoLieu == undefined) {
 					dec.NhapSoLieu = [];
 				}
 			}
-
 			for (const de of object.SoLieuCon) {
 				if (de.NhapSoLieu == null || de.NhapSoLieu == undefined) {
 					de.NhapSoLieu = [];
@@ -404,20 +393,18 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.UpdateData(object).subscribe(res => {
-
+		this.objectService.UpdateData(object).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						object
-					});
+				if (withBack) {
+					this.dialogRef.close({ object });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -429,18 +416,17 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.CreateData(object).subscribe(res => {
+		this.objectService.CreateData(object).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						object
-					});
+				if (withBack) {
+					this.dialogRef.close({ object });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
-					this.focusInput.nativeElement.focus();
+					this.layoutUtilsService.showInfo(_messageType);
+					if (this.focusInput) 
+						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
 				}
 			} else {
@@ -455,7 +441,7 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 		this.mauSoLieuSelected = mauSoLieuSelected;
 		this.item.Id = 0;
 		this.item.Id_MauSoLieu = this.mauSoLieuSelected.Id_MauSoLieu;
-		this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id_MauSoLieu, mauSoLieuSelected.Nam).subscribe(res => {
+		this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id_MauSoLieu, mauSoLieuSelected.Nam).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status == 1) {
 				this.listDetail = res.data;
@@ -499,12 +485,12 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 		});
 	}
+
 	closeForm() {
 		this.dialogRef.close();
 	}
 
-
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -518,6 +504,7 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 				return cn.title;
 			}
 		}
+		return '';
 	}
 	
 	getStringDate(datetime: string) {
@@ -527,12 +514,13 @@ export class NhapSoLieuEditDialogComponent implements OnInit {
 		return '';
 	}
 
-	toggleMask($event, object) {
+	toggleMask($event: any, object: any) {
 		if ($event.target.value == "")
 			object.NhapSoLieu.Value = null;
 	}
-	xuatDanhSach(){
-		this.objectService.exportChiTiet(this.item.Id_MauSoLieu, this.item.Nam, this.item.Id_DonVi).subscribe(res => {
+	
+	xuatDanhSach() {
+		this.objectService.exportChiTiet(this.item.Id_MauSoLieu, this.item.Nam, this.item.Id_DonVi).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			const headers = res.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

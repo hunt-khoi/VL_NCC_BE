@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
 	selector: 'kt-nhap-so-lieu-duyet',
@@ -6,8 +6,4 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class NhapSoLieuDuyetComponent implements OnInit {
-	constructor() { }
-
-	ngOnInit() { }
-}
+export class NhapSoLieuDuyetComponent { }

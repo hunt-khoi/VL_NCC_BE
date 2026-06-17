@@ -1,26 +1,28 @@
-import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { MauSoLieuService } from '../Services/mau-so-lieu.service';
 import { CommonService } from '../../../services/common.service';
+import { MauSoLieuService } from '../Services/mau-so-lieu.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'm-list-phien-ban-dialog',
 	templateUrl: './list-phien-ban.dialog.component.html',
 })
 
-export class ListPhienBanDialogComponent implements OnInit {
+export class ListPhienBanDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	hasFormErrors: boolean = false;
 	viewLoading: boolean = false;
 	loadingAfterSubmit: boolean = false;
 	disabledBtn: boolean = false;
 	allowEdit: boolean = true;
-	list_button: boolean;
+	list_button: boolean = false;
 	lstVer: any[] = [];
 	_NAME: string = '';
-	isZoomSize: boolean;
+	isZoomSize: boolean	= false;
 
 	constructor(public dialogRef: MatDialogRef<ListPhienBanDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
@@ -31,14 +33,13 @@ export class ListPhienBanDialogComponent implements OnInit {
 			this._NAME = this.translate.instant('MAU_SO_LIEU.maunhap')
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
 		if (this.item.Id > 0) {
-			this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id).subscribe(res => {
+			this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id).pipe(takeUntil(this.destroy$)).subscribe(res => {
 				this.viewLoading = false;
 				if (res && res.status == 1) {
 					this.lstVer = res.dataExtra;
@@ -52,13 +53,14 @@ export class ListPhienBanDialogComponent implements OnInit {
 		}
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	/** UI */
 	getTitle(): string {
 		return this.translate.instant('MAU_SO_LIEU.dsphienban') +  ' - ' + this.item.MauSoLieu;
-	}
-
-	onAlertClose($event) {
-		this.hasFormErrors = false;
 	}
 
 	close() {
@@ -70,21 +72,16 @@ export class ListPhienBanDialogComponent implements OnInit {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._NAME.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._NAME.toLowerCase() });
 		const _waitDesciption = this.translate.instant('OBJECT.DELETE.WAIT_DESCRIPTION', { name: this._NAME.toLowerCase() });
-
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-
-			this.xoa(_item.id);
+			if (res) 
+				this.xoa(_item.id);
 		});
 	}
 
-	xoa(id, Force: boolean = false) {
+	xoa(id: number, Force: boolean = false) {
 		const _deleteMessage = this.translate.instant('OBJECT.DELETE.MESSAGE', { name: this._NAME });
-
-		this.objectService.deleteItem(id, Force).subscribe(res => {
+		this.objectService.deleteItem(id, Force).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_deleteMessage);
 				this.ngOnInit();
@@ -93,14 +90,13 @@ export class ListPhienBanDialogComponent implements OnInit {
 				if (res.error.allowForce) {
 					const dialogRef = this.layoutUtilsService.deleteElement("Cảnh báo", res.error.message, 'Yêu cầu đang được xử lý');
 					dialogRef.afterClosed().subscribe(res => {
-						if (!res) {
-							return;
-						}
-						this.xoa(id, true);
+						if (res) 
+							this.xoa(id, true);
 					});
 
-				} else
+				} else {
 					this.layoutUtilsService.showError(res.error.message);
+				}
 			}
 		});
 	}

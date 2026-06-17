@@ -1,23 +1,24 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { MauSoLieuService } from './../Services/mau-so-lieu.service';
 import { FormSoLieuConModel } from '../Model/detail-list.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-so-lieu-bo-sung-edit-dialog',
 	templateUrl: './so-lieu-bo-sung-edit-dialog.component.html',
 })
 
-export class SoLieuBoSungEditDialogComponent implements OnInit {
-
+export class SoLieuBoSungEditDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	item: any;
-	oldItem: any;
 	object: any;
-	itemForm: FormGroup;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -25,31 +26,31 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 	isZoomSize = false;
 	listSoLieu: any[] = [];
 	listLoaiSoLieu: any[] = [];
-	uutien = 0;
-	mota = '';
+	uutien: number = 0;
+	mota: string = '';
 	listSoLieuChild: any = [];
 	titleSoLieu = '';
 	idMauSoLieu = 0;
 	titleLoaiSoLieu = '';
 	soLieuisSelected: any = [];
-	filterSoLieu: number;
+	filterSoLieu: number = 0;
 	tempListSoLieu: any[] = [];
 	allowEdit = false;
 	demolist: any[] = [];
 	listDetail: any[] = [];
 
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
 	_name = '';
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -61,13 +62,11 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 		private commonService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private objectService: MauSoLieuService,
 		private translate: TranslateService) {
 			this._name = this.translate.instant('MAU_SO_LIEU.slbosung');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		// deep copy object
 		// *Important:	Nếu dùng assign thì đối tượng vẫn bị tham chiếu!!
@@ -85,10 +84,15 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 		this.createForm();
 	}
 
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	getLoaiSoLieu(filterSoLieu: number) {
 		this.listSoLieuChild = [];
 		let soLieu: any;
-		this.objectService.getSoLieu(filterSoLieu).subscribe(data => {
+		this.objectService.getSoLieu(filterSoLieu).pipe(takeUntil(this.destroy$)).subscribe(data => {
 			soLieu = data.data;
 			this.titleSoLieu = data.data.SoLieu;
 			this.titleLoaiSoLieu = data.data.LoaiSoLieu;
@@ -112,11 +116,11 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 		this.itemForm.controls.LoaiSoLieu.disable();
 		this.itemForm.controls.Priority.disable();
 		this.itemForm.controls.MoTa.disable();
-		this.focusInput.nativeElement.focus();
 
-		if (!this.allowEdit) {
+		if (this.focusInput) 
+			this.focusInput.nativeElement.focus();
+		if (!this.allowEdit) 
 			this.itemForm.disable();
-		}
 	}
 
 	getListSoLieuTruocDo(): any[] {
@@ -129,7 +133,7 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 		return tempListSoLieu;
 	}
 
-	getSoLieuDaSelected(tempListSoLieu): any[] {
+	getSoLieuDaSelected(tempListSoLieu: any): any[] {
 		if (this.soLieuisSelected.IdSoLieu > 0) {
 			let sl: any = { id: 0 };
 			sl.id = this.soLieuisSelected.IdSoLieu;
@@ -149,7 +153,7 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 	loadListSoLieu() {
 		this.tempListSoLieu = this.getListSoLieuTruocDo();
 		this.tempListSoLieu = this.getSoLieuDaSelected(this.tempListSoLieu);
-		this.commonService.liteSoLieuParentIsNull().subscribe(res => {
+		this.commonService.liteSoLieuParentIsNull().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.listSoLieu = res.data;
 			// không hiển thị số liệu đã được chọn
 			this.tempListSoLieu.forEach(ele => {
@@ -163,9 +167,7 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 		return 'Thêm mới Số liệu bổ sung';
 	}
 
-	/** ACTIONS */
 	prepareData(): any {
-
 		const controls = this.itemForm.controls;
 		const _item: any = new FormSoLieuConModel;
 		_item.clear();
@@ -186,21 +188,18 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
 		const soLieuConModel = this.prepareData();
-		if (this.item.Id_Detail > 0) {
+		if (this.item.Id_Detail > 0) 
 			this.Update(soLieuConModel, withBack);
-		} else {
+		else 
 			this.Create(soLieuConModel, withBack);
-		}
 	}
 
 	Update(soLieuConModel: any, withBack: boolean) {
@@ -213,18 +212,17 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 				this.item.SoLieuCon.push(sl);
 			}
 		}
-		this.objectService.CreateSoLieuCon(this.data.idMauSoLieu, this.item).subscribe(res => {
+		this.objectService.CreateSoLieuCon(this.data.idMauSoLieu, this.item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.dialogRef.close({});
 			} else {
-				if (res.error.allowForce)
-				{
+				if (res.error.allowForce) {
 					const dialogRef = this.layoutUtilsService.deleteElement("Cảnh báo", res.error.message, 'Yêu cầu đang được xử lý');
 					dialogRef.afterClosed().subscribe(res => {
 						if (!res) return;
-						let object1: any = Object.assign({},soLieuConModel)
-						object1.Force=true;
-						this.Update(object1,withBack);
+						let object1: any = Object.assign({}, soLieuConModel)
+						object1.Force = true;
+						this.Update(object1, withBack);
 					});
 
 				} else
@@ -244,7 +242,7 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 			this.item.SoLieuCon.push(sl);
 		}
 		this.changeDetectorRefs.detectChanges();
-		if (withBack == true) {
+		if (withBack) {
 			this.close();
 		} else {
 			this.disabledBtn = false;
@@ -252,7 +250,7 @@ export class SoLieuBoSungEditDialogComponent implements OnInit {
 		}
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 	

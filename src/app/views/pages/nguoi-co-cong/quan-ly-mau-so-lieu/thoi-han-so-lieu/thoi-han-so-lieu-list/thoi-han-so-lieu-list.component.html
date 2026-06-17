@@ -34,9 +34,10 @@
 				<div class="row align-items-center">
 					<div class="col-md-2 kt--margin-bottom-10-mobile">
 						<mat-form-field class="mat-form-field-fluid ">
-							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" (selectionChange)=filterDistrictID(filterdistrict) [disabled]="Capcocau == 2">
+							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" 
+								(selectionChange)=filterDistrictID(filterdistrict) [disabled]="Capcocau === 2">
 								<mat-option [value]="0">Tất cả</mat-option>
-								<mat-option [value]="district.ID_Row" *ngFor="let district of listdistrict;">{{district.District}}</mat-option>
+								<mat-option [value]="d.ID_Row" *ngFor="let d of listdistrict;">{{d.District}}</mat-option>
 							</mat-select>
 						</mat-form-field>
 					</div>
@@ -44,7 +45,7 @@
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="{{ 'WARD.NAME' | translate }}" [(value)]="filterward">
 								<mat-option value="">Tất cả</mat-option>
-								<mat-option value="{{ward.ID_Row}}" *ngFor="let ward of listward;">{{ward.Ward}}</mat-option>
+								<mat-option value="{{w.ID_Row}}" *ngFor="let w of listward;">{{w.Ward}}</mat-option>
 							</mat-select>
 						</mat-form-field>
 					</div>
@@ -70,12 +71,12 @@
 			</div>
 		</div>
 
-		<div class="example-container mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}" id="print-section">
-			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="SoHoSo" matSortDirection="asc" 
-				matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
+		<div class="example-container mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter ? 'unset' : 'auto'}" id="print-section">
+			<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="SoHoSo" 
+				matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
 				<ng-container matColumnDef="STT">
 					<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode"><span translate="COMMON.STT"></span></th>
-					<td mat-cell *matCellDef="let object;let vi = index" class="mat-column-vinCode">{{vi + 1}}</td>
+					<td mat-cell *matCellDef="let vi = index" class="mat-column-vinCode">{{vi + 1}}</td>
 				</ng-container>
 				<ng-container matColumnDef="MauSoLieu">
 					<th mat-header-cell *matHeaderCellDef>
@@ -95,7 +96,8 @@
 					<th mat-header-cell *matHeaderCellDef>Tình trạng</th>
 					<td mat-cell *matCellDef="let object">
 						<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide 
-							kt-badge--{{getStatusString(object.Status)}}">{{object.strStatus}}</span>
+							kt-badge--{{getStatusString(object.Status)}}">{{object.strStatus}}
+						</span>
 					</td>
 				</ng-container>
 				<ng-container matColumnDef="Deadline">
@@ -133,37 +135,23 @@
 				</ng-container>
 
 				<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
-				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+				<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" 
+					[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
+				</tr>
 			</table>
-
 			<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
 		</div>
-		<!-- start: BOTTOM -->
+
 		<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 			<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
-				<mat-chip-list>
-					<ng-container *ngFor="let chip of gridService.model.lstChip">
-						<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
-							{{chip.title}}: {{chip.data}}
-							<mat-icon matChipRemove>cancel</mat-icon>
-						</mat-chip>
-						<ng-container *ngIf="chip.type==1">
-							<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
-								{{chip.title}}: {{item.name}}
-								<mat-icon matChipRemove>cancel</mat-icon>
-							</mat-chip>
-						</ng-container>
-					</ng-container>
-					<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
-						Đặt lại
-					</mat-chip>
-				</mat-chip-list>
+				<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
 			</div>
 			<div class="flt-page" style="width: 50%;">
 				<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+				<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" 
+					[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+				</mat-paginator>
 			</div>
 		</div>
-		<!-- end: BOTTOM -->
 	</div>
 </kt-portlet>

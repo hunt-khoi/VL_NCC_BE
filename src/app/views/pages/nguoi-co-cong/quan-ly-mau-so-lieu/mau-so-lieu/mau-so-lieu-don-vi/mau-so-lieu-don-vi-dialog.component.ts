@@ -1,57 +1,57 @@
-// Angular
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-// Service
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
+import { ChonNhieuDonViComponent } from '../../../components';
 import { DonVi, FormDonVi } from '../Model/detail-list.model';
 import { MauSoLieuService } from '../Services/mau-so-lieu.service';
-import { ChonNhieuDonViComponent } from '../../../components';
 import { Moment } from 'moment';
-import * as moment from 'moment';
+import moment from 'moment';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'kt-mau-so-lieu-don-vi-edit-dialog',
 	templateUrl: './mau-so-lieu-don-vi-dialog.component.html',
 })
 
-export class MauSoLieuDonViDialogComponent implements OnInit {
-	item: FormDonVi;
-	oldItem: any;
+export class MauSoLieuDonViDialogComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
+	item: FormDonVi = new FormDonVi();
 	object: any;
-	itemForm: FormGroup;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 
-	filterSoLieu: number;
+	filterSoLieu: number = 0;
 	tempListSoLieu: any[] = [];
 	errorChonDonVi: boolean = false;
-	idMauSoLieu: number;
+	idMauSoLieu: number = 0;
 	ListDonVi: Array<DonVi> = [];
-	max: Moment;
-	min: Moment;
+	max: Moment | null = null;
+	min: Moment | null = null;
 
-	@ViewChild('focusInput', { static: true }) focusInput: ElementRef;
-	_name = '';
-	IdDonVi: number;
+	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
+	_name: string = '';
+	IdDonVi: number = 0;
 	phienban: number = 0;
 	lstVer: any[] = [];
 	IsMauTheoPhong: boolean = false;
-	isZoomSize: boolean;
+	isZoomSize: boolean = false;
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -63,13 +63,11 @@ export class MauSoLieuDonViDialogComponent implements OnInit {
 		private commonService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private typesUtilsService: TypesUtilsService,
 		private objectService: MauSoLieuService,
 		private translate: TranslateService) {
 			this._name = 'Đơn vị';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.IdDonVi = this.data.IdDonVi;
 		this.item = this.data._item;
@@ -77,7 +75,7 @@ export class MauSoLieuDonViDialogComponent implements OnInit {
 			this.IsMauTheoPhong = this.data.IsMauTheoPhong;
 		this.ListDonVi = this.item.ListDonVi;
 		this.createForm();
-		this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id_MauSoLieu).subscribe(res => {
+		this.objectService.getListMauSoLieuDetailByIdMauSoLieu(this.item.Id_MauSoLieu).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status == 1) {
 				this.lstVer = res.dataExtra;
@@ -85,6 +83,11 @@ export class MauSoLieuDonViDialogComponent implements OnInit {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
+	}
+
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	changeVer() {
@@ -103,13 +106,13 @@ export class MauSoLieuDonViDialogComponent implements OnInit {
 			return { id: x.Id_DonVi, title: x.title }
 		});
 		const disabled_ids = this.ListDonVi.filter(x => x.IsNhap).map(x => { return x.Id_DonVi; }); //disable các đv đã nhập
-		const dialogRef = this.dialog.open(ChonNhieuDonViComponent, { data: { selected: selected, disabled_ids: disabled_ids, 
-			id_parent: this.IdDonVi, type: 1, isMulti: true } });
+		const dialogRef = this.dialog.open(ChonNhieuDonViComponent, { data: 
+			{ selected: selected, disabled_ids: disabled_ids, id_parent: this.IdDonVi, type: 1, isMulti: true } 
+		});
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
-				res = res.filter(x=> !(x.data.length > 0 && x.Capcocau ==2)) //bỏ đv huyện, tp
-				this.ListDonVi = res.map(x => {
+			if (res) {
+				res = res.filter((x: any)=> !(x.data.length > 0 && x.Capcocau ==2)) //bỏ đv huyện, tp
+				this.ListDonVi = res.map((x: any) => {
 					return {
 						Id_DonVi: x.id,
 						title: x.title,
@@ -138,12 +141,10 @@ export class MauSoLieuDonViDialogComponent implements OnInit {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-
 			this.hasFormErrors = true;
 			return;
 		}
@@ -166,26 +167,25 @@ export class MauSoLieuDonViDialogComponent implements OnInit {
 		item.ThoiGian = this.commonService.f_convertDate(this.itemForm.controls.ThoiGian.value);
 
 		let _createMessage = this.translate.instant(item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE', { name: this._name });
-		this.objectService.updateGiao(item).subscribe(res => {
+		this.objectService.updateGiao(item).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			if (res && res.status === 1) {
 				this.layoutUtilsService.showInfo(_createMessage);
-				if (withBack == true) {
+				if (withBack) 
 					this.dialogRef.close(true);
-				} else {
+				else 
 					this.ngOnInit();
-				}
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
 	}
 
-	DeleteWorkplace(index) {
+	DeleteWorkplace(index: number) {
 		this.ListDonVi.splice(index, 1);
 		this.changeDetectorRefs.detectChanges();
 	}
 
-	onAlertClose($event) {
+	onAlertClose() {
 		this.hasFormErrors = false;
 	}
 
@@ -193,7 +193,7 @@ export class MauSoLieuDonViDialogComponent implements OnInit {
 		this.dialogRef.close();
 	}
 
-	onAlertCloseDonVi($event) {
+	onAlertCloseDonVi() {
 		this.errorChonDonVi = false;
 	}
 }
