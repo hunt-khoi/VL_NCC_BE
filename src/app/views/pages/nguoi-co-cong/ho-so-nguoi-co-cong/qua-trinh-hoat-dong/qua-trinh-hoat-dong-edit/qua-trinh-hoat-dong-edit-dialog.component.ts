@@ -3,8 +3,8 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { QuaTrinhHoatDongService } from '../Services/qua-trinh-hoat-dong.service';
 import { QuaTrinhHoatDongEditComponent } from '../../../components';
+import { QuaTrinhHoatDongService } from '../Services/qua-trinh-hoat-dong.service';
 import moment from 'moment';
 import { Moment } from 'moment';
 
@@ -15,19 +15,17 @@ import { Moment } from 'moment';
 })
 
 export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
-
 	ChildComponentInstance: any;
 	childComponentType: Type<any> | any;
 	childComponentData: any = {};
 	item: any;
-	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
 	isZoomSize = false;
 	allowEdit = false;
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
-	_NAME = '';
+	_NAME: string = '';
 	maxNS: Moment | undefined;
 	default: number = 0;
 	ngay1: Moment | undefined;
@@ -37,15 +35,14 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
-
 
 	constructor(public dialogRef: MatDialogRef<QuaTrinhHoatDongEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
@@ -57,7 +54,6 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 			this._NAME = this.translate.instant('QT_HOATDONG.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.maxNS = moment(new Date());
 		this.item = this.data._item;
@@ -102,10 +98,8 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
@@ -127,10 +121,8 @@ export class QuaTrinhHoatDongEditDialogComponent implements OnInit {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType);

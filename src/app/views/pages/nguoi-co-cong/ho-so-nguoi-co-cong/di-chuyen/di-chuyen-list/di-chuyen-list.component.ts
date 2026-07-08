@@ -1,4 +1,3 @@
-// Angular
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -8,7 +7,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
-// Services
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
@@ -18,8 +16,8 @@ import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
 import { HoSoNCCModule } from '../../ho-so-ncc/ho-so-ncc.module';
 import { DiChuyenService } from '../Services/di-chuyen.service';
 import { DiChuyenDataSource } from '../Model/data-sources/di-chuyen.datasource';
-import { QuyetDinhEditDialogComponent } from '../../quyet-dinh/quyet-dinh-edit/quyet-dinh-edit-dialog.component';
 import { DiChuyenEditDialogComponent } from '../di-chuyen-edit/di-chuyen-edit-dialog.component';
+import { QuyetDinhEditDialogComponent } from '../../quyet-dinh/quyet-dinh-edit/quyet-dinh-edit-dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -34,10 +32,7 @@ export class DiChuyenListComponent implements OnInit {
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
-	// Selection
-	selection = new SelectionModel<HoSoNCCModule>(true, []);
-	productsResult: HoSoNCCModule[] = [];
-	_name = '';
+	_name: string = '';
 	objectId = '';
 	_user: any = {};
 	// khoi tao grildModel
@@ -45,6 +40,7 @@ export class DiChuyenListComponent implements OnInit {
 	gridService: TableService | undefined;
 	ncc: any;
 	list_button: boolean = false;
+	btnClass: string = '';
 
 	constructor(
 		private router: Router,
@@ -63,6 +59,8 @@ export class DiChuyenListComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+		
 		var arr = this.router.url.split("/");
 		if (arr.length > 1) {
 			this.objectId = arr[arr.length - 2];
@@ -94,7 +92,6 @@ export class DiChuyenListComponent implements OnInit {
 				alwaysChecked: false,
 				isShow: true,
 			},
-
 			{
 				stt: 1,
 				name: 'NgayChuyen',
@@ -174,11 +171,7 @@ export class DiChuyenListComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -213,14 +206,6 @@ export class DiChuyenListComponent implements OnInit {
 				queryParams.sortOrder = 'desc';
 				queryParams.filter.Id_NCC = this.objectId;
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 		this.objectService.getNCC(+this.objectId).subscribe(res => {

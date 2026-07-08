@@ -80,7 +80,6 @@ export class HoSoNCCListComponent implements OnInit {
 			this.print = false;
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		const tmp = moment();
 		const y = tmp.get('year');
@@ -376,10 +375,11 @@ export class HoSoNCCListComponent implements OnInit {
 
 	Export() {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'SoQuyetDinh' && x != 'actions');
+		let gridService = this.gridService;
+		var cols = gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'SoQuyetDinh' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
-			var f = this.gridService.model.availableColumns.find(x => x.name == col);
+			var f = gridService.model.availableColumns.find(x => x.name == col);
 			headers.push(f.displayName);
 		});
 		const queryParams = new QueryParamsModel(
@@ -666,10 +666,16 @@ export class HoSoNCCListComponent implements OnInit {
 		}
 	);
 	}
-	
+
 	printTicket(print_template: any) {
 		this.print = true;
-		this.changeDetectorRefs.detectChanges();
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
+		const popupWinindow = window.open();
+		if (!popupWinindow) return;
+		popupWinindow.document.open();
+		// Gắn tiêu đề và nội dung HTML vào body
 		let title = 'Tiếp nhận hồ sơ';
 		let zoom = '';
 		if (this.gridService && this.gridService.IsAllColumnsChecked()) {
@@ -677,13 +683,11 @@ export class HoSoNCCListComponent implements OnInit {
 				zoom: 60%;
 			}`;
 		}  
-
-		let innerContents = document.getElementById(print_template).innerHTML;
-		const popupWinindow = window.open();
-		if (!popupWinindow) return;
-		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+ title +'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
+		popupWinindow.document.title = title;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
 		@media print {
 			`
 			+ zoom +
@@ -693,21 +697,21 @@ export class HoSoNCCListComponent implements OnInit {
 			.hiden-print {
 				display: none !important;
 			}
-			td{
+			td {
 				border-bottom: 1px solid #dee2e6;
 				padding: 10px;
 				font-size: 10pt;
 			}
-			th{
+			th {
 				padding: 10px;
 				font-size: 12pt;
 			}
-			
-		}
-		</style>
-	  `);
-	  	popupWinindow.document.close();
-		popupWinindow.onafterprint = window.close;
-		  this.print = false;
- 	}
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
+		this.print = false;
+		this.changeDetectorRefs.detectChanges();
+	}
 }

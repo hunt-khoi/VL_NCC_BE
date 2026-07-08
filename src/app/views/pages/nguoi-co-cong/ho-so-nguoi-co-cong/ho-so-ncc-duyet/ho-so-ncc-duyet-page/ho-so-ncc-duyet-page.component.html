@@ -9,6 +9,7 @@
 		overflow: hidden !important;
 		text-overflow: ellipsis;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		max-width: 200px;
 		word-break: break-all;
 	}
@@ -31,7 +32,7 @@
 				<div class="col-md-6 m--margin-bottom-20-mobile">
 					<h3>{{getTitle()}}</h3>
 				</div>
-				<div class="col-md-6 m--margin-bottom-20-mobile {{getWidth() > 767?'text-right':''}} ">
+				<div class="col-md-6 m--margin-bottom-20-mobile {{getWidth() > 767 ? 'text-right' : ''}}">
 					<button type="button" mat-raised-button color="primary" (click)="onSubmit(true)"
 						matTooltip="Duyệt" [disabled]="!item.IsEnable_Duyet || disabledBtn">
 						{{ 'COMMON.DUYET' | translate }}
@@ -66,7 +67,8 @@
 				<mat-expansion-panel [expanded]="true">
 					<mat-expansion-panel-header>
 						<mat-panel-title>
-							<a [routerLink]="['/chi-tiet-ho-so',item.Id]" target="_blank" mat-icon-button matTooltip="Xem đầy đủ thông tin hồ sơ" color="primary" class="text-left">
+							<a [routerLink]="['/chi-tiet-ho-so', item.Id]" target="_blank" mat-icon-button 
+								matTooltip="Xem đầy đủ thông tin hồ sơ" color="primary" class="text-left">
 								Chi tiết hồ sơ
 							</a>
 						</mat-panel-title>

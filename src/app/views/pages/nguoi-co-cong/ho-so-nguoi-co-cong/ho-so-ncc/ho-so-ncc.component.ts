@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { HoSoNCCService } from './Services/ho-so-ncc.service';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
+import { HoSoNCCService } from './Services/ho-so-ncc.service';
 
 @Component({
 	selector: 'kt-ho-so-ncc',

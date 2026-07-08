@@ -12,9 +12,8 @@ import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
 import { CommonService } from '../../../services/common.service';
 import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
-import { HoSoNCCModule } from '../../ho-so-ncc/ho-so-ncc.module';
-import { QuaTrinhHoatDongDataSource } from '../Model/data-sources/qua-trinh-hoat-dong.datasource';
 import { QuaTrinhHoatDongService } from '../Services/qua-trinh-hoat-dong.service';
+import { QuaTrinhHoatDongDataSource } from '../Model/data-sources/qua-trinh-hoat-dong.datasource';
 import { QuaTrinhHoatDongEditDialogComponent } from '../qua-trinh-hoat-dong-edit/qua-trinh-hoat-dong-edit-dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -29,17 +28,15 @@ export class QuaTrinhHoatDongListComponent implements OnInit {
 	dataSource: QuaTrinhHoatDongDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Selection
-	selection = new SelectionModel<HoSoNCCModule>(true, []);
-	productsResult: HoSoNCCModule[] = [];
 
-	_name = '';
+	_name: string = '';
 	objectId = '';
 	_user: any = {};
 	// khoi tao grildModel
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		private router: Router,
@@ -58,6 +55,7 @@ export class QuaTrinhHoatDongListComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		var arr = this.router.url.split("/");
 		if (arr.length > 1) {
 			this.objectId = arr[arr.length - 2];
@@ -175,7 +173,6 @@ export class QuaTrinhHoatDongListComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
@@ -210,14 +207,6 @@ export class QuaTrinhHoatDongListComponent implements OnInit {
 				queryParams.sortField = 'TuNgay';
 				queryParams.filter.Id_NCC = this.objectId;
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}

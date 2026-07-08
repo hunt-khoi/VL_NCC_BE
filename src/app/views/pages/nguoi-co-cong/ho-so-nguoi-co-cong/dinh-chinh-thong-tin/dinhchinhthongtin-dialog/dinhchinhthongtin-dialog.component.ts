@@ -17,12 +17,10 @@ import moment from 'moment';
 	selector: 'kt-dinhchinhthongtin-dialog',
 	templateUrl: './dinhchinhthongtin-dialog.component.html',
 })
-
 export class DinhchinhthongtinDialogComponent implements OnInit {
 	item: any;
 	ncc: any = {};
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -57,7 +55,7 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit();
 		}
 	}
@@ -147,9 +145,8 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 
 	LastTableIsNull(): boolean {
 		var lastitem = this.formGiayTo[this.formGiayTo.length - 1];
-		if (lastitem.GiayTo && lastitem.Id_LoaiGiayTo && lastitem.NgayCap && lastitem.NoiCap && lastitem.So) {
+		if (lastitem.GiayTo && lastitem.Id_LoaiGiayTo && lastitem.NgayCap && lastitem.NoiCap && lastitem.So) 
 			return false;
-		}
 		return true;
 	}
 
@@ -218,15 +215,11 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 	}
 
 	checkShow(index: number) {
-		try {
-			let r = this.listField.filter((item: any) => {
-				let t1 = this.ListColumn.findIndex(x => x.ColumnName === item.ID_Row);
-				return t1 !== -1 ? t1 == index : t1 == -1;
-			});
-			return r;
-		} catch (error) {
-			return [];
-		}
+		let r = this.listField.filter((item: any) => {
+			let t1 = this.ListColumn.findIndex(x => x.ColumnName === item.ID_Row);
+			return t1 !== -1 ? t1 == index : t1 == -1;
+		});
+		return r;
 	}
 
 	SetupType(value: any, index: number) {
@@ -260,7 +253,6 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 	}
 
 	checkDataIsValid(): boolean {
-		if (!this.itemForm) return false;
 		let p = document.getElementById("fileUploadExcel") as HTMLInputElement;
 		return this.itemForm.controls['fileDinhKems'] && this.item.controls['fileDinhKems'].valid && 
 		(p ? (p.type == 'file' ? p.files && p.files.length > 0 : false) : false);
@@ -284,7 +276,6 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 				var metaIdx = base64Str.indexOf(';base64,');
 				base64Str = base64Str.substr(metaIdx + 8); // Cắt meta data khỏi chuỗi base64
 			};
-			// const controls = this.itemForm.controls;
 			var model = new FileUploadModel();
 			setTimeout(res => {
 				model = new FileUploadModel();
@@ -466,8 +457,6 @@ export class DinhchinhthongtinDialogComponent implements OnInit {
 	
 	reset() {
 		this.item = Object.assign({}, this.item);
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

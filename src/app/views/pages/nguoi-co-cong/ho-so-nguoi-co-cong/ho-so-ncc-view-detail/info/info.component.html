@@ -18,23 +18,24 @@
 			</h3>
 		</div>
 		<div class="kt-portlet__head-toolbar">
-			<button mat-button mat-raised-button color="info" (click)="downAllFiles()" *ngIf="!item.IsGiam">Tải tất cả
-				tệp đính kèm</button>
-			<button mat-button mat-raised-button color="primary" (click)="onSubmit()"
-				*ngIf="item.AllowEdit && !item.IsGiam">Lưu</button>
-			<div class="view-mobile" style="margin-left: 10px; width:20px"></div>
+			<button mat-button mat-raised-button color="info" (click)="downAllFiles()" *ngIf="!item.IsGiam">
+				Tải tất cả tệp đính kèm
+			</button>
+			<button mat-button mat-raised-button color="primary" (click)="onSubmit()" 
+				*ngIf="item.AllowEdit && !item.IsGiam">Lưu
+			</button>
+			<div class="view-mobile" style="margin-left: 10px; width: 20px"></div>
 		</div>
 	</div>
 	<div class="kt-portlet__body">
 		<form class="kt-form" [formGroup]="itemForm">
 			<div class="row">
 				<div class="col-lg-4 m--margin-bottom-20-mobile">
-					<m-datetime-picker [placeholder]="'Ngày gửi'" [required]="true"
-						formControlName="NgayGui"></m-datetime-picker>
+					<m-datetime-picker [placeholder]="'Ngày gửi'" [required]="true" formControlName="NgayGui">
+					</m-datetime-picker>
 				</div>
 				<!-- bỏ [disabled]="!allowEdit" để hiện ngày -->
-				<div class="col-lg-8 m--margin-bottom-20-mobile" style="padding-top: 15px;">
-				</div>
+				<div class="col-lg-8 m--margin-bottom-20-mobile" style="padding-top: 15px;"></div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid">
 						<mat-select disableOptionCentering placeholder="Đối tượng người có công"
@@ -98,7 +99,7 @@
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" formControlName="District"
 							class="require" (selectionChange)="loadGetListWardByDistrict(filterdistrict)"
-							[(value)]="filterdistrict" required [disabled]="Capcocau==3 || !allowEdit">
+							[(value)]="filterdistrict" required [disabled]="Capcocau===3 || !allowEdit">
 							<mat-option [value]="district.ID_Row"
 								*ngFor="let district of listdistrict;">{{district.District}}</mat-option>
 						</mat-select>
@@ -107,7 +108,7 @@
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select placeholder="{{ 'WARD.NAME' | translate }}" formControlName="Id_Xa" class="require"
-							[(value)]="filterward" required [disabled]="Capcocau==3 || !allowEdit"
+							[(value)]="filterward" required [disabled]="Capcocau===3 || !allowEdit"
 							(selectionChange)="loadKhomAp()">
 							<mat-option [value]="ward.ID_Row" *ngFor="let ward of listward;">{{ward.Ward}}</mat-option>
 						</mat-select>
@@ -232,8 +233,7 @@
 							<strong *ngIf="itemForm.controls['SDT'].errors && itemForm.controls['SDT'].errors.pattern">
 								không hợp lệ
 							</strong>
-							<strong
-								*ngIf="itemForm.controls['SDT'].errors && itemForm.controls['SDT'].errors.maxlength">
+							<strong *ngIf="itemForm.controls['SDT'].errors && itemForm.controls['SDT'].errors.maxlength">
 								tối đa 20 ký tự
 							</strong>
 						</mat-error>
@@ -346,7 +346,8 @@
 					<mat-form-field class="mat-form-field-fluid ">
 						<textarea matInput placeholder="{{ 'THONG_TIN_NCC.noidungtang' | translate }}"
 							formControlName="NoiXetDuyet" rows="3"
-							matTooltip="Chúng tôi thống nhất đề nghị: Tặng hoặc truy tặng danh hiệu vinh dự Nhà nước “Bà mẹ Việt Nam anh hùng” cho: (Nhập nội dung)"></textarea>
+							matTooltip="Chúng tôi thống nhất đề nghị: Tặng hoặc truy tặng danh hiệu vinh dự Nhà nước “Bà mẹ Việt Nam anh hùng” cho: (Nhập nội dung)">
+						</textarea>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile" *ngIf="showNDCanCu">

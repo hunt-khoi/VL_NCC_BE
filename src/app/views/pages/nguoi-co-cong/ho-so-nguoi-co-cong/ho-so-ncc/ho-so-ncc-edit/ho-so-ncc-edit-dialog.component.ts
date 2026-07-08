@@ -2,15 +2,15 @@ import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewC
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { CommonService } from '../../../services/common.service';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import moment from 'moment';
 import { ReplaySubject } from 'rxjs';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
+import { CommonService } from '../../../services/common.service';
 import { ThanNhanService } from './../../than-nhan/Services/than-nhan.service';
 import { HoSoNCCService } from './../Services/ho-so-ncc.service';
 import { HoSoNCCModel } from '../../ho-so-ncc/Model/ho-so-ncc.model';
 import { QuaTrinhHoatDongEditComponent, TroCapRowEditComponent, DiChuyenEditComponent, ThanNhanEditComponent } from '../../../components';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-ho-so-ncc-edit',
@@ -55,7 +55,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 
 	item: HoSoNCCModel = new HoSoNCCModel();
 	oldItem: HoSoNCCModel = new HoSoNCCModel();
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
@@ -116,7 +116,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		this._NAME = 'Hồ sơ người có công';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		this.childComponentData2.ncc = this.item;
@@ -170,7 +169,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 					this.filterward = '' + this.item.Id_Xa;
 					this.loadKhomAp();
 					this.createForm();
-					this.quanhe = this.item.QuanHeVoiLietSy;
+					this.quanhe = this.item.QuanHeVoiLietSy || 0;
 				} else {
 					this.layoutUtilsService.showError(res.error.message);
 				}
@@ -327,7 +326,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	}
 
 	changeNS(isNam = false) {
-		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh.setValue('');
 		}
@@ -340,7 +338,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		}
 	}
 	changeNS1(isNam = false) {
-		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh1.setValue('');
 		}
@@ -355,7 +352,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 
 	/** ACTIONS */
 	prepareCustomer(): HoSoNCCModel | null {
-		if (!this.itemForm) return null;
 		const controls = this.itemForm.controls;
 		const _item = new HoSoNCCModel();
 		_item.Id = +this.item.Id;
@@ -445,7 +441,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	onSubmit(withBack: boolean = false) {
 		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		/* check form */
 		if (this.itemForm.invalid) {
@@ -580,12 +575,10 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	}
 
 	changeQuanHeLietSy() {
-		if (!this.itemForm) return;
-		if (this.itemForm.controls.NguoiThoCungLietSy) {
+		if (this.itemForm.controls.NguoiThoCungLietSy) 
 			this.require = '';
-		} else {
+		else 
 			this.require = 'require';
-		}
 	}
 
 	changeThanNhan(id: any) {
@@ -650,7 +643,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
 		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -667,7 +659,6 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	changeDC(name: string) {
 		let _name = name;
 		if (name == 'TruQuan') _name = 'DiaChi';
-		if (!this.itemForm) return;
 		let dc = this.itemForm.controls[name].value;
 		this.ChildComponentInstance3.itemForm.controls[_name].setValue(dc);
 	}

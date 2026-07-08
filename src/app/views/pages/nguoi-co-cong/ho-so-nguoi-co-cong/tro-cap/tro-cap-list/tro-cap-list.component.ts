@@ -15,8 +15,8 @@ import { HoSoNCCModule } from '../../ho-so-ncc/ho-so-ncc.module';
 import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
 import { TroCapService } from '../Services/tro-cap.service';
 import { TroCapDataSource } from '../Model/data-sources/tro-cap.datasource';
-import { QuyetDinhEditDialogComponent } from '../../quyet-dinh/quyet-dinh-edit/quyet-dinh-edit-dialog.component';
 import { TroCapEditDialogComponent } from './../tro-cap-edit-dialog/tro-cap-edit-dialog.component';
+import { QuyetDinhEditDialogComponent } from '../../quyet-dinh/quyet-dinh-edit/quyet-dinh-edit-dialog.component';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -30,20 +30,15 @@ export class TroCapListComponent implements OnInit {
 	dataSource: TroCapDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
-	// Selection
-	selection = new SelectionModel<HoSoNCCModule>(true, []);
-	productsResult: HoSoNCCModule[] = [];
 
-	_name = '';
+	_name: string = '';
 	objectId = '';
 	// khoi tao grildModel
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	_user: any = {};
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		private router: Router,
@@ -60,9 +55,10 @@ export class TroCapListComponent implements OnInit {
 			this._name = this.translate.instant('TROCAP.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		var arr = this.router.url.split("/");
 		if (arr.length > 1) {
 			this.objectId = arr[arr.length - 2];
@@ -171,7 +167,6 @@ export class TroCapListComponent implements OnInit {
 				alwaysChecked: false,
 				isShow: true,
 			},
-
 			{
 				stt: 8,
 				name: 'CreatedBy',
@@ -209,11 +204,7 @@ export class TroCapListComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -247,14 +238,6 @@ export class TroCapListComponent implements OnInit {
 				queryParams.sortField = 'TuNgay';
 				queryParams.filter.Id_NCC = this.objectId;
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}
@@ -317,9 +300,6 @@ export class TroCapListComponent implements OnInit {
 		//	showCat = true;
 		//}
 		_item.Id_NCC = this.objectId;
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
-		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(TroCapEditDialogComponent, { data: { _item, allowEdit, IsCat, allowEditCat} });
 		dialogRef.afterClosed().subscribe(res => {
 			this.loadDataList();
@@ -372,7 +352,6 @@ export class TroCapListComponent implements OnInit {
 			link.href = fileURL;
 			link.download = filename;
 			link.click();
-
 			//tắt xem trước
 			// let ApiRoot = environment.ApiRoot.slice(0, environment.ApiRoot.length - 3);
 			// let path = "viewer/file-dinh-kem/0?path=" + ApiRoot + "dulieu/quyet-dinh/" + filename;

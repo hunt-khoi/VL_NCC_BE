@@ -1,8 +1,8 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/qua-trinh-hoat-dong';
 

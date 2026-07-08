@@ -1,6 +1,6 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
 import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 
@@ -11,10 +11,6 @@ export class HoSoNCCDuyetService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'desc', 'CreatedDate', 0, 10));
 	lastFilterHD$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'desc', 'ngay_tao', 0, 10));
 	ReadOnlyControl: boolean = false;
-	lastFilterDSExcel$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-	lastFilterInfoExcel$: BehaviorSubject<any> = new BehaviorSubject(undefined);
-	lastFileUpload$: BehaviorSubject<{}> = new BehaviorSubject({});
-	data_import: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
@@ -94,4 +90,5 @@ export class HoSoNCCDuyetService {
 			observe: 'response'
 		});
 	}
+	//#endregion
 }

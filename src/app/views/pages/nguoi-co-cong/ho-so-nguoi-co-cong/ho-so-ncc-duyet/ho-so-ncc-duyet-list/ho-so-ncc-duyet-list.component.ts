@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
-// Services
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
 import { CommonService } from '../../../services/common.service';
@@ -30,14 +29,11 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 	dataSource: HoSoNCCDuyetDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
 
 	// Selection
 	selection = new SelectionModel<any>(true, []);
 	productsResult: any[] = [];
-	_name = '';
+	_name: string = '';
 	// filter District
 	filterprovinces: number = 0;
 	listprovinces: any[] = [];
@@ -55,6 +51,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 	gridService: TableService | undefined;
 	list_button: boolean = false;
 	selectedTab: number = 0;
+	btnClass: string = "";
 
 	constructor(
 		public objectService: HoSoNCCDuyetService,
@@ -72,6 +69,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		this.selection = new SelectionModel<any>(true, []);
 		this.route.data.subscribe(data => {
 			if (data.IsEnable_Duyet!=undefined)
@@ -307,10 +305,7 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -566,18 +561,18 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(HoSoNCCDuyetDialogComponent, { data: { _item, isDuyet: true, isReturn: true } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (res) {
+			if (res) 
 				this.loadDataList();
-			}
 		});
 	}
 
 	Export() {
 		if (!this.paginator || !this.sort || !this.gridService) return;
-		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'SoQuyetDinh' && x != 'actions');
+		let gridService = this.gridService;
+		var cols = gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'SoQuyetDinh' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
-			var f = this.gridService.model.availableColumns.find(x => x.name == col);
+			var f = gridService.model.availableColumns.find(x => x.name == col);
 			headers.push(f.displayName);
 		});
 
@@ -621,10 +616,13 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 	print: boolean = false;
 	printTicket(print_template: any) {
 		this.print = true;
-		this.changeDetectorRefs.detectChanges();
-		const element = document.getElementById(print_template);
-		if (!element) return;
-		let innerContents = element.innerHTML;
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
+		const popupWinindow = window.open();
+		if (!popupWinindow) return;
+		popupWinindow.document.open();
+		// Gắn tiêu đề và nội dung HTML vào body
 		let str = '<button class="mat-sort-header-button" type="button" aria-label="Change sorting for CreatedDate">Ngày tạo</button>';
 		let str1 = '<span aria-label="Change sorting for CreatedDate">Ngày tạo</span>';
 		innerContents = innerContents.replace(str, str1);
@@ -635,13 +633,12 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 			}`;
 		}
 		let title = !this.IsEnable_Duyet? 'Hồ sơ người có công cần duyệt' : 'Hồ sơ người có công đã duyệt';
-		const popupWinindow = window.open();
-		if (!popupWinindow) return;
-		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+title+'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
+		popupWinindow.document.title = title;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
 		@media print {
-			`+zoom+`
 			th:last-child,
 			td:last-child,
 			.hiden-print {
@@ -656,14 +653,11 @@ export class HoSoNCCDuyetListComponent implements OnInit {
 				padding: 10px;
 				font-size: 12pt;
 			}
-		}
-		</style>
-		`);
-
-		popupWinindow.document.close();
-		// popupWinindow.print();
-		popupWinindow.onafterprint = window.close;
-		// setTimeout(popupWinindow.close, 0);
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
 		this.print = false;
 		this.changeDetectorRefs.detectChanges();
 	}

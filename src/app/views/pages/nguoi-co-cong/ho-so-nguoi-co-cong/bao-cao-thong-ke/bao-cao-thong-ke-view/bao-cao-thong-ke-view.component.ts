@@ -1,14 +1,13 @@
 import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SelectionModel } from '@angular/cdk/collections';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { CommonService } from '../../../services/common.service';
+import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
@@ -29,13 +28,7 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 	dataSource: BaoCaoThongKeDataSource| undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
 
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict = '';
@@ -62,7 +55,6 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 		private changeDetectorRefs: ChangeDetectorRef,
 		private ref: ApplicationRef,
 		private commonService: CommonService,
-		private translate: TranslateService,
 		private tokenStorage: TokenStorage) {
 	}
 
@@ -72,7 +64,6 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 		this.from = moment(new Date(y, 0, 1));
 		this.to = moment(new Date(y, 11, 31));
 		this.list_button = CommonService.list_button();
-		this.selection = new SelectionModel<any>(true, []);
 		this.commonService.GetAllProvinces().subscribe(res => {
 			this.listprovinces = res.data;
 		});
@@ -305,19 +296,10 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 		this.route.queryParams.subscribe(_ => {
 			this.loadDataList(false);
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -373,31 +355,13 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 		});
 	}
 
-	/** SELECTION */
-	isAllSelected() {
-		const numSelected = this.selection.selected.length;
-		const numRows = this.productsResult.filter(row => !row.IsEnable_Duyet).length;
-		return numSelected === numRows;
-	}
-
-	/** Selects all rows if they are not all selected; otherwise clear selection. */
-	masterToggle() {
-		if (this.isAllSelected()) {
-			this.selection.clear();
-		} else {
-			this.productsResult.forEach(row => {
-				if (!row.IsEnable_Duyet)
-					this.selection.select(row)
-			});
-		}
-	}
-
 	export() {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
+		let gridService = this.gridService;
+		var cols = gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
-			var f = this.gridService.model.availableColumns.find(x => x.name == col);
+			var f = gridService.model.availableColumns.find(x => x.name == col);
 			headers.push(f.displayName);
 		});
 		let queryParams = new QueryParamsModel(
@@ -438,35 +402,40 @@ export class BaoCaoThongKeViewComponent implements OnInit {
 	print: boolean = false;
 	printTicket(print_template: any) {
 		this.print = true;
-		this.changeDetectorRefs.detectChanges();
-		let title = 'Thống kê hồ sơ người có công đã duyệt';
-		let innerContents = document.getElementById(print_template).innerHTML;
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
 		const popupWinindow = window.open();
 		if (!popupWinindow) return;
 		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+title+'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
+		// Gắn tiêu đề và nội dung HTML vào body
+		let title = 'Thống kê hồ sơ người có công đã duyệt';
+		popupWinindow.document.title = title;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
 		@media print {
 			th:last-child,
 			td:last-child,
 			.hiden-print {
 				display: none !important;
 			}
-			td{
+			td {
 				border-bottom: 1px solid #dee2e6;
 				padding: 10px;
 				font-size: 10pt;
 			}
-			th{
+			th {
 				padding: 10px;
 				font-size: 12pt;
 			}
-			
-		}
-		</style>
-	  `);
-	  	popupWinindow.document.close();
-		popupWinindow.onafterprint = window.close;
-		  this.print = false;
-	 }
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
+		this.print = false;
+		this.changeDetectorRefs.detectChanges();
+	}
 }

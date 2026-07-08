@@ -6,7 +6,9 @@ import { QuyetDinhRefModule } from '../quyet-dinh/quyet-dinh-ref.module';
 import { HoSoNCCEditPageComponent } from './ho-so-ncc-edit-page/ho-so-ncc-edit-page.component';
 
 const routes: Routes = [
-	{ path: '', component: HoSoNCCEditPageComponent }
+	{ 
+		path: '', component: HoSoNCCEditPageComponent 
+	}
 ];
 
 @NgModule({
@@ -20,4 +22,5 @@ const routes: Routes = [
 		HoSoNCCEditPageComponent,
 	],
 })
+
 export class HoSoNCCEditModule { }

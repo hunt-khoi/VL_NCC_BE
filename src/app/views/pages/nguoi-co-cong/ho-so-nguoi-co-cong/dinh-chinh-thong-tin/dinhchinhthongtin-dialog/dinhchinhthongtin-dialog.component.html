@@ -6,19 +6,19 @@
 </div>
 <div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
 	<div class="kt-portlet__head kt-portlet__head__custom">
-		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
 			 style="margin-top: 20px;">
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
-		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile"
+		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile"
 			 style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
 			<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn"
 					matTooltip="{{'COMMON.LUU_DONG' | translate}}">
 				<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
 				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>
-			<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn"
-					*ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+			<button type="button" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" class="hide-view-sm"
+				*ngIf="item.Id === 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
 				<span translate="COMMON.LUU_TIEPTUC"></span>&nbsp;&nbsp;
 				<div *ngIf="disabledBtn" class="spinner-button-pad"></div>
 			</button>
@@ -57,9 +57,9 @@
 							</mat-select>
 						</mat-form-field>
 					</div>
-					<div class="col-lg-5 m--margin-bottom-20-mobile" *ngIf=" !(TypeOfColumn(lstCol.Type)=='year')">
+					<div class="col-lg-5 m--margin-bottom-20-mobile" *ngIf=" !(TypeOfColumn(lstCol.Type)==='year')">
 						<mat-form-field class="mat-form-field-fluid">
-							<input matInput [disabled]="!allowEdit" *ngIf="!(TypeOfColumn(lstCol.Type)=='dropdown')"
+							<input matInput [disabled]="!allowEdit" *ngIf="!(TypeOfColumn(lstCol.Type)==='dropdown')"
 								type={{TypeOfColumn(lstCol.Type)}} placeholder="Giá trị mới" required
 								[(ngModel)]="ListColumn[i].GiaTriMoi" />
 							<!-- bỏ loại đính chính gt là dropdown -->
@@ -91,12 +91,11 @@
 							</mat-select> -->
 						</mat-form-field>
 					</div>
-					<div class="col-lg-5 m--margin-20-mobile" *ngIf=" (TypeOfColumn(lstCol.Type)=='year')">
+					<div class="col-lg-5 m--margin-20-mobile" *ngIf=" (TypeOfColumn(lstCol.Type)==='year')">
 						<mat-form-field class="w-100" appearance="fill">
 							<input matInput [(ngModel)]="ListColumn[i].GiaTriMoi" [matDatepicker]="dp" [max]="_maxyear" readonly />
 							<mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-							<mat-datepicker #dp startView="multi-year" (yearSelected)="chosenYearHandler($event, dp,i)">
-							</mat-datepicker>
+							<mat-datepicker #dp startView="multi-year" (yearSelected)="chosenYearHandler($event, dp,i)"></mat-datepicker>
 						</mat-form-field>
 					</div>
 					<div class="col-lg-1 text-right text-danger" style="padding-top: 20px;">
@@ -199,7 +198,7 @@
 											<div class="attach-item-name" *ngIf="item.Id > 0 ">
 												<p>{{formGiayTo[i].FileDinhKem.filename}}</p>
 												<span>
-													<a href="viewer/file-dinh-kem/0?path={{formGiayTo[i].FileDinhKem.src}}" target="_blank"> Preview</a>&nbsp;&middot;&nbsp;
+													<a href="viewer/file-dinh-kem/0?path={{formGiayTo[i].FileDinhKem.src}}" target="_blank">Preview</a>&nbsp;&middot;&nbsp;
 													<a href="javascript:;" (click)="DownloadFile(formGiayTo[i].FileDinhKem.src)">Download</a>
 												</span>
 											</div>
@@ -217,7 +216,7 @@
 					</div>
 				</div>
 				<div class="row" *ngIf="allowDuyet">
-					<div class="col-md-12" *ngIf="item.IsDuyet == null">
+					<div class="col-md-12" *ngIf="item.IsDuyet === null">
 						<button (click)="DuyetTin(true)" mat-button mat-raised-button color="primary">{{'COMMON.DUYET' | translate }}</button>
 						<button (click)="DuyetTin(false)" mat-button mat-raised-button color="warn">{{'COMMON.KODUYET' | translate }}</button>
 					</div>

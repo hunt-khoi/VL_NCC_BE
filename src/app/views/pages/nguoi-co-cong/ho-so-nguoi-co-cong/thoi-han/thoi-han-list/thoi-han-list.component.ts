@@ -9,33 +9,26 @@ import { tap } from 'rxjs/operators';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
-import { ThoiHanService } from '../Services/thoi-han.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
+import { ThoiHanService } from '../Services/thoi-han.service';
 import { ThoiHanDataSource } from '../Model/data-sources/thoi-han.datasource';
+import { CookieService } from 'ngx-cookie-service';
 import { Moment } from 'moment';
 import moment from 'moment';
-import { CookieService } from 'ngx-cookie-service';
 
 @Component({
 	selector: 'kt-thoi-han-list',
 	templateUrl: './thoi-han-list.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class ThoiHanListComponent implements OnInit {
 	// Table fields
 	dataSource: ThoiHanDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterType = '';
 
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
 	lstStatus: any[] = [];
-
 	// filter District
 	filterprovinces: number = 0;
 	listprovinces: any[] = [];
@@ -54,7 +47,8 @@ export class ThoiHanListComponent implements OnInit {
 	now = new Date();
 	to: Moment | undefined;
 	from: Moment | undefined;
-	list_button: boolean | undefined;
+	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(public objectService: ThoiHanService,
 		public dialog: MatDialog,
@@ -68,14 +62,12 @@ export class ThoiHanListComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
 		let tmp = moment();
 		let y = tmp.get("year");
 		this.from = moment(new Date(y, 0, 1));
 		this.to = moment(new Date(y, 11, 31));
-		//tmp=tmp.set('date', 1);
-		//this.from = tmp;
-		//this.to = moment();
-		this.selection = new SelectionModel<any>(true, []);
 		this.tokenStorage.getUserInfo().subscribe(res => {
 			this.Capcocau = res.Capcocau;
 			this.filterprovinces = res.IdTinh;
@@ -111,7 +103,6 @@ export class ThoiHanListComponent implements OnInit {
 		this.gridModel.filterText.SoHoSo = '';
 		this.gridModel.filterText.DoiTuong = '';
 		this.gridModel.filterText.DistrictID = this.filterdistrict;
-
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 		// create availableColumns
 		const availableColumns = [
@@ -257,11 +248,7 @@ export class ThoiHanListComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -285,22 +272,12 @@ export class ThoiHanListComponent implements OnInit {
 					})
 				).subscribe();
 		}
-
 		// Init DataSource
 		this.dataSource = new ThoiHanDataSource(this.objectService);
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -323,31 +300,29 @@ export class ThoiHanListComponent implements OnInit {
 
 	filterConfiguration(): any {
 		const filter: any = {};
-		if (this.IsTre) {
-			if (this.IsTre == "0") {
-				filter.Status = '2';
-				filter.IsTre = false;
-			}
-			if (this.IsTre == "1") {
-				filter.Status = '2';
-				filter.IsTre = true;
-			}
-			if (this.IsTre == "2") {
-				filter.Status = '1';
-				filter.IsTre = true;
-			}
-			if (this.IsTre == "3") {
-				filter.Status = '1';
-				filter.IsTre = false;
-			}
-			if (this.IsTre == "-1") {
-				filter.Status = '0';
-				filter.IsTre = '0'
-			}
-		}
-		else {
+		if (!this.IsTre) {
 			this.layoutUtilsService.showError("Hãy chọn tình trạng thống kê")
 			return;
+		}
+		if (this.IsTre == "0") {
+			filter.Status = '2';
+			filter.IsTre = false;
+		}
+		if (this.IsTre == "1") {
+			filter.Status = '2';
+			filter.IsTre = true;
+		}
+		if (this.IsTre == "2") {
+			filter.Status = '1';
+			filter.IsTre = true;
+		}
+		if (this.IsTre == "3") {
+			filter.Status = '1';
+			filter.IsTre = false;
+		}
+		if (this.IsTre == "-1") {
+			filter.Status = '0';
+			filter.IsTre = '0'
 		}
 		if (this.from)
 			filter["TuNgay"] = this.from.format("DD/MM/YYYY");
@@ -398,10 +373,11 @@ export class ThoiHanListComponent implements OnInit {
 
 	export() {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'actions');
+		let gridService = this.gridService;
+		var cols = gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
-			var f = this.gridService.model.availableColumns.find(x => x.name == col);
+			var f = gridService.model.availableColumns.find(x => x.name == col);
 			headers.push(f.displayName);
 		});
 		const queryParams = new QueryParamsModel(
@@ -436,41 +412,46 @@ export class ThoiHanListComponent implements OnInit {
 	print: boolean = false;
 	printTicket(print_template: any) {
 		this.print = true;
-		this.changeDetectorRefs.detectChanges();
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
+		const popupWinindow = window.open();
+		if (!popupWinindow) return;
+		popupWinindow.document.open();
+		// Gắn tiêu đề và nội dung HTML vào body
 		let title = this.translate.instant('THONG_KE_NCC.tkthoihan');
-		let innerContents = document.getElementById(print_template).innerHTML;
 		let substr = '<button class="mat-sort-header-button" type="button" aria-label="Change sorting for HoTen">Họ tên</button>';
 		let newstr = '<span class="mat-sort-header-button" aria-label="Change sorting for HoTen">Họ tên</span>';
 		innerContents = innerContents.replace(substr, newstr);
 		substr = '<button class="mat-sort-header-button" type="button" aria-label="Change sorting for Deadline">Thời hạn</button>';
-		newstr = '<span class="mat-sort-header-button" aria-label="Change sorting for HoTen">Thời hạn</span>';
+		newstr = '<span class="mat-sort-header-button" aria-label="Change sorting for Deadline">Thời hạn</span>';
 		innerContents = innerContents.replace(substr, newstr);
-		const popupWinindow = window.open();
-		if (!popupWinindow) return;
-		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+title+'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
+		popupWinindow.document.title = title;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
 		@media print {
 			th:last-child,
 			td:last-child,
 			.hiden-print {
 				display: none !important;
 			}
-			td{
+			td {
 				border-bottom: 1px solid #dee2e6;
 				padding: 10px;
 				font-size: 10pt;
 			}
-			th{
+			th {
 				padding: 10px;
 				font-size: 12pt;
 			}
-			
-		}
-		</style>
-	  `);
-	  	popupWinindow.document.close();
-		popupWinindow.onafterprint = window.close;
-		  this.print = false;
-	 }
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
+		this.print = false;
+		this.changeDetectorRefs.detectChanges();
+	}
 }

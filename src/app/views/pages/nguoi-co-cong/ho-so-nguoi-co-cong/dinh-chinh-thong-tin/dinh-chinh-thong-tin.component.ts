@@ -14,14 +14,13 @@ import { TableModel } from './../../../../partials/table/table.model';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
 import { LayoutUtilsService } from './../../../../../core/_base/crud/utils/layout-utils.service';
 import { ReviewExportComponent } from './../../components/review-export/review-export.component';
-import { HoSoNCCModule } from './../ho-so-ncc/ho-so-ncc.module';
+import { HoSoNCCService } from '../ho-so-ncc/Services/ho-so-ncc.service';
 import { DinhChinhThongTinService } from './Services/dinh-chinh-thong-tin.service';
 import { DinhChinhModel } from './Model/dinh-chinh.model';
 import { DinhChinhDataSource } from './Model/data-sources/dinh-chinh.datasource';
 import { DinhchinhthongtinDialogComponent } from './dinhchinhthongtin-dialog/dinhchinhthongtin-dialog.component';
 import { QuyetDinhEditDialogComponent } from './../quyet-dinh/quyet-dinh-edit/quyet-dinh-edit-dialog.component';
 import { CookieService } from 'ngx-cookie-service';
-import { HoSoNCCService } from '../ho-so-ncc/Services/ho-so-ncc.service';
 
 @Component({
 	selector: 'kt-dinh-chinh-thong-tin',
@@ -32,14 +31,8 @@ export class DinhChinhThongTinComponent implements OnInit {
 	dataSource: DinhChinhDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
-	// Selection
-	selection = new SelectionModel<HoSoNCCModule>(true, []);
-	productsResult: HoSoNCCModule[] = [];
 
-	_name = '';
+	_name: string = '';
 	objectId = '';
 	_user: any = {};
 	// khoi tao grildModel
@@ -47,10 +40,11 @@ export class DinhChinhThongTinComponent implements OnInit {
 	gridService: TableService | undefined;
 	ncc: any;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		private router: Router,
-		public dinhchinhService: DinhChinhThongTinService,
+		public apiService: DinhChinhThongTinService,
 		private hosoService: HoSoNCCService,
 		public dialog: MatDialog,
 		private route: ActivatedRoute,
@@ -65,6 +59,7 @@ export class DinhChinhThongTinComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		var arr = this.router.url.split("/");
 		if (arr.length > 1) {
 			this.objectId = arr[arr.length - 2];
@@ -154,7 +149,6 @@ export class DinhChinhThongTinComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
@@ -181,28 +175,20 @@ export class DinhChinhThongTinComponent implements OnInit {
 		}
 
 		// Init DataSource
-		this.dataSource = new DinhChinhDataSource(this.dinhchinhService);
+		this.dataSource = new DinhChinhDataSource(this.apiService);
 		let queryParams = new QueryParamsModel({});
 
 		// Read from URL itemId, for restore previous state
 		this.route.queryParams.subscribe(_ => {
 			if (this.dataSource) {
-				queryParams = this.dinhchinhService.lastFilter$.getValue();
+				queryParams = this.apiService.lastFilter$.getValue();
 				queryParams.sortField = 'NgayChuyen';
 				queryParams.filter.Id_NCC = this.objectId;
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 
-		this.dinhchinhService.getNCC(+this.objectId).subscribe(res => {
+		this.apiService.getNCC(+this.objectId).subscribe(res => {
 			if (res && res.status === 1) {
 				this.ncc = res.data;
 			} else {
@@ -245,7 +231,7 @@ export class DinhChinhThongTinComponent implements OnInit {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 			
-			this.dinhchinhService.Delete(item.ID_DC).subscribe(res => {
+			this.apiService.Delete(item.ID_DC).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				} else {
@@ -263,8 +249,7 @@ export class DinhChinhThongTinComponent implements OnInit {
 
 	Edit(_item: any, allowEdit: boolean = true, allowDuyet: boolean = false, checkTN: boolean = false) {
 		_item.Id_NCC = this.objectId;
-		let saveMessageTranslateParam = '';
-		saveMessageTranslateParam += _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
+		let saveMessageTranslateParam = _item.Id > 0 ? 'OBJECT.EDIT.UPDATE_MESSAGE' : 'OBJECT.EDIT.ADD_MESSAGE';
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(DinhchinhthongtinDialogComponent, {
 			width: '70vw',
@@ -275,17 +260,16 @@ export class DinhChinhThongTinComponent implements OnInit {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
 
 	print(item: any) {
-		this.dinhchinhService.PrintDinhChinh(item.ID_DC).subscribe(res => {
+		this.apiService.PrintDinhChinh(item.ID_DC).subscribe(res => {
 			if (res && res.status == 1) {
 				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
 				dialogRef.afterClosed().subscribe(res => {
 					if (!res) return;
-					this.dinhchinhService.exportDinhChinh(item.ID_DC, item.Id_NCC, res.loai).subscribe(response => {
+					this.apiService.exportDinhChinh(item.ID_DC, item.Id_NCC, res.loai).subscribe(response => {
 						const headers = response.headers;
 						const filename = headers.get('x-filename');
 						const type = headers.get('content-type');
@@ -314,7 +298,7 @@ export class DinhChinhThongTinComponent implements OnInit {
 		data.ID_NCC = item.Id_NCC;
 		data.Id = item.ID_DC;
 		data.IsDuyet = val;
-		this.dinhchinhService.Approved(data).subscribe(res => {
+		this.apiService.Approved(data).subscribe(res => {
 			if (res && res.status == 1) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
@@ -346,7 +330,7 @@ export class DinhChinhThongTinComponent implements OnInit {
 		const dialogRef = this.dialog.open(QuyetDinhEditDialogComponent, { data: { _item, callapi: false } });
 		dialogRef.afterClosed().subscribe(respone => {
 			if (!respone) return;
-			this.dinhchinhService.Duyet(respone).subscribe(res => {
+			this.apiService.Duyet(respone).subscribe(res => {
 				if (res && res.status == 1) {
 					this.layoutUtilsService.showInfo("Tạo quyết định thành công");
 					this.ngOnInit();

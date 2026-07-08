@@ -4,8 +4,8 @@ export class HoSoNCCModel extends BaseModel {
 	Id: number = 0;
 	NgayGui: any;
 	SoHoSo: string = "";
-	Id_DoiTuongNCC: number | null = null;
-	Id_LoaiHoSo: number | null = null;
+	Id_DoiTuongNCC: number = 0;
+	Id_LoaiHoSo: number = 0;
 	HoTen: string = "";
 	BiDanh: string = "";
 	NgaySinh: string = "";
@@ -89,8 +89,8 @@ export class HoSoNCCModel extends BaseModel {
 		this.Id = 0;
 		this.NgayGui = null;
 		this.SoHoSo = '';
-		this.Id_DoiTuongNCC = null;
-		this.Id_LoaiHoSo = null;
+		this.Id_DoiTuongNCC = 0;
+		this.Id_LoaiHoSo = 0;
 		this.NamSinh = null;
 		this.Id_Xa = null;
 		this.Id_KhomAp = null;

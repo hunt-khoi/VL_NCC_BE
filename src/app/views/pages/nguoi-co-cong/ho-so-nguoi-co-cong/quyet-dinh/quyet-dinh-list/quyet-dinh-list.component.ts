@@ -11,7 +11,6 @@ import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_ba
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
 import { CommonService } from '../../../services/common.service';
-import { HoSoNCCModule } from '../../ho-so-ncc/ho-so-ncc.module';
 import { QuyetDinhService } from '../Services/quyet-dinh.service';
 import { QuyetDinhDataSource } from '../Model/data-sources/quyet-dinh.datasource';
 import { QuyetDinhEditDialogComponent } from './../quyet-dinh-edit/quyet-dinh-edit-dialog.component';
@@ -28,20 +27,15 @@ export class QuyetDinhListComponent implements OnInit {
 	dataSource: QuyetDinhDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
-	// Selection
-	selection = new SelectionModel<HoSoNCCModule>(true, []);
-	productsResult: HoSoNCCModule[] = [];
 
-	_name = '';
+	_name: string = '';
 	objectId = '';
 	selected: number = 0;
 	// khoi tao grildModel
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(public objectService: QuyetDinhService,
 		public dialog: MatDialog,
@@ -56,6 +50,7 @@ export class QuyetDinhListComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		// filter
 		this.gridModel = new TableModel();
 		this.gridModel.clear();
@@ -161,7 +156,6 @@ export class QuyetDinhListComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
@@ -194,14 +188,6 @@ export class QuyetDinhListComponent implements OnInit {
 			if (this.dataSource) { 
 				queryParams = this.objectService.lastFilter$.getValue();
 				this.dataSource.loadList(queryParams);
-			}
-		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
 			}
 		});
 	}
@@ -277,10 +263,11 @@ export class QuyetDinhListComponent implements OnInit {
 
 	exportList() {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
+		let gridService = this.gridService;
+		var cols = gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'actions');
 		var headers: string[] = [];
 		cols.forEach(col => {
-			var f = this.gridService.model.availableColumns.find(x => x.name == col);
+			var f = gridService.model.availableColumns.find(x => x.name == col);
 			headers.push(f.displayName);
 		});
 		const queryParams = new QueryParamsModel(

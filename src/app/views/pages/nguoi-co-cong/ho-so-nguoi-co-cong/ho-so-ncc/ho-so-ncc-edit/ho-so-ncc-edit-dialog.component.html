@@ -5,10 +5,11 @@
 </div>
 <div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
 	<div class="kt-portlet__head kt-portlet__head__custom">
-		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
+		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile" style="margin-top: 20px;">
 			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
 		</div>
-		<div class="col-md-{{item.Id == 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
+		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" 
+			style="margin-top: 10px; text-align: right;" *ngIf="allowEdit">
 			<button type="button" mat-raised-button (click)="resizeDialog()">
 				{{isZoomSize ? 'Thu nhỏ' : 'Phóng to'}}
 			</button>
@@ -49,29 +50,32 @@
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="{{ 'PROVINCE.NAME' | translate }}" formControlName="Province" class="require" (selectionChange)="loadGetListDistrictByProvinces(filterprovinces)" [(value)]="filterprovinces" required [disabled]="true">
-							<mat-option [value]="provinces.id_row" *ngFor="let provinces of listprovinces;">{{provinces.Province}}</mat-option>
+						<mat-select placeholder="{{ 'PROVINCE.NAME' | translate }}" formControlName="Province" class="require" 
+							(selectionChange)="loadGetListDistrictByProvinces(filterprovinces)" [(value)]="filterprovinces" required [disabled]="true">
+							<mat-option [value]="p.id_row" *ngFor="let p of listprovinces;">{{p.Province}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" formControlName="District" class="require" (selectionChange)="loadGetListWardByDistrict(filterdistrict)" [(value)]="filterdistrict" required [disabled]="Capcocau==3">
-							<mat-option [value]="district.ID_Row" *ngFor="let district of listdistrict;">{{district.District}}</mat-option>
+						<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" formControlName="District" class="require" 
+							(selectionChange)="loadGetListWardByDistrict(filterdistrict)" [(value)]="filterdistrict" required [disabled]="Capcocau===3">
+							<mat-option [value]="d.ID_Row" *ngFor="let d of listdistrict;">{{d.District}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="{{ 'WARD.NAME' | translate }}" formControlName="Id_Xa" class="require" [(value)]="filterward" required [disabled]="Capcocau==3" (selectionChange)="loadKhomAp();changeLoaiHS(Id_LoaiHoSo);">
-							<mat-option [value]="ward.ID_Row" *ngFor="let ward of listward;">{{ward.Ward}}</mat-option>
+						<mat-select placeholder="{{ 'WARD.NAME' | translate }}" formControlName="Id_Xa" class="require"  
+							(selectionChange)="loadKhomAp();changeLoaiHS(Id_LoaiHoSo);" [(value)]="filterward" required [disabled]="Capcocau===3">
+							<mat-option [value]="w.ID_Row" *ngFor="let w of listward;">{{w.Ward}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select placeholder="Khóm, ấp" formControlName="Id_KhomAp" class="require" required>
-							<mat-option [value]="ward.id" *ngFor="let ward of listKhomAp;">{{ward.title}}</mat-option>
+							<mat-option [value]="k.id" *ngFor="let k of listKhomAp;">{{k.title}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
@@ -93,14 +97,16 @@
 				</div>
 				<div class="col-lg-3 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Ngày sinh đối tượng" formControlName="NgaySinh" type="text" [matDatepicker]="picker" [max]="maxNS" (dateChange)="changeNS()">
+						<input matInput placeholder="Ngày sinh đối tượng" formControlName="NgaySinh" type="text" 
+						[matDatepicker]="picker" [max]="maxNS" (dateChange)="changeNS()">
 						<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
 						<mat-datepicker #picker></mat-datepicker>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-3 m--margin-bottom-20-mobile">
 					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Năm sinh đối tượng" formControlName="NamSinh" type="number" [min]="0" class="require" required (change)="changeNS(true)">
+						<input matInput placeholder="Năm sinh đối tượng" formControlName="NamSinh" type="number" 
+						[min]="0" class="require" required (change)="changeNS(true)">
 					</mat-form-field>
 				</div>
 				<div class="col-lg-6 m--margin-bottom-20-mobile">
@@ -112,82 +118,19 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-lg-12 m--margin-bottom-20-mobile" [hidden]="item.Id==0 ">
+				<div class="col-lg-12 m--margin-bottom-20-mobile" [hidden]="item.Id===0 ">
 					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="Thân nhân người có công" formControlName="IdThanNhan" class="require" (selectionChange)=changeThanNhan(filterthannhan) [(value)]="filterthannhan">
-							<mat-option [value]="thannhan.Id" *ngFor="let thannhan of listthannhan;">({{thannhan.Id_QHGiaDinh}}) {{thannhan.HoTen}}</mat-option>
+						<mat-select placeholder="Thân nhân người có công" formControlName="IdThanNhan" class="require" 
+							(selectionChange)=changeThanNhan(filterthannhan) [(value)]="filterthannhan">
+							<mat-option [value]="t.Id" *ngFor="let t of listthannhan;">({{t.Id_QHGiaDinh}}) {{t.HoTen}}</mat-option>
 						</mat-select>
 					</mat-form-field>
 				</div>
 				<div class="col-lg-12 m--margin-bottom-20-mobile" [hidden]="item.Id>0 ">
-					<lib-dynamic-component [childComponentType]="childComponentType3" [data]="childComponentData3" (getInstance)="getInstance3($event)"></lib-dynamic-component>
+					<lib-dynamic-component [childComponentType]="childComponentType3" [data]="childComponentData3" (getInstance)="getInstance3($event)">
+					</lib-dynamic-component>
 				</div>
 			</div>
-			<!--<div class="row" [hidden]="item.Id>0">
-				<div class="col-lg-6 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Thân nhân người có công" formControlName="NguoiThoCungLietSy" [(ngModel)]="thannhanName" change="changeQuanHeLietSy()" style="text-transform:capitalize" />
-					</mat-form-field>
-				</div>
-				<div class="col-lg-3 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Ngày sinh thân nhân" formControlName="NgaySinh1" type="text" [matDatepicker]="picker1" (dateChange)="changeNS1()">
-						<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-						<mat-datepicker #picker1></mat-datepicker>
-					</mat-form-field>
-				</div>
-				<div class="col-lg-3 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Năm sinh thân nhân" formControlName="NamSinh1" type="number" [min]="0" class="require" required (change)="changeNS1(true)">
-					</mat-form-field>
-				</div>
-				<div class="col-lg-3 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="Giới tính thân nhân" formControlName="GioiTinh1">
-							<mat-option [value]="gt.id" *ngFor="let gt of listgioitinh;">{{gt.title}}</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
-				<div class="col-lg-6 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select placeholder="Quan hệ với người có công" formControlName="QuanHeVoiLietSy" [(ngModel)]="quanhe">
-							<mat-option [value]="object.id" *ngFor="let object of listquanhevoilietsy;">{{object.title}}</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
-				<div class="col-lg-12 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Nguyên quán của thân nhân người có công" formControlName="NguyenQuan1" />
-					</mat-form-field>
-				</div>
-				<div class="col-lg-12 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Trú quán của thân nhân người có công" formControlName="TruQuan1" />
-					</mat-form-field>
-				</div>
-				<div class="col-lg-3 m--margin-bottom-20-mobile">
-					<mat-checkbox formControlName="IsChet">Nhân thân đã mất</mat-checkbox>
-				</div>
-				<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="!itemForm.controls['IsChet'].value">
-					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Ngày từ trần" formControlName="NgayChet" type="text" [matDatepicker]="picker2" (dateChange)="changeNS1()">
-						<mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-						<mat-datepicker #picker2></mat-datepicker>
-					</mat-form-field>
-				</div>
-				<div class="col-lg-12 m--margin-bottom-20-mobile" [hidden]="!itemForm.controls['IsChet'].value">
-					<mat-form-field class="mat-form-field-fluid ">
-						<input matInput placeholder="Số khai tử" formControlName="SoKhaiTu" />
-					</mat-form-field>
-				</div>
-			</div>-->
-			<!--<mat-accordion>
-			<mat-expansion-panel>
-				<mat-expansion-panel-header>
-					<mat-panel-title>
-						Thông tin tỷ lệ mất sức lao động
-					</mat-panel-title>
-				</mat-expansion-panel-header>-->
 			<div class="row">
 				<div class="col-lg-12 m--margin-bottom-20-mobile">
 					<h4 style="border-bottom: solid 1px;color: #5867dd;">
@@ -216,7 +159,7 @@
 						<input matInput placeholder="Tỷ lệ mất sức lao động(%)" formControlName="TiLe" type="text">
 					</mat-form-field>
 				</div>
-				<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="NhomDoiTuong==2|| NhomDoiTuong==4">
+				<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="NhomDoiTuong===2|| NhomDoiTuong===4">
 					<mat-form-field class="mat-form-field-fluid ">
 						<mat-select placeholder="Mộ an táng" formControlName="Mo">
 							<mat-option [value]="0">--Chọn--</mat-option>
@@ -269,7 +212,7 @@
 				</div>
 			</div>
 			<div class="form-group kt-form__group row">
-				<div class="col-lg-12 m--margin-bottom-20-mobile" *ngIf="item.Id==0">
+				<div class="col-lg-12 m--margin-bottom-20-mobile" *ngIf="item.Id===0">
 					<mat-checkbox [(ngModel)]="nhapTC" [ngModelOptions]="{standalone: true}">Nhập trợ cấp</mat-checkbox>&nbsp;&nbsp;&nbsp;
 					<mat-checkbox [(ngModel)]="nhapHD" [ngModelOptions]="{standalone: true}">Nhập chứng tử</mat-checkbox>&nbsp;&nbsp;&nbsp;
 					<mat-checkbox [(ngModel)]="nhapDC" [ngModelOptions]="{standalone: true}">Nhập di chuyển</mat-checkbox>
@@ -307,19 +250,6 @@
 					</mat-form-field>
 				</div>
 			</div>
-			<!--</mat-expansion-panel>
-			<mat-expansion-panel [hidden]="!nhapTC">
-				<mat-expansion-panel-header>
-					<mat-panel-title>
-						Thông tin trợ cấp
-					</mat-panel-title>							
-					<mat-panel-description style="justify-content: flex-end;">
-						<button mat-button mat-raised-button color="primary" (click)="addTC($event)" matTooltip="Thêm trợ cấp">Thêm trợ cấp</button>
-					</mat-panel-description>
-				</mat-expansion-panel-header>-->
-			<!--<div *ngFor="let opt of lstTC; index as i">
-				<h5 style="border-bottom: solid 1px;">Trợ cấp {{i+1}}<button mat-butotn mat-raised-button color="warn" (click)="delTC(i)">Xóa trợ cấp</button></h5>
-			</div>-->
 			<div [hidden]="!nhapTC" style="overflow-x:auto;">
 				<div class="form-group kt-form__group row">
 					<div class="col-lg-12 m--margin-bottom-20-mobile">
@@ -347,19 +277,11 @@
 						<th class="text-center" style="width: 100px;">Ngày cắt trợ cấp</th>
 						<th class="text-center" style="width: 100px;">Năm cắt trợ cấp</th>
 						<th class="text-center" style="width: 100px;">Tháng thu hồi</th>
-						<th class="text-center" style="width: 80px;	"></th>
+						<th class="text-center" style="width: 80px;"></th>
 					</tr>
 					<ng-template #libInsertion></ng-template>
 				</table>
 			</div>
-			<!--<lib-dynamic-component [childComponentType]="childComponentType" [data]="childComponentData" (getInstance)="getInstance($event)"></lib-dynamic-component>-->
-			<!--</mat-expansion-panel>
-			<mat-expansion-panel [hidden]="!nhapHD">
-				<mat-expansion-panel-header>
-					<mat-panel-title>
-						Nội dung chứng tử
-					</mat-panel-title>
-				</mat-expansion-panel-header>-->
 			<div [hidden]="!nhapHD">
 				<br />
 				<div class="row">
@@ -369,13 +291,9 @@
 						</h4>
 					</div>
 				</div>
-				<lib-dynamic-component [childComponentType]="childComponentType1" [data]="childComponentData1" (getInstance)="getInstance1($event)"></lib-dynamic-component>
+				<lib-dynamic-component [childComponentType]="childComponentType1" [data]="childComponentData1" (getInstance)="getInstance1($event)">
+				</lib-dynamic-component>
 			</div>
-			<!--</mat-expansion-panel>
-			<mat-expansion-panel [hidden]="!nhapDC">
-				<mat-expansion-panel-header>
-					<mat-panel-title>Di chuyển</mat-panel-title>
-				</mat-expansion-panel-header>-->
 			<div [hidden]="!nhapDC">
 				<div class="row">
 					<div class="col-lg-12 m--margin-bottom-20-mobile">
@@ -384,17 +302,16 @@
 						</h4>
 					</div>
 				</div>
-				<lib-dynamic-component [childComponentType]="childComponentType2" [data]="childComponentData2" (getInstance)="getInstance2($event)"></lib-dynamic-component>
+				<lib-dynamic-component [childComponentType]="childComponentType2" [data]="childComponentData2" (getInstance)="getInstance2($event)">
+				</lib-dynamic-component>
 			</div>
-			<!--</mat-expansion-panel>
-			</mat-accordion>-->
 			<div class="row">
 				<div class="col-md-6 kt-margin-bottom-10-mobile">
 					<dl-image-control formControlName="fileDinhKem" nameButton="Chọn file hồ sơ" [multiple]="false" [disabled]="false">
 					</dl-image-control>
 				</div>
 			</div>
-			<div class="row" [hidden]="GiayTos.length == 0 || item.Id>0">
+			<div class="row" [hidden]="GiayTos.length === 0 || item.Id>0">
 				<div class="col-lg-12 m--margin-bottom-20-mobile">
 					<h4 style="border-bottom: solid 1px;color: #5867dd;">
 						Các giấy tờ cần thiết
@@ -429,7 +346,8 @@
 								</mat-form-field>
 							</td>
 							<td class="text-center">
-								<dl-image-control [(ngModel)]="loai.FileDinhKem" nameButton="Chọn tệp" [multiple]="false" [disabled]="!allowEdit" [ngModelOptions]="{standalone: true}">
+								<dl-image-control [(ngModel)]="loai.FileDinhKem" nameButton="Chọn tệp" [multiple]="false" 
+									[disabled]="!allowEdit" [ngModelOptions]="{standalone: true}">
 								</dl-image-control>
 							</td>
 						</tr>
@@ -438,11 +356,13 @@
 			</div>
 			<div class="form-group kt-form__group row">
 				<div class="col-md-12 text-center">
-					<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+					<button type="button" mat-raised-button color="accent" (click)="onSubmit(true)" [disabled]="disabledBtn" 
+						matTooltip="{{'COMMON.LUU_DONG' | translate}}">
 						<span translate="COMMON.LUU_DONG"></span>
 					</button>
 					&nbsp;
-					<button type="button" class="hide-view-sm" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" *ngIf="item.Id == 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}">
+					<button type="button" mat-raised-button color="primary" (click)="onSubmit(false)" [disabled]="disabledBtn" 
+						*ngIf="item.Id === 0" matTooltip="{{'COMMON.LUU_TIEPTUC' | translate}}" class="hide-view-sm">
 						<span translate="COMMON.LUU_TIEPTUC"></span>
 					</button>
 				</div>

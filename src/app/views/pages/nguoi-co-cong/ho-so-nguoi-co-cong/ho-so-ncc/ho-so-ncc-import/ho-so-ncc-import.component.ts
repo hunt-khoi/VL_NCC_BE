@@ -16,29 +16,29 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 
 	// Public properties
 	HoSoNCC: HoSoNCCModel = new HoSoNCCModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 
 	loadingSubject = new BehaviorSubject<boolean>(true);
-	loading$: Observable<boolean> | undefined;
+	loading$: Observable<boolean> = this.loadingSubject.asObservable();
 	lstNCC: HoSoNCCModel[] = [];
 	dataSource = new MatTableDataSource(this.lstNCC);
 	viewLoading = false;
 	isChange = false;
-	_soLanImport = 0;
+	_soLanImport: number = 0;
 	_dataImport: any[] = [];
 	HTMLStr = '';
 	isReview = false;
-	displayedColumns: string[] = ['STT', 'SoHoSo', 'HoTen', 'NgaySinh', 'GioiTinh', 'DoiTuong', 'DiaChi','KhomAp', 'Title', 'DistrictName', 'NguoiThoCungLietSy', 'QuanHeVoiLietSy', 'actions'];
+	displayedColumns: string[] = ['STT', 'SoHoSo', 'HoTen', 'NgaySinh', 'GioiTinh', 'DoiTuong', 'DiaChi', 'KhomAp', 'Title', 
+		'DistrictName', 'NguoiThoCungLietSy', 'QuanHeVoiLietSy', 'actions'];
 	private componentSubscriptions: Subscription | undefined;
 
 	constructor(
 		public dialogRef: MatDialogRef<HoSoNCCImportComponent>,
-		private HoSoNCCFB: FormBuilder,
+		private itemFb: FormBuilder,
 		public dialog: MatDialog,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
-		private HoSoNCCService: HoSoNCCService) { }
+		private apiService: HoSoNCCService) { }
 
 	ngOnInit() {
 		this.viewLoading = false;
@@ -52,16 +52,9 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 	}
 
 	createForm() {
-		this.itemForm = this.HoSoNCCFB.group({
+		this.itemForm = this.itemFb.group({
 			file: [''],
 		});
-	}
-
-	isControlInvalid(controlName: string): boolean {
-		if (!this.itemForm) return false;
-		const control = this.itemForm.controls[controlName];
-		const result = control.invalid && control.touched;
-		return result;
 	}
 
 	numberOnly(event: any): boolean {
@@ -76,7 +69,6 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 	}
 
 	loadImport() {
-		if (!this.itemForm) return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -84,7 +76,7 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 		}
 		this.viewLoading = true;
 		var data: any = files[0];
-		this.HoSoNCCService.importFile(data).subscribe(res => {
+		this.apiService.importFile(data).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.lstNCC = res.data;
@@ -97,7 +89,6 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 	}
 
 	luuImport() {
-		if (!this.itemForm) return;
 		let files = this.itemForm.controls["file"].value;
 		if (!files) {
 			this.layoutUtilsService.showError("Vui lòng chọn file");
@@ -106,7 +97,7 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 		this.viewLoading = true;
 		var data: any = files[0];
 		data.review = false;
-		this.HoSoNCCService.importFile(data).subscribe(res => {
+		this.apiService.importFile(data).subscribe(res => {
 			this.viewLoading = false;
 			if (res && res.status === 1) {
 				this.dialogRef.close(true);
@@ -119,7 +110,7 @@ export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 	}
 
 	DownloadFileMau() {
-		this.HoSoNCCService.downloadTemplate().subscribe(response => {
+		this.apiService.downloadTemplate().subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');

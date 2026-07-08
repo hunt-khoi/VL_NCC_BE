@@ -18,8 +18,6 @@ export class ThanNhanEditDialogComponent implements OnInit {
 	childComponentType: Type<any> | undefined;
 	childComponentData: any = {};
 	item: ThanNhanModel = new ThanNhanModel();
-	oldItem: ThanNhanModel = new ThanNhanModel();
-	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -31,11 +29,11 @@ export class ThanNhanEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -51,7 +49,6 @@ export class ThanNhanEditDialogComponent implements OnInit {
 			this._NAME = this.translate.instant('THANNHAN.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
@@ -75,7 +72,6 @@ export class ThanNhanEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
 	onSubmit(withBack: boolean = false) {
 		let Edit = this.ChildComponentInstance.onSubmit();
 		if (Edit) {
@@ -94,10 +90,8 @@ export class ThanNhanEditDialogComponent implements OnInit {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
@@ -117,10 +111,8 @@ export class ThanNhanEditDialogComponent implements OnInit {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+				if (withBack ) {
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType);

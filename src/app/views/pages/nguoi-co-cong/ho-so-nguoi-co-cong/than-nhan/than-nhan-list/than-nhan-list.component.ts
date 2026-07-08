@@ -8,10 +8,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
-// Services
 import { TableService } from '../../../../../partials/table/table.service';
 import { TableModel } from '../../../../../partials/table/table.model';
-import { HoSoNCCModule } from './../../ho-so-ncc/ho-so-ncc.module';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';
 import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
 import { ThanNhanModel } from '../../than-nhan/Model/than-nhan.model';
@@ -27,22 +25,19 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class ThanNhanListComponent implements OnInit {
-
 	// Table fields
 	dataSource: ThanNhanDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
 
-	// Selection
-	selection = new SelectionModel<HoSoNCCModule>(true, []);
-	productsResult: HoSoNCCModule[] = [];
-	_name = '';
+	_name: string = '';
 	objectId = '';
 	// khoi tao grildModel
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	_user: any = {};
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	constructor(
 		private router: Router,
@@ -59,9 +54,9 @@ export class ThanNhanListComponent implements OnInit {
 			this._name = this.translate.instant('THANNHAN.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		var arr = this.router.url.split("/");
 		if (arr.length > 1) {
 			this.objectId = arr[arr.length - 2];
@@ -186,11 +181,7 @@ export class ThanNhanListComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.availableColumns = availableColumns;
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -225,15 +216,6 @@ export class ThanNhanListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.detechChange.detectChanges();
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -260,7 +242,6 @@ export class ThanNhanListComponent implements OnInit {
 		return filter;
 	}
 
-	/** Delete */
 	Delete(_item: ThanNhanModel) {
 		const _title = this.translate.instant('OBJECT.DELETE.TITLE', { name: this._name.toLowerCase() });
 		const _description = this.translate.instant('OBJECT.DELETE.DESCRIPTION', { name: this._name.toLowerCase() });

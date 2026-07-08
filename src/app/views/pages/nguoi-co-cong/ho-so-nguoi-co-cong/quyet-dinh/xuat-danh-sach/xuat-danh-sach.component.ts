@@ -28,7 +28,6 @@ export class XuatDanhSachComponent implements OnInit {
 	Capcocau: number = 0;
 	to: Moment | undefined;
 	from: Moment | undefined;
-	list_button: boolean = false;
 
 	constructor(public objectService: QuyetDinhService,
 		public dialog: MatDialog,
@@ -38,13 +37,11 @@ export class XuatDanhSachComponent implements OnInit {
 		private tokenStorage: TokenStorage) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		let tmp = moment();
 		let y = tmp.get("year");
 		this.from = moment(new Date(y, 0, 1));
 		this.to = moment(new Date(y, 11, 31));
-		this.list_button = CommonService.list_button();
 		this.commonService.liteDoiTuongNCC(false).subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstLoaiDT = res.data;

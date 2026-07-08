@@ -16,9 +16,7 @@ import moment from 'moment';
 
 export class GiayToEditDialogComponent implements OnInit {
 	item: GiayToModel = new GiayToModel();
-	oldItem: GiayToModel = new GiayToModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -34,11 +32,11 @@ export class GiayToEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -54,7 +52,6 @@ export class GiayToEditDialogComponent implements OnInit {
 		this._NAME = this.translate.instant('GIAYTO.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		this.allowEdit = this.data.allowEdit;
@@ -108,9 +105,7 @@ export class GiayToEditDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
-	prepare(): GiayToModel | null {
-		if (!this.itemForm) return null;
+	prepare(): GiayToModel {
 		const controls = this.itemForm.controls;
 		const _item = new GiayToModel();
 		_item.Id = this.item.Id;
@@ -133,25 +128,19 @@ export class GiayToEditDialogComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const Edit = this.prepare();
-		if (Edit) {
-			if (Edit.Id > 0)
-				this.Update(Edit, withBack);
-			else
-				this.Create(Edit, withBack);
-		}
+		if (Edit.Id > 0)
+			this.Update(Edit, withBack);
+		else
+			this.Create(Edit, withBack);
 	}
 
 	Update(item: GiayToModel, withBack: boolean) {
@@ -163,9 +152,7 @@ export class GiayToEditDialogComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack) {
-					this.dialogRef.close({
-						item
-					});
+					this.dialogRef.close({ item });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
@@ -188,9 +175,7 @@ export class GiayToEditDialogComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType);
@@ -221,8 +206,6 @@ export class GiayToEditDialogComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

@@ -29,11 +29,11 @@ export class DiChuyenEditDialogComponent implements OnInit {
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -47,7 +47,6 @@ export class DiChuyenEditDialogComponent implements OnInit {
 		this._NAME = this.translate.instant('DICHUYEN.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
@@ -90,9 +89,7 @@ export class DiChuyenEditDialogComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack) {
-					this.dialogRef.close({
-						item
-					});
+					this.dialogRef.close({ item });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
@@ -115,9 +112,7 @@ export class DiChuyenEditDialogComponent implements OnInit {
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack) {
-					this.dialogRef.close({
-						item
-					});
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType);

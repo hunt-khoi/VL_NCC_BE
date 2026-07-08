@@ -1,8 +1,8 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/di-chuyen';
 const API_QD = environment.ApiRoot + '/quyet-dinh';
@@ -11,6 +11,7 @@ const API_QD = environment.ApiRoot + '/quyet-dinh';
 export class DiChuyenService {
 	lastFilter$: BehaviorSubject<QueryParamsModel> = new BehaviorSubject(new QueryParamsModel({}, 'asc', '', 0, 10));
 	ReadOnlyControl: boolean = false;
+
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
 	getAllItems(): Observable<any[]> {

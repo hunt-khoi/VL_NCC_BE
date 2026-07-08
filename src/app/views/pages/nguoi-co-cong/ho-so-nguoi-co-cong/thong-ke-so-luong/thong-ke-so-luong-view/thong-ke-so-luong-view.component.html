@@ -59,7 +59,7 @@
 		<div class="kt-form">
 			<div class="kt-form__filtration">
 				<div class="row align-items-center">
-					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="Capcocau==1">
+					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="Capcocau===1">
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict">
 								<mat-option value="">Tất cả</mat-option>
@@ -89,11 +89,11 @@
 			</div>
 
 			<div class="form-group kt-form__group row" id="print-section">
-				<div class="col-md-12 kt-margin-bottom-10-mobile table-responsive" *ngIf="loai!=''">
+				<div class="col-md-12 kt-margin-bottom-10-mobile table-responsive" *ngIf="loai!==''">
 					<table class="table-bordered table-sm w-100">
 						<tr>
 							<th style="width:20px">STT</th>
-							<th style="min-width: 150px;">{{loai=='0' ? 'Đơn vị' : 'Họ tên'}}</th>
+							<th style="min-width: 150px;">{{loai==='0' ? 'Đơn vị' : 'Họ tên'}}</th>
 							<th style="width: 150px; text-align: center;">Trước hạn</th>
 							<th style="width: 150px; text-align: center;">Hoàn thành đúng hạn</th>
 							<th style="width: 150px; text-align: center;">Hoàn thành muộn</th>
@@ -102,8 +102,8 @@
 							<th style="width: 150px; text-align: center;">Tổng cộng</th>
 						</tr>
 						<ng-container *ngFor="let items of dataThongKe; let j=index">
-							<tr [ngClass]="{'rowGroup': loai=='0'}">
-								<td><span *ngIf="loai!='0'">{{j + 1}}</span></td>
+							<tr [ngClass]="{'rowGroup': loai==='0'}">
+								<td><span *ngIf="loai!=='0'">{{j + 1}}</span></td>
 								<td>{{items.title}}</td>
 								<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(items, 0)">{{items.SoLuong.HTTruoc}}</a></td>
 								<td class="txt-right"><a href="javascript:;" matTooltip="Xem chi tiết" (click)="xem(items, 1)">{{items.SoLuong.HTDungHan}}</a></td>
@@ -125,7 +125,7 @@
 								</tr>
 							</ng-container>
 						</ng-container>
-						<tr *ngIf="dataThongKe.length==0">
+						<tr *ngIf="dataThongKe.length===0">
 							<td colspan="7" style="text-align: center;">Không có dữ liệu</td>
 						</tr>
 					</table>

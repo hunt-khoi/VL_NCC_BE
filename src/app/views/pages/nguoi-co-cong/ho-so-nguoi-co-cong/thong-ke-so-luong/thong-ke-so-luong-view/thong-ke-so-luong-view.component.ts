@@ -2,9 +2,9 @@ import { Component, OnInit, ElementRef, ViewChild, ChangeDetectionStrategy, Chan
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject } from 'rxjs';
-import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
+import { CommonService } from '../../../services/common.service';
 import { ThongKeSoLuongService } from '../Services/thong-ke-so-luong.service';
 import { ChiTietThongKeComponent } from './../chi-tiet-thong-ke/chi-tiet-thong-ke.component';
 import { Moment } from 'moment';
@@ -14,7 +14,6 @@ import { Moment } from 'moment';
 	templateUrl: './thong-ke-so-luong-view.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
-
 export class ThongKeSoLuongViewComponent implements OnInit {
 
 	loadingSubject = new BehaviorSubject<boolean>(false);
@@ -40,7 +39,6 @@ export class ThongKeSoLuongViewComponent implements OnInit {
 		private translate: TranslateService) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		// let tmp = moment();
 		// tmp = tmp.set('date', 1);
@@ -74,7 +72,7 @@ export class ThongKeSoLuongViewComponent implements OnInit {
 		return filter;
 	}
 
-	print(){
+	print() {
 		if (this.printme) {
 			const printme = this.printme.nativeElement as HTMLElement;
 			printme.click();
@@ -121,9 +119,6 @@ export class ThongKeSoLuongViewComponent implements OnInit {
 			width:'90vw',
 			data: { item, status, IdParent, loai } 
 		});
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			}
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
 }

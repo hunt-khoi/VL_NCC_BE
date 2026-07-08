@@ -3,7 +3,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { HoSoNCCDuyetService } from '../Services/ho-so-ncc-duyet.service';
 import { HuongDanHuongThienDialogComponent } from '../huong-dan-hoan-thien/huong-dan-hoan-thien-dialog.component';
@@ -15,32 +15,31 @@ import { HuongDanHuongThienDialogComponent } from '../huong-dan-hoan-thien/huong
 })
 
 export class HoSoNCCDuyetDialogComponent implements OnInit {
-
 	item: any;
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
 	isZoomSize: boolean = false;
 	isDuyet: boolean = true;//k duyệt thì chỉ hiển thị comment
-	require = '';
-	id = 0;
+	require: string = '';
+	id: number = 0;
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
-	_NAME = '';
-	userId = 0;
-	guiduyet = false;
-	isShowNhacnho = false;
+	_NAME: string = '';
+	userId: number = 0;
+	guiduyet: boolean = false;
+	isShowNhacnho: boolean = false;
 	isReturn: boolean = false;
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// duyệt
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		// ko duyệt
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -51,7 +50,7 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		private objectService: HoSoNCCDuyetService,
 		private router: Router,
-		private CommonService: CommonService,
+		private commonService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
 		private changeDetectorRefs: ChangeDetectorRef,
 		public dialog: MatDialog,
@@ -60,10 +59,9 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 			// load id user
 			const userInfo = localStorage.getItem('UserInfo');
 			this.userId = userInfo ? (JSON.parse(userInfo)).Id : 0;
-			this.isShowNhacnho = this.CommonService.IsShowNhacnhoduyet(this.router.url);
+			this.isShowNhacnho = this.commonService.IsShowNhacnhoduyet(this.router.url);
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.isDuyet != undefined)
@@ -117,9 +115,7 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
 	prepareData(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		let Id: number;
@@ -135,9 +131,7 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 
 	onSubmit(value: boolean) {
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -151,23 +145,23 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 			this.Duyet(item, value, message);
 		} else {
 			const message = this.translate.instant('OBJECT.KHONGDUYET.MESSAGE', { name: this._NAME });
-			this.CommonService.getIdHuongDan(this.item.Id, 2).subscribe(res1 => {
-				if (res1 && res1.status == 1) {
-					let itemHD = res1.dataExtra;
+			this.commonService.getIdHuongDan(this.item.Id, 2).subscribe(res => {
+				if (res && res.status == 1) {
+					let itemHD = res.dataExtra;
 					const dialogRef = this.dialog.open(HuongDanHuongThienDialogComponent, { data: { item: { id_quytrinh_lichsu: 0, itemHD } } });
-					dialogRef.afterClosed().subscribe(res => {
-						if (res) {
-							item.HuongDan = res._item;
+					dialogRef.afterClosed().subscribe(res1 => {
+						if (res1) {
+							item.HuongDan = res1._item;
 							this.Duyet(item, value, message);
 						}
 					});
 				} else
-			 		this.layoutUtilsService.showError(res1.error.message);
+			 		this.layoutUtilsService.showError(res.error.message);
 			});
 		}
 	}
 
-	Duyet(item: any, value: boolean, _Message: string) {
+	Duyet(item: any, value: boolean, message: string) {
 		item.value = value;
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
@@ -178,10 +172,8 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				this.layoutUtilsService.showInfo(_Message);
-				this.dialogRef.close({
-					item
-				});
+				this.layoutUtilsService.showInfo(message);
+				this.dialogRef.close({ item });
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
 			}
@@ -193,14 +185,12 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 		var dataNoty: any = {};
 		dataNoty.To = this.item.NguoiDuyetDon;
 		dataNoty.url = 'duyet-ho-so/ho-so/' + this.item.Id;
-		this.CommonService.DeXuatDuyet(dataNoty).subscribe(res => {
-		});
+		this.commonService.DeXuatDuyet(dataNoty).subscribe(res => { });
 	}
 
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -212,16 +202,13 @@ export class HoSoNCCDuyetDialogComponent implements OnInit {
 
 	traLai() {
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
 			return;
 		}
-
 		const item = this.prepareData();
 		this.objectService.traLai(item.Id, item.note).subscribe(res => {
 			this.viewLoading = false;

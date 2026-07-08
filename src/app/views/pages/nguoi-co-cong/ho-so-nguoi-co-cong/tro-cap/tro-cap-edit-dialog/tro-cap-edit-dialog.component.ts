@@ -11,7 +11,6 @@ import { TroCapEditComponent } from '../../../components';
 	templateUrl: './tro-cap-edit-dialog.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class TroCapEditDialogComponent implements OnInit {
 	ChildComponentInstance: any;
 	childComponentType: Type<any> | any;
@@ -24,17 +23,17 @@ export class TroCapEditDialogComponent implements OnInit {
 	allowEdit = false;
 	IsCat = false;
 	isTruyLinh: boolean = false;
-	_NAME = '';
+	_NAME: string = '';
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -50,7 +49,6 @@ export class TroCapEditDialogComponent implements OnInit {
 			this._NAME = this.translate.instant('TROCAP.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		if (this.data.allowEdit != undefined)
 			this.allowEdit = this.data.allowEdit;
@@ -97,10 +95,8 @@ export class TroCapEditDialogComponent implements OnInit {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
@@ -120,10 +116,8 @@ export class TroCapEditDialogComponent implements OnInit {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 					this.layoutUtilsService.showInfo(_messageType);

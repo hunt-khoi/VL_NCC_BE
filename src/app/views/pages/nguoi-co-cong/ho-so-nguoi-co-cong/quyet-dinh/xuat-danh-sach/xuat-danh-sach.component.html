@@ -19,7 +19,7 @@
 							<mat-select placeholder="Loại danh sách" [(value)]="loaids" class="require" required>
 								<mat-option [value]="0">Chọn loại danh sách xuất</mat-option>
 								<mat-option [value]="1">Danh sách thờ cúng</mat-option>
-								<mat-option [value]="2" *ngIf="Capcocau==1">Danh sách khám</mat-option>
+								<mat-option [value]="2" *ngIf="Capcocau===1">Danh sách khám</mat-option>
 								<mat-option [value]="3">Danh sách truy tặng BMVNAH</mat-option>
 							</mat-select>
 						</mat-form-field>
@@ -42,7 +42,7 @@
 							<mat-error>Ngày hoặc khoảng thời gian<strong> không hợp lệ</strong></mat-error>
 						</mat-form-field>
 					</div>
-					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids==1 || loaids==3">
+					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids===1 || loaids===3">
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" 
 								(selectionChange)="filterDistrictID(filterdistrict)" [disabled]="Capcocau >= 2">
@@ -53,9 +53,9 @@
 							</mat-select>
 						</mat-form-field>
 					</div>
-					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids==1 || loaids==3">
+					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids===1 || loaids===3">
 						<mat-form-field class="mat-form-field-fluid ">
-							<mat-select placeholder="{{ 'WARD.NAME' | translate }}" [(value)]="filterward" [disabled]="Capcocau == 3">
+							<mat-select placeholder="{{ 'WARD.NAME' | translate }}" [(value)]="filterward" [disabled]="Capcocau === 3">
 								<mat-option [value]="0">Tất cả</mat-option>
 								<mat-option [value]="w.ID_Row" *ngFor="let w of listward;">
 									{{w.Ward}}
@@ -63,7 +63,7 @@
 							</mat-select>
 						</mat-form-field>
 					</div>
-					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids==2">
+					<div class="col-md-2 kt--margin-bottom-10-mobile" *ngIf="loaids===2">
 						<mat-form-field class="mat-form-field-fluid ">
 							<mat-select placeholder="Loại đối tượng" [(value)]="loaidt">
 								<mat-option [value]="0">Chọn loại đối tượng</mat-option>

@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
+import { ThoiHanService } from './Services/thoi-han.service';
 import { ThoiHanComponent } from './thoi-han.component';
 import { ThoiHanListComponent } from './thoi-han-list/thoi-han-list.component';
-import { ThoiHanRefModule } from './thoi-han-ref.module';
-import { ThoiHanService } from './Services/thoi-han.service';
 
 const routes: Routes = [
 	{
@@ -23,13 +22,14 @@ const routes: Routes = [
     imports: [
         RouterModule.forChild(routes),
         DPSCommonModule,
-        ThoiHanRefModule,
     ],
     providers: [
         ThoiHanService,
     ],
     declarations: [
         ThoiHanComponent,
+        ThoiHanListComponent,
     ]
 })
+
 export class ThoiHanModule { }

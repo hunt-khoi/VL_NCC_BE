@@ -17,4 +17,5 @@ import { QuyetDinhEditDialogComponent } from './quyet-dinh-edit/quyet-dinh-edit-
         QuyetDinhEditDialogComponent
     ]
 })
+
 export class QuyetDinhRefModule { }

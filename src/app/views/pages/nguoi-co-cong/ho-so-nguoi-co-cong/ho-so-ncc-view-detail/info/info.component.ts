@@ -2,13 +2,13 @@ import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@an
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { HoSoNCCModel } from '../../ho-so-ncc/Model/ho-so-ncc.model';
-import { CommonService } from '../../../services/common.service';
-import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
-import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ReplaySubject } from 'rxjs';
-import moment from 'moment';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
+import { LayoutUtilsService } from '../../../../../../core/_base/crud';
+import { CommonService } from '../../../services/common.service';
+import { HoSoNCCModel } from '../../ho-so-ncc/Model/ho-so-ncc.model';
+import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-info',
@@ -17,10 +17,8 @@ import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 
 export class InfoComponent implements OnInit {
 	objectId: string | null = null;
-	item: HoSoNCCModel;
-	oldItem: HoSoNCCModel;
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	item: HoSoNCCModel = new HoSoNCCModel();
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -62,48 +60,6 @@ export class InfoComponent implements OnInit {
 		private changeDetectorRefs: ChangeDetectorRef,
 		private tokenStorage: TokenStorage,
 		private translate: TranslateService) {
-	}
-
-	filter() {
-		if (!this.listOpt) return;
-		let search = this.FilterCtrl;
-		if (!search) {
-			this.listdoituongncc.next(this.listOpt.slice());
-			return;
-		} else {
-			search = search.toLowerCase();
-		}
-		this.listdoituongncc.next(
-			this.listOpt.filter(ts => ts.title.toLowerCase().indexOf(search) > -1)
-		);
-		this.changeDetectorRefs.detectChanges();
-	}
-
-	filter1() {
-		if (!this.listOpt1) return;
-		let search = this.FilterCtrl1;
-		if (!search) {
-			this.listLoaiHS.next(this.listOpt1.slice());
-			return;
-		} else {
-			search = search.toLowerCase();
-		}
-		this.listLoaiHS.next(
-			this.listOpt1.filter(ts => ts.title.toLowerCase().indexOf(search) > -1)
-		);
-		this.changeDetectorRefs.detectChanges();
-	}
-
-	changeHoSo(id_hs: number) {
-		let temp = this.listAllLoaiHS.filter(x => x.id == id_hs);
-		this.listOpt1 = temp;
-		this.listLoaiHS.next(temp);
-	}
-
-	changeDoiTuong(id_dt: number) {
-		let temp = this.listOpt.filter(x => x.id == id_dt);
-		this.listOpt = temp;
-		this.listdoituongncc.next(temp);
 	}
 
 	ngOnInit() {
@@ -158,6 +114,48 @@ export class InfoComponent implements OnInit {
 					this.lstTemplate = res.data;
 			});
 		}
+	}
+
+	filter() {
+		if (!this.listOpt) return;
+		let search = this.FilterCtrl;
+		if (!search) {
+			this.listdoituongncc.next(this.listOpt.slice());
+			return;
+		} else {
+			search = search.toLowerCase();
+		}
+		this.listdoituongncc.next(
+			this.listOpt.filter(ts => ts.title.toLowerCase().indexOf(search) > -1)
+		);
+		this.changeDetectorRefs.detectChanges();
+	}
+
+	filter1() {
+		if (!this.listOpt1) return;
+		let search = this.FilterCtrl1;
+		if (!search) {
+			this.listLoaiHS.next(this.listOpt1.slice());
+			return;
+		} else {
+			search = search.toLowerCase();
+		}
+		this.listLoaiHS.next(
+			this.listOpt1.filter(ts => ts.title.toLowerCase().indexOf(search) > -1)
+		);
+		this.changeDetectorRefs.detectChanges();
+	}
+
+	changeHoSo(id_hs: number) {
+		let temp = this.listAllLoaiHS.filter(x => x.id == id_hs);
+		this.listOpt1 = temp;
+		this.listLoaiHS.next(temp);
+	}
+
+	changeDoiTuong(id_dt: number) {
+		let temp = this.listOpt.filter(x => x.id == id_dt);
+		this.listOpt = temp;
+		this.listdoituongncc.next(temp);
 	}
 
 	showNgayBiBenh = false;
@@ -339,7 +337,6 @@ export class InfoComponent implements OnInit {
 	}
 
 	changeNS(isNam = false) {
-		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh.setValue('');
 		}
@@ -352,9 +349,7 @@ export class InfoComponent implements OnInit {
 		}
 	}
 
-	/** ACTIONS */
-	prepare(): HoSoNCCModel | null {
-		if (!this.itemForm) return null;
+	prepare(): HoSoNCCModel {
 		const controls = this.itemForm.controls;
 		const _item = new HoSoNCCModel();
 		_item.Id = +this.item.Id;
@@ -427,7 +422,6 @@ export class InfoComponent implements OnInit {
 	}
 
 	changeQuanHeLietSy() {
-		if (!this.itemForm) return;
 		if (this.itemForm.controls.NguoiThoCungLietSy) 
 			this.require = 'require';
 		else 
@@ -481,8 +475,6 @@ export class InfoComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();
@@ -513,16 +505,12 @@ export class InfoComponent implements OnInit {
 	}
 
 	onSubmit() {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		let Edit: any = this.prepare();

@@ -26,19 +26,12 @@ import { CookieService } from 'ngx-cookie-service';
 })
 
 export class HuongDanListComponent implements OnInit {
-
 	// Table fields
 	dataSource: HuongDanDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Filter fields
-	filterStatus = '';
-	filterType = '';
 
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
-	_name = '';
+	_name: string = '';
 	// filter District
 	filterprovinces: number = 0;
 	listprovinces: any[] = [];
@@ -51,6 +44,7 @@ export class HuongDanListComponent implements OnInit {
 	gridModel: TableModel | undefined;
 	gridService: TableService | undefined;
 	list_button: boolean = false;
+	btnClass: string = '';
 
 	constructor(
 		public objectService: HoSoNCCDuyetService,
@@ -66,10 +60,9 @@ export class HuongDanListComponent implements OnInit {
 			this._name = 'Hồ sơ người có công';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
-		this.selection = new SelectionModel<any>(true, []);
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		this.commonService.GetAllProvinces().subscribe(res => {
 			this.listprovinces = res.data;
 		});
@@ -278,10 +271,7 @@ export class HuongDanListComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.selectedColumns = new SelectionModel<any>(
-			true,
-			this.gridModel.availableColumns
-		);
+		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
 			this.layoutUtilsService,
@@ -314,19 +304,10 @@ export class HuongDanListComponent implements OnInit {
 				this.dataSource.loadList(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -337,6 +318,7 @@ export class HuongDanListComponent implements OnInit {
 		);
 		this.dataSource.loadList(queryParams);
 	}
+
 	filterDistrictID(id: any) {
 		this.filterdistrict = id;
 		this.filterward = '';
@@ -346,6 +328,7 @@ export class HuongDanListComponent implements OnInit {
 				this.listward = res.data;
 		})
 	}
+
 	filterWardID(id: any) {
 		this.filterward = id;
 		this.loadDataList();
@@ -373,25 +356,6 @@ export class HuongDanListComponent implements OnInit {
 			this.listdistrict = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-	}
-
-	/** SELECTION */
-	isAllSelected() {
-		const numSelected = this.selection.selected.length;
-		const numRows = this.productsResult.filter(row => !row.IsEnable_Duyet).length;
-		return numSelected === numRows;
-	}
-
-	/** Selects all rows if they are not all selected; otherwise clear selection. */
-	masterToggle() {
-		if (this.isAllSelected()) {
-			this.selection.clear();
-		} else {
-			this.productsResult.forEach(row => {
-				if (!row.IsEnable_Duyet)
-					this.selection.select(row)
-			});
-		}
 	}
 
 	Duyet(item: any, isDuyet: boolean = true) {

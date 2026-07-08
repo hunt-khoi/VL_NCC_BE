@@ -1,10 +1,10 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { Injectable } from '@angular/core';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { HoSoNCCModel } from './../Model/ho-so-ncc.model';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/ncc';
 
@@ -19,7 +19,6 @@ export class HoSoNCCService {
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	// READ
 	getAllItems(): Observable<HoSoNCCModel[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<HoSoNCCModel[]>(API_URL + '?more=true', { headers: httpHeaders });
@@ -56,7 +55,6 @@ export class HoSoNCCService {
 		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
-	// Gửi duyệt
 	GuiDuyet(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/gui-duyet?id=${itemId}`;
@@ -68,7 +66,6 @@ export class HoSoNCCService {
 		return this.http.post<any>(url, data, { headers: httpHeaders });
 	}
 
-	// Thu hồi
 	ThuHoi(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = `${API_URL}/thu-hoi?id=${itemId}`;
@@ -79,6 +76,7 @@ export class HoSoNCCService {
 		const url = `${API_URL}/thu-hoi`;
 		return this.http.post<any>(url, data, { headers: httpHeaders });
 	}
+
 	reviewFile(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(API_URL + '/import', item, { headers: httpHeaders });
@@ -215,7 +213,7 @@ export class HoSoNCCService {
 				catchError(err => {
 					return throwError(err);
 				})
-			);;
+			);
 	}
 
 	GetFieldTab(idDT: number = 0, idLoaiHS: number = 0): Observable<any> {

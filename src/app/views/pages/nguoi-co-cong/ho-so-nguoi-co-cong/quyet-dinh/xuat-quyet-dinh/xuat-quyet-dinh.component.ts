@@ -27,14 +27,13 @@ export class XuatQuyetDinhComponent implements OnInit {
 	lstLoaiHoSo: any[] = [];
 	lstLoaiHoSo2: any[] = [];
 	list_button: boolean = false;
+	btnClass: string = "";
 
 	// Table fields
 	dataSource: QuyetDinhDataSource | undefined;
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator | undefined;
 	@ViewChild(MatSort, { static: true }) sort: MatSort | undefined;
-	// Selection
-	selection = new SelectionModel<any>(true, []);
-	productsResult: any[] = [];
+
 	// filter District
 	filterprovinces: number = 0;
 	listprovinces: any[] = [];
@@ -63,6 +62,7 @@ export class XuatQuyetDinhComponent implements OnInit {
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
+		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 		this.commonService.liteConstLoaiQuyetDinh(true).subscribe(res => {
 			if (res && res.status == 1) {
 				this.lstLoai = res.data;
@@ -98,7 +98,6 @@ export class XuatQuyetDinhComponent implements OnInit {
 				this.lstcc = res.data;
 		})
 
-		this.selection = new SelectionModel<any>(true, []);
 		// filter
 		this.gridModel = new TableModel();
 		this.gridModel.clear();
@@ -111,9 +110,9 @@ export class XuatQuyetDinhComponent implements OnInit {
 		this.gridModel.filterText.LoaiHoSo = '';
 		this.gridModel.filterGroupDataCheckedFake = Object.assign({}, this.gridModel.filterGroupDataChecked);
 		this.commonService.getStatusNCC().subscribe(res => {
+			if (!this.gridService) return;
 			if (res && res.status == 1) {
 				this.lstStatus = res.data;
-				if (!this.gridService) return;
 				this.gridService.model.filterGroupDataChecked['Status'] = this.lstStatus.map(x => {
 					return {
 						name: x.title,
@@ -269,7 +268,6 @@ export class XuatQuyetDinhComponent implements OnInit {
 			}
 		];
 		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
-		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(true, this.gridModel.availableColumns);
 
 		this.gridService = new TableService(
@@ -305,14 +303,6 @@ export class XuatQuyetDinhComponent implements OnInit {
 				this.dataSource.loadListNCC(queryParams);
 			}
 		});
-		this.dataSource.entitySubject.subscribe(res => {
-			this.productsResult = res;
-			if (this.productsResult && this.paginator) {
-				if (this.productsResult.length == 0 && this.paginator.pageIndex > 0) {
-					this.loadDataList(false);
-				}
-			}
-		});
 	}
 
 	checkDT(arr: any, id_dt: any) {
@@ -343,7 +333,6 @@ export class XuatQuyetDinhComponent implements OnInit {
 
 	loadDataList(holdCurrentPage: boolean = true) {
 		if (!this.paginator || !this.sort || !this.dataSource || !this.gridService) return;
-		this.selection.clear();
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
 			this.sort.direction,
@@ -378,7 +367,6 @@ export class XuatQuyetDinhComponent implements OnInit {
 	}
 
 	chon($event: any) {
-		this.selection.clear();
 		$event.stopPropagation();
 	}
 
@@ -389,10 +377,10 @@ export class XuatQuyetDinhComponent implements OnInit {
 	}
 
 	in(IdTemplate = 0, id_ncc = 0, ispdf: boolean = true) {
-		if (id_ncc == 0) {
-			if (this.selection.selected.length > 0)
-				id_ncc = this.selection.selected[0].Id;
-		}
+		// if (id_ncc == 0) {
+		// 	if (this.selection.selected.length > 0)
+		// 		id_ncc = this.selection.selected[0].Id;
+		// }
 		this.objectService.downloadByTemplate(IdTemplate, id_ncc, ispdf).subscribe(
 			response => {
 				const headers = response.headers;

@@ -9,6 +9,7 @@
 		overflow: hidden !important;
 		text-overflow: ellipsis;
 		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		max-width: 200px;
 	}
 
@@ -36,7 +37,7 @@
 		</mat-tab>
 	</mat-tab-group>
 
-	<div [ngStyle]="{'display':!IsEnable_Duyet || selectedTab==0 ? 'block' : 'none'}">
+	<div [ngStyle]="{'display': (!IsEnable_Duyet || selectedTab===0) ? 'block' : 'none'}">
 		<kt-portlet-header [sticky]="!IsEnable_Duyet" [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
 			<ng-container ktPortletTitle>
 				<div class="kt-form__filtration">
@@ -57,7 +58,7 @@
 				</div>
 				<div class="kt-form">
 					<div class="row align-items-center collapse kt-form__group-actions"
-						 [ngClass]="{'show' : selection.selected.length > 0}">
+						[ngClass]="{'show' : selection.selected.length > 0}">
 						<div class="col-xl-12">
 							<div class="kt-form__group kt-form__group--inline">
 								<div class="kt-form__label kt-form__label-no-wrap">
@@ -85,7 +86,8 @@
 					<div class="row align-items-center">
 						<div class="col-md-3 kt--margin-bottom-10-mobile">
 							<mat-form-field class="mat-form-field-fluid ">
-								<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" (selectionChange)="filterDistrictID(filterdistrict)" [disabled]="Capcocau == 2">
+								<mat-select placeholder="{{ 'DISTRICT.NAME' | translate }}" [(value)]="filterdistrict" 
+									(selectionChange)="filterDistrictID(filterdistrict)" [disabled]="Capcocau === 2">
 									<mat-option value="">Tất cả</mat-option>
 									<mat-option value="{{district.ID_Row}}" *ngFor="let district of listdistrict;">{{district.District}}</mat-option>
 								</mat-select>
@@ -103,22 +105,25 @@
 				</div>
 			</div>
 
-			<div id="print-section" class="example-container mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'auto':'auto','display': dataSource.hasItems? 'flex':'unset'}">
+			<div id="print-section" class="example-container mat-table__wrapper" 
+				[ngStyle]="{'overflow-x': gridService.model.haveFilter ? 'auto' : 'auto', 'display': dataSource.hasItems? 'flex' : 'unset'}">
 				<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="CreatedDate" 
 					matSortDirection="desc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
 					<ng-container matColumnDef="select">
 						<th mat-header-cell *matHeaderCellDef class="mat-column-checkbox select-cell hiden-print" style="padding-right: 20px;">
-							<mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'">
+							<mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" 
+								[indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'">
 							</mat-checkbox>
 						</th>
 						<td mat-cell *matCellDef="let row" class="mat-column-checkbox select-cell hiden-print" style="padding-right: 20px;">
-							<mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [color]="'primary'" [disabled]="row.IsEnable_Duyet">
+							<mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" 
+								[checked]="selection.isSelected(row)" [color]="'primary'" [disabled]="row.IsEnable_Duyet">
 							</mat-checkbox>
 						</td>
 					</ng-container>
 					<ng-container matColumnDef="STT">
 						<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode stt-cell"><span translate="COMMON.STT"></span></th>
-						<td mat-cell *matCellDef="let object;let vi = index" class="mat-column-vinCode stt-cell">{{vi + 1}}</td>
+						<td mat-cell *matCellDef="let i = index" class="mat-column-vinCode stt-cell">{{i + 1}}</td>
 					</ng-container>
 					<ng-container matColumnDef="SoHoSo">
 						<th nowrap mat-header-cell *matHeaderCellDef >
@@ -173,7 +178,9 @@
 							<kt-column-filter [gridService]="gridService" [enable_sort]="!print" column_name="IsTre" column_title="Thời hạn"></kt-column-filter>
 						</th>
 						<td mat-cell *matCellDef="let object">
-							<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide kt-badge--warn" *ngIf="object.IsTre" title="Trễ hạn">{{object.Deadline}}</span>
+							<span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--wide kt-badge--warn" 
+								*ngIf="object.IsTre" title="Trễ hạn">{{object.Deadline}}
+							</span>
 							<span *ngIf="!object.IsTre">{{object.Deadline}}</span>
 						</td>
 					</ng-container>
@@ -223,20 +230,20 @@
 						<th mat-header-cell *matHeaderCellDef style="width: 160px;">
 							<span translate="COMMON.TACVU"></span>
 						</th>
-						<td mat-cell *matCellDef="let object" class="action-cell" [ngClass]="list_button?'list-button':''">
-							<a href="javascript:;" (click)="viewCT(object.Id)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" 
-								matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" *ngIf="!IsEnable_Duyet">
+						<td mat-cell *matCellDef="let object" class="action-cell" [ngClass]="list_button ? 'list-button' : ''">
+							<a href="javascript:;" mat-button (click)="viewCT(object.Id)" [ngClass]="btnClass" *ngIf="!IsEnable_Duyet"
+								matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info">
 								<mat-icon>remove_red_eye</mat-icon>
 								<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 							</a>
 							<!-- nút xem ở ds hs chưa duyệt -->
-							<a [routerLink]="['/duyet-ho-so/ho-so',object.Id]" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" 
-								matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info" *ngIf="IsEnable_Duyet">
+							<a [routerLink]="['/duyet-ho-so/ho-so', object.Id]" mat-button [ngClass]="btnClass" *ngIf="IsEnable_Duyet"
+								matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info">
 								<mat-icon>remove_red_eye</mat-icon>
 								<span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
 							</a> 
 							<!-- nút xem ở ds hồ sơ đã duyệt, duyệt rồi ko chưa sửa hs -->
-							<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" [matMenuTriggerFor]="menu" color="info" *ngIf="object.path!=''">
+							<button mat-button [ngClass]="btnClass" [matMenuTriggerFor]="menu" color="info" *ngIf="object.path!==''">
 								<mat-icon>attach_file</mat-icon>
 								<span class="button-text">{{ 'COMMON.DOWNLOAD' | translate }}</span>
 							</button>
@@ -250,36 +257,32 @@
 									<span>{{ 'COMMON.DOWNLOAD' | translate }}</span>
 								</button>
 							</mat-menu>
-							<ng-container *ngIf="!IsEnable_Duyet">
-								<!-- <button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" type="button" (click)="Duyet(object)" [disabled]="object.IsEnable_Duyet" *ngIf="object.IsVisible_Duyet" matTooltip="Duyệt" color="primary">
-									<mat-icon>done_outline</mat-icon>
-									<span class="button-text">Duyệt</span>
-								</button> -->
-								<a [routerLink]="['/duyet-ho-so/ho-so',object.Id]" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info">
-									<mat-icon>remove_red_eye</mat-icon>
-									<span class="button-text">Duyệt</span>
-								</a>
-							</ng-container>
-							<ng-container *ngIf="IsEnable_Duyet && object.AllowBack">
-								<button (click)="TraLai(object)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" matTooltip="Trả lại xã" color="warn" type="button" [disabled]="!object.AllowBack">
-									<mat-icon>undo</mat-icon>
-									<span class="button-text">Trả lại xã</span>
-								</button>
-							</ng-container>
-							<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" type="button" (click)="Duyet(object,false)" matTooltip="Thảo luận" color="primary">
+							<a [routerLink]="['/duyet-ho-so/ho-so',object.Id]" mat-button [ngClass]="btnClass" *ngIf="!IsEnable_Duyet" 
+								matTooltip="{{ 'COMMON.DETAIL' | translate }}" color="info">
+								<mat-icon>remove_red_eye</mat-icon>
+								<span class="button-text">Duyệt</span>
+							</a>
+							<button mat-button (click)="TraLai(object)" [ngClass]="btnClass" *ngIf="IsEnable_Duyet && object.AllowBack"
+								[disabled]="!object.AllowBack" matTooltip="Trả lại xã" color="warn" type="button">
+								<mat-icon>undo</mat-icon>
+								<span class="button-text">Trả lại xã</span>
+							</button>
+							<button mat-button (click)="Duyet(object, false)" [ngClass]="btnClass"   
+								matTooltip="Thảo luận" color="primary" type="button">
 								<mat-icon>insert_comment</mat-icon>
 								<span class="button-text">Thảo luận</span>
 							</button>
-							<button type="button" (click)="timeline(object)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="primary" matTooltip="Xem sơ đồ">
+							<button mat-button (click)="timeline(object)" [ngClass]="btnClass"  
+								matTooltip="Xem sơ đồ" color="primary" type="button">
 								<mat-icon>timeline</mat-icon>
 								<span class="button-text">Xem sơ đồ</span>
 							</button>
-							<button type="button" (click)="inhuongdan(object)" mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="info" matTooltip="Xem hướng dẫn hoàn thiện hồ sơ" *ngIf="object.IsReturn">
+							<button mat-button (click)="inhuongdan(object)" [ngClass]="btnClass" *ngIf="object.IsReturn"  
+								matTooltip="Xem hướng dẫn hoàn thiện hồ sơ" color="info" type="button" >
 								<mat-icon>info</mat-icon>
 								<span class="button-text">Xem hướng dẫn</span>
 							</button>
-							<button mat-button [class.mat-raised-button]="list_button" [class.mat-icon-button]="!list_button" color="info" (click)="InBienNhan(object)" type="button" matTooltip="In biên nhận">
-								<!-- *ngIf="object.status!=0" -->
+							<button mat-button (click)="InBienNhan(object)" [ngClass]="btnClass" matTooltip="In biên nhận" color="info" type="button">
 								<mat-icon>print</mat-icon>
 								<span class="button-text">In biên nhận</span>
 							</button>
@@ -289,34 +292,21 @@
 					<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
 					<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" 
 						[ngClass]="{hovered: row.hovered, highlighted: row.highlighted,'row-return': row.IsReturn, error:row.IsTre}" 
-						(mouseover)="row.hovered = true" (mouseout)="row.hovered = false"></tr>
+						(mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
+					</tr>
 				</table>
 				<div class="mat-table__message" *ngIf="!dataSource.hasItems"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
 			</div>
 			
 			<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
 				<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
-					<mat-chip-list>
-						<ng-container *ngFor="let chip of gridService.model.lstChip">
-							<mat-chip removable="true" *ngIf="chip.type==2" (removed)="gridService.removeText(chip.key)">
-								{{chip.title}}: {{chip.data}}
-								<mat-icon matChipRemove>cancel</mat-icon>
-							</mat-chip>
-							<ng-container *ngIf="chip.type==1">
-								<mat-chip *ngFor="let item of chip.data" removable="true" (removed)="gridService.remove(item,chip.key);gridService.showClearAllButton()">
-									{{chip.title}}: {{item.name}}
-									<mat-icon matChipRemove>cancel</mat-icon>
-								</mat-chip>
-							</ng-container>
-						</ng-container>
-						<mat-chip class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll" (click)="gridService.Clear()">
-							Đặt lại
-						</mat-chip>
-					</mat-chip-list>
+					<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
 				</div>
 				<div class="flt-page" style="width: 50%;">
 					<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-					<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true"></mat-paginator>
+					<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" 
+						[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+					</mat-paginator>
 				</div>
 			</div>
 		</div>

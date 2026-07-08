@@ -1,7 +1,7 @@
-import { HoSoNCCService } from '../../Services/ho-so-ncc.service';
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../../../../../core/_base/crud';
+import { HoSoNCCService } from '../../Services/ho-so-ncc.service';
 
 export class HoSoNCCDataSource extends BaseDataSource {
 	constructor(private objectService: HoSoNCCService) {
@@ -11,18 +11,18 @@ export class HoSoNCCDataSource extends BaseDataSource {
 	loadList(queryParams: QueryParamsModel) {
 		this.objectService.lastFilter$.next(queryParams);
 		this.loadingSubject.next(true);
-
 		this.objectService.findData(queryParams)
 			.pipe(
-				tap(resultFromServer => {
-					this.entitySubject.next(resultFromServer.data);
-					const totalCount = resultFromServer.page.TotalCount || (resultFromServer.page.AllPage * resultFromServer.page.Size);
+				tap(res => {
+					this.entitySubject.next(res.data);
+					const totalCount = res.page.TotalCount || (res.page.AllPage * res.page.Size);
 					this.paginatorTotalSubject.next(totalCount);
 				}),
 				catchError(err => of(new QueryResultsModel([], err))),
 				finalize(() => this.loadingSubject.next(false))
 			).subscribe(res => {
 				this.objectService.ReadOnlyControl = res.Visible;
-			});
+			}
+		);
 	}
 }

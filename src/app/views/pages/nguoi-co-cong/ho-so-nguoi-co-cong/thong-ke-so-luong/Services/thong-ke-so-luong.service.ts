@@ -25,7 +25,6 @@ export class ThongKeSoLuongService {
 
 	getDetail(filter: any): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		// const httpParams = this.httpUtils.parseFilter(filter);
 		const httpParams = this.httpUtils.getFindHTTPParams(filter);
 		const url = API_URL;
 		return this.http.get<QueryResultsModel>(url+'/so-luong-detail-ds', {

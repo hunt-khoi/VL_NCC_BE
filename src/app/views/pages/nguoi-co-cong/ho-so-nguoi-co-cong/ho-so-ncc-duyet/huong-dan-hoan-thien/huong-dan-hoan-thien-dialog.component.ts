@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { HoSoNCCDuyetService } from '../Services/ho-so-ncc-duyet.service';
@@ -14,8 +13,7 @@ import { HoSoNCCDuyetService } from '../Services/ho-so-ncc-duyet.service';
 
 export class HuongDanHuongThienDialogComponent implements OnInit {
 	item: any;
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
@@ -30,11 +28,9 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 		private objectService: HoSoNCCDuyetService,
 		public CommonService: CommonService,
 		private layoutUtilsService: LayoutUtilsService,
-		private changeDetectorRefs: ChangeDetectorRef,
-		private translate: TranslateService) {
+		private changeDetectorRefs: ChangeDetectorRef) {
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data.item;
 		if (this.item.itemHD != undefined) {
@@ -73,9 +69,7 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
 	prepareData(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = { id_quytrinh_lichsu: this.item.id_quytrinh_lichsu };
 		_item.NoiDung = controls.NoiDung.value;
@@ -84,16 +78,12 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 	}
 
 	onSubmit() {
-		if (!this.itemForm) return;
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
 			);
-			this.hasFormErrors = true;
 			return;
 		}
 		const _item = this.prepareData();
@@ -101,16 +91,12 @@ export class HuongDanHuongThienDialogComponent implements OnInit {
 			this.objectService.updateHuongDan(_item).subscribe(res => {
 				if (res && res.status == 1) {
 					this.layoutUtilsService.showInfo("Cập nhật hướng dẫn thành công");
-					this.dialogRef.close({
-						_item
-					});
+					this.dialogRef.close({ _item });
 				} else
 					this.layoutUtilsService.showError(res.error.message);
 			})
 		} else {
-			this.dialogRef.close({
-				_item
-			});
+			this.dialogRef.close({ _item });
 		}
 	}
 

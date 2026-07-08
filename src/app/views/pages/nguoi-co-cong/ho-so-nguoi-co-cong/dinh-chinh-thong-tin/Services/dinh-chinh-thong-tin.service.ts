@@ -1,10 +1,10 @@
-import { QueryResultsModel } from './../../../../../../core/_base/crud/models/query-models/query-results.model';
-import { HttpUtilsService } from './../../../../../../core/_base/crud/utils/http-utils.service';
-import { QueryParamsModel } from './../../../../../../core/_base/crud/models/query-models/query-params.model';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { environment } from './../../../../../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpUtilsService } from './../../../../../../core/_base/crud/utils/http-utils.service';
+import { QueryResultsModel } from './../../../../../../core/_base/crud/models/query-models/query-results.model';
+import { QueryParamsModel } from './../../../../../../core/_base/crud/models/query-models/query-params.model';
+import { environment } from './../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/dinh-chinh';
 

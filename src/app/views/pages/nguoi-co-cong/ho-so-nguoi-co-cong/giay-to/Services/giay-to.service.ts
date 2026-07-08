@@ -1,9 +1,8 @@
-import { GiayToModel } from './../Model/giay-to.model';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { Injectable } from '@angular/core';
-import { environment } from '../../../../../../../environments/environment';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
+import { environment } from '../../../../../../../environments/environment';
 
 const API_URL = environment.ApiRoot + '/giay-to';
 
@@ -13,10 +12,9 @@ export class GiayToService {
 	ReadOnlyControl: boolean = false;
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	// READ
-	getAllItems(): Observable<GiayToModel[]> {
+	getAllItems(): Observable<any[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get<GiayToModel[]>(API_URL + '?more=true', { headers: httpHeaders });
+		return this.http.get<any[]>(API_URL + '?more=true', { headers: httpHeaders });
 	}
 
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
@@ -40,7 +38,7 @@ export class GiayToService {
 		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
-	Update(item: GiayToModel): Observable<any> {
+	Update(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}

@@ -8,7 +8,7 @@ import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
 export class PermissionViewHS implements CanActivate, CanActivateChild, CanLoad {
 
 	constructor(private router: Router,
-		private hs: HoSoNCCService,
+		private apiService: HoSoNCCService,
 		private snackBar: MatSnackBar) { }
 
 	canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
@@ -21,7 +21,7 @@ export class PermissionViewHS implements CanActivate, CanActivateChild, CanLoad 
 
 	async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 		var id = state.url.split("/")[2];
-		let re = await this.hs.isViewChiTiet(id).toPromise()
+		let re = await this.apiService.isViewChiTiet(id).toPromise()
 			.then(res => {
 				if (res && res.data) {
 					this.snackBar.dismiss();

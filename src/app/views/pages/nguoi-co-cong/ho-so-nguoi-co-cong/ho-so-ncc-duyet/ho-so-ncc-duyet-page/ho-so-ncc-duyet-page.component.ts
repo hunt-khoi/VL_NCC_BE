@@ -18,15 +18,15 @@ import { HuongDanHuongThienDialogComponent } from '../huong-dan-hoan-thien/huong
 export class HoSoNCCDuyetPageComponent implements OnInit {
 	item: any = {};
 	ListFile: any = [];
-	itemForm: FormGroup | undefined;
+	itemForm: FormGroup = new FormGroup({});
 	viewLoading = false;
 	disabledBtn = false;
 	loadingAfterSubmit = false;
 	isZoomSize: boolean = false;
-	require = '';
-	id = 0;
+	require: string = '';
+	id: number = 0;
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
-	_NAME = '';
+	_NAME: string = '';
 	Cap: number = 0;
 	lstCap: any = [];
 
@@ -43,7 +43,6 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 			this._NAME = 'Hồ sơ người có công';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.actRoute.paramMap.subscribe(params => {
 			const idParam = params.get('id');
@@ -85,9 +84,7 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 		return result;
 	}
 
-	/** ACTIONS */
 	prepareData(): any {
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		let _item: any = {};
 		let Id: number;
@@ -103,9 +100,7 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 
 	onSubmit(value: boolean) {
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
-		/* check form */
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
 				controls[controlName].markAsTouched()
@@ -176,7 +171,6 @@ export class HoSoNCCDuyetPageComponent implements OnInit {
 	reset() {
 		this.item = Object.assign({}, this.item);
 		this.createForm();
-		if (!this.itemForm) return;
 		this.itemForm.markAsPristine();
 		this.itemForm.markAsUntouched();
 		this.itemForm.updateValueAndValidity();

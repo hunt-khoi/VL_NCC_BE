@@ -20,7 +20,6 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 	childComponentData: any = {};
 
 	item: any;
-	hasFormErrors = false;
 	viewLoading = false;
 	loadingAfterSubmit = false;
 	disabledBtn = false;
@@ -32,18 +31,18 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 	ngay1: Moment | undefined;
 	ngay2: Moment | undefined;
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
-	_NAME = '';
+	_NAME: string = '';
 	//type: trợ cấp: 1, cắt trợ cấp: 3 
 
 	/* Keyboard Shortcut Keys */
 	@HostListener('document:keydown', ['$event'])
 	onKeydownHandler(event: KeyboardEvent) {
 		// lưu đóng
-		if (event.altKey && event.keyCode == 13) { //phím Enter
+		if (event.altKey && event.key === 'Enter') { 
 			this.onSubmit(true);
 		}
 		//lưu tiếp tục
-		if (event.ctrlKey && event.keyCode == 13) { //phím Enter
+		if (event.ctrlKey && event.key === 'Enter') {
 			this.onSubmit(false);
 		}
 	}
@@ -58,7 +57,6 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 			this._NAME = this.translate.instant('QUYETDINH.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.item = this.data._item;
 		if (this.data.allowEdit != undefined)
@@ -95,29 +93,26 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 			this.dialogRef.close(EditQuyetDinh);
 			return;
 		}
-		if (EditQuyetDinh.Id > 0) {
+		if (EditQuyetDinh.Id > 0)
 			this.UpdateQuyetDinh(EditQuyetDinh, withBack);
-		} else {
+		else
 			this.CreateQuyetDinh(EditQuyetDinh, withBack);
-		}
 	}
 
-	UpdateQuyetDinh(_item: any, withBack: boolean) {
+	UpdateQuyetDinh(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Update(_item).subscribe(res => {
+		this.objectService.Update(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
-				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+				if (withBack) {
+					this.dialogRef.close({ item });
 				} else {
 					this.ngOnInit();
 					const _messageType = this.translate.instant('OBJECT.EDIT.UPDATE_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
+					this.layoutUtilsService.showInfo(_messageType);
 					if (this.focusInput) 
 						this.focusInput.nativeElement.focus();
 				}
@@ -127,21 +122,19 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 		});
 	}
 
-	CreateQuyetDinh(_item: any, withBack: boolean) {
+	CreateQuyetDinh(item: any, withBack: boolean) {
 		this.loadingAfterSubmit = true;
 		// 	this.viewLoading = true;
 		this.disabledBtn = true;
-		this.objectService.Create(_item).subscribe(res => {
+		this.objectService.Create(item).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
 				if (withBack == true) {
-					this.dialogRef.close({
-						_item
-					});
+					this.dialogRef.close({ item });
 				} else {
 					const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
-					this.layoutUtilsService.showInfo(_messageType).afterDismissed().subscribe(tt => { });
+					this.layoutUtilsService.showInfo(_messageType);
 					if (this.focusInput) 
 						this.focusInput.nativeElement.focus();
 					this.ngOnInit();
@@ -151,16 +144,6 @@ export class QuyetDinhEditDialogComponent implements OnInit {
 				this.layoutUtilsService.showError(res.error.message);
 			}
 		});
-	}
-
-	resizeDialog() {
-		if (!this.isZoomSize) {
-			this.dialogRef.updateSize('100vw', '100vh');
-			this.isZoomSize = true;
-		} else if (this.isZoomSize) {
-			this.dialogRef.updateSize('900px', 'auto');
-			this.isZoomSize = false;
-		}
 	}
 
 	close() {
