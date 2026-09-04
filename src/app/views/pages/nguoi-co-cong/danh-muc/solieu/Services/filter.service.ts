@@ -4,7 +4,7 @@ import { Observable, BehaviorSubject, of } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { environment } from 'environments/environment';
 
-const API_filter = environment.ApiRoot + '/filter';
+const API_URL = environment.ApiRoot + '/filter';
 
 @Injectable()
 export class filterService {
@@ -13,41 +13,40 @@ export class filterService {
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
+	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
+		const httpHeaders = this.httpUtils.getHTTPHeaders();
+		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
+		return this.http.get<QueryResultsModel>(API_URL, {
+			headers: httpHeaders,
+			params: httpParams
+		});
+	}
+
 	Update(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<any>(API_filter + '/Update', item, { headers: httpHeaders });
+		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
 	Insert(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<any>(API_filter + '/Insert', item, { headers: httpHeaders });
+		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
 	GetListKey(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_filter}/list_filterkey`;
+		const url = `${API_URL}/list_filterkey`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
 	Delete(id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_filter}/Delete?id=${id}`;
-		return this.http.get<any>(url, { headers: httpHeaders });
+		const url = `${API_URL}/${id}`;
+		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
 	Detail(id: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_filter}/detail?id=${id}`;
+		const url = `${API_URL}/${id}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
-	}
-
-	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
-		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_filter+'/List';
-		return this.http.get<QueryResultsModel>(url, {
-			headers: httpHeaders,
-			params: httpParams
-		});
 	}
 }

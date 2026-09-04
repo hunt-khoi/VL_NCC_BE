@@ -211,7 +211,7 @@ export class CommonService {
 
 	numberOnly(event: any): boolean {
 		const charCode = (event.which) ? event.which : event.keyCode;
-		if (charCode > 31 && (charCode < 48 || charCode > 57)) 
+		if (charCode > 31 && (charCode < 48 || charCode > 57))
 			return false;
 		return true;
 	}
@@ -245,9 +245,9 @@ export class CommonService {
 		if (!digits)
 			return NaN;
 
-		var key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
-				"","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
-				"","I","II","III","IV","V","VI","VII","VIII","IX"];
+		var key = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
+			"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC",
+			"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
 		var roman = "";
 
 		var i = 3;
@@ -256,7 +256,7 @@ export class CommonService {
 		return Array(+digits.join("") + 1).join("M") + roman;
 	}
 
-	get_colorByName(ten: string){
+	get_colorByName(ten: string) {
 		let result;
 		switch (ten) {
 			case "A":
@@ -314,7 +314,7 @@ export class CommonService {
 			case "V":
 				return result = "rgb(117 158 19)";
 			case "X":
-				return result = "rgb(241, 196, 15)"; 
+				return result = "rgb(241, 196, 15)";
 			case "W":
 				return result = "rgb(211, 84, 0)";
 		}
@@ -422,7 +422,7 @@ export class CommonService {
 		const url = environment.ApiRoot + `/lite/doi-tuong-nhan-qua-lite?Locked=${locked}&include_muc=${include_muc}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	liteDoiTuongNCC(locked: boolean = false, Id_LoaiHoSo:number=0): Observable<any> {
+	liteDoiTuongNCC(locked: boolean = false, Id_LoaiHoSo: number = 0): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + `/lite/doi-tuong-ncc-lite?Locked=${locked}&Id_LoaiHoSo=${Id_LoaiHoSo}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
@@ -596,7 +596,7 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + `/lite/cach-nhap-so-lieu`;
 		return this.http.get<any>(url, { headers: httpHeaders });
-	} 
+	}
 
 	liteDonViDongGop(nam: number = 0): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
@@ -908,11 +908,11 @@ export class CommonService {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.get<any>(environment.ApiRoot + '/thong-ke/bieudo-vanban', { headers: httpHeaders });
 	}
-	
+
 	LastestFeedbackDasboard(queryParams: QueryParamsModel) {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParms = this.httpUtils.getFindHTTPParams(queryParams)
-		return this.http.get<any>(environment.ApiRoot + '/thong-bao/get-thong-bao-dashboard', { headers: httpHeaders, params: httpParms });
+		return this.http.get<any>(environment.ApiRoot + '/notify/get-dashboard', { headers: httpHeaders, params: httpParms });
 	}
 
 	getAllChucdanh(): Observable<QueryResultsModel> {

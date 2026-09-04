@@ -17,21 +17,19 @@ export class donvihanhchinhService {
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	findDataProvinces(queryParams: QueryParamsModel): Observable<QueryResultsModel> {		
+	findDataProvinces(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_provinces + '/ListAll';
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_provinces, {
 			headers: httpHeaders,
 			params: httpParams
 		});
 	}
 
-	findDataWard(queryParams: QueryParamsModel): Observable<QueryResultsModel> {		
+	findDataWard(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_ward + '/ListAll';
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_ward, {
 			headers: httpHeaders,
 			params: httpParams
 		});
@@ -40,8 +38,7 @@ export class donvihanhchinhService {
 	findDataKhomAp(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_KhomAp + '/ListAll';
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_KhomAp, {
 			headers: httpHeaders,
 			params: httpParams
 		});
@@ -49,17 +46,17 @@ export class donvihanhchinhService {
 
 	CreateKhomAp(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<any>(API_KhomAp + '/Insert', item, { headers: httpHeaders });
+		return this.http.post<any>(API_KhomAp, item, { headers: httpHeaders });
 	}
 
 	UpdateKhomAp(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post(API_KhomAp + '/Update', item, { headers: httpHeaders });
+		return this.http.put(API_KhomAp + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
 	DeleteKhomAp(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_KhomAp}/Delete?id=${itemId}`;
-		return this.http.get<any>(url, { headers: httpHeaders });
+		const url = `${API_KhomAp}/${itemId}`;
+		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 }

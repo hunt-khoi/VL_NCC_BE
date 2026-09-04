@@ -4,10 +4,9 @@ import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
 import { HttpUtilsService } from 'app/core/_base/crud/utils/http-utils.service';
 import { QueryParamsModel, QueryResultsModel } from 'app/core/_base/crud';
-import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
 
-const API_ROOT_URL = environment.ApiRoot + '/nguoi-dung';
-const API_ROOT_URL1 = environment.ApiRoot + '/vai-tro-nguoi-dung';
+const API_URL = environment.ApiRoot + '/user-manager';
+const API_URL1 = environment.ApiRoot + '/user-rule';
 
 @Injectable()
 export class NguoiDungDPSService {
@@ -24,84 +23,85 @@ export class NguoiDungDPSService {
 	getData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParms = this.httpUtils.getFindHTTPParams(queryParams)
-		return this.http.get<any>(API_ROOT_URL + '/list', { headers: httpHeaders, params: httpParms });
+		return this.http.get<any>(API_URL + '/list', { headers: httpHeaders, params: httpParms });
 
 	}
-	getNguoiDungDPSById(itemId: any): Observable<any> {
+	getById(itemId: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get<any>(API_ROOT_URL + `/detail?id=${itemId}`, { headers: httpHeaders });
+		return this.http.get<any>(API_URL + `/${itemId}`, { headers: httpHeaders });
 	}
-	deleteNguoiDungDPS(itemId: any): Observable<any> {
+	delete(itemId: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_ROOT_URL}/delete?id=${itemId}`;
-		return this.http.get<any>(url, { headers: httpHeaders });
+		const url = `${API_URL}/${itemId}`;
+		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 	lock(itemId: any, islock: boolean): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_ROOT_URL}/lock?id=${itemId}&islock=${islock}`;
+		const url = `${API_URL}/lock?id=${itemId}&islock=${islock}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	GiaHan(itemId: any): Observable<any> {
+	renew(itemId: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_ROOT_URL}/gia-han?id=${itemId}`;
+		const url = `${API_URL}/renew?id=${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
-	createNguoiDungDPS(item: any): Observable<any> {
+	create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<NguoiDungDPSModel>(API_ROOT_URL + '/create', item, { headers: httpHeaders });
+		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
-	updateNguoiDungDPS(item: any): Observable<any> {
+	update(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<NguoiDungDPSModel>(API_ROOT_URL + '/update', item, { headers: httpHeaders });
+		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
-	ResetPassNguoiDungDPS(item: any): Observable<any> {
+	resetPass(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<NguoiDungDPSModel>(API_ROOT_URL + '/reset-password', item, { headers: httpHeaders });
-	}
-	//#region vai trò
-	getVaiTro(itemId: any): Observable<any> {
-		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_ROOT_URL1}/list?id=${itemId}`;
-		return this.http.get<any>(url, { headers: httpHeaders });
-	}
-	deleteVaiTro(itemId: any): Observable<any> {
-		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_ROOT_URL1}/delete?id=${itemId}`;
-		return this.http.get<any>(url, { headers: httpHeaders });
-	}
-	lockVaiTro(itemId: any, islock: boolean): Observable<any> {
-		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_ROOT_URL1}/lock?id=${itemId}&islock=${islock}`;
-		return this.http.get<any>(url, { headers: httpHeaders });
-	}
-	updateVaiTro(item: any): Observable<any> {
-		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<NguoiDungDPSModel>(API_ROOT_URL1 + '/update', item, { headers: httpHeaders });
+		return this.http.post<any>(API_URL + '/reset-password', item, { headers: httpHeaders });
 	}
 	uploadFile(data: any): Observable<any> {
-		const url = API_ROOT_URL + '/UploadFile';
+		const url = API_URL + '/upload';
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(url, data, { headers: httpHeaders });
 	}
 	importFile(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<any>(API_ROOT_URL + '/ImportFile', item, { headers: httpHeaders });
+		return this.http.post<any>(API_URL + '/import', item, { headers: httpHeaders });
 	}
 	downloadTemplate(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get(API_ROOT_URL + `/DownloadFileMauImportNguoiDung`, {
+		return this.http.get(API_URL + `/dowload-template-import/2`, {
 			headers: httpHeaders,
 			responseType: 'blob',
 			observe: 'response'
 		});
 	}
-	ExportFile(): Observable<any> {
+	exportFile(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get(API_ROOT_URL + `/ExportExcelNguoiDung`, {
+		return this.http.get(API_URL + `/export`, {
 			headers: httpHeaders,
 			responseType: 'blob',
 			observe: 'response'
 		});
+	}
+
+	//#region vai trò
+	getVaiTro(itemId: any): Observable<any> {
+		const httpHeaders = this.httpUtils.getHTTPHeaders();
+		const url = `${API_URL1}?id=${itemId}`;
+		return this.http.get<any>(url, { headers: httpHeaders });
+	}
+	deleteVaiTro(itemId: any): Observable<any> {
+		const httpHeaders = this.httpUtils.getHTTPHeaders();
+		const url = `${API_URL1}/${itemId}`;
+		return this.http.delete<any>(url, { headers: httpHeaders });
+	}
+	lockVaiTro(itemId: any, islock: boolean): Observable<any> {
+		const httpHeaders = this.httpUtils.getHTTPHeaders();
+		const url = `${API_URL1}/lock?id=${itemId}&islock=${islock}`;
+		return this.http.get<any>(url, { headers: httpHeaders });
+	}
+	updateVaiTro(item: any): Observable<any> {
+		const httpHeaders = this.httpUtils.getHTTPHeaders();
+		return this.http.post<any>(API_URL1, item, { headers: httpHeaders });
 	}
 	//#endregion
 }

@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { HttpUtilsService, QueryParamsModel, QueryResultsModel } from '../../../../../../core/_base/crud';
-import { tongiaoModel } from '../Model/tongiao.model';
 import { environment } from '../../../../../../../environments/environment';
 
-const API_PRODUCTS_URL = environment.ApiRoot + '/tongiao';
+const API_URL = environment.ApiRoot + '/tongiao';
 
 @Injectable()
 export class tongiaoService {
@@ -14,16 +13,15 @@ export class tongiaoService {
 
 	constructor(private http: HttpClient, private httpUtils: HttpUtilsService) { }
 
-	getAllItems(): Observable<tongiaoModel[]> {
+	getAllItems(): Observable<any[]> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get<tongiaoModel[]>(API_PRODUCTS_URL + '/ListAll?more=true', { headers: httpHeaders });
+		return this.http.get<any[]>(API_URL + '?more=true', { headers: httpHeaders });
 	}
 
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = API_PRODUCTS_URL + '/ListAll';
-		return this.http.get<QueryResultsModel>(url, {
+		return this.http.get<QueryResultsModel>(API_URL, {
 			headers: httpHeaders,
 			params: httpParams
 		});
@@ -31,17 +29,17 @@ export class tongiaoService {
 
 	Create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<any>(API_PRODUCTS_URL + '/Insert', item, { headers: httpHeaders });
+		return this.http.post<any>(API_URL, item, { headers: httpHeaders });
 	}
 
 	Update(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post(API_PRODUCTS_URL + '/Update', item, { headers: httpHeaders });
+		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
 	}
 
 	Delete(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_PRODUCTS_URL}/Delete?id=${itemId}`;
-		return this.http.get<any>(url, { headers: httpHeaders });
+		const url = `${API_URL}/${itemId}`;
+		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 }
