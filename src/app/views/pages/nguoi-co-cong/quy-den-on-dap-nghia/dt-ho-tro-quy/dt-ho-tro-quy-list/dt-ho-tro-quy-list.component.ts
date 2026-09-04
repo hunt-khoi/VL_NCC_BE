@@ -41,7 +41,7 @@ export class DTHoTroListComponent implements OnInit, OnDestroy {
 	productsResult: any[] = [];
 	_name: string = "";
 	Capcocau: number = 0;
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict: number = 0;
 	listdistrict: any[] = [];
@@ -479,22 +479,28 @@ export class DTHoTroListComponent implements OnInit, OnDestroy {
 			this.layoutUtilsService.showError("Xuất danh sách thất bại")
 		});
 	}
-	print: boolean = false;
-	printTicket(print_template) {
-		this.print = true;
-		this.changeDetectorRefs.detectChanges();
 
-		let innerContents = document.getElementById(print_template).innerHTML;
+	print: boolean = false;
+	printTicket(print_template: any) {
+		this.print = true;
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
+		const popupWinindow = window.open();
+		if (!popupWinindow) return;
+		popupWinindow.document.open();
+		// Gắn tiêu đề và nội dung HTML vào body
 		let zoom ='';
-		if(this.gridService.IsAllColumnsChecked()){
+		if (this.gridService.IsAllColumnsChecked()){
 			zoom = `body {
 				zoom: 60%;
 			}`;
 		}
-		const popupWinindow = window.open();
-		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+this._name+'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
+		popupWinindow.document.title = this._name;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
 		@media print {
 			`+zoom+`
 			th:last-child,
@@ -515,11 +521,12 @@ export class DTHoTroListComponent implements OnInit, OnDestroy {
 			table{
 				width: 100%;
 			}
-		}
-		</style>
-	  `);
-	  	popupWinindow.document.close();
-		popupWinindow.onafterprint = window.close;
-		  this.print = false;
-	 }
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
+		this.print = false;
+		this.changeDetectorRefs.detectChanges();
+	}
 }

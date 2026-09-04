@@ -1,12 +1,12 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef, ViewContainerRef, OnDestroy } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { LayoutUtilsService, QueryParamsModel } from '../../../../../../../core/_base/crud';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LayoutUtilsService } from '../../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../../core/auth/_services/token-storage.service';
 import { CommonService } from '../../../../services/common.service';
-import { ThanNhanService } from './../../../than-nhan/Services/than-nhan.service';
 import { HoSoNCCService } from './../../Services/ho-so-ncc.service';
-import { HoSoNCCModel } from '../../../ho-so-ncc/Model/ho-so-ncc.model';
 import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 import moment from 'moment';
@@ -17,50 +17,24 @@ import moment from 'moment';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class FormCatTuatComponent extends FormBaseComponent implements OnInit {
-	data: any;
+export class FormCatTuatComponent extends FormBaseComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	//#region nhúng mảng form trợ cấp
-	lstTC: any[] = [];
 	childComponentType = TroCapRowEditComponent;
 	@ViewChild("libInsertion", { static: true, read: ViewContainerRef }) insertionPoint: ViewContainerRef | undefined;
 	//#endregion
-
-	item: HoSoNCCModel = new HoSoNCCModel();
-	oldItem: HoSoNCCModel = new HoSoNCCModel();
-	itemForm: FormGroup | undefined;
-	hasFormErrors = false;
-	viewLoading = false;
-	loadingAfterSubmit = false;
-	isZoomSize: boolean = false;
-	disabledBtn = false;
-	allowEdit: boolean = true;
-
 	@ViewChild('focusInput', { static: true }) focusInput: ElementRef | undefined;
-	_NAME = '';
-	maxNS = moment(new Date()).add(-16, 'year').toDate();
-	IsThanNhan: boolean = false;
-	Capcocau: number = 0;
-	Id_LoaiHoSo: number = 0;
-	//
-	nhapTC: boolean = true;
-	nhapDC: boolean = true;
-	//di chuyển
-	isChuyenDi: boolean = false;
 
-	constructor(private componentFactoryResolver: ComponentFactoryResolver,
-		private fb: FormBuilder,
+	constructor(private fb: FormBuilder,
 		public commonService: CommonService,
 		private objectService: HoSoNCCService,
-		private thannhanService: ThanNhanService,
 		public layoutUtilsService: LayoutUtilsService,
 		public changeDetectorRefs: ChangeDetectorRef,
 		private tokenStorage: TokenStorage,
 		private translate: TranslateService) {
 		super(commonService, layoutUtilsService, changeDetectorRefs);
-		this._NAME = 'Hồ sơ người có công';
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.selectedTab = 0;
 		this.item = this.data._item;
@@ -69,14 +43,14 @@ export class FormCatTuatComponent extends FormBaseComponent implements OnInit {
 			this.allowEdit = this.data.allowEdit;
 
 		this.loadProvinces();
-		this.tokenStorage.getUserInfo().subscribe(res => {
+		this.tokenStorage.getUserInfo().pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.filterprovinces = res.IdTinh;
 			this.item.ProvinceID = this.filterprovinces;
 			this.loadGetListDistrictByProvinces(this.filterprovinces);
 			this.Capcocau = res.Capcocau;
 			if (res.Capcocau == 2) { //cấp huyện
 				this.filterdistrict = res.ID_Goc_Cha;
-				this.item.DistrictID = +this.filterdistrict			
+				this.item.DistrictID = +this.filterdistrict
 				if (this.item.Id == 0) {
 					this.loadGetListWardByDistrict(this.filterdistrict);
 				}
@@ -93,103 +67,21 @@ export class FormCatTuatComponent extends FormBaseComponent implements OnInit {
 			}
 		})
 
-		this.loadListDoiTuongNCC();
 		this.loadListDanToc();
 		this.loadListTonGiao();
-		this.loadListGioiTinh();
-		this.loadListQuanHeVoiLietSy();
+		this.loadCommonData();
 
 		this.createForm();
-		this.loadLoaiTC();
+		this.loadLoaiTC([19, 20, 23]);
 	}
 
-	AllLoaiTroCap: any[] = [];
-	listLoaiTroCap: any[] = [];
-	loadLoaiTC() {
-		this.commonService.liteConstLoaiTroCap().subscribe(res => {
-			if (res && res.status == 1) {
-				this.AllLoaiTroCap = res.data;
-				this.listLoaiTroCap = this.AllLoaiTroCap.filter(x => (x.id == 19 || x.id == 20 || x.id == 23)); //bỏ 24
-			}
-			this.addTC();
-		})
-	}
-
-	getInstanceNew($event: any, index: number) {
-		this.lstTC[index] = $event;
-	}
-
-	loadListDoiTuongNCC() {
-		this.commonService.liteDoiTuongNCC(false, this.Id_LoaiHoSo).subscribe(res => {
-			this.listdoituongncc.next(res.data);
-			this.listOpt = res.data;
-		});
-		this.commonService.liteConstLoaiHoSo(true).subscribe(res => {
-			this.listAllLoaiHS = res.data;
-			this.listLoaiHS.next(res.data);
-			this.listOpt1 = res.data;
-			this.changeLoaiHS(this.item.Id_LoaiHoSo);
-		});
-	}
-
-	isBangTQ: boolean = false;
-	changeLoaiHS(value: any) {
-		let xa = "";
-		const form = this.itemForm;
-		if (!form) return;
-		if (form.controls["Id_Xa"].value) {
-			let fx = this.listward.find(x => x.ID_Row == form.controls["Id_Xa"].value);
-			if (fx)
-				xa = this.firstLowerCase(fx.Ward);
-		}
-		this.Id_LoaiHoSo = +value;
-		var f = this.listOpt1.find(x => x.id == value);
-		if (f) {
-			this.GiayTos = f.data.GiayTos.map((x: any) => { return { Id_LoaiGiayTo: x.id, GiayTo: x.title, IsRequired: x.IsRequired, NoiCap: xa } });
-			var k = this.GiayTos.find(x => x.Id_LoaiGiayTo == 9) //bằng tổ quốc ghi công
-			if(k)	this.isBangTQ = true;
-			this.GiayTos = this.GiayTos.filter(x => x.Id_LoaiGiayTo != 9)
-			this.changeDetectorRefs.detectChanges(); //lệnh này làm khi chọn xã mới, nơi cấp sẽ tự cập nhật là xã này
-		}
+	ngOnDestroy() {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	createForm() {
-		let ng = this.item.Id > 0 ? moment(this.item.NgayGui) : new Date();
-		const temp: any = {
-			NgayGui: [ng, Validators.required],
-			SoHoSo: [this.item.SoHoSo],
-			HoTen: [this.item.HoTen, Validators.required],
-			DiaChi: [this.item.DiaChi],
-			SDT: [this.item.SDT, [Validators.pattern(this.commonService.ValidateFormatRegex('phone')), Validators.maxLength(11)]],
-			Email: [this.item.Email, [Validators.email]],
-			NgaySinh: [this.item.NgaySinh],
-			NamSinh: [this.item.NamSinh],
-			GioiTinh: [this.item.GioiTinh, Validators.required],
-			Province: [this.item.ProvinceID, Validators.required],
-			District: [this.item.DistrictID, Validators.required],
-			Id_Xa: [this.item.Id_Xa, Validators.required],
-			Id_KhomAp: [this.item.Id_KhomAp, Validators.required],
-			DanToc: [this.item.Id_DanToc == null ? 0 : this.item.Id_DanToc],
-			TonGiao: [this.item.Id_TonGiao == null ? 0 : this.item.Id_TonGiao],
-			IdThanNhan: [this.item.Id_ThanNhan],
-			Id_DoiTuongNCC: [this.item.Id_DoiTuongNCC, Validators.required],
-			Id_LoaiHoSo: [this.item.Id_LoaiHoSo, Validators.required],
-			//#region thông tin thân nhân (trợ cấp)
-			NguoiThoCungLietSy: [this.item.NguoiThoCungLietSy],
-			QuanHeVoiLietSy: [this.item.QuanHeVoiLietSy],
-			NguyenQuan1: [this.item.NguyenQuan1],
-			TruQuan1: [this.item.TruQuan1],
-			NgaySinh1: [this.item.NgaySinh1],
-			NamSinh1: [this.item.NamSinh1],
-			GioiTinh1: [this.item.GioiTinh1],
-			IsChet1: [this.item.IsChet1],
-			NgayChet1: [this.item.NgayChet1],
-			SoKhaiTu1: [this.item.SoKhaiTu1],
-			NgayKhaiTu1: [this.item.NgayKhaiTu1],
-			NoiKhaiTu1: [this.item.NoiKhaiTu1],
-			SoHoSo1: [],
-			//#endregion
-			//#region thông tin thân nhân (đã mất)
+		const temp: any = Object.assign(this.buildBaseForm(this.item), {
 			HoTenTN: [],
 			QuanHeVoiLietSy2: [],
 			NguyenQuan2: [],
@@ -202,58 +94,10 @@ export class FormCatTuatComponent extends FormBaseComponent implements OnInit {
 			SoKhaiTu2: [],
 			NgayKhaiTu2: [],
 			NoiKhaiTu2: [],
-			SoHoSo2: [],
-			//#endregion
-
-			BiDanh: [this.item.BiDanh],
-			NguyenQuan: [this.item.NguyenQuan],
-			TruQuan: [this.item.TruQuan],
-			NgayNhapNgu: [this.item.NgayNhapNgu],
-			NgayXuatNgu: [this.item.NgayXuatNgu],
-			NoiCongTac: [this.item.NoiCongTac],
-			CapBac: [this.item.CapBac],
-			ChucVu: [this.item.ChucVu],
-			Ngay_: [this.item.Ngay_],
-			TruongHop_: [this.item.TruongHop_],
-			Noi_: [this.item.Noi_],
-			Mo: [this.item.Mo == null ? 0 : this.item.Mo],
-			TiLe: [this.item.TiLe],
-			fileDinhKem: [this.item.FileDinhKem ? [this.item.FileDinhKem] : null],
-			IsChet: [true],
-			NgayChet: [this.item.NgayChet],
-			NgayKhaiTu: [this.item.NgayKhaiTu],
-			//#region di chuyển
-			tinhdc: [],
-			huyendc: [],
-			xadc: [],
-			diaChidc: [],
-			DaGiaiQuyet: [],
-			ChuaGiaiQuyet: [],
-			ThucHien: [],
-			GiayTo: [],
-			IsBanChinh: [],
-			NgayChuyen: [],
-			//#endregion
-			//#region 9. bằng tổ quốc ghi công
-			GiayTo9: [],
-			So9: [],
-			NgayCap9: [],
-			NoiCap9: [],
-			//#endregion
-			//#region 1. giấy báo tử
-			GiayTo1: [],
-			So1: [],
-			NgayCap1: [],
-			NoiCap1: [],
-			//#endregion
-			//#region đính chính
-			HoTen_new: [],
-			NamSinh_new: [],
-			GhiChu_new: [],
-			//#endregion
-		};
+			SoHoSo2: []
+		});
 		this.itemForm = this.fb.group(temp);
-		
+
 		if (!this.allowEdit) {
 			this.itemForm.disable();
 		}
@@ -261,57 +105,13 @@ export class FormCatTuatComponent extends FormBaseComponent implements OnInit {
 			this.itemForm.controls.NguoiThoCungLietSy.disable();
 			this.itemForm.controls.QuanHeVoiLietSy.disable();
 		}
-		this.changeDetectorRefs.detectChanges();
 		Object.keys(this.itemForm.controls).forEach(controlName => {
-			if (this.itemForm) 
+			if (this.itemForm)
 				this.itemForm.controls[controlName].markAsUntouched();
 		});
 	}
 
-	/** UI */
-	getTitle(): string {
-		let result = this.translate.instant('COMMON.CREATE');
-		if (!this.allowEdit) {
-			result = 'Xem chi tiết';
-			return result;
-		}
-		if (!this.item || !this.item.Id) {
-			return result;
-		}
-		result = this.translate.instant('COMMON.UPDATE') + ` hồ sơ người có công`;
-		return result;
-	}
-
-	changeNS(isNam = false) {
-		if (!this.itemForm) return;
-		if (isNam) {
-			this.itemForm.controls.NgaySinh.setValue('');
-		}
-		else {
-			let val = this.itemForm.controls.NgaySinh.value;
-			if (val) {
-				let y = moment(val).get('year');
-				this.itemForm.controls.NamSinh.setValue(y);
-			}
-		}
-	}
-
-	changeNS1(isNam = false) {
-		if (!this.itemForm) return;
-		if (isNam) {
-			this.itemForm.controls.NgaySinh1.setValue('');
-		}
-		else {
-			let val = this.itemForm.controls.NgaySinh1.value;
-			if (val) {
-				let y = moment(val).get('year');
-				this.itemForm.controls.NamSinh1.setValue(y);
-			}
-		}
-	}
-
 	changeNS2(isNam = false) {
-		if (!this.itemForm) return;
 		if (isNam) {
 			this.itemForm.controls.NgaySinh2.setValue('');
 		}
@@ -324,21 +124,8 @@ export class FormCatTuatComponent extends FormBaseComponent implements OnInit {
 		}
 	}
 
-	changeDC(name: string) {
-		if (!this.itemForm) return;
-		let _name = name;
-		if (name == 'TruQuan') _name = 'DiaChi';
-		let dc = this.itemForm.controls[name].value;
-		if (_name == 'NguyenQuan')
-			this.itemForm.controls["NguyenQuan1"].setValue(dc);
-		if (_name == 'DiaChi')
-			this.itemForm.controls["TruQuan1"].setValue(dc);
-	}
-
 	onSubmit(callapi: boolean = false) {
-		this.hasFormErrors = false;
 		this.loadingAfterSubmit = false;
-		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
 			Object.keys(controls).forEach(controlName =>
@@ -367,7 +154,7 @@ export class FormCatTuatComponent extends FormBaseComponent implements OnInit {
 			return EditHoSoNCC;
 
 		this.disabledBtn = true;
-		this.objectService.Create(EditHoSoNCC).subscribe(res => {
+		this.objectService.Create(EditHoSoNCC).pipe(takeUntil(this.destroy$)).subscribe(res => {
 			this.disabledBtn = false;
 			this.changeDetectorRefs.detectChanges();
 			if (res && res.status === 1) {
@@ -380,67 +167,15 @@ export class FormCatTuatComponent extends FormBaseComponent implements OnInit {
 		});
 	}
 
-	changeQuanHeLietSy() {
-		if (!this.itemForm) return;
-		if (this.itemForm.controls.NguoiThoCungLietSy) {
-			this.require = '';
-		} else {
-			this.require = 'require';
-		}
-	}
-
-	changeQuanHeLietSy2() {
-		if (!this.itemForm) return;
-		if (this.itemForm.controls.HoTenTN) {
-			this.require = '';
-		} else {
-			this.require = 'require';
-		}
-	}
-
-	filterKhom = '';
-	fillNguyenTruQuan(cap: number) {
-		if (!this.itemForm) return;
-		let val = this.findNguyenTruQuan(cap, this.filterKhom);
-		this.itemForm.controls["NguyenQuan"].setValue(val);
-		this.itemForm.controls["TruQuan"].setValue(val);
-		this.itemForm.controls["NguyenQuan1"].setValue(val);
-		this.itemForm.controls["TruQuan1"].setValue(val);
-	}
-
-	// lay danh sach than nhan
-	loadListThanNhan() {
-		const queryParams = new QueryParamsModel({});
-		queryParams.filter.Id_NCC = this.item.Id;
-		this.thannhanService.findData(queryParams).subscribe(res => {
-			this.listthannhan = res.data;
-		});
-	}
-
-	reset() {
-		this.item = Object.assign({}, this.item);
-		this.createForm();
-		this.hasFormErrors = false;
-		if (!this.itemForm) return;
-		this.itemForm.markAsPristine();
-		this.itemForm.markAsUntouched();
-		this.itemForm.updateValueAndValidity();
-	}
-
-	onAlertClose() {
-		this.hasFormErrors = false;
-	}
-
 	addTC() {
 		if (!this.insertionPoint) return;
 		if (this.lstTC.length > 0) {
 			this.lstTC = [];
 			this.insertionPoint.clear()
 		}
-		for (var i=0; i<this.listLoaiTroCap.length; i++) {
-			var item =  this.listLoaiTroCap[i]
-			let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.childComponentType);
-			let componentRef = this.insertionPoint.createComponent(componentFactory);
+		for (var i = 0; i < this.listLoaiTroCap.length; i++) {
+			var item = this.listLoaiTroCap[i]
+			let componentRef = this.insertionPoint.createComponent(this.childComponentType);
 			let instance = componentRef.instance;
 			instance.cmpRef = componentRef;
 			if (item.id == 19) { //mtp 

@@ -30,7 +30,6 @@ import { CookieService } from 'ngx-cookie-service';
 export class DoiTuongBaoHiemListComponent implements OnInit {
 	// Table fields
 	dataSource: DoiTuongBaoHiemDataSource;
-
 	@ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 	@ViewChild(MatSort, { static: true }) sort: MatSort;
 	// Filter fields
@@ -43,7 +42,7 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 	// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
 	_name = '';
 	// filter District
-	filterprovinces: number;
+	filterprovinces: number = 0;
 	listprovinces: any[] = [];
 	filterdistrict: number = 0;
 	listdistrict: any[] = [];
@@ -70,7 +69,6 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 		this._name = this.translate.instant('DOITUONGBHYT.NAME');
 	}
 
-	/** LOAD DATA */
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.selection = new SelectionModel<any>(true, []);
@@ -226,10 +224,7 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 				isShow: true,
 			}
 		];
-		this.gridModel.availableColumns = availableColumns.sort(
-			(a, b) => a.stt - b.stt
-		);
-
+		this.gridModel.availableColumns = availableColumns.sort((a, b) => a.stt - b.stt);
 		this.gridModel.availableColumns = availableColumns;
 		this.gridModel.selectedColumns = new SelectionModel<any>(
 			true,
@@ -312,17 +307,14 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 		if (this.filterward) {
 			filter.Id_Xa = +this.filterward;
 		}
-
 		if (this.gridService.model.filterText) {
 			filter.DiaChi = this.gridService.model.filterText.DiaChi;
 			filter.HoTen = this.gridService.model.filterText.HoTen;
 			filter.SoHoSo = this.gridService.model.filterText.SoHoSo;
 			filter.DoiTuong = this.gridService.model.filterText.DoiTuong;
 		}
-
 		return filter;
 	}
-
 
 	loadGetListDistrictByProvinces(idProvince: any) {
 		this.commonService.GetListDistrictByProvinces(idProvince).subscribe(res => {
@@ -340,9 +332,7 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 
 			this.objectService.deleteItem(_item.Id).subscribe(res => {
 				if (res && res.status === 1) {
@@ -376,21 +366,17 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 		const _saveMessage = this.translate.instant(saveMessageTranslateParam, { name: this._name });
 		const dialogRef = this.dialog.open(DoiTuongBaoHiemEditDialogComponent, { data: { _item, allowEdit } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) {
 				this.layoutUtilsService.showInfo(_saveMessage);
 				this.loadDataList();
 			}
-
 		});
 	}
 
 	Import() {
 		const dialogRef = this.dialog.open(DoiTuongBaoHiemImportComponent, { width: '80%' });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
+			if (!res) return;
 			this.loadDataList();
 		});
 	}
@@ -428,43 +414,43 @@ export class DoiTuongBaoHiemListComponent implements OnInit {
 			this.layoutUtilsService.showError("Xuất danh sách thất bại")
 		});
 	}
+
 	print: boolean = false;
-	printTicket(print_template) {
+	printTicket(print_template: any) {
 		this.print = true;
-		this.changeDetectorRefs.detectChanges();
-		let innerContents = document.getElementById(print_template).innerHTML;
-		// let str = '<button class="mat-sort-header-button" type="button" aria-label="Change sorting for CreatedDate">Ngày tạo</button>';
-		// let str1 = '<span aria-label="Change sorting for CreatedDate">Ngày tạo</span>';
-		// innerContents = innerContents.replace(str, str1);
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
 		const popupWinindow = window.open();
+		if (!popupWinindow) return;
 		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+this._name+'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
+		// Gắn tiêu đề và nội dung HTML vào body
+		popupWinindow.document.title = this._name;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
 		@media print {
 			th:last-child,
 			td:last-child,
 			.hiden-print {
 				display: none !important;
 			}
-			td{
+			td {
 				border-bottom: 1px solid #dee2e6;
 				padding: 10px;
 				font-size: 10pt;
 			}
-			th{
+			th {
 				padding: 10px;
 				font-size: 12pt;
 			}
-			
-		}
-		</style>
-		`);
-
-			popupWinindow.document.close();
-			// popupWinindow.print();
-		popupWinindow.onafterprint = window.close;
-			// setTimeout(popupWinindow.close, 0);
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
 		this.print = false;
 		this.changeDetectorRefs.detectChanges();
-	 }
+	}
 }

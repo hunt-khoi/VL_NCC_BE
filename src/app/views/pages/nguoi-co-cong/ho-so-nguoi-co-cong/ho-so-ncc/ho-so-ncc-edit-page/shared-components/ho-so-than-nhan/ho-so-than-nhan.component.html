@@ -1,0 +1,81 @@
+<div [formGroup]="parentForm">
+	<div class="row">
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.hoten1' | translate }}"
+					formControlName="NguoiThoCungLietSy" [ngModel]="thannhanName"
+					(ngModelChange)="thannhanNameChange.emit($event)" (change)="onChangeQuanHeLietSy.emit()"
+					style="text-transform:capitalize" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.ngaysinh1' | translate }}" formControlName="NgaySinh1"
+					type="text" [matDatepicker]="picker1" (dateChange)="onChangeNS1.emit()">
+				<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+				<mat-datepicker #picker1></mat-datepicker>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.namsinh1' | translate }}" formControlName="NamSinh1"
+					type="number" [min]="0" (change)="onChangeNS1.emit(true)">
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid ">
+				<mat-select placeholder="{{ 'THONG_TIN_NCC.gioitinh1' | translate }}" formControlName="GioiTinh1">
+					<mat-option [value]="gt.id" *ngFor="let gt of listgioitinh;">{{gt.title}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<mat-select placeholder="{{ 'THONG_TIN_NCC.quanhe' | translate }}" formControlName="QuanHeVoiLietSy"
+					[ngModel]="quanhe" (ngModelChange)="quanheChange.emit($event)">
+					<mat-option [value]="object.id"
+						*ngFor="let object of listquanhevoilietsy;">{{object.title}}</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.nguyenquan1' | translate }}"
+					formControlName="NguyenQuan1" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.diachi1' | translate }}" formControlName="TruQuan1" />
+			</mat-form-field>
+		</div>
+
+		<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="!parentForm.controls['IsChet1']?.value">
+			<mat-form-field class="mat-form-field-fluid ">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.ngaychet1' | translate }}" formControlName="NgayChet1"
+					type="text" [matDatepicker]="picker2">
+				<mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+				<mat-datepicker #picker2></mat-datepicker>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="!parentForm.controls['IsChet1']?.value">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.sokhaitu1' | translate }}" formControlName="SoKhaiTu1" />
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="!parentForm.controls['IsChet1']?.value">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.ngaykhaitu1' | translate }}"
+					formControlName="NgayKhaiTu1" type="text" [matDatepicker]="picker3">
+				<mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+				<mat-datepicker #picker3></mat-datepicker>
+			</mat-form-field>
+		</div>
+		<div class="col-lg-3 m--margin-bottom-20-mobile" [hidden]="!parentForm.controls['IsChet1']?.value">
+			<mat-form-field class="mat-form-field-fluid">
+				<input matInput placeholder="{{ 'THONG_TIN_NCC.noikhaitu1' | translate }}"
+					formControlName="NoiKhaiTu1" />
+			</mat-form-field>
+		</div>
+	</div>
+</div>

@@ -25,6 +25,9 @@ import { FormTCThang_TuDayComponent } from './ho-so-ncc-edit-page/form-tc-thang-
 import { FormDC_LSComponent } from './ho-so-ncc-edit-page/form-dc-ls/form-dc-ls.component';
 import { FormTDC_LSComponent } from './ho-so-ncc-edit-page/form-tdc-ls/form-tdc-ls.component';
 import { FormBaseComponent } from './ho-so-ncc-edit-page/form-base.component';
+import { HoSoGiayToComponent } from './ho-so-ncc-edit-page/shared-components/ho-so-giay-to/ho-so-giay-to.component';
+import { HoSoThanNhanComponent } from './ho-so-ncc-edit-page/shared-components/ho-so-than-nhan/ho-so-than-nhan.component';
+import { HoSoThanNhanDaMatComponent } from './ho-so-ncc-edit-page/shared-components/ho-so-than-nhan-da-mat/ho-so-than-nhan-da-mat.component';
 
 // form base theo loại hs
 import { FormDiChuyenComponent } from './ho-so-ncc-edit-page/form-di-chuyen/form-di-chuyen.component';
@@ -44,6 +47,9 @@ import { FormCatTuatTTComponent } from './ho-so-ncc-edit-page/form-cat-tuat-tutr
     declarations: [
         HoSoNCCEditDialogComponent,
         FormBaseComponent,
+        HoSoGiayToComponent,
+        HoSoThanNhanComponent,
+        HoSoThanNhanDaMatComponent,
         FormCatTCComponent,
         FormCatTC_2LietSyComponent,
         FormCatTC_MTPComponent,

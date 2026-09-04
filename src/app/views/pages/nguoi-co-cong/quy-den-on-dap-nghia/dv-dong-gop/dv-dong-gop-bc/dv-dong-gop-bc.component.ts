@@ -27,13 +27,13 @@ export class DVDongGopBaoCaoComponent implements OnInit {
 	display: boolean = false;
 	filterprovinces: number = 0;
 	filterDistrict: number = 0;
-	filterWard: number;
+	filterWard: number = 0;
 	listXa: any[] = [];
 
 	viewLoading: boolean = false;
-	queryParams: QueryParamsModel;
+	queryParams: QueryParamsModel = new QueryParamsModel({});
 
-	Capcocau: number;
+	Capcocau: number = 0;
 	tsSeparator = "";
 	lstThang = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; 
 	Nam = 0
@@ -143,7 +143,7 @@ export class DVDongGopBaoCaoComponent implements OnInit {
 	}
 
 	getQueryParams() {
-		let sortField: string;
+		let sortField: string = '';
 		if (this.typeSort == 1)
 			sortField = 'DonVi';
 		if (this.typeSort == 2)
@@ -201,17 +201,17 @@ export class DVDongGopBaoCaoComponent implements OnInit {
 		})
 	}
 
-	getValue(item, t) {
-		var find = item.Thangs.find(x => x.Thang == t)
+	getValue(item: any, t: number) {
+		var find = item.Thangs.find((x: any) => x.Thang == t)
 		if (find != null)
 			return this.commonService.f_currency_V2(find['SoTien'].toString())
 		return '0'
 	}
 
-	sumThang(item, t, isCurrency = true) {
+	sumThang(item: any, t: number, isCurrency = true) {
 		var sum = 0;
-		item.forEach(x => {
-			x.Thangs.forEach(y => {
+		item.forEach((x: any) => {
+			x.Thangs.forEach((y: any) => {
 				if (y.Thang == t)
 					sum += y.SoTien
 			});
@@ -219,19 +219,19 @@ export class DVDongGopBaoCaoComponent implements OnInit {
 		return isCurrency ? this.commonService.f_currency_V2(sum.toString()) : sum;
 	}
 
-	sumTong(item, str, isCurrency = true) {
+	sumTong(item: any, str: string, isCurrency = true) {
 		var sum = 0;
-		item.forEach(x => {
+		item.forEach((x: any) => {
 			sum += x[str]
 		});
 		return isCurrency ? this.commonService.f_currency_V2(sum.toString()) : sum;
 	}
 
-	replace(result) {
+	replace(result: any) {
 		return result.toString().replace('.', ',')
 	}
 
-	tinhPT(item) {
+	tinhPT(item: any) {
 		var sumT = this.sumTong(item, 'Tong', false)
 		var sumCT = this.sumTong(item, 'TienChiTieu', false)
 		if (sumCT == 0) return 0;
@@ -239,23 +239,23 @@ export class DVDongGopBaoCaoComponent implements OnInit {
 		return this.replace(Math.round(value * 1000) / 1000);
 	}
 
-	sumThangHuyen(item, t, isCurrency = true) {
+	sumThangHuyen(item: any, t: number, isCurrency = true) {
 		var sum = 0;
-		item.forEach(x => {
+		item.forEach((x: any) => {
 			sum += this.sumThang(x.ThongKes, t, false)
 		});
 		return isCurrency ? this.commonService.f_currency_V2(sum.toString()) : sum;
 	}
 
-	sumTongHuyen(item, str, isCurrency = true) {
+	sumTongHuyen(item: any, str: string, isCurrency = true) {
 		var sum = 0;
-		item.forEach(x => {
+		item.forEach((x: any) => {
 			sum += this.sumTong(x.ThongKes, str, false)
 		});
 		return isCurrency ? this.commonService.f_currency_V2(sum.toString()) : sum;
 	}
 
-	tinhPTHuyen(item) {
+	tinhPTHuyen(item: any) {
 		var sumT = this.sumTongHuyen(item, 'Tong', false)
 		var sumCT = this.sumTongHuyen(item, 'TienChiTieu', false)
 		if (sumCT == 0) return 0;
@@ -282,29 +282,41 @@ export class DVDongGopBaoCaoComponent implements OnInit {
 		});
 	}
 
-	printTicket(print_template) {
-		let innerContents = document.getElementById(print_template).innerHTML;
+	print: boolean = false;
+	printTicket(print_template: any) {
+		this.print = true;
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
 		const popupWinindow = window.open();
+		if (!popupWinindow) return;
 		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
-		@media print{
-			@page {size: A4 landscape !important};		
+		// Gắn tiêu đề và nội dung HTML vào body
+		popupWinindow.document.title = this._name;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
+		@media print {
+			@page { size: A4 landscape !important };		
 		}
-		td{
+		td {
 			border-right: 1px solid #dee2e6;
 			border-bottom: 1px solid #dee2e6;
 		}
-		th{
+		th {
 			border-right: 1px solid #dee2e6;
 			border-bottom: 1px solid #dee2e6;
 		}
-		table{
+		table {
 			border: 1px solid #dee2e6;
 			border-collapse: collapse;
-		}
-		</style>
-	  `);
-		popupWinindow.document.close();
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
+		this.print = false;
+		this.changeDetectorRefs.detectChanges();
 	}
 }

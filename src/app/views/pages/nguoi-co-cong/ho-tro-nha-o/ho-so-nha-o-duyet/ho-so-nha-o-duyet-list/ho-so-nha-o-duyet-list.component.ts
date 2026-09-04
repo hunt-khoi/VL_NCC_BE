@@ -385,23 +385,12 @@ export class HoSoNhaODuyetListComponent implements OnInit {
 		});
 	}
 
-	restoreState(queryParams: QueryParamsModel, id: number) {
-		if (id > 0) {
-		}
-
-		if (!queryParams.filter) {
-			return;
-		}
-	}
-
 	Duyet(item: any, isDuyet: boolean = true) {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(HoSoNhaODuyetDialogComponent, { data: { _item, isDuyet } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			} else {
+			if (res) 
 				this.loadDataList();
-			}
 		});
 	}
 
@@ -411,8 +400,7 @@ export class HoSoNhaODuyetListComponent implements OnInit {
 			const dialogRef = this.dialog.open(HoSoNhaOSupportsDialogComponent, { data: { _item } });
 			dialogRef.componentInstance.IsDuyet = true;
 			dialogRef.afterClosed().subscribe(res => {
-				if (!res) {
-				} else {	
+				if (res) {
 					let str = res.data.success + "/" + res.data.total;
 					this.layoutUtilsService.showInfo("Duyệt thành công " + str);
 					this.ngOnInit();
@@ -431,10 +419,7 @@ export class HoSoNhaODuyetListComponent implements OnInit {
 	
 			const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 			dialogRef.afterClosed().subscribe(res => {
-				if (!res) {
-					return;
-				}
-	
+				if (!res) return;
 				this.objectService.Duyets(data).subscribe(res => {
 					if (res && res.status === 1) {
 						let str = " " + res.data.success + "/" + res.data.total;
@@ -467,61 +452,55 @@ export class HoSoNhaODuyetListComponent implements OnInit {
 		}
 	}
 
-	Download(object) {
+	Download(object: any) {
 		window.open(object.path, '_blank');
 	}
+
 	timeline(QuaTrinhKhongCoNguoiDuyet: any) {
 		var data = { id_phieu: QuaTrinhKhongCoNguoiDuyet.Id };
 		const dialogRef = this.dialog.open(SettingProcessComponent, { data: { data: data, Type: 5 } });
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
+	
 	historyHoTro(item: any) {
 		const dialogRef = this.dialog.open(HoSoNhaOHistoryComponent, { data: { item } });
-		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-				return;
-			}
-		});
+		dialogRef.afterClosed().subscribe(res => { });
 	}
-	changeTab($event) {
+
+	changeTab($event: any) {
 		this.selectedTab = $event;
 		//this.filterConfiguration();
 	}
+
 	inhuongdan(QuaTrinhKhongCoNguoiDuyet: any) {
 		let id_quatrinh_lichsu: number = 0;
 		this.commonService.getIdHuongDan(QuaTrinhKhongCoNguoiDuyet.Id, 5).subscribe(res1 => {
-			if (res1 && res1.status == 1) {
-				id_quatrinh_lichsu = +res1.data;
-				this.commonService.getHuongDan(id_quatrinh_lichsu, 5).subscribe(res => {
-					if (res && res.status == 1) {
-						const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
-						dialogRef.afterClosed().subscribe(res2 => {
-							if (!res2) {
-							} else {
-								this.commonService.exportHuongDan(id_quatrinh_lichsu, 5, res2.loai).subscribe(response => {
-									const headers = response.headers;
-									const filename = headers.get('x-filename');
-									const type = headers.get('content-type');
-									const blob = new Blob([response.body], { type });
-									const fileURL = URL.createObjectURL(blob);
-									const link = document.createElement('a');
-									link.href = fileURL;
-									link.download = filename;
-									link.click();
-								}, err => {
-									this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
-								});
-							}
-						});
-					} else
-						this.layoutUtilsService.showError(res.error.message);
-				})
-			} else
+			if (res1.status == 0) {
 				this.layoutUtilsService.showError(res1.error.message);
+			}
+			id_quatrinh_lichsu = +res1.data;
+			this.commonService.getHuongDan(id_quatrinh_lichsu, 5).subscribe(res => {
+				if (res.status == 0) {
+					this.layoutUtilsService.showError(res.error.message);
+				}
+				const dialogRef = this.dialog.open(ReviewExportComponent, { data: res.data });
+				dialogRef.afterClosed().subscribe(res2 => {
+					if (!res2) return;
+					this.commonService.exportHuongDan(id_quatrinh_lichsu, 5, res2.loai).subscribe(response => {
+						const headers = response.headers;
+						const filename = headers.get('x-filename');
+						const type = headers.get('content-type');
+						const blob = new Blob([response.body], { type });
+						const fileURL = URL.createObjectURL(blob);
+						const link = document.createElement('a');
+						link.href = fileURL;
+						link.download = filename;
+						link.click();
+					}, err => {
+						this.layoutUtilsService.showError("Xuất hướng dẫn thất bại")
+						});
+					});
+				})
 		});
 	}
 
@@ -533,10 +512,8 @@ export class HoSoNhaODuyetListComponent implements OnInit {
 
 		//const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		//dialogRef.afterClosed().subscribe(res => {
-		//	if (!res) {
-		//		return;
-		//	}
-
+		//	if (!res) return;
+		//	
 		//	this.DeXuatService1.thuHoi(_item.Id).subscribe(res => {
 		//		if (res && res.status === 1) {
 		//			this.loadDataList();
@@ -549,67 +526,64 @@ export class HoSoNhaODuyetListComponent implements OnInit {
 		let _item = Object.assign({}, item);
 		const dialogRef = this.dialog.open(HoSoNhaODuyetDialogComponent, { data: { _item, isDuyet: true, isReturn: true } });
 		dialogRef.afterClosed().subscribe(res => {
-			if (!res) {
-			}
-			else {
+			if (res) 
 				this.loadDataList();
-			}
 		});
 	}
+
 	print: boolean = false;
-	printTicket(print_template) {
+	printTicket(print_template: any) {
 		this.print = true;
-		this.changeDetectorRefs.detectChanges();
-		let innerContents = document.getElementById(print_template).innerHTML;
+		let documentPrint = document.getElementById(print_template);
+		if (!documentPrint) return;
+		let innerContents = documentPrint.innerHTML;
+		const popupWinindow = window.open();
+		if (!popupWinindow) return;
+		popupWinindow.document.open();
+		// Gắn tiêu đề và nội dung HTML vào body
 		let str = '<button class="mat-sort-header-button" type="button" aria-label="Change sorting for CreatedDate">Ngày tạo</button>';
 		let str1 = '<span aria-label="Change sorting for CreatedDate">Ngày tạo</span>';
 		innerContents = innerContents.replace(str, str1);
-		str = 'warning';
-		str1 = ' ';
+		str = 'warning'; str1 = ' ';
 		innerContents = innerContents.replace(str, str1);
 		let zoom ='';
-		if(this.gridService.IsAllColumnsChecked()){
+		if (this.gridService.IsAllColumnsChecked()) {
 			zoom = `body {
 				zoom: 60%;
 			}`;
 		}
 		let title = !this.IsEnable_Duyet ? 'Hồ sơ nhà ở cần duyệt' : 'Hồ sơ nhà ở đã duyệt';
-
-		const popupWinindow = window.open();
-		popupWinindow.document.open();
-		popupWinindow.document.write('<html><head><title>'+title+'</title></head><body onload="window.print()">' + innerContents + '</html>');
-		popupWinindow.document.write(`<style>
+		popupWinindow.document.title = title;
+		popupWinindow.document.body.innerHTML = innerContents;
+		// Tạo style và đẩy vào Head
+		const style = popupWinindow.document.createElement('style');
+		style.innerHTML = `
 		@media print {
-			`+zoom+`
 			th:last-child,
 			td:last-child,
 			.hiden-print {
 				display: none !important;
 			}
-			td{
+			td {
 				border-bottom: 1px solid #dee2e6;
 				padding: 10px;
 				font-size: 10pt;
 			}
-			th{
+			th {
 				padding: 10px;
 				font-size: 12pt;
 			}
-			
-		}
-		</style>
-		`);
-
-			popupWinindow.document.close();
-			// popupWinindow.print();
-		popupWinindow.onafterprint = window.close;
-			// setTimeout(popupWinindow.close, 0);
+		}`;
+		popupWinindow.document.head.appendChild(style);
+	  	// Xử lý sự kiện in
+    	popupWinindow.onafterprint = function() { popupWinindow.close(); };
+    	popupWinindow.setTimeout(() => popupWinindow.print(), 250); 
 		this.print = false;
 		this.changeDetectorRefs.detectChanges();
-	 }
+	}
+
 	Export() {
 		var cols = this.gridService.model.displayedColumns.filter(x => x != 'STT' && x != 'select' && x != 'SoQuyetDinh' && x != 'actions');
-
 		var headers: string[] = [];
 		cols.forEach(col => {
 			var f = this.gridService.model.availableColumns.find(x => x.name == col);
@@ -617,17 +591,14 @@ export class HoSoNhaODuyetListComponent implements OnInit {
 		});
 
 		let index = cols.indexOf("Id_HinhThuc");
-		if(index != -1){
+		if (index != -1) 
 			cols[index] = 'strHinhThuc';
-		};
 		index = cols.indexOf("IsTre_Duyet");
-		if(index != -1){
+		if (index != -1) 
 			cols[index] = 'Deadline_Duyet';
-		};
 		index = cols.indexOf("IsTre");
-		if(index != -1){
+		if (index != -1) 
 			cols[index] = 'Deadline';
-		};
 
 		const queryParams = new QueryParamsModel(
 			this.filterConfiguration(),
