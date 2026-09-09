@@ -64,7 +64,7 @@ export class DashboardComponent implements OnInit {
 		this.queryFB.sortField = "CreatedDate";
 		this.queryFB.pageNumber = 0;
 		this.queryFB.pageSize = 10;
-		this.commonService.ThongKeDasboard().subscribe(res => {
+		this.commonService.GetStatCards().subscribe(res => {
 			if (res.status == 1) {
 				this.data_thongke = [];
 				this.ThongKeDashboard = res.data;
@@ -89,7 +89,7 @@ export class DashboardComponent implements OnInit {
 			}
 		});
 
-		this.commonService.BieuDoThongKeVanBan().subscribe(res => {
+		this.commonService.GetPieChart().subscribe(res => {
 			if (res.status == 1) {
 				let _data = res.data;
 				_data.forEach((x: any) => {

@@ -900,13 +900,13 @@ export class CommonService {
 		}
 	}
 
-	ThongKeDasboard() {
+	GetStatCards() {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get<any>(environment.ApiRoot + '/thong-ke/thong-ke-dasboard', { headers: httpHeaders });
+		return this.http.get<any>(environment.ApiRoot + '/dashboard/stat-cards', { headers: httpHeaders });
 	}
-	BieuDoThongKeVanBan() {
+	GetPieChart() {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get<any>(environment.ApiRoot + '/thong-ke/bieudo-vanban', { headers: httpHeaders });
+		return this.http.get<any>(environment.ApiRoot + '/dashboard/pie-chart', { headers: httpHeaders });
 	}
 
 	LastestFeedbackDasboard(queryParams: QueryParamsModel) {
