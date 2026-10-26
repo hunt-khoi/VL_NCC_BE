@@ -58,7 +58,7 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 			this.NguoiDungDPS = this.data.NguoiDungDPS;
 		}
 		if (this.data.NguoiDungDPS && this.data.NguoiDungDPS.UserID > 0) {
-			this.apiService.getNguoiDungDPSById(this.data.NguoiDungDPS.UserID).subscribe(res => {
+			this.apiService.getById(this.data.NguoiDungDPS.UserID).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.NguoiDungDPS = res.data;
@@ -89,9 +89,9 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 
 	createForm() {
 		let temp: any = {};
-		if (this.Strong_Pass == '1') 
+		if (this.Strong_Pass == '1')
 			temp.password = ['', [Validators.required, Validators.pattern(this.commonService.ValidateFormatRegex('password'))]];
-		else 
+		else
 			temp.password = ['', Validators.required];
 		temp.confirmPassword = ['', Validators.required];
 		this.itemForm = this.itemFB.group(temp, {
@@ -134,13 +134,13 @@ export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {
 			this.layoutUtilsService.showError("Xác nhận mật khẩu không đúng");
 			return null;
 		}
-		if (this.NguoiDungDPS.UserID) 
+		if (this.NguoiDungDPS.UserID)
 			_item.Id = this.NguoiDungDPS.UserID;
 		return _item;
 	}
 
 	reset(item: any) {
-		this.apiService.ResetPassNguoiDungDPS(item).subscribe(res => {
+		this.apiService.resetPass(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Đặt lại mật khẩu người dùng thành công`;

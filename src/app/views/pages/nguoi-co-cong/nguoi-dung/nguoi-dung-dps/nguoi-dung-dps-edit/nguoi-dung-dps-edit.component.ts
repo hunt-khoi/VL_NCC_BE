@@ -83,7 +83,7 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 			this.NguoiDungDPS = this.data.NguoiDungDPS;
 		}
 		if (this.data.NguoiDungDPS && this.data.NguoiDungDPS.UserID > 0) {
-			this.apiService.getNguoiDungDPSById(this.data.NguoiDungDPS.UserID).subscribe(res => {
+			this.apiService.getById(this.data.NguoiDungDPS.UserID).subscribe(res => {
 				this.viewLoading = false;
 				if (res.status == 1 && res.data) {
 					this.NguoiDungDPS = res.data;
@@ -239,7 +239,7 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	}
 
 	add(item: NguoiDungDPSModel, withBack: boolean = false) {
-		this.apiService.createNguoiDungDPS(item).subscribe(res => {
+		this.apiService.create(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Thêm mới người dùng thành công`;
@@ -256,7 +256,7 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	}
 
 	update(item: NguoiDungDPSModel) {
-		this.apiService.updateNguoiDungDPS(item).subscribe(res => {
+		this.apiService.update(item).subscribe(res => {
 			if (res.status == 1) {
 				this.isChange = true;
 				const message = `Cập nhật người dùng thành công`;
@@ -321,16 +321,16 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 	remove(item: any, loai = 0): void {
 		if (loai == 0) {
 			const index = this.NguoiDungDPS.lstDoiTuongNCC.indexOf(item);
-			if (index >= 0) 
+			if (index >= 0)
 				this.NguoiDungDPS.lstDoiTuongNCC.splice(index, 1);
 		}
 		if (loai == 1) {
 			const index = this.NguoiDungDPS.DonViQuanTam.indexOf(item);
-			if (index >= 0) 
+			if (index >= 0)
 				this.NguoiDungDPS.DonViQuanTam.splice(index, 1);
 		} else {
 			const index = this.NguoiDungDPS.DonViLayHanXuLy.indexOf(item);
-			if (index >= 0) 
+			if (index >= 0)
 				this.NguoiDungDPS.DonViLayHanXuLy.splice(index, 1);
 		}
 		this.changeDetectorRefs.detectChanges();
@@ -342,8 +342,8 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 				data: {
 					selected: this.NguoiDungDPS.lstDoiTuongNCC.map(x => {
 						return { Id: x.id, DoiTuong: x.title }
-					}) 
-				} 
+					})
+				}
 			});
 			dialogRef.afterClosed().subscribe(res => {
 				if (!res) return;
@@ -355,10 +355,10 @@ export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {
 				}
 			});
 		} else {
-			const dialogRef = this.dialog.open(ChonNhieuDonViComponent, { 
-				data: { 
-					selected: loai == 1 ? this.NguoiDungDPS.DonViQuanTam : this.NguoiDungDPS.DonViLayHanXuLy 
-				} 
+			const dialogRef = this.dialog.open(ChonNhieuDonViComponent, {
+				data: {
+					selected: loai == 1 ? this.NguoiDungDPS.DonViQuanTam : this.NguoiDungDPS.DonViLayHanXuLy
+				}
 			});
 			dialogRef.afterClosed().subscribe(res => {
 				if (!res) return;

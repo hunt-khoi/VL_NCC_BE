@@ -290,7 +290,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		this.dataSource.entitySubject.subscribe(res => {
 			this.nguoidungdpssResult = res;
 			this.tmpnguoidungdpssResult = [];
-			if (this.nguoidungdpssResult  && this.paginator) {
+			if (this.nguoidungdpssResult && this.paginator) {
 				if (this.nguoidungdpssResult.length == 0 && this.paginator.pageIndex > 0) {
 					this.loadDataList();
 				} else {
@@ -401,7 +401,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
 
-			this.apiService.deleteNguoiDungDPS(item.UserID).subscribe(res => {
+			this.apiService.delete(item.UserID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -483,7 +483,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		const dialogRef = this.layoutUtilsService.deleteElement(_title, _description, _waitDesciption);
 		dialogRef.afterClosed().subscribe(res => {
 			if (!res) return;
-			this.apiService.GiaHan(item.UserID).subscribe(res => {
+			this.apiService.renew(item.UserID).subscribe(res => {
 				if (res && res.status === 1) {
 					this.layoutUtilsService.showInfo(_deleteMessage);
 				}
@@ -524,7 +524,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 	}
 
 	exportFile() {
-		this.apiService.ExportFile().subscribe(response => {
+		this.apiService.exportFile().subscribe(response => {
 			const headers = response.headers;
 			const filename = headers.get('x-filename');
 			const type = headers.get('content-type');
@@ -545,7 +545,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		// var hiden = document.getElementsByClassName('hiden-print') as HTMLCollectionOf<HTMLElement> ;
 		// for(var i=0; i< hiden.length; i++){
 		// 	hiden[i].style.display = "none"
-		 
+
 		// }
 		// html2canvas(data).then(canvas => {
 		// 	// Few necessary setting options
@@ -566,7 +566,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		// });
 		// this.viewLoading = false;
 	}
-	
+
 	DownloadFile() {
 		// download the file using old school javascript method
 		// var hiden = document.getElementsByClassName('hiden-print') as HTMLCollectionOf<HTMLElement> ;
@@ -575,7 +575,7 @@ export class NguoiDungDPSListComponent implements OnInit, OnDestroy {
 		// }
 		// this.exportAsService.save(this.exportAsConfig, 'hinhanh').subscribe(() => {
 		// });
-		
+
 		// setTimeout(() => {
 		// 	for(var i=0; i< hiden.length; i++){
 		// 		hiden[i].style.visibility = "visible"
