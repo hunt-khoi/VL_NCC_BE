@@ -9,4 +9,9 @@ module.exports = {
       /vi/
     ),
   ],
+  resolve: {
+    alias: {
+      querystring: 'querystring-es3',
+    },
+  },
 };

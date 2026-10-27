@@ -1,5 +1,8 @@
 {
 	"$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+	"cli": {
+		"analytics": "8653d63a-a80c-459d-a904-676495a20a6f"
+	},
 	"version": 1,
 	"newProjectRoot": "projects",
 	"projects": {
@@ -19,7 +22,9 @@
 					"options": {
 						"customWebpackConfig": {
 							"path": "./webpack.extra.config.js",
-							"mergeStrategies": { "plugins": "append" }
+							"mergeStrategies": {
+								"plugins": "append"
+							}
 						},
 						"outputPath": "prod_260428",
 						"index": "src/index.html",
@@ -152,7 +157,7 @@
 								}
 							],
 							"scripts": [],
-							"outputPath": "prodSOTBVL_260427",
+							"outputPath": "prodSOTBVL_261026",
 							"optimization": true,
 							"outputHashing": "all",
 							"sourceMap": false,
