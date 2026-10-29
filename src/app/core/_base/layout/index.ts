@@ -22,6 +22,7 @@ export { GetObjectPipe } from './pipes/get-object.pipe';
 export { JoinPipe } from './pipes/join.pipe';
 export { SafePipe } from './pipes/safe.pipe';
 export { TimeElapsedPipe } from './pipes/time-elapsed.pipe';
+export { EncodePathPipe } from './pipes/encode-path.pipe';
 
 // Services
 export { TranslationService } from './services/translation.service';

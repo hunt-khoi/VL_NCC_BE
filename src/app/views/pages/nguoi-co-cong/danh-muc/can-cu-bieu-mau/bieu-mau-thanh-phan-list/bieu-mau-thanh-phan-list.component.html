@@ -75,7 +75,7 @@
 						<span class="button-text">Tệp</span>
 					</button>
 					<mat-menu #menu="matMenu">
-						<a mat-menu-item href="viewer/file-dinh-kem/0?path={{item.path}}" target="_blank">
+						<a mat-menu-item href="viewer/file-dinh-kem/0?path={{item.path | encodePath}}" target="_blank">
 							<mat-icon>visibility</mat-icon>
 							<span>Xem trước</span>
 						</a>
@@ -89,7 +89,7 @@
 						<span class="button-text">Tệp không thỏa</span>
 					</button>
 					<mat-menu #menu1="matMenu">
-						<a mat-menu-item href="viewer/file-dinh-kem/0?path={{item.pathFail}}" target="_blank">
+						<a mat-menu-item href="viewer/file-dinh-kem/0?path={{item.pathFail | encodePath}}" target="_blank">
 							<mat-icon>visibility</mat-icon>
 							<span>Xem trước</span>
 						</a>

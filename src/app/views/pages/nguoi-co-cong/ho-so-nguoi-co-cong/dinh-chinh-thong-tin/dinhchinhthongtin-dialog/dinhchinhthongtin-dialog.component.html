@@ -199,7 +199,7 @@
 											<div class="attach-item-name" *ngIf="item.Id > 0 ">
 												<p>{{formGiayTo[i].FileDinhKem.filename}}</p>
 												<span>
-													<a href="viewer/file-dinh-kem/0?path={{formGiayTo[i].FileDinhKem.src}}" target="_blank"> Preview</a>&nbsp;&middot;&nbsp;
+													<a href="viewer/file-dinh-kem/0?path={{formGiayTo[i].FileDinhKem.src | encodePath}}" target="_blank"> Preview</a>&nbsp;&middot;&nbsp;
 													<a href="javascript:;" (click)="DownloadFile(formGiayTo[i].FileDinhKem.src)">Download</a>
 												</span>
 											</div>

@@ -241,7 +241,7 @@
 								<span class="button-text">{{ 'COMMON.DOWNLOAD' | translate }}</span>
 							</button>
 							<mat-menu #menu="matMenu">
-								<a mat-menu-item href="viewer/file-dinh-kem/0?path={{object.path}}" target="_blank">
+								<a mat-menu-item href="viewer/file-dinh-kem/0?path={{object.path | encodePath}}" target="_blank">
 									<mat-icon>remove_red_eye</mat-icon>
 									<span>Xem trước</span>
 								</a>

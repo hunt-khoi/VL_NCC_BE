@@ -33,7 +33,13 @@ export class FileViewerComponent implements OnInit, AfterViewInit {
 	ngOnInit() {
 		this.activatedRoute.queryParams.subscribe(params => {
 			if (params.path) {
-				this.Url = params.path;
+				try {
+					this.Url = decodeURIComponent(atob(params.path));
+				} catch (e) {
+					this.Url = params.path;
+				}
+				const src = 'https://view.officeapps.live.com/op/view.aspx?src=' + this.Url;
+				this.src = this.sanitizer.bypassSecurityTrustResourceUrl(this.sanitizer.sanitize(SecurityContext.URL, src) as string);
 				this.changeDetectorRefs.detectChanges();
 			}
 			if (params.id && params.id != '0') {
@@ -68,7 +74,7 @@ export class FileViewerComponent implements OnInit, AfterViewInit {
 	}
 
 	reloadIFrame(iframe: any) {
-		if (iframe) {
+		if (iframe && this.Url) {
 			const src = 'https://view.officeapps.live.com/op/view.aspx?src=' + this.Url;
 			iframe.src = src;
 		}
@@ -81,6 +87,7 @@ export class FileViewerComponent implements OnInit, AfterViewInit {
 	async getUrl() {
 		await this.getDetail().then(res => {
 			if (res && res.status == 1) {
+				this.Url = res.data;
 				const src = 'https://view.officeapps.live.com/op/view.aspx?src=' + res.data;
 				this.src = this.sanitizer.bypassSecurityTrustResourceUrl(this.sanitizer.sanitize(SecurityContext.URL, src) as string);
 				this.changeDetectorRefs.detectChanges();

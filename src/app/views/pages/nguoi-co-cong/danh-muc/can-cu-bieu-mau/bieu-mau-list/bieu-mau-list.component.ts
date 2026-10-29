@@ -368,4 +368,10 @@ export class BieuMauListComponent implements OnInit {
 			link.click();
 		});
 	}
+
+	viewFile(path: string) {
+		if (!path) return;
+		const encoded = btoa(encodeURIComponent(path));
+		window.open(`viewer/file-dinh-kem/0?path=${encoded}`, '_blank');
+	}
 }

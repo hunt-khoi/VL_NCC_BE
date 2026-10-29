@@ -16,7 +16,8 @@ import {
 	StickyDirective,
 	TabClickEventDirective,
 	TimeElapsedPipe,
-	ToggleDirective
+	ToggleDirective,
+	EncodePathPipe
 } from './_base/layout';
 
 @NgModule({
@@ -38,6 +39,7 @@ import {
 		GetObjectPipe,
 		SafePipe,
 		FirstLetterPipe,
+		EncodePathPipe
 	],
 	exports: [
 		// directives
@@ -56,6 +58,7 @@ import {
 		GetObjectPipe,
 		SafePipe,
 		FirstLetterPipe,
+		EncodePathPipe
 	],
 	providers: []
 })

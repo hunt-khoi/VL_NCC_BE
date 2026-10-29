@@ -11,6 +11,7 @@ import { CdkTreeModule } from '@angular/cdk/tree';
 import { TranslateModule } from '@ngx-translate/core';
 // UI
 import { PartialsModule } from '../../../views/partials/partials.module';
+import { CoreModule } from '../../../core/core.module';
 // Core => Utils
 import {
 	HttpUtilsService,
@@ -128,6 +129,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 		CommonModule,
 		HttpClientModule,
 		PartialsModule,
+		CoreModule,
 		NgxPermissionsModule.forChild(),
 		NgxMatSelectSearchModule,
 		FormsModule,
@@ -296,6 +298,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) = null;
 		CommonModule,
 		HttpClientModule,
 		PartialsModule,
+		CoreModule,
 		NgxPermissionsModule,
 		NgxMatSelectSearchModule,
 		FormsModule,

@@ -28,6 +28,11 @@
 		event.waitUntil(clients.claim());
 	});
 	self.addEventListener('fetch', function (event) {
+		// 29/10/2026: Nếu là link ngoài (như fonts.googleapis.com) thì bỏ qua không can thiệp
+		if (!event.request.url.startsWith(self.location.origin)) {
+			return;
+		}
+
 		event.respondWith(
 			caches.match(event.request)
 				.then(function (response) {

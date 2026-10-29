@@ -155,7 +155,7 @@
 									<div class="attach-item-name">
 										<p>{{quyen.ls_att.filename}}</p>
 										<span>
-											<a href="viewer/file-dinh-kem/0?path={{quyen.ls_att.path}}" target="_blank">
+											<a href="viewer/file-dinh-kem/0?path={{quyen.ls_att.path | encodePath}}" target="_blank">
 												Preview</a>&nbsp;&middot;&nbsp;
 											<a href="javascript:;"
 												(click)="DownloadFile(quyen.ls_att.path)">Download</a>

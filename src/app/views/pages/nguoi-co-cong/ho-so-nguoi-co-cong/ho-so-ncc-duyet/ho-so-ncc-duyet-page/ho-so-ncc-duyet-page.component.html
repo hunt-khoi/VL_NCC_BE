@@ -182,7 +182,7 @@
 									<td>{{file.CreatedDate}}</td>
 									<td>{{file.MoTa}}</td>
 									<td>
-										<a href="viewer/file-dinh-kem/0?path={{file.path}}" matTooltip="Xem file đính kèm" target="_blank" mat-button mat-raised-button color="info">
+										<a href="viewer/file-dinh-kem/0?path={{file.path | encodePath}}" matTooltip="Xem file đính kèm" target="_blank" mat-button mat-raised-button color="info">
 											Xem
 										</a>
 										&nbsp;

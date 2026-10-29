@@ -38,12 +38,22 @@ export class hdsdListComponent implements OnInit {
 		private tokenStorage: TokenStorage,
 		private changeDetectorRefs: ChangeDetectorRef,
 		private translate: TranslateService) {
-			this._name = this.translate.instant('HDSD.NAME');
+		this._name = this.translate.instant('HDSD.NAME');
 	}
 
 	ngOnInit() {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
+
+		// Init DataSource
+		this.dataSource = new hdsdDataSource(this.apiService);
+		let queryParams = new QueryParamsModel({});
+		this.route.queryParams.subscribe(_ => {
+			if (this.dataSource) {
+				queryParams = this.apiService.lastFilter$.getValue();
+				this.dataSource.loadList(queryParams);
+			}
+		});
 
 		this.apiService.getVersion().subscribe(res => {
 			this.ver = res.data;
@@ -65,16 +75,6 @@ export class hdsdListComponent implements OnInit {
 					})
 				).subscribe();
 		}
-
-		// Init DataSource
-		this.dataSource = new hdsdDataSource(this.apiService);
-		let queryParams = new QueryParamsModel({});
-		this.route.queryParams.subscribe(_ => {
-			if (this.dataSource) { 
-				queryParams = this.apiService.lastFilter$.getValue();
-				this.dataSource.loadList(queryParams);
-			}
-		});
 	}
 
 	loadDataList(holdCurrentPage: boolean = true) {
@@ -85,7 +85,7 @@ export class hdsdListComponent implements OnInit {
 			holdCurrentPage ? this.paginator.pageIndex : this.paginator.pageIndex = 0,
 			this.paginator.pageSize
 		);
-		this.dataSource.loadList(queryParams);	
+		this.dataSource.loadList(queryParams);
 	}
 
 	Download(object: any) {
