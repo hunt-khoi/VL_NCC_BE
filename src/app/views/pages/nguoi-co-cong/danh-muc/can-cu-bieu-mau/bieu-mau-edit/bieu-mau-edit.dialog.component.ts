@@ -226,7 +226,8 @@ export class BieuMauEditDialogComponent implements OnInit {
 		let f = controls['fileDinhKem'].value;
 		if (f && f.length > 0) {
 			this.fileDinhKem = f[0];
-			if (this.fileDinhKem.extension != "doc" || this.fileDinhKem.extension != "docx") {
+			let ext = (this.fileDinhKem.extension || '').replace('.', '').toLowerCase();
+			if (ext !== 'doc' && ext !== 'docx') {
 				this.layoutUtilsService.showError("File nội dung không đúng định dạng")
 				return;
 			}
