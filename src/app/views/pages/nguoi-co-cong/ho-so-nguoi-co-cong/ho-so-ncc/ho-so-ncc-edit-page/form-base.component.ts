@@ -7,14 +7,14 @@ import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
 
 @Component({
 	selector: 'kt-form-base',
-	template: '',  
+	template: '',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class FormBaseComponent {
 
 	lstTC: any[] = [];
-    FilterCtrl: string = '';
+	FilterCtrl: string = '';
 	listOpt: any[] = [];
 	listdoituongncc: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 	listAllLoaiHS: any = [];
@@ -56,7 +56,7 @@ export class FormBaseComponent {
 	constructor(public commonService: CommonService,
 		public layoutUtilsService: LayoutUtilsService,
 		public changeDetectorRefs: ChangeDetectorRef) { }
-    
+
 	getInstanceNew($event: any, index: number) {
 		this.lstTC[index] = $event;
 	}
@@ -66,7 +66,7 @@ export class FormBaseComponent {
 	}
 
 	prepareCustomer(itemForm: any, id: number, id_ncc: number): HoSoNCCModel | null {
-        const controls = itemForm.controls;
+		const controls = itemForm.controls;
 		const item = new HoSoNCCModel();
 		item.Id = +id;
 		item.NgayGui = moment(controls.NgayGui.value).format("YYYY-MM-DDTHH:mm:ss.0000000");
@@ -87,7 +87,7 @@ export class FormBaseComponent {
 			if (controls.NguoiThoCungLietSy.value) {
 				if (controls.QuanHeVoiLietSy.value) {
 					item.ThanNhanModel = this.prepareThanNhan(controls, id_ncc);
-                }
+				}
 				else {
 					this.layoutUtilsService.showInfo("Vui lòng chọn quan hệ với đối tượng");
 					return null;
@@ -96,7 +96,7 @@ export class FormBaseComponent {
 		}
 
 		//thân nhân đã mất
-		if (id == 0 && this.checkForm(itemForm, 'HoTenTN') 
+		if (id == 0 && this.checkForm(itemForm, 'HoTenTN')
 			&& this.checkForm(itemForm, 'QuanHeVoiLietSy2')) {
 			item.Id_ThanNhan = 0;
 			if (controls.HoTenTN.value) { //có nhập hoten than nhân đã mất
@@ -135,24 +135,24 @@ export class FormBaseComponent {
 		item.Mo = controls.Mo.value;
 		item.TiLe = controls.TiLe.value;
 
-		if (this.checkForm(itemForm, 'NgayHS')) 
+		if (this.checkForm(itemForm, 'NgayHS'))
 			item.NgayHS = this.commonService.f_convertDate(controls.NgayHS.value);
 		if (this.checkForm(itemForm, 'NoiHS'))
 			item.NoiHS = controls.NoiHS.value;
-        if (this.checkForm(itemForm, 'TinhTrangHT'))
-		    item.TinhTrangHT = controls.TinhTrangHT.value;
-        if (this.checkForm(itemForm, 'GhiChuTruyTang'))
-		    item.GhiChuTruyTang = controls.GhiChuTruyTang.value;
-        if (this.checkForm(itemForm, 'NgayHop'))
-            item.NgayHop = this.commonService.f_convertDate(controls.NgayHop.value);
-        if (this.checkForm(itemForm, 'GioHop'))
-            item.GioHop = controls.GioHop.value;
-        if (this.checkForm(itemForm, 'ThanhPhanHop'))
-            item.ThanhPhanHop = controls.ThanhPhanHop.value;
-        if (this.checkForm(itemForm, 'NoiDungHop'))
-            item.NoiDungHop = controls.NoiDungHop.value;
-        if (this.checkForm(itemForm, 'CanCuLS'))
-            item.CanCuLietSy = controls.CanCuLS.value;
+		if (this.checkForm(itemForm, 'TinhTrangHT'))
+			item.TinhTrangHT = controls.TinhTrangHT.value;
+		if (this.checkForm(itemForm, 'GhiChuTruyTang'))
+			item.GhiChuTruyTang = controls.GhiChuTruyTang.value;
+		if (this.checkForm(itemForm, 'NgayHop'))
+			item.NgayHop = this.commonService.f_convertDate(controls.NgayHop.value);
+		if (this.checkForm(itemForm, 'GioHop'))
+			item.GioHop = controls.GioHop.value;
+		if (this.checkForm(itemForm, 'ThanhPhanHop'))
+			item.ThanhPhanHop = controls.ThanhPhanHop.value;
+		if (this.checkForm(itemForm, 'NoiDungHop'))
+			item.NoiDungHop = controls.NoiDungHop.value;
+		if (this.checkForm(itemForm, 'CanCuLS'))
+			item.CanCuLietSy = controls.CanCuLS.value;
 		if (this.checkForm(itemForm, 'LyDoGTYKhoa'))
 			item.LyDoGTYKhoa = controls.LyDoYKhoa.value;
 		if (this.checkForm(itemForm, 'LyDoTangTuat'))
@@ -174,7 +174,7 @@ export class FormBaseComponent {
 
 		item.GiayTos = [];
 		if (controls.GiayTo9.value) {
-			if (controls.So9.value && controls.NgayCap9.value )
+			if (controls.So9.value && controls.NgayCap9.value)
 				item.GiayTos.push(this.prepareGT(controls, 9));
 			else {
 				this.layoutUtilsService.showInfo("Vui lòng nhập đầy đủ thông tin của bằng tổ quốc ghi công");
@@ -182,7 +182,7 @@ export class FormBaseComponent {
 			}
 		}
 		item.IsChet = controls.IsChet.value;
-		if (item.IsChet) {
+		if (item.IsChet && controls.NgayChet.value) {
 			//thêm giấy báo tử
 			if (controls.GiayTo1.value) {
 				if (controls.So1.value && controls.NgayCap1.value && controls.NoiCap1.value)
@@ -196,48 +196,48 @@ export class FormBaseComponent {
 			item.HoatDongModel = this.prepareHD(controls);
 		}
 		for (var i = 0; i < this.GiayTos.length; i++) {
-            let gt = this.GiayTos[i];
+			let gt = this.GiayTos[i];
 
-            if (gt.IsRequired) { //giấy tờ là bắt buộc
-                if (!gt.So || !gt.NgayCap || !gt.NoiCap) {
-                    this.layoutUtilsService.showInfo("Giấy tờ '" + gt.GiayTo + "' là bắt buộc nhập");
-                    return null;
-                }
-                let copy = Object.assign({}, gt);
-                if (gt.FileDinhKem != null && gt.FileDinhKem.length > 0) { //có chọn thêm file
+			if (gt.IsRequired) { //giấy tờ là bắt buộc
+				if (!gt.So || !gt.NgayCap || !gt.NoiCap) {
+					this.layoutUtilsService.showInfo("Giấy tờ '" + gt.GiayTo + "' là bắt buộc nhập");
+					return null;
+				}
+				let copy = Object.assign({}, gt);
+				if (gt.FileDinhKem != null && gt.FileDinhKem.length > 0) { //có chọn thêm file
 					copy.FileDinhKem = gt.FileDinhKem[0];
 				}
-                copy.NgayCap = this.commonService.f_convertDate(gt.NgayCap);
-                item.GiayTos.push(copy);
-            } else {
-                if ((gt.So && !gt.NgayCap) || (!gt.So && gt.NgayCap) //chỉ nhập 1 trong 2 trường
-					|| (gt.NoiCap && (!gt.So || !gt.NgayCap)) ) { //nhập trường nơi cấp mà trường So hoặc NgayCap ko nhập
-                    this.layoutUtilsService.showInfo("Vui lòng nhập đầy đủ thông tin của giấy tờ");
-                    return null;
-                }
-                if (gt.So && gt.NgayCap) { //đã nhập đủ 2 trường
-                    let copy = Object.assign({}, gt);
-                    if (gt.FileDinhKem != null && gt.FileDinhKem.length > 0) { //có chọn thêm file
-                        copy.FileDinhKem = gt.FileDinhKem[0];
-                
-                    }
-                    copy.NgayCap = this.commonService.f_convertDate(gt.NgayCap);
-                    item.GiayTos.push(copy);
-                }
-            }
-        }
+				copy.NgayCap = this.commonService.f_convertDate(gt.NgayCap);
+				item.GiayTos.push(copy);
+			} else {
+				if ((gt.So && !gt.NgayCap) || (!gt.So && gt.NgayCap) //chỉ nhập 1 trong 2 trường
+					|| (gt.NoiCap && (!gt.So || !gt.NgayCap))) { //nhập trường nơi cấp mà trường So hoặc NgayCap ko nhập
+					this.layoutUtilsService.showInfo("Vui lòng nhập đầy đủ thông tin của giấy tờ");
+					return null;
+				}
+				if (gt.So && gt.NgayCap) { //đã nhập đủ 2 trường
+					let copy = Object.assign({}, gt);
+					if (gt.FileDinhKem != null && gt.FileDinhKem.length > 0) { //có chọn thêm file
+						copy.FileDinhKem = gt.FileDinhKem[0];
 
-        //item.DinhChinhModel = this.prepareDinhChinh(controls);
+					}
+					copy.NgayCap = this.commonService.f_convertDate(gt.NgayCap);
+					item.GiayTos.push(copy);
+				}
+			}
+		}
+
+		//item.DinhChinhModel = this.prepareDinhChinh(controls);
 		//item.DiChuyenModel = this.prepareDC(controls);
 
 		return item;
 	}
 
-    checkForm(itemForm: any, name: string) {
-        if (itemForm.contains(name))
-            return itemForm.controls[name].value ? true : false;
-        return false;
-    }
+	checkForm(itemForm: any, name: string) {
+		if (itemForm.contains(name))
+			return itemForm.controls[name].value ? true : false;
+		return false;
+	}
 
 	prepareThanNhan(controls: any, id_ncc: number = 0) {
 		let item: any = {};
@@ -337,17 +337,19 @@ export class FormBaseComponent {
 		item.GhiChu = controls.GhiChu_new.value;
 		item.ListColumn = [];
 		if (controls.HoTen_new.value)
-			item.ListColumn.push({ 
-                ColumName: 'hoten', 
-                GiaTriCu: controls.HoTen.value, 
-                GiaTriMoi: controls.HoTen_new.value, 
-                Type: 1 });
+			item.ListColumn.push({
+				ColumName: 'hoten',
+				GiaTriCu: controls.HoTen.value,
+				GiaTriMoi: controls.HoTen_new.value,
+				Type: 1
+			});
 		if (controls.NamSinh_new.value)
-			item.ListColumn.push({ 
-                ColumName: 'NamSinh', 
-                GiaTriCu: controls.NamSinh.value, 
-                GiaTriMoi: controls.NamSinh_new.value, 
-                Type: 1 });
+			item.ListColumn.push({
+				ColumName: 'NamSinh',
+				GiaTriCu: controls.NamSinh.value,
+				GiaTriMoi: controls.NamSinh_new.value,
+				Type: 1
+			});
 		return item;
 	}
 
@@ -378,13 +380,13 @@ export class FormBaseComponent {
 	}
 	//#endregion
 
-    loadProvinces() {
-        this.commonService.GetAllProvinces().subscribe(res => {
+	loadProvinces() {
+		this.commonService.GetAllProvinces().subscribe(res => {
 			this.listprovinces = res.data;
 			this.listTinh = res.data;
 			this.changeDetectorRefs.detectChanges();
 		});
-    } 
+	}
 	loadGetListDistrictByProvinces(idProvince: any) {
 		this.commonService.GetListDistrictByProvinces(idProvince).subscribe(res => {
 			this.listdistrict = res.data;
@@ -409,13 +411,13 @@ export class FormBaseComponent {
 		});
 	}
 
-    loadListDanToc() {
+	loadListDanToc() {
 		this.commonService.ListDanToc().subscribe(res => {
 			this.listDanToc = res.data;
 		});
 	}
 
-    loadListTonGiao() {
+	loadListTonGiao() {
 		this.commonService.ListTonGiao().subscribe(res => {
 			this.listTonGiao = res.data;
 		});
@@ -451,17 +453,17 @@ export class FormBaseComponent {
 				break;
 			}
 			case 3: {
-				val = this.firstLowerCase(xa.Ward) + ", " + this.firstLowerCase(huyen.District) 
+				val = this.firstLowerCase(xa.Ward) + ", " + this.firstLowerCase(huyen.District)
 					+ ", " + this.firstLowerCase(tinh.Province)
 				break;
 			}
 			case 4: {
-				val = this.firstLowerCase(khom.title) + ", " + this.firstLowerCase(xa.Ward) 
+				val = this.firstLowerCase(khom.title) + ", " + this.firstLowerCase(xa.Ward)
 					+ ", " + this.firstLowerCase(huyen.District) + ", " + this.firstLowerCase(tinh.Province)
 				break;
 			}
 		}
-        return val;
+		return val;
 	}
 
 	tieptuc() { this.selectedTab++; }

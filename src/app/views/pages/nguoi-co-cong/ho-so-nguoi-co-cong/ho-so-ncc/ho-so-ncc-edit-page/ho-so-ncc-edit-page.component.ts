@@ -52,7 +52,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 	_item: any = {};
 	tenloai: any;
 	filteredLoai: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
-	
+
 	constructor(
 		private objectService: HoSoNCCService,
 		private layoutUtilsService: LayoutUtilsService,
@@ -66,7 +66,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 		this.loadListLoaiHS_Dt();
 	}
 
-	filterBanks() { 
+	filterBanks() {
 		this.loadListLoaiHS_Dt(this.tenloai)
 	}
 
@@ -82,9 +82,9 @@ export class HoSoNCCEditPageComponent implements OnInit {
 		history.back();
 	}
 
-	handleInput(event: KeyboardEvent): void{
+	handleInput(event: KeyboardEvent): void {
 		event.stopPropagation();
-	} 
+	}
 
 	getHeight(): any {
 		let tmp_height = 0;
@@ -106,17 +106,17 @@ export class HoSoNCCEditPageComponent implements OnInit {
 		this.childComponentData = {
 			_item: Object.assign({}, this._item)
 		};
-			
+
 		//#region Chọn component child
 		switch (this._item.Id_LoaiHoSo) {
-			case 1: 
+			case 1:
 				{ //cắt trợ cấp 
 					if (this._item.Id_DoiTuongNCC == 1)  //bà mẹ vnah
 						this.childComponentType = FormCatTCComponent;
 
- 					break;
+					break;
 				}
-			case 2: 
+			case 2:
 				{ //cắt trợ cấp + mtp 
 					this.childComponentType = FormCatTC_MTPComponent
 					break;
@@ -126,7 +126,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 					this.childComponentType = FormCatTC_MTP_TuatComponent
 					break;
 				}
-			case 4: 
+			case 4:
 				{ //cắt tuất tái giá x
 					if (this._item.Id_DoiTuongNCC == 5) //liệt sĩ
 						this.childComponentType = FormCatTuatComponent;
@@ -140,17 +140,17 @@ export class HoSoNCCEditPageComponent implements OnInit {
 				}
 			case 10:
 				{ //đính chính 
-					this.childComponentType = FormDinhChinhComponent 
+					this.childComponentType = FormDinhChinhComponent
 					break;
 				}
 			case 11:
 				{ //giấy báo tử 
-					if (this._item.Id_DoiTuongNCC == 5) 
+					if (this._item.Id_DoiTuongNCC == 5)
 						this.childComponentType = FormGiayBTComponent
 
 					break
 				}
-			case 12: 
+			case 12:
 				{ //giấy giới thiệu x
 					this.childComponentType = FormGiayGTComponent
 					break
@@ -162,7 +162,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 				}
 			case 14:
 				{ //tạm đình chỉ 
-					this.childComponentType = FormTDCComponent; 
+					this.childComponentType = FormTDCComponent;
 					break;
 				}
 			case 15:
@@ -177,16 +177,16 @@ export class HoSoNCCEditPageComponent implements OnInit {
 				}
 			case 18:
 				{ //tăng tuất ls 
-					if (this._item.Id_DoiTuongNCC == 5) 
+					if (this._item.Id_DoiTuongNCC == 5)
 						this.childComponentType = FormTangTuatLSComponent
-					
+
 					break;
 				}
-			case 19: 
+			case 19:
 				{ //thờ cúng
-					if (this._item.Id_DoiTuongNCC == 5) 
+					if (this._item.Id_DoiTuongNCC == 5)
 						this.childComponentType = FormThoCungComponent
-					
+
 					break
 				}
 			case 20:
@@ -196,16 +196,16 @@ export class HoSoNCCEditPageComponent implements OnInit {
 						|| this._item.Id_DoiTuongNCC == 4 // trước 1/1/45
 						|| this._item.Id_DoiTuongNCC == 18 //tiền khởi nghĩa
 						|| this._item.Id_DoiTuongNCC == 1 //bmvnah 
-						|| this._item.Id_DoiTuongNCC == 22) { 
-						this.childComponentType = FormTroCap1LanComponent 
+						|| this._item.Id_DoiTuongNCC == 22) {
+						this.childComponentType = FormTroCap1LanComponent
 					}
 
 					break;
 				}
 			case 21:
 				{ //tc hàng tháng 
-					if (this._item.Id_DoiTuongNCC == 23) 
-						this.childComponentType = FormTCThangComponent 
+					if (this._item.Id_DoiTuongNCC == 23)
+						this.childComponentType = FormTCThangComponent
 
 					break;
 				}
@@ -241,21 +241,21 @@ export class HoSoNCCEditPageComponent implements OnInit {
 			// 	}
 			case 28:
 				{ //đình chỉ thờ cúng liệt sỹ
-					if (this._item.Id_DoiTuongNCC == 5) 
+					if (this._item.Id_DoiTuongNCC == 5)
 						this.childComponentType = FormDinhChiLSComponent
 
 					break;
 				}
 			case 29:
 				{ //tạm đình chỉ thờ cúng liệt sỹ
-					if (this._item.Id_DoiTuongNCC == 5) 
+					if (this._item.Id_DoiTuongNCC == 5)
 						this.childComponentType = FormTDC_LSComponent
 
 					break;
 				}
 			case 30:
 				{ //tc 1l thân nhân
-					this.childComponentType = FormTroCap1LanComponent 
+					this.childComponentType = FormTroCap1LanComponent
 					break;
 				}
 			case 31:
@@ -287,7 +287,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 				{
 					if (this._item.Id_DoiTuongNCC == 19) //tù đày 
 						this.childComponentType = FormTCThang_TuDayComponent
-					
+
 					break;
 				}
 			case 42:
@@ -297,7 +297,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 
 					break;
 				}
-			
+
 		}
 		//#endregion
 		this.changeDetectorRefs.detectChanges();
@@ -308,6 +308,7 @@ export class HoSoNCCEditPageComponent implements OnInit {
 	}
 
 	onSubmit(withBack: boolean = false) {
+		debugger
 		let EditHoSoNCC = this.ChildComponentInstance.onSubmit();
 		if (EditHoSoNCC == null) {
 			this.layoutUtilsService.showError("Vui lòng nhập đầy đủ thông tin");
@@ -326,9 +327,9 @@ export class HoSoNCCEditPageComponent implements OnInit {
 			if (res && res.status === 1) {
 				const _messageType = this.translate.instant('OBJECT.EDIT.ADD_MESSAGE', { name: this._NAME });
 				this.layoutUtilsService.showInfo(_messageType);
-				if (withBack) 
+				if (withBack)
 					this.back();
-				else 
+				else
 					this.ChildComponentInstance.ngOnInit();
 			} else {
 				this.layoutUtilsService.showError(res.error.message);
@@ -338,8 +339,8 @@ export class HoSoNCCEditPageComponent implements OnInit {
 
 	drop(event: CdkDragDrop<string[]>) {
 		if (event.previousContainer === event.container) {
-			moveItemInArray(event.container.data, 
-				event.previousIndex, 
+			moveItemInArray(event.container.data,
+				event.previousIndex,
 				event.currentIndex);
 		} else {
 			transferArrayItem(event.previousContainer.data,

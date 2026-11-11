@@ -37,7 +37,7 @@
 				<div class="col-md-6 text-right">
 					<p>
 						Load thành công : {{lstNCC.length}} dòng dữ liệu <span style="color:red;">({{lstNCCError.length}} lỗi)</span>
-						&nbsp;<mat-checkbox (change)="filter($event)" [(ngModel)]="isError">Lọc dữ liệu lỗi</mat-checkbox>
+						&nbsp;<mat-checkbox (change)="filter($event)" [(ngModel)]="isError" [ngModelOptions]="{standalone: true}">Lọc dữ liệu lỗi</mat-checkbox>
 					</p>
 					<em style="color:red;">Số hồ sơ trùng vẫn được lưu</em>
 				</div>

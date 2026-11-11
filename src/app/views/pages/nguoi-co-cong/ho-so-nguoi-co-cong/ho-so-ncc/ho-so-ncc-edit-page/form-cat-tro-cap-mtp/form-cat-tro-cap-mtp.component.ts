@@ -77,7 +77,7 @@ export class FormCatTC_MTPComponent extends FormBaseComponent implements OnInit 
 			this.Capcocau = res.Capcocau;
 			if (res.Capcocau == 2) { //cấp huyện
 				this.filterdistrict = res.ID_Goc_Cha;
-				this.item.DistrictID = +this.filterdistrict			
+				this.item.DistrictID = +this.filterdistrict
 				if (this.item.Id == 0) {
 					this.loadGetListWardByDistrict(this.filterdistrict);
 				}
@@ -154,7 +154,7 @@ export class FormCatTC_MTPComponent extends FormBaseComponent implements OnInit 
 		if (f) {
 			this.GiayTos = f.data.GiayTos.map((x: any) => { return { Id_LoaiGiayTo: x.id, GiayTo: x.title, IsRequired: x.IsRequired, NoiCap: xa } });
 			var k = this.GiayTos.find(x => x.Id_LoaiGiayTo == 9) //bằng tổ quốc ghi công
-			if(k)	this.isBangTQ = true;
+			if (k) this.isBangTQ = true;
 			this.GiayTos = this.GiayTos.filter(x => x.Id_LoaiGiayTo != 9)
 			this.changeDetectorRefs.detectChanges(); //lệnh này làm khi chọn xã mới, nơi cấp sẽ tự cập nhật là xã này
 		}
@@ -259,7 +259,7 @@ export class FormCatTC_MTPComponent extends FormBaseComponent implements OnInit 
 		}
 		this.changeDetectorRefs.detectChanges();
 		Object.keys(this.itemForm.controls).forEach(controlName => {
-			if (this.itemForm) 
+			if (this.itemForm)
 				this.itemForm.controls[controlName].markAsUntouched();
 		});
 	}
@@ -323,9 +323,14 @@ export class FormCatTC_MTPComponent extends FormBaseComponent implements OnInit 
 		if (!this.itemForm) return;
 		const controls = this.itemForm.controls;
 		if (this.itemForm.invalid) {
-			Object.keys(controls).forEach(controlName =>
-				controls[controlName].markAsTouched()
-			);
+			const controls = this.itemForm.controls;
+			Object.keys(controls).forEach(controlName => {
+				const control = controls[controlName];
+				// if (control.invalid) {
+				// 	console.log(`Trường bị lỗi: "${controlName}"`, control.errors);
+				// }
+				control.markAsTouched();
+			});
 			this.hasFormErrors = true;
 			return;
 		}
@@ -347,7 +352,7 @@ export class FormCatTC_MTPComponent extends FormBaseComponent implements OnInit 
 		}
 		if (!callapi)
 			return EditHoSoNCC;
-		
+
 		this.disabledBtn = true;
 		this.objectService.Create(EditHoSoNCC).subscribe(res => {
 			this.disabledBtn = false;
@@ -372,7 +377,7 @@ export class FormCatTC_MTPComponent extends FormBaseComponent implements OnInit 
 	}
 
 	filterKhom = '';
-	fillNguyenTruQuan(cap : number) {
+	fillNguyenTruQuan(cap: number) {
 		if (!this.itemForm) return;
 		let val = this.findNguyenTruQuan(cap, this.filterKhom);
 		this.itemForm.controls["NguyenQuan"].setValue(val);
@@ -410,12 +415,12 @@ export class FormCatTC_MTPComponent extends FormBaseComponent implements OnInit 
 			this.lstTC = [];
 			this.insertionPoint.clear()
 		}
-		
+
 		if (this.item.Id_DoiTuongNCC != 1) {
 			this.listLoaiTroCap = this.listLoaiTroCap.filter(x => x.id != 26);
 		}
-		for (var i=0; i<this.listLoaiTroCap.length; i++) {
-			var item =  this.listLoaiTroCap[i]
+		for (var i = 0; i < this.listLoaiTroCap.length; i++) {
+			var item = this.listLoaiTroCap[i]
 			let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.childComponentType);
 			let componentRef = this.insertionPoint.createComponent(componentFactory);
 			let instance = componentRef.instance;
