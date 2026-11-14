@@ -11,6 +11,8 @@
     "build-prod": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=prod",
     "build-kg": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=prod_KG",
     "build-sotbvl": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=prod_SOTBVL",
+    "verify:dev": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=dev --output-path build/_verify_dev",
+    "verify:prod": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=prod --output-path build/_verify_prod",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

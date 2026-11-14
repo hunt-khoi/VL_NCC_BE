@@ -53,8 +53,12 @@ package-lock.json
 ./node_modules
 
 yarn-error.log
-yarn.lock
 
 /.vscode
 /.angular
 /build
+/tools/visual/shots
+/tools/visual/report
+/tools/visual/reference
+/tools/visual/.env
+/tools/visual/node_modules
