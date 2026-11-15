@@ -20,8 +20,5 @@
 		],
 		"allowSyntheticDefaultImports": true,
 		"skipLibCheck": true
-	},
-	"angularCompilerOptions": {
-		"enableIvy": true
 	}
 }

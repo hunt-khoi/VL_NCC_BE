@@ -1,5 +1,41 @@
 [
 	{
+		"name": "can-cu-bieu-mau",
+		"path": "/can-cu-bieu-mau"
+	},
+	{
+		"name": "cap-quan-ly",
+		"path": "/cap-quan-ly"
+	},
+	{
+		"name": "cau-hinh-email",
+		"path": "/cau-hinh-email"
+	},
+	{
+		"name": "cau-hinh-he-thong",
+		"path": "/cau-hinh-he-thong"
+	},
+	{
+		"name": "chuc-danh",
+		"path": "/chuc-danh"
+	},
+	{
+		"name": "chuc-vu",
+		"path": "/chuc-vu"
+	},
+	{
+		"name": "co-cau-to-chuc",
+		"path": "/co-cau-to-chuc"
+	},
+	{
+		"name": "dan-toc",
+		"path": "/dan-toc"
+	},
+	{
+		"name": "danh-muc-khac",
+		"path": "/danh-muc-khac"
+	},
+	{
 		"name": "danh-sach-de-xuat",
 		"path": "/danh-sach-de-xuat"
 	},
@@ -12,12 +48,28 @@
 		"path": "/de-xuat-da-duyet"
 	},
 	{
+		"name": "dien-chinh-hinh",
+		"path": "/dien-chinh-hinh"
+	},
+	{
+		"name": "doi-tuong-ncc",
+		"path": "/doi-tuong-ncc"
+	},
+	{
 		"name": "doi-tuong-nhan-qua",
 		"path": "/doi-tuong-nhan-qua"
 	},
 	{
+		"name": "don-vi-hanh-chinh",
+		"path": "/don-vi-hanh-chinh"
+	},
+	{
 		"name": "dot-tang-qua",
 		"path": "/dot-tang-qua"
+	},
+	{
+		"name": "dung-cu-chinh-hinh",
+		"path": "/dung-cu-chinh-hinh"
 	},
 	{
 		"name": "duyet-de-xuat",
@@ -48,12 +100,40 @@
 		"path": "/"
 	},
 	{
+		"name": "loai-dieu-duong",
+		"path": "/loai-dieu-duong"
+	},
+	{
+		"name": "loai-giay-to",
+		"path": "/loai-giay-to"
+	},
+	{
+		"name": "loai-so-lieu",
+		"path": "/loai-so-lieu"
+	},
+	{
+		"name": "log",
+		"path": "/log"
+	},
+	{
 		"name": "mau-so-lieu",
 		"path": "/mau-so-lieu"
 	},
 	{
+		"name": "nguoi-dung",
+		"path": "/nguoi-dung"
+	},
+	{
+		"name": "nguon-kinh-phi",
+		"path": "/nguon-kinh-phi"
+	},
+	{
 		"name": "nhap-so-lieu",
 		"path": "/nhap-so-lieu"
+	},
+	{
+		"name": "nhom-le-tet",
+		"path": "/nhom-le-tet"
 	},
 	{
 		"name": "profile",
@@ -64,6 +144,14 @@
 		"path": "/profile/notification"
 	},
 	{
+		"name": "qh-gia-dinh",
+		"path": "/qh-gia-dinh"
+	},
+	{
+		"name": "quy-trinh-duyet",
+		"path": "/quy-trinh-duyet"
+	},
+	{
 		"name": "quyet-dinh",
 		"path": "/quyet-dinh"
 	},
@@ -72,8 +160,20 @@
 		"path": "/quyet-dinh-tang-qua"
 	},
 	{
+		"name": "so-do-to-chuc",
+		"path": "/so-do-to-chuc"
+	},
+	{
+		"name": "so-lieu",
+		"path": "/so-lieu"
+	},
+	{
 		"name": "so-lieu-da-duyet",
 		"path": "/so-lieu-da-duyet"
+	},
+	{
+		"name": "theo-doi-quy-trinh",
+		"path": "/theo-doi-quy-trinh"
 	},
 	{
 		"name": "thoi-han-ho-so",
@@ -110,6 +210,14 @@
 	{
 		"name": "tinh-hinh-tang-qua",
 		"path": "/tinh-hinh-tang-qua"
+	},
+	{
+		"name": "ton-giao",
+		"path": "/ton-giao"
+	},
+	{
+		"name": "vai-tro",
+		"path": "/vai-tro"
 	},
 	{
 		"name": "xuat-du-lieu",

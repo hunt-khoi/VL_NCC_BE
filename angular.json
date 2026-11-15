@@ -15,14 +15,8 @@
       },
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "customWebpackConfig": {
-              "path": "./webpack.extra.config.js",
-              "mergeStrategies": {
-                "plugins": "append"
-              }
-            },
             "outputPath": "build/prod_260428",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -200,7 +194,7 @@
           }
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "metronic:build:dev"
           },
@@ -231,41 +225,11 @@
               "src/assets"
             ]
           }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
-          }
-        }
-      }
-    },
-    "metronic-e2e": {
-      "root": "e2e/",
-      "projectType": "application",
-      "prefix": "",
-      "architect": {
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "metronic:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "metronic:serve:production"
-            }
-          }
         }
       }
     }
   },
-  "defaultProject": "metronic",
   "cli": {
-    "analytics": "ed88fc36-68b3-4e80-9db5-15bd9e5e535b",
-    "defaultCollection": "@angular-eslint/schematics"
+    "analytics": "ed88fc36-68b3-4e80-9db5-15bd9e5e535b"
   }
 }

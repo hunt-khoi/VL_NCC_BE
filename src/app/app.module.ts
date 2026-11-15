@@ -79,7 +79,10 @@ export function initializeLayoutConfig(appConfig: LayoutConfigService) {
 		PartialsModule,
 		CoreModule,
 		OverlayModule,
-		StoreModule.forRoot(reducers, {metaReducers}),
+		StoreModule.forRoot(reducers, {
+			metaReducers,
+			runtimeChecks: { strictStateImmutability: true, strictActionImmutability: true },
+		}),
 		EffectsModule.forRoot([]),
 		StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
 		!environment.production ? StoreDevtoolsModule.instrument() : [],

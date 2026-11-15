@@ -161,6 +161,13 @@ async function runCapture(page) {
 const browser = await chromium.launch();
 try {
 	const context = await browser.newContext({ viewport: VIEWPORT, ignoreHTTPSErrors: true, locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh' });
+	// Ban build co the tro toi mot dia chi API khac voi API dang chay tren may nay
+	// (environment.ts ghi cong 44371). Chuyen huong o day de khong phai sua ma nguon.
+	const apiFrom = process.env.VISUAL_API_FROM?.replace(/\/+$/, '');
+	const apiTo = process.env.VISUAL_API_TO?.replace(/\/+$/, '');
+	if (!live && apiFrom && apiTo) {
+		await context.route(apiFrom + '/**', (route) => route.continue({ url: apiTo + route.request().url().slice(apiFrom.length) }));
+	}
 	const page = await context.newPage();
 	if (discover) watchMenu(page);
 	await login(page);
