@@ -1,0 +1,118 @@
+[
+	{
+		"name": "danh-sach-de-xuat",
+		"path": "/danh-sach-de-xuat"
+	},
+	{
+		"name": "danh-sach-nhap",
+		"path": "/danh-sach-nhap"
+	},
+	{
+		"name": "de-xuat-da-duyet",
+		"path": "/de-xuat-da-duyet"
+	},
+	{
+		"name": "doi-tuong-nhan-qua",
+		"path": "/doi-tuong-nhan-qua"
+	},
+	{
+		"name": "dot-tang-qua",
+		"path": "/dot-tang-qua"
+	},
+	{
+		"name": "duyet-de-xuat",
+		"path": "/duyet-de-xuat"
+	},
+	{
+		"name": "duyet-ho-so",
+		"path": "/duyet-ho-so"
+	},
+	{
+		"name": "duyet-so-lieu",
+		"path": "/duyet-so-lieu"
+	},
+	{
+		"name": "hdsd",
+		"path": "/hdsd"
+	},
+	{
+		"name": "ho-so-da-duyet",
+		"path": "/ho-so-da-duyet"
+	},
+	{
+		"name": "ho-so-ncc",
+		"path": "/ho-so-ncc"
+	},
+	{
+		"name": "home",
+		"path": "/"
+	},
+	{
+		"name": "mau-so-lieu",
+		"path": "/mau-so-lieu"
+	},
+	{
+		"name": "nhap-so-lieu",
+		"path": "/nhap-so-lieu"
+	},
+	{
+		"name": "profile",
+		"path": "/profile"
+	},
+	{
+		"name": "profile-notification",
+		"path": "/profile/notification"
+	},
+	{
+		"name": "quyet-dinh",
+		"path": "/quyet-dinh"
+	},
+	{
+		"name": "quyet-dinh-tang-qua",
+		"path": "/quyet-dinh-tang-qua"
+	},
+	{
+		"name": "so-lieu-da-duyet",
+		"path": "/so-lieu-da-duyet"
+	},
+	{
+		"name": "thoi-han-ho-so",
+		"path": "/thoi-han-ho-so"
+	},
+	{
+		"name": "thoi-han-so-lieu",
+		"path": "/thoi-han-so-lieu"
+	},
+	{
+		"name": "thong-ke-chi-tra",
+		"path": "/thong-ke-chi-tra"
+	},
+	{
+		"name": "thong-ke-ho-so",
+		"path": "/thong-ke-ho-so"
+	},
+	{
+		"name": "thong-ke-so-lieu",
+		"path": "/thong-ke-so-lieu"
+	},
+	{
+		"name": "thong-ke-so-luong-ho-so",
+		"path": "/thong-ke-so-luong-ho-so"
+	},
+	{
+		"name": "thong-ke-tang-giam",
+		"path": "/thong-ke-tang-giam"
+	},
+	{
+		"name": "tiep-nhan-ho-so",
+		"path": "/tiep-nhan-ho-so"
+	},
+	{
+		"name": "tinh-hinh-tang-qua",
+		"path": "/tinh-hinh-tang-qua"
+	},
+	{
+		"name": "xuat-du-lieu",
+		"path": "/xuat-du-lieu"
+	}
+]

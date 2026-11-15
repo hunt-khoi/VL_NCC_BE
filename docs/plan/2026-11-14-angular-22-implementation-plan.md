@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Nhánh làm việc: `upgrade-2026`. Không đụng `main`.
+- Nhánh làm việc: `upgrade-angular-22` (tách từ `upgrade-2026` sau commit tài liệu). Không đụng `main`.
 - Package manager: `yarn` 1.22 với `--ignore-engines`. Không dùng `npm install`.
 - Node: dùng Node 24 cho toàn bộ quá trình (baseline Angular 13 đã build được trên Node 24.14.0). Trước Task 19 phải nâng Node lên `>= 24.15.0`. Nếu một bản CLI trung gian từ chối chạy trên Node 24, cài nvm-windows và dùng Node 18.20 (Angular 14–17) hoặc Node 20.19 (Angular 18–19) cho riêng bản đó.
 - Đích: `@angular/core` 22.2.x, TypeScript `>=6.0 <6.1`, zone.js `~0.15.0 || ~0.16.0`, RxJS `^7.4.0`.
