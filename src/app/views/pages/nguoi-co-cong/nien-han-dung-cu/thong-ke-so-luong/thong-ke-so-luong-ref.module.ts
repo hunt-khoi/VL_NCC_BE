@@ -14,14 +14,6 @@ import { ThongKeTheoNienHanComponent } from './thong-ke-theo-nien-han/thong-ke-t
 	providers: [
 		ThongKeSoLuongService
 	],
-	entryComponents: [
-		ThongKeTabComponent,
-		ThongKeTheoDoiTuongComponent,
-		ThongKeTheoNienHanComponent,
-		ThongKeTheoDungCuComponent,
-		BaoCaoTongHopComponent
-
-	],
 	declarations: [
 		ThongKeTabComponent,
 		ThongKeTheoDoiTuongComponent,

@@ -6,7 +6,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-ho-so-nha-o-duyet',

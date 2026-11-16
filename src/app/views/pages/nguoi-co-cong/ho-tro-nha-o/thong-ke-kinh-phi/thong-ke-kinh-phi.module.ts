@@ -27,9 +27,6 @@ const routes: Routes = [
 	providers: [
 		ThongKeKinhPhiService
 	],
-	entryComponents: [
-		ThongKeKinhPhiDialogComponent,
-	],
 	declarations: [
 		ThongKeKinhPhiComponent,
 		ThongKeKinhPhiDialogComponent

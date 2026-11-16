@@ -9,7 +9,6 @@ import { NhapNienHanService } from './Services/nhap-nien-han.service';
 	providers: [
 		NhapNienHanService
 	],
-	entryComponents: [],
 	declarations: [],
 })
 export class NhapNienHanRefModule { }

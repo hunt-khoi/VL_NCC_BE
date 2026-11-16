@@ -13,10 +13,6 @@ import { NhapBaoHiemRefModule } from '../nhap-bao-hiem/nhap-bao-hiem-ref.module'
 	providers: [
 		NhapBaoHiemDuyetService
 	],
-	entryComponents: [
-		NhapBaoHiemDuyetListComponent,
-		NhapBaoHiemDuyetDialogComponent,
-	],
 	declarations: [
 		NhapBaoHiemDuyetListComponent,
 		NhapBaoHiemDuyetDialogComponent,

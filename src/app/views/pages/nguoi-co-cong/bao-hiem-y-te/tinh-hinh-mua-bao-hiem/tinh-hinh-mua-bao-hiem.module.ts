@@ -25,8 +25,6 @@ const routes: Routes = [
 	providers: [
 		TinhHinhMuaBaoHiemService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		TinhHinhBaoHiemComponent
 	]

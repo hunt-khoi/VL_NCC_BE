@@ -25,6 +25,5 @@ const routes: Routes = [
         thongkeDCTangGiamRefModule,
 	],
 	providers: [],
-	entryComponents: [],
 })
 export class thongkeTangGiamModule { }

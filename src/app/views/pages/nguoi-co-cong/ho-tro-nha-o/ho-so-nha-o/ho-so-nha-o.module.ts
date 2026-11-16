@@ -30,8 +30,6 @@ const routes: Routes = [
 	providers: [
 		HoSoNhaOService,
 	],
-	entryComponents: [
-	],
 	declarations: [
 		HoSoNhaOComponent,
 	],

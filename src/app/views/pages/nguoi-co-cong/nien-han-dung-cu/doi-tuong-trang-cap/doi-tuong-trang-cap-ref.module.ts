@@ -14,10 +14,6 @@ import { DoiTuongTrangCapService } from './Services/doi-tuong-trang-cap.service'
 	providers: [
 		DoiTuongTrangCapService,
 	],
-	entryComponents: [
-		DoiTuongTrangCapImportComponent,
-		DoiTuongTrangCapEditDialogComponent
-	],
 	declarations: [
 		DoiTuongTrangCapListComponent,
 		DoiTuongTrangCapEditDialogComponent,

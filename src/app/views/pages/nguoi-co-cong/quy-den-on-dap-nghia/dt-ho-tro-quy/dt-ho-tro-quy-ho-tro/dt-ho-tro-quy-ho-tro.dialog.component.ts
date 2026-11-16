@@ -7,7 +7,7 @@ import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { CommonService } from '../../../services/common.service';
 import { dtHoTroServices } from '../Services/dt-ho-tro-quy.service';
 import { HoTro_DTModel } from '../Model/dt-ho-tro-quy.model';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'kt-dt-ho-tro-quy-ho-tro',

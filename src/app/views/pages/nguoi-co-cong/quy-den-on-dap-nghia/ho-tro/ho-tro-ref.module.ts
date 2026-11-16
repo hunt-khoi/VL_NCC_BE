@@ -13,10 +13,6 @@ import { HoTroPhatEditDialogComponent } from './ho-tro-phat-edit/ho-tro-phat-edi
 		HoTroService,
 		dtHoTroServices
 	],
-	entryComponents: [
-		HoTroEditDialogComponent,
-		HoTroPhatEditDialogComponent
-	],
 	declarations: [
 		HoTroEditDialogComponent,
 		HoTroPhatEditDialogComponent

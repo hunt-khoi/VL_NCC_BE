@@ -14,10 +14,6 @@ import { QuyetDinhCapTienDialogComponent } from './quyet-dinh-cap-tien/quyet-din
 	providers: [
 		NienHanService
 	],
-	entryComponents: [
-		NienHanEditDialogComponent,
-		QuyetDinhCapTienDialogComponent
-	],
 	declarations: [
 		NienHanEditDialogComponent,
 		QuyetDinhCapTienDialogComponent

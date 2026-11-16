@@ -15,11 +15,6 @@ import { DVDongGopBaoCaoComponent } from './dv-dong-gop-bc/dv-dong-gop-bc.compon
 		dvDongGopServices,
 		ThemeService
 	],
-	entryComponents: [
-		DVDongGopListComponent,
-		DVDongGopEditDialogComponent,
-		dvDongGopImportComponent
-	],
 	declarations: [
 		DVDongGopListComponent,
 		DVDongGopBaoCaoComponent,

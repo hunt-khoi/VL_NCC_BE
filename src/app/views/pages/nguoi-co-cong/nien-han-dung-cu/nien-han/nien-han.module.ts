@@ -36,8 +36,6 @@ const routes: Routes = [
 	providers: [
 		NienHanService,
 	],
-	entryComponents: [
-	],
 	declarations: [
 		NienHanComponent,
 		NienHanListComponent,

@@ -33,8 +33,6 @@ const routes: Routes = [
 	providers: [
 		HoTroService,
 	],
-	entryComponents: [
-	],
 	declarations: [
 		HoTroComponent,
 		HoTroListComponent,

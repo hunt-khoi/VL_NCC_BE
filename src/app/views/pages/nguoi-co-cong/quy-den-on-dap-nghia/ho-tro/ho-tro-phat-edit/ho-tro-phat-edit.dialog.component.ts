@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { dtHoTroServices } from '../../dt-ho-tro-quy/Services/dt-ho-tro-quy.service';
 import { HoTro_DTModel } from '../../dt-ho-tro-quy/Model/dt-ho-tro-quy.model';
 

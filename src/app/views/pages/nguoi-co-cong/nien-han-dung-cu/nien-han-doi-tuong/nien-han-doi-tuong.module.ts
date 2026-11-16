@@ -28,8 +28,6 @@ const routes: Routes = [
 	providers: [
 		NienHanDoiTuongService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		NienHanDoiTuongComponent
 	]

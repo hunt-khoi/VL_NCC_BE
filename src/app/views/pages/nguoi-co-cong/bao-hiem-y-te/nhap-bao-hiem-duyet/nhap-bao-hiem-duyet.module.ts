@@ -33,7 +33,6 @@ const routes: Routes = [
 	providers: [
 		NhapBaoHiemDuyetService
 	],
-	entryComponents: [],
 	declarations: [
 		NhapBaoHiemDuyetComponent,
 		DuyetNhapBHPageComponent,

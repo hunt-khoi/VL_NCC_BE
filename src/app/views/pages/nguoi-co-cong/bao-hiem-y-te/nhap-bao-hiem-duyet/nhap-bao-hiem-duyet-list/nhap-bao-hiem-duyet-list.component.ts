@@ -17,7 +17,7 @@ import { DisplayHtmlContentComponent, SettingProcessComponent } from '../../../c
 import { CommonService } from '../../../services/common.service';
 import { NhapBaoHiemDuyetDataSource } from '../Model/data-sources/nhap-bao-hiem-duyet.datasource';
 import { NhapBaoHiemDuyetService } from '../Services/nhap-bao-hiem-duyet.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { NhapBaoHiemDuyetDialogComponent } from '../nhap-bao-hiem-duyet/nhap-bao-hiem-duyet.dialog.component';
 import { NhapBaoHiemEditDialogComponent } from '../../nhap-bao-hiem/nhap-bao-hiem-edit/nhap-bao-hiem-edit.dialog.component';

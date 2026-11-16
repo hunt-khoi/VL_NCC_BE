@@ -7,7 +7,7 @@ import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { CommonService } from '../../../services/common.service';
 import { dtHoTroModel } from '../Model/dt-ho-tro-quy.model';
 import { dtHoTroServices } from '../Services/dt-ho-tro-quy.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ReplaySubject } from 'rxjs';
 
 @Component({

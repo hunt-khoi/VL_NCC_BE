@@ -16,13 +16,6 @@ import { NhacNhoNienHanComponent } from './nhac-nho-nien-han/nhac-nho-nien-han.c
 	providers: [
 		NienHanDuyetService
 	],
-	entryComponents: [
-		NienHanDuyetListComponent,
-		NienHanHuyenDuyetListComponent,
-		NienHanXaDuyetListComponent,
-		NienHanDuyetDialogComponent,
-		NhacNhoNienHanComponent
-	],
 	declarations: [
 		NienHanDuyetListComponent,
 		NienHanHuyenDuyetListComponent,

@@ -6,7 +6,7 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { HoTroModel } from '../../ho-tro/Model/ho-tro.model';
 import { CommonService } from '../../../services/common.service';
 import { HoTroService } from '../Services/ho-tro.service';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'm-ho-tro-edit-dialog',

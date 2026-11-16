@@ -11,11 +11,6 @@ import { TKTheoDoiTuongComponent } from './thong-ke-theo-doi-tuong/thong-ke-theo
 	providers: [
 		SoLuongTongHopService
 	],
-	entryComponents: [
-		SoLuongTongHopTabComponent,
-		TKTheoDoiTuongComponent
-
-	],
 	declarations: [
 		SoLuongTongHopTabComponent,
 		TKTheoDoiTuongComponent

@@ -23,7 +23,7 @@ import { HoSoNhaOHistoryComponent } from '../ho-so-nha-o-history/ho-so-nha-o-his
 import { HoSoNhaOEditDialogComponent } from '../ho-so-nha-o-edit/ho-so-nha-o-edit-dialog.component';
 import { HoSoNhaOImportComponent } from '../ho-so-nha-o-import/ho-so-nha-o-import.component';
 import { Moment } from 'moment';
-import * as moment from 'moment';
+import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 import { HoSoNhaOSupportsDialogComponent } from '../ho-tro-nha-o-supports/ho-tro-nha-o-supports-dialog.component';
 

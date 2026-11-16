@@ -33,9 +33,6 @@ const routes: Routes = [
 	providers: [
         dvDongGopServices,
     ],
-	entryComponents: [
-		
-    ],
     declarations: [
         DVDongGopComponent,
     ]

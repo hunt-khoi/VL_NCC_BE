@@ -14,10 +14,6 @@ import { DoiTuongBaoHiemService } from './Services/doi-tuong-bao-hiem.service';
 	providers: [
 		DoiTuongBaoHiemService,
 	],
-	entryComponents: [
-		DoiTuongBaoHiemImportComponent,
-		DoiTuongBaoHiemEditDialogComponent
-	],
 	declarations: [
 		DoiTuongBaoHiemListComponent,
 		DoiTuongBaoHiemEditDialogComponent,

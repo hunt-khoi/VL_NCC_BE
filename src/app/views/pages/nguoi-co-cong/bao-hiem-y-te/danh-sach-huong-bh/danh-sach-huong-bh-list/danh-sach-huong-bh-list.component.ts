@@ -16,7 +16,7 @@ import { TableService } from '../../../../../partials/table/table.service';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { DSHuongBaoHiemDataSource } from '../Model/data-sources/danh-sach-huong-bh.datasource';
 import { DSHuongBaoHiemService } from '../Services/danh-sach-huong-bh.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Moment } from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 

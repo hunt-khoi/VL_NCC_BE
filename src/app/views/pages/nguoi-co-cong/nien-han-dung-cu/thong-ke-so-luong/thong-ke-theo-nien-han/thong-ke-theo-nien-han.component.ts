@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ThongKeSoLuongService } from '../../thong-ke-so-luong/Services/thong-ke-so-luong.service';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
+import moment from 'moment';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 
 @Component({

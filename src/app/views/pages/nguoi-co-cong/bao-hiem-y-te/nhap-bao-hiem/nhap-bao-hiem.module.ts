@@ -34,9 +34,6 @@ const routes: Routes = [
 	providers: [
 		NhapBaoHiemService,
 	],
-	entryComponents: [
-		NhapBaoHiemListComponent
-	],
 	declarations: [
 		NhapBaoHiemComponent,
 		NhapBaoHiemDonViComponent,

@@ -10,7 +10,7 @@ import { LayoutUtilsService, TypesUtilsService } from '../../../../../../core/_b
 import { CommonService } from '../../../services/common.service';
 import { HoSoNhaOService } from './../Services/ho-so-nha-o.service';
 import { HoSoNhaOModel } from '../../ho-so-nha-o/Model/ho-so-nha-o.model';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ReplaySubject } from 'rxjs';
 
 @Component({

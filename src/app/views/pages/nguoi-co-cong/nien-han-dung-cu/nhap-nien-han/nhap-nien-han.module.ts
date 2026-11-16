@@ -31,9 +31,6 @@ const routes: Routes = [
 		NhapNienHanService,
 		NienHanService
 	],
-	entryComponents: [
-		NhapNienHanListComponent,
-	],
 	declarations: [
 		NhapNienHanComponent,
 		NhapNienHanListComponent,

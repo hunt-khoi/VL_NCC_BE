@@ -7,7 +7,7 @@ import { merge, BehaviorSubject } from 'rxjs';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { TinhHinhMuaBaoHiemService } from './Services/tinh-hinh-mua-bao-hiem.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Moment } from 'moment';
 
 @Component({

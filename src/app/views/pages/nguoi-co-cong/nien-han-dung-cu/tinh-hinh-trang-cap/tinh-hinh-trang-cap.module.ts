@@ -25,8 +25,6 @@ const routes: Routes = [
 	providers: [
 		TinhHinhTrangCapService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		TinhHinhTrangCapComponent,
 	]

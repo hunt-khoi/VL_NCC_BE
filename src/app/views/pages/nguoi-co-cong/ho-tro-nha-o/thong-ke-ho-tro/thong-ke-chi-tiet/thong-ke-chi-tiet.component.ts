@@ -13,7 +13,7 @@ import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_ba
 import { TableModel } from '../../../../../partials/table';
 import { TableService } from '../../../../../partials/table/table.service';
 import { FormGroup } from '@angular/forms';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Moment } from 'moment';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 

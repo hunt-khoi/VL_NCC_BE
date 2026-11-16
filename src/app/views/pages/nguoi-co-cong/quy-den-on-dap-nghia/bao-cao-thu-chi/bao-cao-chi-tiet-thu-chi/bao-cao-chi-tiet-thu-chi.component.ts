@@ -7,7 +7,7 @@ import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 import { Moment } from 'moment';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'm-bao-cao-chi-tiet-thu-chi',

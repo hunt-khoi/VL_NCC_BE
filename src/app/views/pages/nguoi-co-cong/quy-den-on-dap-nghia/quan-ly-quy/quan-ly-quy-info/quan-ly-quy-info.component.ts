@@ -8,7 +8,7 @@ import { Label } from 'ng2-charts';
 import { ChartOptions, ChartType } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Moment } from 'moment';
-import * as moment from 'moment';
+import moment from 'moment';
 // Service
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { CommonService } from './../../../services/common.service';

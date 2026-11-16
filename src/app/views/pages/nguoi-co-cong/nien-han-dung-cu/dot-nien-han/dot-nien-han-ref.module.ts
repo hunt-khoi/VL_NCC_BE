@@ -11,10 +11,6 @@ import { dotnienhanEditDialogComponent } from './dot-nien-han-edit/dot-nien-han-
 	providers: [
 		dotnienhanService
 	],
-	entryComponents: [
-		dotnienhanListComponent,
-		dotnienhanEditDialogComponent,
-	],
 	declarations: [
 		dotnienhanListComponent,
 		dotnienhanEditDialogComponent,

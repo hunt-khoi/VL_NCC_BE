@@ -9,7 +9,7 @@ import { XuatHoTroNhaService } from './Services/xuat-da-ho-tro.service';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { TableService } from 'app/views/partials/table/table.service';
 import { TableModel } from 'app/views/partials/table';
 

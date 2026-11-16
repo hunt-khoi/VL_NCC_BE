@@ -33,8 +33,6 @@ const routes: Routes = [
 	providers: [
 		HoTroDTDuyetService,
 	],
-	entryComponents: [
-	],
 	declarations: [
 		HoTroDTDuyetPageComponent,
 		HoTroDTDuyetComponent,

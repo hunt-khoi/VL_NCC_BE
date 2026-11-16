@@ -14,12 +14,6 @@ import { ThongKeTongHopComponent } from './thong-ke-tong-hop/thong-ke-tong-hop.c
 	providers: [
 		ThongKeHoTroService
 	],
-	entryComponents: [
-		ThongKeHoTroTabComponent,
-		ThongKeChiTietComponent,
-		ThongKeTongHopComponent,
-		ThongKeTongHopDialogComponent
-	],
 	declarations: [
 		ThongKeHoTroTabComponent,
 		ThongKeChiTietComponent,

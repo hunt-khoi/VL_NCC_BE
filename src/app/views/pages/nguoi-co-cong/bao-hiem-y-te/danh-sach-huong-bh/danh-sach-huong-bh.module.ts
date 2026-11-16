@@ -28,8 +28,6 @@ const routes: Routes = [
 	providers: [
 		DSHuongBaoHiemService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		DSHuongBaoHiemComponent,
 	]

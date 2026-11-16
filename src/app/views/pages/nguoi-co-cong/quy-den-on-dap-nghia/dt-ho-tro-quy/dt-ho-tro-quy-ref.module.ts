@@ -16,13 +16,6 @@ import { XuatDTDaHoTroComponent } from './xuat-dt-da-ho-tro/xuat-dt-da-ho-tro.co
 	providers: [
 		dtHoTroServices
 	],
-	entryComponents: [
-		DTHoTroTabComponent,
-		DTHoTroListComponent,
-		XuatDTDaHoTroComponent,
-		DTHoTroEditDialogComponent,
-		DTHoTroHoTroDialogComponent
-	],
 	declarations: [
 		DTHoTroTabComponent,
 		DTHoTroListComponent,

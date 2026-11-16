@@ -28,8 +28,6 @@ const routes: Routes = [
 	providers: [
 		KeHoachVanDongService,
 	],
-	entryComponents: [
-	],
 	declarations: [
 		KeHoachVanDongComponent
 	]

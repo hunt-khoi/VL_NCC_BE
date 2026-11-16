@@ -35,9 +35,6 @@ const routes: Routes = [
 	providers: [
 		NienHanDuyetService
 	],
-	entryComponents: [
-		// DeXuatTongHopDialogComponent
-	],
 	declarations: [
 		NienHanDuyetComponent,
 		DuyetNienHanPageComponent

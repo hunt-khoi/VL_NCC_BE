@@ -33,9 +33,6 @@ const routes: Routes = [
 	providers: [
         PhiSoLieuServices,
     ],
-	entryComponents: [
-		
-    ],
     declarations: [
         PhiSoLieuComponent,
     ]

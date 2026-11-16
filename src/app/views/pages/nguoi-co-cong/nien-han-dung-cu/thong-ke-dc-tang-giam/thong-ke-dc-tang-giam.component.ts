@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { CommonService } from '../../services/common.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ThongKeTangGiamService } from './Services/thong-ke-dc-tang-giam.service';
 
 @Component({

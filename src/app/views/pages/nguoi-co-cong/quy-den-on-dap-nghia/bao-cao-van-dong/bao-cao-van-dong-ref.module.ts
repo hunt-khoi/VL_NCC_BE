@@ -14,11 +14,6 @@ import { BaoCaoThoiDiemComponent } from './bao-cao-thoi-diem/bao-cao-thoi-diem.c
 	providers: [
 		BaoCaoVanDongService
 	],
-	entryComponents: [
-		BaoCaoVanDongTabComponent,
-		BaoCaoThangComponent,
-		BaoCaoThoiDiemComponent
-	],
 	declarations: [
 		BaoCaoVanDongTabComponent,
 		BaoCaoThangComponent,

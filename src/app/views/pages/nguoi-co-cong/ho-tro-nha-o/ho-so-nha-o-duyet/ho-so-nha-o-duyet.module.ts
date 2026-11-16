@@ -33,8 +33,6 @@ const routes: Routes = [
 	providers: [
 		HoSoNhaODuyetService,
 	],
-	entryComponents: [
-	],
 	declarations: [
 		HoSoNhaODuyetPageComponent,
 		HoSoNhaODuyetComponent,

@@ -11,9 +11,6 @@ import { thongkeDCTangGiamComponent } from './thong-ke-dc-tang-giam.component';
 	providers: [
 		ThongKeTangGiamService
 	],
-	entryComponents: [
-		thongkeDCTangGiamComponent,
-	],
 	declarations: [
 		thongkeDCTangGiamComponent,
 	],

@@ -19,12 +19,6 @@ import { QuanLyQuyService } from '../quan-ly-quy/Services/quan-ly-quy.service';
 		KeHoachVanDongService,
 		QuanLyQuyService
 	],
-	entryComponents: [
-		KeHoachVanDongComponent,
-		KeHoachVanDongTabComponent,
-		KHVanDongEditDialogComponent,
-		KHVanDongDetailEditDialogComponent
-	],
 	declarations: [
 		KeHoachVanDongTabComponent,
 		KeHoachVanDongListComponent,

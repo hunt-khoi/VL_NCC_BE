@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel, TypesUtilsService } from '../../../../../../core/_base/crud';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Sort } from '@angular/material/sort';
 import { HoTroDTDuyetService } from '../Services/ho-tro-duyet.service';
 import { HoTroSupDialogComponent } from '../ho-tro-sup-edit/ho-tro-sup-edit-dialog.component';

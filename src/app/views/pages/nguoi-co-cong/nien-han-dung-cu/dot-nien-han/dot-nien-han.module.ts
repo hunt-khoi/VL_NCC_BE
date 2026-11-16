@@ -28,8 +28,6 @@ const routes: Routes = [
 	providers: [
 		dotnienhanService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		dotnienhanComponent,
 	]

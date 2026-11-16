@@ -8,7 +8,7 @@ import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import * as moment from 'moment';
+import moment from 'moment';
 // Services
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from '../../../../../partials/table';

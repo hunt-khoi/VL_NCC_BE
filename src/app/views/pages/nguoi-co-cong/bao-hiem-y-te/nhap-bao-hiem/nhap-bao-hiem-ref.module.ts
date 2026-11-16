@@ -12,9 +12,6 @@ import { DoiTuongBaoHiemRefModule } from '../doi-tuong-bao-hiem/doi-tuong-bao-hi
 	providers: [
 		NhapBaoHiemService
 	],
-	entryComponents: [
-		NhapBaoHiemEditDialogComponent,
-	],
 	declarations: [
 		NhapBaoHiemEditDialogComponent,
 	],

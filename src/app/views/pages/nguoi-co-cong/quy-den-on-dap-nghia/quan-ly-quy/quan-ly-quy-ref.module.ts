@@ -23,15 +23,6 @@ import { ChiQuyChiDialogComponent } from './quyet-dinh-chi-quy/quyet-dinh-chi-qu
 	providers: [
 		ThemeService
 	],
-	entryComponents: [
-		QuanLyQuyTabComponent,
-		QLQuyInfoEditDialogComponent,
-		QuanLyQuyInfoCanvasComponent,
-		DongGopQuyEditDialogComponent,
-		DongGopQuyHistoryDialogComponent,
-		ChiQuyEditDialogComponent,
-		ChiQuyChiDialogComponent,
-	],
 	declarations: [
 		QuanLyQuyComponent,
 		QuanLyQuyTabComponent,

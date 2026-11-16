@@ -28,9 +28,6 @@ const routes: Routes = [
 	providers: [
         dtHoTroServices,
     ],
-	entryComponents: [
-		
-    ],
     declarations: [
         DTHoTroComponent,
     ]

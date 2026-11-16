@@ -7,7 +7,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import * as moment from 'moment';
+import moment from 'moment';
 
 import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
 import { CommonService } from 'app/views/pages/nguoi-co-cong/services/common.service';

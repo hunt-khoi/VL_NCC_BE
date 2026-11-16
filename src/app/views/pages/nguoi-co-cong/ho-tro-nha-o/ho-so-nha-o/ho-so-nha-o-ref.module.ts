@@ -17,13 +17,6 @@ import { HoSoNhaOSupportsDialogComponent } from './ho-tro-nha-o-supports/ho-tro-
 	providers: [
 		HoSoNhaOService,
 	],
-	entryComponents: [
-		HoSoNhaOImportComponent,
-		HoSoNhaOEditDialogComponent,
-		HoSoNhaOSupportDialogComponent,
-		HoSoNhaOSupportsDialogComponent,
-		HoSoNhaOHistoryComponent
-	],
 	declarations: [
 		HoSoNhaOListComponent,
 		HoSoNhaOEditDialogComponent,

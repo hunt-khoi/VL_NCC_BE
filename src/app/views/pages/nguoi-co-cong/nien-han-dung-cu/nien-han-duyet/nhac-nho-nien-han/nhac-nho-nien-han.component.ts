@@ -14,7 +14,7 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from '../../../../../partials/table';
 import { TableService } from '../../../../../partials/table/table.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { SettingProcessComponent } from '../../../components';
 import { NienHanDuyetDataSource } from '../Model/data-sources/nien-han-duyet.datasource';
 import { NienHanDuyetService } from '../Services/nien-han-duyet.service';

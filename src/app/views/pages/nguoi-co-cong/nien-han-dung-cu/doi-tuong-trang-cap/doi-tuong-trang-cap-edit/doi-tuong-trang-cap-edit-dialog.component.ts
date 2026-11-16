@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ReplaySubject } from 'rxjs';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { LayoutUtilsService, TypesUtilsService } from 'app/core/_base/crud';

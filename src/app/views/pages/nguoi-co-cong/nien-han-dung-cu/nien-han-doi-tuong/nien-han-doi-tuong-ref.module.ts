@@ -12,11 +12,6 @@ import { NienHanDoiTuongTabComponent } from './nien-han-doi-tuong-tab.component'
 	providers: [
 		NienHanDoiTuongService,
 	],
-	entryComponents: [
-		NienHanDoiTuongTabComponent,
-		NienHanDoiTuongListComponent,
-		DoiTuongCapListComponent
-	],
 	declarations: [
 		NienHanDoiTuongTabComponent,
 		NienHanDoiTuongListComponent,

@@ -5,7 +5,7 @@ import { xuatDuToanService } from './Services/xuat-du-toan.service';
 import { CommonService } from '../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
 	selector: 'm-xuat-du-toan',

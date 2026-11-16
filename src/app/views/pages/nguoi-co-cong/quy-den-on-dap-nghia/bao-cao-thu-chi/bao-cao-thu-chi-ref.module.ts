@@ -15,14 +15,6 @@ import { BaoCaoThuChiCTComponent } from './bao-cao-chi-tiet-thu-chi/bao-cao-chi-
 	providers: [
 		BaoCaoThuChiService
 	],
-	entryComponents: [
-		BaoCaoThuChiTabComponent,
-		BaoCaoTheoNDChiComponent,
-		BaoCaoQuyThuChiComponent,
-		BaoCaoChiQuyComponent,
-		BaoCaoTheoKyComponent,
-		BaoCaoThuChiCTComponent
-	],
 	declarations: [
 		BaoCaoThuChiTabComponent,
 		BaoCaoTheoNDChiComponent,

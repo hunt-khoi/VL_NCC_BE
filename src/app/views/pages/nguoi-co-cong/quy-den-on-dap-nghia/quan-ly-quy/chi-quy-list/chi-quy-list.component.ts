@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Moment } from 'moment';
-import * as moment from 'moment';
+import moment from 'moment';
 // Services
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';

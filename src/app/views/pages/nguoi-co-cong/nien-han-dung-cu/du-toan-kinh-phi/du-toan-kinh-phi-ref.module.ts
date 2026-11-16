@@ -13,12 +13,6 @@ import { DuToanKinhPhiImportComponent } from './du-toan-kinh-phi-import/du-toan-
 	providers: [
 		dutoankinhphiService
 	],
-	entryComponents: [
-		dutoankinhphiListComponent,
-		dutoankinhphinnewEditDialogComponent,
-		dutoankinhphiEditDialogComponent,
-		DuToanKinhPhiImportComponent
-	],
 	declarations: [
 		dutoankinhphiListComponent,
 		dutoankinhphinnewEditDialogComponent,

@@ -19,7 +19,7 @@ import { NienHanDuyetDataSource } from '../Model/data-sources/nien-han-duyet.dat
 import { NienHanDuyetService } from '../Services/nien-han-duyet.service';
 import { NienHanDuyetDialogComponent } from '../nien-han-duyet/nien-han-duyet.dialog.component';
 import { NienHanEditDialogComponent } from '../../nien-han/nien-han-edit/nien-han-edit.dialog.component';
-import * as moment from 'moment';
+import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({

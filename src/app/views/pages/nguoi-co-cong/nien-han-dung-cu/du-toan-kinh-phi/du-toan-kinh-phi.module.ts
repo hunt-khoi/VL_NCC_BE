@@ -28,8 +28,6 @@ const routes: Routes = [
 	providers: [
 		dutoankinhphiService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		dutoankinhphiComponent,
 	]

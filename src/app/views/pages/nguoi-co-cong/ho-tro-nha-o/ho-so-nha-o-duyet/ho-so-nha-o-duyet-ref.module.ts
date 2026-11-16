@@ -20,12 +20,6 @@ import { HoSoNhaOHDListComponent } from './ho-so-nha-o-hd-list/ho-so-nha-o-hd-li
 	providers: [
 		HoSoNhaODuyetService
 	],
-	entryComponents: [
-		HoSoNhaODuyetComponent,
-		HoSoNhaODuyetDialogComponent,
-		HoSoNhaOHoanThienDialogComponent,
-		HoSoNhaOHDListComponent
-	],
 	declarations: [
 		HoSoNhaODuyetListComponent,
 		HoSoNhaODuyetDialogComponent,

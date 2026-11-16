@@ -12,7 +12,7 @@ import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
 import { TableService } from 'app/views/partials/table/table.service';
 import { TableModel } from 'app/views/partials/table';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ThongKeKinhPhiDialogComponent } from './thong-ke-kinh-phi-dialog/thong-ke-kinh-phi-dialog.component';
 
 @Component({

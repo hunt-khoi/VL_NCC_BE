@@ -17,11 +17,6 @@ import { HoTroSupDialogComponent } from './ho-tro-sup-edit/ho-tro-sup-edit-dialo
 	providers: [
 		HoTroDTDuyetService
 	],
-	entryComponents: [
-		HoTroDTDuyetComponent,
-		HoTroDTDuyetDialogComponent,
-		HoTroSupDialogComponent
-	],
 	declarations: [
 		HoTroDuyetListComponent,
 		HoTroDTDuyetDialogComponent,

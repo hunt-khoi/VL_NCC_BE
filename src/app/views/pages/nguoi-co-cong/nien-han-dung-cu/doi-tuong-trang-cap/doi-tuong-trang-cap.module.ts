@@ -27,8 +27,6 @@ const routes: Routes = [
 	providers: [
 		DoiTuongTrangCapService
 	],
-	entryComponents: [
-	],
 	declarations: [
 		DoiTuongTrangCapComponent,
 	],

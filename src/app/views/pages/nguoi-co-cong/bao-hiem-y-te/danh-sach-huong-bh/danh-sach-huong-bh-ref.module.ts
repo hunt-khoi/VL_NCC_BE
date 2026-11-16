@@ -10,9 +10,6 @@ import { DSHuongBaoHiemService } from './Services/danh-sach-huong-bh.service';
 	providers: [
 		DSHuongBaoHiemService
 	],
-	entryComponents: [
-		DSHuongBaoHiemListComponent,
-	],
 	declarations: [
 		DSHuongBaoHiemListComponent,
 	],
