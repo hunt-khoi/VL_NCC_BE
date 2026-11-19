@@ -83,7 +83,7 @@ Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smok
 | 19 | — | `ComponentFactoryResolver` (bị xoá ở 22) → truyền thẳng class vào `createComponent` ở `ngb/util/popup.ts`, `ngb/tooltip/tooltip.ts`, `ho-so-ncc-edit-dialog` | API bị xoá |
 | 19 | — | `ng-inline-svg-2` 14.0.2 → 20.0.2 | Bản 14 import `ComponentFactoryResolver` |
 | 19 | — | 22 chỗ `(click)="in(...)"` → `this.in(...)` | Từ 22, `in` là toán tử trong template |
-| 19 | — | 2 nút đóng (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`) có cả `mat-button`, `mat-raised-button`, `mat-mini-fab`; chỉ giữ `mat-mini-fab` như mọi dialog khác | Lỗi NG8023. Từ Material MDC (Task 12) hai nút này đã lỗi NG0300 lúc mở dialog |
+| 19 | — | 2 nút đóng (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`) có cả `mat-button`, `mat-raised-button`, `mat-mini-fab`; chỉ giữ `mat-mini-fab` như mọi dialog khác | Lỗi NG8023. Nhiều khả năng từ Material MDC (Task 12) hai dialog này đã lỗi NG0300 lúc mở (chưa kiểm chứng) |
 | 19 | — | Migration thêm `changeDetection: ChangeDetectionStrategy.Eager` vào 144 component, `withXhr()` vào `provideHttpClient` | Giữ hành vi trước 22 |
 | Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
 
