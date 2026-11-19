@@ -1,6 +1,6 @@
 import { ComponentRef, Injectable, Injector } from '@angular/core';
 import { Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentPortal } from '@angular/cdk/portal';
 import { LoadingComponent } from '../components/loading/loading.component';
 
 export class LoadingOverlayRef {
@@ -60,9 +60,8 @@ export class LoadingService {
     return containerRef.instance;
   }
 
-  private createInjector(dialogRef: LoadingOverlayRef): PortalInjector {
-    const injectionTokens = new WeakMap();
-    injectionTokens.set(LoadingOverlayRef, dialogRef);
-    return new PortalInjector(this.injector, injectionTokens);
+  private createInjector(dialogRef: LoadingOverlayRef): Injector {
+    // PortalInjector da bi bo o Angular CDK 20; Injector.create cho ket qua tuong duong.
+    return Injector.create({ providers: [{ provide: LoadingOverlayRef, useValue: dialogRef }], parent: this.injector });
   }
 }

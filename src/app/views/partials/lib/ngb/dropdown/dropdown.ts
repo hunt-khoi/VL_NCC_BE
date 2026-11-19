@@ -21,9 +21,10 @@ import {
   QueryList,
   Renderer2,
   SimpleChanges,
-  Optional
+  Optional,
+  DOCUMENT
 } from '@angular/core';
-import {DOCUMENT} from '@angular/common';
+
 import {fromEvent, Subject, Subscription} from 'rxjs';
 import {take} from 'rxjs/operators';
 

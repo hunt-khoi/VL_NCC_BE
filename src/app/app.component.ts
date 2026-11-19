@@ -1,12 +1,12 @@
 import { Subscription } from 'rxjs';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, Inject, DOCUMENT } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { LayoutConfigService, SplashScreenService, TranslationService } from './core/_base/layout';
 import { LayoutConfig } from './core/_config/layout.config';
 // language list
 import { locale as viLang } from './core/_config/i18n/vi';
 import { Title } from '@angular/platform-browser';
-import { DOCUMENT } from '@angular/common';
+
 import { FormControlName } from '@angular/forms';
 
 const originFormControlNameNgOnChanges = FormControlName.prototype.ngOnChanges;
