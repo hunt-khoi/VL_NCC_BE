@@ -1715,12 +1715,11 @@
   resolved "https://registry.yarnpkg.com/@standard-schema/spec/-/spec-1.1.0.tgz#a79b55dbaf8604812f52d140b2c9ab41bc150bb8"
   integrity sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==
 
-"@tinymce/tinymce-angular@7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@tinymce/tinymce-angular/-/tinymce-angular-7.0.0.tgz#010de497d5774a8bdc5d5936bf4fb976adf05f56"
-  integrity sha512-IKNaG/ihlxE1XCfq6lzULbnsqZO9KNJtlpu5jo6JDJDL9zcFzj/N2A16Kk7rTj1yfmDoB1IXAk/BpMOvgDY8cg==
+"@tinymce/tinymce-angular@9.1.2":
+  version "9.1.2"
+  resolved "https://registry.yarnpkg.com/@tinymce/tinymce-angular/-/tinymce-angular-9.1.2.tgz#2ae15e28d48945baf5099b2156d4b2798047c89c"
+  integrity sha512-15O3vECy+12Ftjt0/Mh17QbXmFTEHqvvpkrFNuvGYqL59IxvVD1W324r7Eu1h0j8fXsUzCyKOmlWhE1OPxcUEQ==
   dependencies:
-    tinymce "^6.0.0 || ^5.5.0"
     tslib "^2.3.0"
 
 "@tybys/wasm-util@^0.10.3":
@@ -5126,12 +5125,7 @@ tinyglobby@0.2.17, tinyglobby@^0.2.15, tinyglobby@^0.2.17:
     fdir "^6.5.0"
     picomatch "^4.0.4"
 
-tinymce@^5.7.1:
-  version "5.10.9"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.10.9.tgz#1dfacb3231c71a688d90ff44a0b3f2e91b3b9edf"
-  integrity sha512-5bkrors87X9LhYX2xq8GgPHrIgJYHl87YNs+kBcjQ5I3CiUgzo/vFcGvT3MZQ9QHsEeYMhYO6a5CLGGffR8hMg==
-
-"tinymce@^6.0.0 || ^5.5.0":
+tinymce@^6.8.6:
   version "6.8.6"
   resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.8.6.tgz#799e4f03eeb4399399dfdeb12ba17b3b91887adf"
   integrity sha512-++XYEs8lKWvZxDCjrr8Baiw7KiikraZ5JkLMg6EdnUVNKJui0IsrAADj5MsyUeFkcEryfn2jd3p09H7REvewyg==

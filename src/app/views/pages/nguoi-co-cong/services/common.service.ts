@@ -69,16 +69,19 @@ export class CommonService {
 	};
 	tinyConfig: any = {
 		language: 'vi',
+		// TinyMCE 6: print, hr, textpattern, noneditable da vao core; toc, imagetools la ban tra phi nen bo khoi plugins.
 		base_url: '/tinymce', // Root for resources
+		// TinyMCE 6.2+ them nut quang cao "Upgrade"; ban 5 khong co.
+		promotion: false,
 		suffix: '.min', // Suffix to use when loading resources
-		plugins: 'print preview  importcss searchreplace autolink autosave save directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+		plugins: 'preview importcss searchreplace autolink autosave save directionality visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help quickbars emoticons',
 		//powerpaste casechange tinydrive advcode mediaembed tinymcespellchecker checklist a11ychecker formatpainter permanentpen pageembed tinycomments mentions linkchecker advtable
 		//tinydrive_token_provider: 'URL_TO_YOUR_TOKEN_PROVIDER',
 		//tinydrive_dropbox_app_key: 'YOUR_DROPBOX_APP_KEY',
 		//tinydrive_google_drive_key: 'YOUR_GOOGLE_DRIVE_KEY',
 		//tinydrive_google_drive_client_id: 'YOUR_GOOGLE_DRIVE_CLIENT_ID',
 		mobile: {
-			plugins: 'print preview  importcss searchreplace autolink autosave save directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap quickbars emoticons',
+			plugins: 'preview importcss searchreplace autolink autosave save directionality visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help quickbars emoticons',
 		},
 		menu: {
 			tc: {
@@ -87,8 +90,8 @@ export class CommonService {
 			}
 		},
 		menubar: 'file edit view insert format tools table tc help',
-		toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist checklist | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | a11ycheck ltr rtl | showcomments addcomment',
-		fontsize_formats: "8pt 10pt 12pt 13pt 14pt 18pt 24pt 36pt",
+		toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist checklist | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | a11ycheck ltr rtl | showcomments addcomment',
+		font_size_formats: "8pt 10pt 12pt 13pt 14pt 18pt 24pt 36pt",
 		autosave_ask_before_unload: true,
 		autosave_interval: '30s',
 		autosave_prefix: '{path}{query}-{id}-',
@@ -118,12 +121,12 @@ export class CommonService {
 		height: 600,
 		image_caption: true,
 		quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-		noneditable_noneditable_class: 'mceNonEditable',
+		noneditable_class: 'mceNonEditable',
 		toolbar_mode: 'sliding',
 		spellchecker_ignore_list: ['Ephox', 'Moxiecode'],
 		tinycomments_mode: 'embedded',
 		content_style: '.mymention{ color: gray; } p {margin: 0}',
-		contextmenu: 'link image imagetools table configurepermanentpen',
+		contextmenu: 'link image table',
 		a11y_advanced_options: true,
 		//skin: useDarkMode ? 'oxide-dark' : 'oxide',
 		//content_css: useDarkMode ? 'dark' : 'default',
