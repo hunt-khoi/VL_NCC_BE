@@ -22,6 +22,7 @@ const option = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : u
 const live = option('--target') === 'live';
 const discover = flag('--discover');
 const only = option('--only');
+const missing = flag('--missing');
 const label = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--target' && args[i - 1] !== '--only');
 
 const baseUrl = (live ? process.env.VISUAL_LIVE_URL : process.env.VISUAL_BASE_URL || 'http://localhost:3105')?.replace(/\/+$/, '');
@@ -54,10 +55,10 @@ const BUSY = 'kt-splash-screen, mat-progress-bar, mat-spinner, mat-progress-spin
 const slug = (p) => p.replace(/^\/+|\/+$/g, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'home';
 
 async function settle(page) {
-	await page.waitForLoadState('networkidle', { timeout: 20000 }).catch(() => {});
+	await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => {});
 	await page.waitForFunction((sel) => {
 		return [...document.querySelectorAll(sel)].every((el) => el.offsetParent === null);
-	}, BUSY, { timeout: 20000 }).catch(() => {});
+	}, BUSY, { timeout: 10000 }).catch(() => {});
 	await page.evaluate(() => document.fonts && document.fonts.ready).catch(() => {});
 	await page.waitForTimeout(600);
 }
@@ -127,6 +128,7 @@ async function runCapture(page) {
 	}
 	let screens = JSON.parse(fs.readFileSync(screensFile, 'utf8'));
 	if (only) screens = screens.filter((s) => s.name.includes(only));
+	if (missing) screens = screens.filter((s) => !fs.existsSync(path.join(here, 'shots', label, s.name + '.png')));
 	if (live) screens = screens.filter((s) => !s.steps || s.steps.length === 0);
 
 	const outDir = path.join(here, 'shots', label);
@@ -137,7 +139,13 @@ async function runCapture(page) {
 		try {
 			await page.goto(baseUrl + screen.path, { waitUntil: 'domcontentloaded', timeout: 45000 });
 			await settle(page);
-			if (new URL(page.url()).pathname.includes('/auth')) throw new Error('bi day ve trang dang nhap');
+			if (new URL(page.url()).pathname.includes('/auth')) {
+				console.log('  phien dang nhap bi mat, dang nhap lai');
+				await login(page);
+				await page.goto(baseUrl + screen.path, { waitUntil: 'domcontentloaded', timeout: 45000 });
+				await settle(page);
+				if (new URL(page.url()).pathname.includes('/auth')) throw new Error('bi day ve trang dang nhap');
+			}
 			if (screen.steps?.length) await runSteps(page, screen.steps);
 			await page.addStyleTag({ content: FREEZE_CSS });
 			const mask = (screen.mask || []).map((sel) => page.locator(sel));
