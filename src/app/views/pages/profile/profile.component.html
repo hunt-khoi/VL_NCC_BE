@@ -87,9 +87,9 @@
 					<div class="kt-widget__head">
 						<div class="kt-widget__media">
 							<!-- <img src="{{_user.avata}}" alt="image"> -->
-							<ngx-avatar size="55" src="{{_user.avata}}" *ngIf="_user.avata; else bindText"></ngx-avatar>
+							<ngx-avatars size="55" src="{{_user.avata}}" *ngIf="_user.avata; else bindText"></ngx-avatars>
 							<ng-template #bindText>
-								<ngx-avatar size="55" bgColor="{{commonService.get_colorByName(_user.charname)}}" [name]="_user.charname"></ngx-avatar>
+								<ngx-avatars size="55" bgColor="{{commonService.get_colorByName(_user.charname)}}" [name]="_user.charname"></ngx-avatars>
 							</ng-template>
 						</div>
 						<div class="kt-widget__content">

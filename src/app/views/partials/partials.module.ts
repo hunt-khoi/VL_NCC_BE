@@ -28,7 +28,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 // NgBootstrap
 import { NgbDropdownModule, NgbTabsetModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 // Perfect Scrollbar
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { PerfectScrollbarModule } from './lib/perfect-scrollbar/perfect-scrollbar';
 // Core module
 import { CoreModule } from '../../core/core.module';
 // CRUD Partials
@@ -59,12 +59,12 @@ import { PortletModule } from './content/general/portlet/portlet.module';
 // Errpr
 import { ErrorComponent } from './content/general/error/error.component';
 // SVG inline
-import { InlineSVGModule } from 'ng-inline-svg';
+import { InlineSVGModule } from 'ng-inline-svg-2';
 import { CommonService } from '../pages/nguoi-co-cong/services/common.service';
 import { UploadFileComponent } from '../pages/nguoi-co-cong/components/upload-file/upload-file.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { AvatarModule } from 'ngx-avatar';
+import { AvatarModule } from 'ngx-avatars';
 import { LibModule } from './lib/lib.module';
 @NgModule({
     declarations: [

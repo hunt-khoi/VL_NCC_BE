@@ -50,7 +50,6 @@
               ]
             },
             "allowedCommonJsDependencies": [
-              "angular2-recaptcha",
               "jwt-decode",
               "chart.js",
               "lodash",

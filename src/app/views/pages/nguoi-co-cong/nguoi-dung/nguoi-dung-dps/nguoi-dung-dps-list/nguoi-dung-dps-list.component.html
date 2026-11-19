@@ -87,9 +87,9 @@
 					<th mat-header-cell *matHeaderCellDef></th>
 					<td mat-cell class="m--padding-10 td-padding" *matCellDef="let item">
 						<!-- <img src="{{item.Avata}}" class="grid-image" /> -->
-						<ngx-avatar size="37" src="{{item.Avata}}" *ngIf="item.image; else bindText"></ngx-avatar>
+						<ngx-avatars size="37" src="{{item.Avata}}" *ngIf="item.image; else bindText"></ngx-avatars>
 						<ng-template #bindText>
-							<ngx-avatar size="37" bgColor="{{commonService.get_colorByName(item.Name)}}" [name]="item.Name"></ngx-avatar>
+							<ngx-avatars size="37" bgColor="{{commonService.get_colorByName(item.Name)}}" [name]="item.Name"></ngx-avatars>
 						</ng-template>
 					</td>
 				</ng-container>

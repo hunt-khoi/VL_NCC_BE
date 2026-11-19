@@ -7,7 +7,7 @@ import { CommentService } from './comment.service';
 import { EmotionDialogComponent } from '../emotion-dialog/emotion-dialog.component';
 import { GlobalVariable } from '../../../../pages/global';
 import { CommentEditDialogComponent } from './comment-edit-dialog/comment-edit-dialog.component';
-import { PopoverContentComponent } from 'ngx-smart-popover';
+import { PopoverContentComponent } from '../../../../partials/lib/popover/popover';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
 import { CommonService } from '../../services/common.service';

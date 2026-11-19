@@ -3,11 +3,11 @@
 		<div class="user-info">
 			<div class="kt-user-card__avatar">
 				<!-- <img alt="" src="{{it.image}}"> -->
-				<ngx-avatar size="44" src="{{it.image}}" *ngIf="it.image; else bindText">
-				</ngx-avatar>
+				<ngx-avatars size="44" src="{{it.image}}" *ngIf="it.image; else bindText">
+				</ngx-avatars>
 				<ng-template #bindText>
-					<ngx-avatar size="44" bgColor="{{commonService.get_colorByName(it.charname)}}"
-						[name]="it.charname"></ngx-avatar>
+					<ngx-avatars size="44" bgColor="{{commonService.get_colorByName(it.charname)}}"
+						[name]="it.charname"></ngx-avatars>
 				</ng-template>
 			</div>
 			<div class="kt-user-card__name">
@@ -26,11 +26,11 @@
 					<div class="user-info">
 						<div class="kt-user-card__avatar">
 							<!-- <img alt="" src="{{UserData.Image}}"> -->
-							<ngx-avatar size="44" src="{{UserData.Image}}" *ngIf="UserData.Image; else bindText">
-							</ngx-avatar>
+							<ngx-avatars size="44" src="{{UserData.Image}}" *ngIf="UserData.Image; else bindText">
+							</ngx-avatars>
 							<ng-template #bindText>
-								<ngx-avatar size="44" bgColor="{{commonService.get_colorByName(UserData.Charname)}}"
-									[name]="UserData.Charname"></ngx-avatar>
+								<ngx-avatars size="44" bgColor="{{commonService.get_colorByName(UserData.Charname)}}"
+									[name]="UserData.Charname"></ngx-avatars>
 							</ng-template>
 						</div>
 						<div class="kt-user-card__name">
@@ -102,13 +102,13 @@
 					<div class="user-info">
 						<div class="kt-user-card__avatar" matTooltip="{{quyen.NguoiTao.chucvu}}">
 							<!-- <img src="{{quyen.NguoiTao.image}}"> -->
-							<ngx-avatar size="44" src="{{quyen.NguoiTao.image}}"
+							<ngx-avatars size="44" src="{{quyen.NguoiTao.image}}"
 								*ngIf="quyen.NguoiTao.image; else bindText">
-							</ngx-avatar>
+							</ngx-avatars>
 							<ng-template #bindText>
-								<ngx-avatar size="44"
+								<ngx-avatars size="44"
 									bgColor="{{commonService.get_colorByName(quyen.NguoiTao.charname)}}"
-									[name]="quyen.NguoiTao.charname"></ngx-avatar>
+									[name]="quyen.NguoiTao.charname"></ngx-avatars>
 							</ng-template>
 						</div>
 						<div class="kt-user-card__name">
@@ -232,13 +232,13 @@
 									<div class="kt-user-card__avatar">
 										<!-- <img src="{{child.NguoiTao.image}}"/> -->
 
-										<ngx-avatar size="44" src="{{child.NguoiTao.image}}"
+										<ngx-avatars size="44" src="{{child.NguoiTao.image}}"
 											*ngIf="child.NguoiTao.image; else bindText">
-										</ngx-avatar>
+										</ngx-avatars>
 										<ng-template #bindText>
-											<ngx-avatar size="44"
+											<ngx-avatars size="44"
 												bgColor="{{commonService.get_colorByName(child.NguoiTao.charname)}}"
-												[name]="child.NguoiTao.charname"></ngx-avatar>
+												[name]="child.NguoiTao.charname"></ngx-avatars>
 										</ng-template>
 									</div>
 									<div class="kt-user-card__name">

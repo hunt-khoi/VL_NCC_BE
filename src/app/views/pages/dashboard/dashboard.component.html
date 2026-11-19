@@ -50,12 +50,12 @@
 						#scrollView (scroll)="scrollViewHandler()" [perfectScrollbar]="{wheelPropagation: true}">
 						<div class="item-feedback" *ngFor="let item of lastestFeedback" (click)="ReadFeedBack(item)">
 							<div class="fd-avt">
-								<ngx-avatar size="45" src="{{item.NguoiGui_Img}}"
-									*ngIf="item.NguoiGui_Img; else bindText"></ngx-avatar>
+								<ngx-avatars size="45" src="{{item.NguoiGui_Img}}"
+									*ngIf="item.NguoiGui_Img; else bindText"></ngx-avatars>
 								<ng-template #bindText>
-									<ngx-avatar size="45" [name]="item.NguoiGui_Name"
+									<ngx-avatars size="45" [name]="item.NguoiGui_Name"
 										bgColor="{{commonService.get_colorByName(item.NguoiGui_Name)}}">
-									</ngx-avatar>
+									</ngx-avatars>
 								</ng-template>
 							</div>
 							<div class="fr-feedback">

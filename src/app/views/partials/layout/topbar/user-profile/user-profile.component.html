@@ -66,12 +66,12 @@
 			<i *ngIf="icon" class="flaticon2-user-outline-symbol"></i>
 			<!-- <img *ngIf="avatar" alt="Pic" [attr.src]="_user.avata">&nbsp; -->
 			<div class="fd-avt">
-				<ngx-avatar size="38" src="{{_user.avata}}" *ngIf="_user.avata; else bindText"></ngx-avatar>
+				<ngx-avatars size="38" src="{{_user.avata}}" *ngIf="_user.avata; else bindText"></ngx-avatars>
 				<ng-template #bindText>
 					<div style="padding-right: 5px;">
-						<ngx-avatar size="38" bgColor="{{commonService.get_colorByName(_user.charname)}}"
+						<ngx-avatars size="38" bgColor="{{commonService.get_colorByName(_user.charname)}}"
 							[name]="_user.charname">
-						</ngx-avatar>
+						</ngx-avatars>
 					</div>
 				</ng-template>
 			</div>
@@ -102,11 +102,11 @@
 				<!-- <img alt="Pic" [attr.src]="_user.avata" /> -->
 
 				<div class="fd-avt">
-					<ngx-avatar size="50" src="{{_user.avata}}" *ngIf="_user.avata; else bindText2"></ngx-avatar>
+					<ngx-avatars size="50" src="{{_user.avata}}" *ngIf="_user.avata; else bindText2"></ngx-avatars>
 					<ng-template #bindText2>
-						<ngx-avatar size="50" bgColor="{{commonService.get_colorByName(_user.charname)}}"
+						<ngx-avatars size="50" bgColor="{{commonService.get_colorByName(_user.charname)}}"
 							[name]="_user.charname">
-						</ngx-avatar>
+						</ngx-avatars>
 					</ng-template>
 				</div>
 				<!-- <span class="kt-badge kt-badge--lg kt-badge--rounded kt-badge--bold kt-font-success">

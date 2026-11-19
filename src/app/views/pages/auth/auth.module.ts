@@ -22,7 +22,7 @@ import { AuthNoticeComponent } from './auth-notice/auth-notice.component';
 // Auth
 import { AuthGuard, AuthService } from '../../../core/auth';
 import { TokenStorage } from '../../../core/auth/_services/token-storage.service';
-import { ReCaptchaModule } from 'angular2-recaptcha';
+import { ReCaptchaModule } from '../../partials/lib/recaptcha/recaptcha';
 
 const routes: Routes = [
 	{

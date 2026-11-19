@@ -6,13 +6,13 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThemeService, ChartsModule } from 'ng2-charts';
-import { AvatarModule } from "ngx-avatar";
+import { AvatarModule } from 'ngx-avatars';
 import { CoreModule } from '../../../core/core.module';
 import { PartialsModule } from '../../partials/partials.module';
 import { DashboardComponent } from './dashboard.component';
 import { CommonService } from '../nguoi-co-cong/services/common.service';
 import { CustomMatPaginatorIntl } from '../nguoi-co-cong/custom-mat-pagination-int';
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { PerfectScrollbarModule } from '../../partials/lib/perfect-scrollbar/perfect-scrollbar';
 
 @NgModule({
 	imports: [

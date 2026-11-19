@@ -96,12 +96,12 @@ import {
 	CanCuLSRowEditComponent,
 	ToTrinhEditComponent
 } from './components';
-import { PopoverModule } from 'ngx-smart-popover';
+import { PopoverModule } from '../../partials/lib/popover/popover';
 import { CommentService } from './components/comment/comment.service';
 import { DynamicProcessService } from './services/dynamic-process.service';
 import { RouterModule } from '@angular/router';
 import { NgxMaskModule, IConfig } from 'ngx-mask';
-import { AvatarModule } from'ngx-avatar';
+import { AvatarModule } from 'ngx-avatars';
 import { LoadingService } from './services/loading.service';
 import { LoadingInterceptor } from './services/loading.interceptor';
 import { AngularEditorModule } from '@kolkov/angular-editor';

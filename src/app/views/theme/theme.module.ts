@@ -11,8 +11,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgbProgressbarModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { LoadingBarModule } from '@ngx-loading-bar/core';
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
-import { InlineSVGModule } from 'ng-inline-svg';
+import { PerfectScrollbarModule } from '../partials/lib/perfect-scrollbar/perfect-scrollbar';
+import { InlineSVGModule } from 'ng-inline-svg-2';
 // Core Module
 import { CoreModule } from '../../core/core.module';
 import { HeaderComponent } from './header/header.component';

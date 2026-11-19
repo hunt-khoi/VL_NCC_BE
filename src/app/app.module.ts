@@ -6,10 +6,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OverlayModule } from '@angular/cdk/overlay';
-// Perfect Scroll bar
-import { PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 // SVG inline
-import { InlineSVGModule } from 'ng-inline-svg';
+import { InlineSVGModule } from 'ng-inline-svg-2';
 // Env
 import { environment } from '../environments/environment';
 // NGX Permissions
@@ -50,14 +48,6 @@ import { LayoutConfig } from './core/_config/layout.config';
 import { PermissionUrl } from './core/auth/_services/permissionurl';
 import { UserProfileService } from './core/auth/_services/user-profile.service';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive';
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-	wheelSpeed: 0.5,
-	swipeEasing: true,
-	minScrollbarLength: 40,
-	maxScrollbarLength: 300,
-};
 
 export function initializeLayoutConfig(appConfig: LayoutConfigService) {
 	// initialize app by loading default demo layout config
@@ -101,10 +91,6 @@ export function initializeLayoutConfig(appConfig: LayoutConfigService) {
 		PageConfigService,
 		KtDialogService,
 		SplashScreenService,
-		{
-			provide: PERFECT_SCROLLBAR_CONFIG,
-			useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
-		},
 		{
 			// layout config initializer
 			provide: APP_INITIALIZER,

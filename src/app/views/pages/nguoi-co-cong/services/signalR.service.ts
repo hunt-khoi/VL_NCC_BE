@@ -1,4 +1,4 @@
-import * as signalR from "@aspnet/signalr";
+import * as signalR from '@microsoft/signalr';
 import { Injectable, EventEmitter } from '@angular/core';
 import { environment } from "../../../../../environments/environment";
 import { TokenStorage } from "../../../../core/auth/_services/token-storage.service";
