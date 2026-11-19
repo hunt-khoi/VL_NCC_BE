@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-19):** đã lên **Angular 21** và build `dev` được (Task 18, commit `928a949` + `78b9bb2`). Bước tiếp theo là Task 19 (Angular 22). Xem mục "Trạng thái thực hiện".
+> **Trạng thái (2026-11-19):** đã lên **Angular 22.3** và build `dev` được (Task 19, commit `177eef7`). Còn Task 20 (dọn dẹp, build đủ 6 cấu hình, smoke test). **Cần Node `^22.22.3` hoặc `>= 24.15.0`.** Xem mục "Trạng thái thực hiện".
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -38,11 +38,15 @@ Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` v
 | 16 | Angular 18 → 19 | `c51cb1c` | Xong; `standalone: false` ở 387 file; sửa style trong thẻ `<style>` của template (xem dưới) |
 | 17 | Angular 19 → 20 | `9620de7` | Xong; `PortalInjector` (đã bị CDK 20 xoá) thay bằng `Injector.create` trong `LoadingService` |
 | 18 | Angular 20 → 21 | `928a949`, `681753a`, `78b9bb2` | Xong; NgRx 21.1.1; migration Material không đổi gì; sửa 2 lỗi template do migration control flow (xem dưới) |
-| 19–20 | Angular 22, hoàn thiện | — | Chưa làm |
+| 19 | Angular 21 → 22 | `177eef7` | Xong; Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0; chỉ kiểm màn hình đăng nhập (không có backend) |
+| 20 | Hoàn thiện, nghiệm thu | — | Chưa làm |
 
 ### Tiếp tục từ đâu
 
-Đầu nhánh đang ở Angular 21, `yarn verify:dev` qua với 0 lỗi. Bước tiếp theo là Task 19: `ng update @angular/core@22 @angular/cli@22`, rồi `@angular/material@22` và `@ngrx/store@22`, sau đó `yarn verify:dev`.
+Đầu nhánh đang ở Angular 22.3, `yarn verify:dev` qua với 0 lỗi; màn hình đăng nhập chạy được, không có lỗi JS. Bước tiếp theo là Task 20.
+
+- **Node:** Angular 22 yêu cầu Node `^22.22.3 || ^24.15.0 || >=26`. Máy đang dùng 24.14.0 phải nâng Node trước khi `yarn install`/`yarn start`.
+- Khi chạy `ng update` trên máy có prettier cài toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Bỏ `NODE_PATH` khi chạy để diff gọn.
 
 - Cài gói: cache yarn của máy đã chuyển sang `D:\DPS_Project\.yarn-cache`; khi build/cài dài nên đặt `TEMP`/`TMP` sang ổ D: vì ổ C: gần đầy.
 - Giao diện **chưa được kiểm bằng mắt** từ Task 5 (người phụ trách đã bỏ qua các mốc smoke). Trước khi phát hành phải đi hết `docs/plan/angular_22_smoke_checklist.md`; 33 chỗ SCSS dễ lệch nhất có comment `// MDC:`. Tag nội bộ `smoke-a` (cuối Chặng 1) và `smoke-b` (sau MDC) giúp khoanh vùng lỗi; hai tag này chưa push.
@@ -74,6 +78,13 @@ Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smok
 | 18 | — | `trackByIndex` ở `danh-sach-tang-qua` nhận thêm tham số thứ 2 | Migration sinh `track trackByIndex(j, ng)` |
 | 18 | — | Migration control flow bỏ qua `config-edit` (HTML lỗi sau khi chuyển) và `comment` (trùng tên `#bindText`); 2 template này vẫn dùng `*ngIf`/`*ngFor` | Cú pháp cũ vẫn chạy ở 21; xử lý ở Task 20 nếu cần |
 | 18 | — | Chạy lại migration bootstrap làm hỏng `src/main.ts` (lặp khoá `applicationProviders`); đã hoàn tác, giữ bản từ lần chạy đầu | Lỗi của migration khi chạy lần hai |
+| 19 | — | `tsconfig.json`: thêm `"strict": false` và `"ignoreDeprecations": "6.0"` | TypeScript 6 mặc định bật `strict` (hơn 300 lỗi kiểu) và báo `baseUrl` sắp bị bỏ; bỏ `baseUrl` phải sửa mọi import `app/...` |
+| 19 | — | Gỡ khối `extendedDiagnostics` migration thêm vào `src/tsconfig.app.json`/`spec.json`, không thêm vào `serve.json` | Gây lỗi NG4003 khi `strictTemplates: false` |
+| 19 | — | `ComponentFactoryResolver` (bị xoá ở 22) → truyền thẳng class vào `createComponent` ở `ngb/util/popup.ts`, `ngb/tooltip/tooltip.ts`, `ho-so-ncc-edit-dialog` | API bị xoá |
+| 19 | — | `ng-inline-svg-2` 14.0.2 → 20.0.2 | Bản 14 import `ComponentFactoryResolver` |
+| 19 | — | 22 chỗ `(click)="in(...)"` → `this.in(...)` | Từ 22, `in` là toán tử trong template |
+| 19 | — | 2 nút đóng (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`) có cả `mat-button`, `mat-raised-button`, `mat-mini-fab`; chỉ giữ `mat-mini-fab` như mọi dialog khác | Lỗi NG8023. Từ Material MDC (Task 12) hai nút này đã lỗi NG0300 lúc mở dialog |
+| 19 | — | Migration thêm `changeDetection: ChangeDetectionStrategy.Eager` vào 144 component, `withXhr()` vào `provideHttpClient` | Giữ hành vi trước 22 |
 | Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
 
 ### Quyết định của người phụ trách trong lúc làm
