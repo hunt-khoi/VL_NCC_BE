@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { ThemeService } from 'ng2-charts';
+import { ThemeService } from '../../../../partials/lib/ng2-charts';
 import { DVDongGopListComponent } from './dv-dong-gop-list/dv-dong-gop-list.component';
 import { dvDongGopServices } from './Services/dv-dong-gop.service';
 import { DPSCommonModule } from '../../dps-common.module';

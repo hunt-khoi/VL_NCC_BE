@@ -110,7 +110,7 @@ import { QuyetDinhBaseEditComponent } from './components/quyet-dinh-base-edit/qu
 import { MonthFormatDirective } from './services/month-format.directive';
 import { CookieService } from 'ngx-cookie-service';
 import { CanvasDemoModule } from './components/canvas-demo/canvas-demo.module';
-import { ChartsModule } from 'ng2-charts';
+import { ChartsModule } from '../../partials/lib/ng2-charts';
 import { CKEditorModule } from 'ckeditor4-angular';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;

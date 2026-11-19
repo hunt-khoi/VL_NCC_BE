@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { ThemeService } from 'ng2-charts';
+import { ThemeService } from '../../../../partials/lib/ng2-charts';
 import { DPSCommonModule } from '../../dps-common.module';
 
 import { QuanLyQuyTabComponent } from './quan-ly-quy-tab/quan-ly-quy-tab.component';

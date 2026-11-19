@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, ViewEncapsulation, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonService } from '../nguoi-co-cong/services/common.service';
 import { ChartType, ChartOptions } from 'chart.js';
-import { SingleDataSet, Label } from 'ng2-charts';
+import { SingleDataSet, Label } from '../../partials/lib/ng2-charts';
 import { Router } from '@angular/router';
 import { SignalRService } from '../nguoi-co-cong/services/signalR.service';
 import { QueryParamsModel } from '../../../core/_base/crud';

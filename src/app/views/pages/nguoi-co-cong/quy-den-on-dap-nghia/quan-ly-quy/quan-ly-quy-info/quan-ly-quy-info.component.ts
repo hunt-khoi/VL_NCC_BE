@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
-import { Label } from 'ng2-charts';
+import { Label } from '../../../../../partials/lib/ng2-charts';
 import { ChartOptions, ChartType } from 'chart.js';
 import { DatePipe } from '@angular/common';
 import { Moment } from 'moment';

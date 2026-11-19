@@ -5,7 +5,7 @@ import { NgbLiteModule } from '../../partials/lib/ngb/ngb-lite.module';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ThemeService, ChartsModule } from 'ng2-charts';
+import { ThemeService, ChartsModule } from '../../partials/lib/ng2-charts';
 import { AvatarModule } from 'ngx-avatars';
 import { CoreModule } from '../../../core/core.module';
 import { PartialsModule } from '../../partials/partials.module';

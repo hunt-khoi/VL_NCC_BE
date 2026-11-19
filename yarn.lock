@@ -1520,7 +1520,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/chart.js@^2.9.24":
+"@types/chart.js@2.9.41":
   version "2.9.41"
   resolved "https://registry.yarnpkg.com/@types/chart.js/-/chart.js-2.9.41.tgz#4148cdc87d4f98fad44b2883271cd0fa57f05e0d"
   integrity sha512-3dvkDvueckY83UyUXtJMalYoH6faOLkWQoaTlJgB4Djde3oORmNP0Jw85HtzTuXyliUHcdp704s0mZFQKio/KQ==
@@ -5810,11 +5810,6 @@ locate-path@^5.0.0:
   dependencies:
     p-locate "^4.1.0"
 
-lodash-es@^4.17.15:
-  version "4.18.1"
-  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.18.1.tgz#b962eeb80d9d983a900bf342961fb7418ca10b1d"
-  integrity sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==
-
 lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
@@ -6313,15 +6308,6 @@ ng-inline-svg-2@14.0.2:
   version "14.0.2"
   resolved "https://registry.yarnpkg.com/ng-inline-svg-2/-/ng-inline-svg-2-14.0.2.tgz#484c0f81cf31320c7a5d430985bdb44b87b7d38a"
   integrity sha512-WOWNDt15K2h0txm8Mcqx/k0AlKyTcqoiPmKNETIe01IDdg/kv6VsWSWy8sU1iWOY9b1JxbH0xwQBiAOxWHKdSA==
-
-ng2-charts@^2.3.2:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/ng2-charts/-/ng2-charts-2.4.3.tgz#e1de6cb55fe04248a5f92d342cf6423507fa532d"
-  integrity sha512-tPrhHSS2DfVyipXQ0gykOPc8zFNnj2b7sAebUVty392vHnEGYCwsP6YbFfpr1iXu4yBSRm4Gt5lffR5w0uyYSw==
-  dependencies:
-    "@types/chart.js" "^2.9.24"
-    lodash-es "^4.17.15"
-    tslib "^2.0.0"
 
 ng2-file-upload@^1.4.0:
   version "1.4.0"
