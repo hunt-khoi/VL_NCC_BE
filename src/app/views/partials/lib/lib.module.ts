@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbLiteModule } from './ngb/ngb-lite.module';
 import { CdkTreeModule } from '@angular/cdk/tree';
@@ -24,8 +24,7 @@ import { DatetimePickerComponent } from './datetime-picker/datetime-picker.compo
 import { DynamicComponentComponent, InsertionDirective } from './dynamic-component/dynamic-component.component';
 import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         DropdownTreeComponent,
         ImageControlComponent,
         DatetimePickerComponent,
@@ -33,9 +32,13 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
         InsertionDirective,
         DynamicFormComponent
     ],
-    imports: [
-        CommonModule,
-        HttpClientModule,
+    exports: [
+        DropdownTreeComponent,
+        ImageControlComponent,
+        DatetimePickerComponent,
+        DynamicComponentComponent,
+        DynamicFormComponent
+    ], imports: [CommonModule,
         FormsModule,
         ReactiveFormsModule,
         NgbLiteModule,
@@ -52,18 +55,9 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
         MatButtonToggleModule,
         MatSelectModule,
         MatNativeDateModule,
-        FileUploadModule
-    ],
-    exports: [
-        DropdownTreeComponent,
-        ImageControlComponent,
-        DatetimePickerComponent,
-        DynamicComponentComponent,
-        DynamicFormComponent
-    ],
-    providers: [
-        DatePipe
-    ]
-})
+        FileUploadModule], providers: [
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 
 export class LibModule { }

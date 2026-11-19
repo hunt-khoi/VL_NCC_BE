@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { TranslateModule } from '@ngx-translate/core';
 import { PartialsModule } from '../../../../partials/partials.module';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -32,11 +32,15 @@ import { TypesUtilsService, LayoutUtilsService, HttpUtilsService, InterceptServi
 import { CanvasDemoDialogComponent } from './canvas-demo-dialog.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
-@NgModule({
-    imports: [
-        MatDialogModule,
+@NgModule({ declarations: [
+        CanvasDemoComponent,
+        CanvasDemoDialogComponent
+    ],
+    exports: [
+        CanvasDemoComponent,
+        CanvasDemoDialogComponent
+    ], imports: [MatDialogModule,
         CommonModule,
-        HttpClientModule,
         PartialsModule,
         NgxPermissionsModule.forChild(),
         FormsModule,
@@ -62,9 +66,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         MatTabsModule,
         MatTooltipModule,
         NgbLiteModule,
-        DragDropModule
-    ],
-    providers: [
+        DragDropModule], providers: [
         InterceptService,
         {
             provide: HTTP_INTERCEPTORS,
@@ -84,14 +86,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         TypesUtilsService,
         LayoutUtilsService,
         HttpUtilsService,
-    ],
-    declarations: [
-        CanvasDemoComponent,
-        CanvasDemoDialogComponent
-    ],
-    exports: [
-        CanvasDemoComponent,
-        CanvasDemoDialogComponent
-    ]
-})
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class CanvasDemoModule { }

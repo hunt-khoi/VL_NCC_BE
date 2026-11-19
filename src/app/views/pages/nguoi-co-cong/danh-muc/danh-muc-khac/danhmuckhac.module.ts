@@ -7,7 +7,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule, } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { TranslateModule } from '@ngx-translate/core';
 import { DPSCommonModule } from '../../dps-common.module';
 import { DanhMucKhacService } from './Services/danh-muc-khac.service';
@@ -38,23 +38,7 @@ const routes: Routes = [
 ];
 
 
-@NgModule({
-    imports: [
-        CommonModule,
-        HttpClientModule,
-        PartialsModule,
-        RouterModule.forChild(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        DPSCommonModule,
-    ],
-    providers: [
-        DanhMucKhacService,
-        HoSoNCCService,
-        LoaiQuyetDinhService,
-        NoiDungChiService
-    ],
-    declarations: [
+@NgModule({ declarations: [
         DanhMucKhacComponent,
         DanhMucKhacListComponent,
         DanhmuckhacDetailComponent,
@@ -66,6 +50,16 @@ const routes: Routes = [
         NoiDungChiListComponent,
         NoiDungChiDetailComponent
     ],
-    exports: []
-})
+    exports: [], imports: [CommonModule,
+        PartialsModule,
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        DPSCommonModule], providers: [
+        DanhMucKhacService,
+        HoSoNCCService,
+        LoaiQuyetDinhService,
+        NoiDungChiService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class DanhMucKhacModule { }

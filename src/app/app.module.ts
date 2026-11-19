@@ -2,7 +2,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OverlayModule } from '@angular/cdk/overlay';
@@ -58,55 +58,49 @@ export function initializeLayoutConfig(appConfig: LayoutConfigService) {
 	};
 }
 
-@NgModule({
-	declarations: [AppComponent],
-	imports: [
-		BrowserAnimationsModule,
-		BrowserModule,
-		AppRoutingModule,
-		HttpClientModule,
-		NgxPermissionsModule.forRoot(),
-		PartialsModule,
-		CoreModule,
-		OverlayModule,
-		StoreModule.forRoot(reducers, {
-			metaReducers,
-			runtimeChecks: { strictStateImmutability: true, strictActionImmutability: true },
-		}),
-		EffectsModule.forRoot([]),
-		StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
-		!environment.production ? StoreDevtoolsModule.instrument({connectInZone: true}) : [],
-		AuthModule.forRoot(),
-		TranslateModule.forRoot(),
-		MatProgressSpinnerModule,
-		InlineSVGModule.forRoot(),
-		NgIdleKeepaliveModule.forRoot(),
-	],
-	exports: [],
-	providers: [
-		AuthService,
-		LayoutConfigService,
-		LayoutRefService,
-		MenuConfigService,
-		PageConfigService,
-		KtDialogService,
-		SplashScreenService,
-		{
-			// layout config initializer
-			provide: APP_INITIALIZER,
-			useFactory: initializeLayoutConfig,
-			deps: [LayoutConfigService], multi: true
-		},
-		// template services
-		SubheaderService,
-		MenuHorizontalService,
-		MenuAsideService,
-		HttpUtilsService,
-		TypesUtilsService,
-		LayoutUtilsService,
-		PermissionUrl,
-		UserProfileService
-	],
-	bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [AppComponent],
+    exports: [],
+    bootstrap: [AppComponent], imports: [BrowserAnimationsModule,
+        BrowserModule,
+        AppRoutingModule,
+        NgxPermissionsModule.forRoot(),
+        PartialsModule,
+        CoreModule,
+        OverlayModule,
+        StoreModule.forRoot(reducers, {
+            metaReducers,
+            runtimeChecks: { strictStateImmutability: true, strictActionImmutability: true },
+        }),
+        EffectsModule.forRoot([]),
+        StoreRouterConnectingModule.forRoot({ stateKey: 'router' }),
+        !environment.production ? StoreDevtoolsModule.instrument({ connectInZone: true }) : [],
+        AuthModule.forRoot(),
+        TranslateModule.forRoot(),
+        MatProgressSpinnerModule,
+        InlineSVGModule.forRoot(),
+        NgIdleKeepaliveModule.forRoot()], providers: [
+        AuthService,
+        LayoutConfigService,
+        LayoutRefService,
+        MenuConfigService,
+        PageConfigService,
+        KtDialogService,
+        SplashScreenService,
+        {
+            // layout config initializer
+            provide: APP_INITIALIZER,
+            useFactory: initializeLayoutConfig,
+            deps: [LayoutConfigService], multi: true
+        },
+        // template services
+        SubheaderService,
+        MenuHorizontalService,
+        MenuAsideService,
+        HttpUtilsService,
+        TypesUtilsService,
+        LayoutUtilsService,
+        PermissionUrl,
+        UserProfileService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }

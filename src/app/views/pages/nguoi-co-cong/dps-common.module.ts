@@ -2,7 +2,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CdkTableModule } from '@angular/cdk/table';
@@ -115,100 +115,7 @@ import { CKEditorModule } from 'ckeditor4-angular';
 
 export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
 
-@NgModule({
-    imports: [
-        RouterModule,
-        NgbLiteModule,
-        MatDialogModule,
-        CommonModule,
-        HttpClientModule,
-        PartialsModule,
-        NgxPermissionsModule.forChild(),
-        NgxMatSelectSearchModule,
-        FormsModule,
-        ReactiveFormsModule,
-        TranslateModule.forChild(),
-        MatButtonModule,
-        MatMenuModule,
-        MatSelectModule,
-        MatInputModule,
-        MatTableModule,
-        MatAutocompleteModule,
-        MatRadioModule,
-        MatIconModule,
-        MatNativeDateModule,
-        MatProgressBarModule,
-        MatDatepickerModule,
-        MatCardModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatCheckboxModule,
-        MatProgressSpinnerModule,
-        MatSnackBarModule,
-        MatTabsModule,
-        MatTooltipModule,
-        NgbLiteModule,
-        MatChipsModule,
-        MatListModule,
-        DragDropModule,
-        ScrollingModule,
-        CdkTableModule,
-        CdkTreeModule,
-        LibModule,
-        MatTreeModule,
-        MatExpansionModule,
-        NgxPrintModule,
-        MatToolbarModule,
-        MatCardModule,
-        PopoverModule,
-        NgxMaskModule.forRoot(),
-        //NgIdleKeepaliveModule.forRoot(),
-        AngularEditorModule,
-        EditorModule,
-        AvatarModule,
-        CanvasDemoModule,
-        ChartsModule,
-        CKEditorModule
-    ],
-    providers: [
-        InterceptService,
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: InterceptService,
-            multi: true
-        },
-        {
-            provide: MAT_DIALOG_DEFAULT_OPTIONS,
-            useValue: {
-                hasBackdrop: true,
-                panelClass: 'kt-mat-dialog-container__wrapper',
-                height: 'auto',
-                width: '70%'
-            }
-        },
-        TypesUtilsService,
-        LayoutUtilsService,
-        HttpUtilsService,
-        { provide: MAT_DATE_LOCALE, useValue: 'vi' },
-        { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS_EDIT },
-        {
-            provide: MatPaginatorIntl,
-            useClass: CustomMatPaginatorIntl
-        },
-        CookieService,
-        CommonService,
-        TableService,
-        CommentService,
-        DynamicProcessService,
-        LoadingService,
-        {
-            provide: HTTP_INTERCEPTORS,
-            useClass: LoadingInterceptor,
-            multi: true
-        }
-    ],
-    declarations: [
+@NgModule({ declarations: [
         ColumnFilterComponent,
         ColumnOptionComponent,
         ChipFilterComponent,
@@ -249,7 +156,6 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
         NgbLiteModule,
         MatDialogModule,
         CommonModule,
-        HttpClientModule,
         PartialsModule,
         NgxPermissionsModule,
         NgxMatSelectSearchModule,
@@ -326,6 +232,93 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
         CanCuLSRowEditComponent,
         ToTrinhEditComponent,
         MonthFormatDirective
-    ]
-})
+    ], imports: [RouterModule,
+        NgbLiteModule,
+        MatDialogModule,
+        CommonModule,
+        PartialsModule,
+        NgxPermissionsModule.forChild(),
+        NgxMatSelectSearchModule,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslateModule.forChild(),
+        MatButtonModule,
+        MatMenuModule,
+        MatSelectModule,
+        MatInputModule,
+        MatTableModule,
+        MatAutocompleteModule,
+        MatRadioModule,
+        MatIconModule,
+        MatNativeDateModule,
+        MatProgressBarModule,
+        MatDatepickerModule,
+        MatCardModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatCheckboxModule,
+        MatProgressSpinnerModule,
+        MatSnackBarModule,
+        MatTabsModule,
+        MatTooltipModule,
+        NgbLiteModule,
+        MatChipsModule,
+        MatListModule,
+        DragDropModule,
+        ScrollingModule,
+        CdkTableModule,
+        CdkTreeModule,
+        LibModule,
+        MatTreeModule,
+        MatExpansionModule,
+        NgxPrintModule,
+        MatToolbarModule,
+        MatCardModule,
+        PopoverModule,
+        NgxMaskModule.forRoot(),
+        //NgIdleKeepaliveModule.forRoot(),
+        AngularEditorModule,
+        EditorModule,
+        AvatarModule,
+        CanvasDemoModule,
+        ChartsModule,
+        CKEditorModule], providers: [
+        InterceptService,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: InterceptService,
+            multi: true
+        },
+        {
+            provide: MAT_DIALOG_DEFAULT_OPTIONS,
+            useValue: {
+                hasBackdrop: true,
+                panelClass: 'kt-mat-dialog-container__wrapper',
+                height: 'auto',
+                width: '70%'
+            }
+        },
+        TypesUtilsService,
+        LayoutUtilsService,
+        HttpUtilsService,
+        { provide: MAT_DATE_LOCALE, useValue: 'vi' },
+        { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+        { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS_EDIT },
+        {
+            provide: MatPaginatorIntl,
+            useClass: CustomMatPaginatorIntl
+        },
+        CookieService,
+        CommonService,
+        TableService,
+        CommentService,
+        DynamicProcessService,
+        LoadingService,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: LoadingInterceptor,
+            multi: true
+        },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class DPSCommonModule { }

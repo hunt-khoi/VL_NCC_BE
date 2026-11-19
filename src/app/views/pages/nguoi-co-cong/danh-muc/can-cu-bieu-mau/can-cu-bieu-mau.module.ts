@@ -2,7 +2,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 import { PartialsModule } from './../../../../partials/partials.module';
@@ -35,24 +35,7 @@ const routes: Routes = [
 	}
 ];
 
-@NgModule({
-    imports: [
-        CommonModule,
-        HttpClientModule,
-        PartialsModule,
-        RouterModule.forChild(routes),
-        FormsModule,
-        ReactiveFormsModule,
-        DPSCommonModule,
-        EditorModule
-    ],
-    providers: [
-        CanCuService,
-        BieuMauService,
-        BieuMauQuaService,
-        { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
-    ],
-    declarations: [
+@NgModule({ declarations: [
         CanCuBieuMauComponent,
         CanCuListComponent,
         CanCuEditDialogComponent,
@@ -64,7 +47,18 @@ const routes: Routes = [
         KeyWordListDialogComponent,
         BieuMauThanhPhanEditDialogComponent,
         BieuMauThanhPhanListComponent
-    ]
-})
+    ], imports: [CommonModule,
+        PartialsModule,
+        RouterModule.forChild(routes),
+        FormsModule,
+        ReactiveFormsModule,
+        DPSCommonModule,
+        EditorModule], providers: [
+        CanCuService,
+        BieuMauService,
+        BieuMauQuaService,
+        { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 
 export class CanCuBieuMauModule { }
