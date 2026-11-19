@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../reducers';
 import { TokenStorage } from './token-storage.service';
@@ -7,7 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../../../environments/environment';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthGuard  {
 	constructor(private store: Store<AppState>,
 		private router: Router,
 		private tokenStorage: TokenStorage) { }

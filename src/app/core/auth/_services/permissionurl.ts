@@ -1,12 +1,12 @@
 
-import { Router, RouterStateSnapshot, ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanLoad, Route } from '@angular/router';
+import { Router, RouterStateSnapshot, ActivatedRouteSnapshot, Route } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TokenStorage } from './token-storage.service';
 import { UserProfileService } from './user-profile.service';
 
 @Injectable()
-export class PermissionUrl implements CanActivate, CanActivateChild, CanLoad {
+export class PermissionUrl  {
 
 	private permissionCache = new Map<string, boolean>();
 	private cachedToken: string | null = null;
