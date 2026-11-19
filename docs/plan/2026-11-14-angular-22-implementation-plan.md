@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-19):** tạm dừng theo yêu cầu người phụ trách. Bản cuối đã build được là **Angular 20** (Task 17, commit `9620de7`). Bước nâng lên Angular 21 (Task 18) bị dừng giữa chừng; theo yêu cầu người phụ trách, phần dở dang được commit thành `928a949` (WIP, **chưa build được**) và đã push. Xem mục "Trạng thái thực hiện". Xem mục "Trạng thái thực hiện".
+> **Trạng thái (2026-11-19):** đã lên **Angular 21** và build `dev` được (Task 18, commit `928a949` + `78b9bb2`). Bước tiếp theo là Task 19 (Angular 22). Xem mục "Trạng thái thực hiện".
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -37,15 +37,13 @@ Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` v
 | 15 | Angular 17 → 18, chuyển sang esbuild | `2d188eb`, `e2e095b` | Xong; output giữ đúng thư mục cũ (`outputPath.browser = ""`); build `dev` còn 101 giây |
 | 16 | Angular 18 → 19 | `c51cb1c` | Xong; `standalone: false` ở 387 file; sửa style trong thẻ `<style>` của template (xem dưới) |
 | 17 | Angular 19 → 20 | `9620de7` | Xong; `PortalInjector` (đã bị CDK 20 xoá) thay bằng `Injector.create` trong `LoadingService` |
-| 18 | Angular 20 → 21 | `928a949` (WIP) | **Dừng giữa chừng**, chưa build được (xem "Tiếp tục từ đâu") |
+| 18 | Angular 20 → 21 | `928a949`, `681753a`, `78b9bb2` | Xong; NgRx 21.1.1; migration Material không đổi gì; sửa 2 lỗi template do migration control flow (xem dưới) |
 | 19–20 | Angular 22, hoàn thiện | — | Chưa làm |
 
 ### Tiếp tục từ đâu
 
-Lệnh `ng update @angular/core@21` bị dừng khi đang chạy. Commit `928a949` chứa `package.json` đã sang Angular 21 và khoảng 280 template do migration của bản 21 sửa, nhưng phần cập nhật Material, NgRx và cài gói chưa xong, chưa build lần nào. Đầu nhánh hiện **không chạy được**.
+Đầu nhánh đang ở Angular 21, `yarn verify:dev` qua với 0 lỗi. Bước tiếp theo là Task 19: `ng update @angular/core@22 @angular/cli@22`, rồi `@angular/material@22` và `@ngrx/store@22`, sau đó `yarn verify:dev`.
 
-- Muốn tiếp tục nâng cấp: `yarn install`, chạy nốt `ng update @angular/material@21 --force --allow-dirty` và `ng update @ngrx/store@21 --force --allow-dirty`, rồi `yarn verify:dev` và sửa lỗi nếu có.
-- Muốn quay về Angular 20 đã chạy được: `git revert 928a949`, `yarn install`, rồi `yarn start`.
 - Cài gói: cache yarn của máy đã chuyển sang `D:\DPS_Project\.yarn-cache`; khi build/cài dài nên đặt `TEMP`/`TMP` sang ổ D: vì ổ C: gần đầy.
 - Giao diện **chưa được kiểm bằng mắt** từ Task 5 (người phụ trách đã bỏ qua các mốc smoke). Trước khi phát hành phải đi hết `docs/plan/angular_22_smoke_checklist.md`; 33 chỗ SCSS dễ lệch nhất có comment `// MDC:`. Tag nội bộ `smoke-a` (cuối Chặng 1) và `smoke-b` (sau MDC) giúp khoanh vùng lỗi; hai tag này chưa push.
 - Chưa build `prod` lần nào kể từ khi nâng cấp (quyết định người phụ trách); lần build `prod` đầu tiên có thể lộ lỗi chỉ có ở cấu hình `prod`.
@@ -71,6 +69,11 @@ Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smok
 | 16 | — | Sửa 46 chỗ trong thẻ `<style>` của 24 template: `>>>` → `::ng-deep`, class Material cũ → MDC | Schematic MDC chỉ xét file `.scss`/`.css`; các quy tắc này đã mất tác dụng từ Task 12 |
 | 16 | — | Ổ C: đầy làm hỏng lần cài đầu; cache yarn chuyển sang `D:\DPS_Project\.yarn-cache`, thêm `network-timeout` vào `.yarnrc` | Theo yêu cầu người phụ trách dùng ổ D: |
 | 17 | — | `PortalInjector` → `Injector.create` | API bị xoá ở Angular CDK 20 |
+| 18 | — | Sửa hoa/thường ở 52 import (`Services/`, `Model/` → `services/`, `model/`) trong 39 file | Thư mục thật viết thường; Windows bỏ qua, Linux build lỗi `Could not resolve` |
+| 18 | — | `*ngIf=""` ở tab "Hồ sơ, giấy tờ đính kèm" (`form-tong-hop`) bị migration đổi thành `@if ()` không hợp lệ; đổi thành `@if (false)` | Giữ hành vi cũ: biểu thức rỗng là false nên tab chưa bao giờ hiện |
+| 18 | — | `trackByIndex` ở `danh-sach-tang-qua` nhận thêm tham số thứ 2 | Migration sinh `track trackByIndex(j, ng)` |
+| 18 | — | Migration control flow bỏ qua `config-edit` (HTML lỗi sau khi chuyển) và `comment` (trùng tên `#bindText`); 2 template này vẫn dùng `*ngIf`/`*ngFor` | Cú pháp cũ vẫn chạy ở 21; xử lý ở Task 20 nếu cần |
+| 18 | — | Chạy lại migration bootstrap làm hỏng `src/main.ts` (lặp khoá `applicationProviders`); đã hoàn tác, giữ bản từ lần chạy đầu | Lỗi của migration khi chạy lần hai |
 | Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
 
 ### Quyết định của người phụ trách trong lúc làm
