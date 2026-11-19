@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái:** đang làm, đã tới Angular 19 (Task 16). Xem mục "Trạng thái thực hiện".
+> **Trạng thái (2026-11-19):** tạm dừng theo yêu cầu người phụ trách. Bản đã commit và push là **Angular 20** (Task 17, commit `9620de7`). Bước nâng lên Angular 21 (Task 18) bị dừng giữa chừng và **không commit**. Xem mục "Trạng thái thực hiện". Xem mục "Trạng thái thực hiện".
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -36,7 +36,19 @@ Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` v
 | 14 | Angular 16 → 17 | `9848a70` | Xong; xoá import thừa `_ParseAST` (API nội bộ đã bị bỏ); migration mã hoá ký tự `@` trong 2 template |
 | 15 | Angular 17 → 18, chuyển sang esbuild | `2d188eb`, `e2e095b` | Xong; output giữ đúng thư mục cũ (`outputPath.browser = ""`); build `dev` còn 101 giây |
 | 16 | Angular 18 → 19 | `c51cb1c` | Xong; `standalone: false` ở 387 file; sửa style trong thẻ `<style>` của template (xem dưới) |
-| 17–20 | Angular 20 → 22, hoàn thiện | — | Đang làm |
+| 17 | Angular 19 → 20 | `9620de7` | Xong; `PortalInjector` (đã bị CDK 20 xoá) thay bằng `Injector.create` trong `LoadingService` |
+| 18 | Angular 20 → 21 | — | **Dừng giữa chừng** theo yêu cầu (xem "Tiếp tục từ đâu") |
+| 19–20 | Angular 22, hoàn thiện | — | Chưa làm |
+
+### Tiếp tục từ đâu
+
+Lệnh `ng update @angular/core@21` bị dừng khi đang chạy, nên trên máy phát triển còn thay đổi **chưa commit** (`package.json` và khoảng 280 template do migration của bản 21 sửa) và `node_modules` có thể không đầy đủ. Các thay đổi này không nằm trong commit đã push.
+
+- Muốn tiếp tục nâng cấp: `git checkout -- .` để bỏ thay đổi dở dang, `yarn install`, kiểm tra `node -p "require('./node_modules/@angular/core/package.json').version"` ra `20.3.x`, rồi chạy lại Task 18 theo "Quy trình chuẩn".
+- Muốn chạy app bản hiện tại: cũng làm hai lệnh đầu ở trên rồi `yarn start`.
+- Cài gói: cache yarn của máy đã chuyển sang `D:\DPS_Project\.yarn-cache`; khi build/cài dài nên đặt `TEMP`/`TMP` sang ổ D: vì ổ C: gần đầy.
+- Giao diện **chưa được kiểm bằng mắt** từ Task 5 (người phụ trách đã bỏ qua các mốc smoke). Trước khi phát hành phải đi hết `docs/plan/angular_22_smoke_checklist.md`; 33 chỗ SCSS dễ lệch nhất có comment `// MDC:`. Tag nội bộ `smoke-a` (cuối Chặng 1) và `smoke-b` (sau MDC) giúp khoanh vùng lỗi; hai tag này chưa push.
+- Chưa build `prod` lần nào kể từ khi nâng cấp (quyết định người phụ trách); lần build `prod` đầu tiên có thể lộ lỗi chỉ có ở cấu hình `prod`.
 
 Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smoke-b` = sau MDC (`d4fb968`). Chưa tạo các tag `upgrade/ng<N>` của mục "Phương án rollback".
 
@@ -58,6 +70,7 @@ Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smok
 | 15 | Kiểm `tinymce/`, `sw.js`, `index.html` trong output | Đã kiểm, kèm `.htaccess`, CKEditor local và script toàn cục | `favicon.ico` không có trong mã nguồn lẫn bản build cũ, không phải lỗi mới |
 | 16 | — | Sửa 46 chỗ trong thẻ `<style>` của 24 template: `>>>` → `::ng-deep`, class Material cũ → MDC | Schematic MDC chỉ xét file `.scss`/`.css`; các quy tắc này đã mất tác dụng từ Task 12 |
 | 16 | — | Ổ C: đầy làm hỏng lần cài đầu; cache yarn chuyển sang `D:\DPS_Project\.yarn-cache`, thêm `network-timeout` vào `.yarnrc` | Theo yêu cầu người phụ trách dùng ổ D: |
+| 17 | — | `PortalInjector` → `Injector.create` | API bị xoá ở Angular CDK 20 |
 | Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
 
 ### Quyết định của người phụ trách trong lúc làm
