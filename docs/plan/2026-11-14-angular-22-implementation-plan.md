@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-**Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công cộng với 5 mốc smoke test tay.
+**Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
 **Tech Stack:** Angular CLI, Angular Material (MDC), NgRx, RxJS, yarn 1.22, Node 24.
 
@@ -26,7 +26,9 @@
 - **Cổng giao diện** (công cụ tạo ở Task 1B): chạy `yarn start`, rồi `yarn --cwd tools/visual capture <nhãn>` và `yarn --cwd tools/visual compare <nhãn gốc> <nhãn>`. "PASS" nghĩa là không màn hình nào lệch quá 0,1% số pixel so với bộ ảnh gốc hiện hành. Màn hình lệch phải được sửa, hoặc được người phụ trách duyệt là thay đổi chấp nhận được và ghi vào `tools/visual/approved.md`. Không tự duyệt.
 - Bộ ảnh gốc ban đầu có nhãn `ng13`. Chỉ đổi bộ ảnh gốc ở ba chỗ plan cho phép (Task 6, 7, 12), sau khi người phụ trách duyệt.
 - Ảnh chụp chứa dữ liệu cá nhân của người có công: thư mục `tools/visual/shots/`, `tools/visual/report/`, `tools/visual/reference/` và file `tools/visual/.env` phải nằm trong `.gitignore`, không commit, không tải lên dịch vụ bên ngoài.
-- Dữ liệu backend phải giữ nguyên giữa các lần chụp: dùng cùng một database local, không nhập liệu thêm trong lúc nâng cấp.
+- Dữ liệu backend phải giữ nguyên giữa các lần chụp: dùng cùng một database local, không nhập liệu thêm trong lúc nâng cấp. Ngoại lệ duy nhất: nhóm test e2e `@rw` (Task 1C), và nhóm này chỉ được chạy trên một database bản sao riêng, không bao giờ trên database dùng để chụp ảnh.
+- **Cổng e2e** (công cụ tạo ở Task 1C): `yarn --cwd tools/e2e test:ro` (chỉ đọc, chạy ở mọi task) và `yarn --cwd tools/e2e test:rw` (có ghi dữ liệu, chỉ chạy ở các mốc smoke). "PASS" nghĩa là exit code 0. Test bị đánh dấu `test.fixme` phải có lý do và được người phụ trách duyệt trong `tools/e2e/KNOWN_ISSUES.md`. Không được tắt test để cho qua cổng.
+- **Rollback:** làm theo mục "Phương án rollback". Không dùng `git reset --hard` hay `push --force` trên nhánh đã push; luôn hoàn tác bằng `git revert`.
 
 ## Các quyết định chính
 
@@ -51,6 +53,44 @@ Năm kiểu lỗi mà build không bắt được, xếp theo khả năng xảy 
 3. **Thư viện chỉ hỏng lúc chạy**: reCAPTCHA không tải script, SignalR không kết nối, TinyMCE không tìm thấy `/tinymce/`, in ấn ra trang trắng. Kiểm ở mọi mốc smoke.
 4. **Thư mục output đổi cấu trúc khi sang application builder**: builder mới mặc định đặt file vào `<outputPath>/browser/`, làm hỏng quy trình deploy đang trỏ vào `build/ncc_dev`. Kiểm bằng bước xác nhận `index.html` ở Task 15.
 5. **File environment lệch field**: `environment-kiengiang.prod.ts`, `environment-sotbvl.prod.ts`, `environment-test.prod.ts`, `environment.prod.ts` chỉ được biên dịch khi build đúng cấu hình của nó. Kiểm bằng bước build đủ 6 cấu hình ở Task 20.
+
+## Phương án rollback
+
+Mục tiêu: ở bất kỳ thời điểm nào cũng quay về được một trạng thái đã chạy đúng trong vài phút, mà không mất các commit đã làm.
+
+### Điểm rollback (tag git)
+
+| Tag | Đặt ở | Ý nghĩa |
+|---|---|---|
+| `upgrade/ng13-baseline` | commit `489ca4e` (trước Task 2) | Angular 13 nguyên trạng, kèm công cụ kiểm tra |
+| `upgrade/ng13-clean` | cuối Task 9, sau mốc smoke A | Angular 13 đã dọn, phát hành được |
+| `upgrade/ng<N>` | cuối mỗi Task 10–19, sau khi qua cổng | Angular `N` build được và qua cổng giao diện, cổng e2e `@ro` |
+| `upgrade/ng15-mdc` | cuối Task 12, sau mốc smoke B | Material đã sang MDC và được duyệt giao diện |
+| `upgrade/ng18-esbuild` | cuối Task 15, sau mốc smoke D | Đã đổi sang application builder |
+| `upgrade/ng22` | cuối Task 20, sau mốc smoke E | Nghiệm thu |
+
+Tạo tag: `git tag -a upgrade/ng<N> -m "angular <N>: verify:dev PASS, visual PASS, e2e ro PASS"` rồi `git push origin upgrade/ng<N>`. Chỉ các tag có mốc smoke (`ng13-clean`, `ng15-mdc`, `ng18-esbuild`, `ng22`) được coi là **phát hành được**; các tag `ng<N>` khác chỉ là điểm quay lui trong lúc phát triển.
+
+Lưu kèm mỗi tag phát hành được: bản build `prod` của tag đó trong `build/_release_<tag>/` (không commit; giữ trên máy phát triển và trên server), và ghi phiên bản Node đã dùng vào message của tag.
+
+### Các mức rollback
+
+1. **Đang làm dở một task, chưa commit, muốn bỏ.**
+   `git restore --staged --worktree .`, `git clean -fd src`, rồi `yarn install --frozen-lockfile`. Kiểm tra `node -p "require('./node_modules/@angular/core/package.json').version"` khớp với bản của commit hiện tại.
+2. **Một task đã commit nhưng gây lỗi phát hiện muộn.**
+   `git revert <commit>` (một commit cho mỗi task nên revert gọn), `yarn install --frozen-lockfile`, `yarn verify:dev`, cổng e2e `@ro`. Ghi lỗi và commit bị revert vào mục "Nhật ký vướng mắc" ở cuối plan.
+3. **Một bản major không qua được.**
+   Timebox: mỗi bản major tối đa **2 ngày làm việc** kể từ lúc chạy `ng update` (riêng Task 12 MDC: 5 ngày). Quá hạn mà `verify:dev` hoặc cổng e2e vẫn đỏ thì dừng: `git revert --no-commit <commit đầu của task>..HEAD`, commit `revert: angular <N-1> to <N> (blocked)`, xác nhận code trùng với tag `upgrade/ng<N-1>` bằng `git diff upgrade/ng<N-1> --stat` (chỉ được khác ở `docs/`). Báo người phụ trách kèm nhật ký lỗi và chọn một trong ba hướng: chờ bản vá thư viện, thay thư viện gây lỗi, hoặc tạm dừng nâng cấp ở `N-1`.
+4. **Đã deploy lên server rồi phát hiện lỗi.**
+   Chỉ deploy từ tag phát hành được. Server giữ thư mục build của bản đang chạy trước đó (tên thư mục build đã có ngày, ví dụ `prod_260428`); deploy bản mới vào thư mục mới rồi đổi đường dẫn site sang thư mục đó. Rollback = trỏ đường dẫn site về thư mục cũ, không cần build lại. Backend và database không đổi trong suốt quá trình nâng cấp nên rollback frontend không cần đụng tới backend. `sw.js` không cache file của app (handler `fetch` chỉ đọc cache, không ghi), nhưng vẫn phải đặt `Cache-Control: no-cache` cho `index.html` trên server để trình duyệt nhận bản rollback ngay.
+
+### Đồng bộ với `main`
+
+Nhánh nâng cấp sống lâu, `main` vẫn có thể có bản sửa lỗi gấp. Ở cuối mỗi chặng (sau Task 9, Task 12, Task 15, trước Task 20): `git fetch origin main && git merge --no-edit origin/main`. Khi xung đột `yarn.lock`, giữ bản của nhánh nâng cấp rồi chạy lại `yarn install`. Sau khi merge phải chạy lại `yarn verify:dev`, cổng e2e `@ro`, và tag lại điểm rollback của chặng đó nếu có thay đổi.
+
+### Hai bước khó quay lui
+
+Task 12 (MDC) và Task 15 (application builder) đổi nhiều file nhất. Trước khi bắt đầu hai task này phải có tag của bước liền trước, bản build `prod` trong `build/_release_<tag>/` và báo cáo cổng giao diện đã lưu, để khi cần quay lui thì so sánh được ngay.
 
 ## Bảng version thư viện theo từng bản Angular
 
@@ -91,7 +131,9 @@ Với `N` là bản đích:
 7. `node -p "require('./node_modules/@angular/core/package.json').version"` phải in ra `N.x.x`.
 8. `yarn verify:dev`. Phải PASS. Sửa lỗi biên dịch nếu có, ghi lại lỗi nào đã sửa vào thông báo commit.
 9. Cổng giao diện với nhãn `ngN` so với bộ ảnh gốc hiện hành. Phải PASS.
-10. Commit: `upgrade angular <N-1> to <N>`.
+10. Cổng e2e: `yarn --cwd tools/e2e test:ro`. Phải PASS.
+11. Commit: `upgrade angular <N-1> to <N>`.
+12. Tag điểm rollback `upgrade/ng<N>` theo mục "Phương án rollback". Nếu tới hạn timebox mà bước 8–10 chưa PASS, làm theo mức rollback 3.
 
 `--force` cần thiết vì thư viện bên thứ ba ở bước 5 chưa được nâng lúc `ng update` kiểm tra peer dependency.
 
@@ -146,6 +188,46 @@ Công cụ nằm trong `tools/visual/` với `package.json` riêng (`playwright`
 - [ ] **Step 7: Kiểm tra độ ổn định.** `yarn --cwd tools/visual capture ng13-repeat` rồi `yarn --cwd tools/visual compare ng13 ng13-repeat`. Expected: PASS. Nếu có màn hình lệch dù code không đổi, thêm `mask` hoặc `waitFor` cho màn hình đó rồi chụp lại cả hai, cho tới khi PASS. Bộ ảnh không ổn định thì mọi cổng giao diện về sau đều vô nghĩa.
 - [ ] **Step 8: Đối chiếu giao diện mẫu.** Đặt giao diện mẫu do người phụ trách cung cấp vào `tools/visual/reference/`, tên file trùng `name` trong `screens.json`. Chạy `yarn --cwd tools/visual compare reference ng13` (script đọc `reference/` như một nhãn). Màn hình nào có trong mẫu mà chưa có trong `screens.json` thì bổ sung và chụp lại `ng13`. Màn hình nào `ng13` đã khác mẫu thì báo người phụ trách quyết định cái nào là chuẩn, trước khi sang Chặng 1.
 - [ ] **Step 9:** Commit `tools/visual/` (không gồm các thư mục đã ignore) và `.gitignore`: `chore: visual regression harness`.
+
+### Task 1C: Bộ test e2e tự động
+
+Cổng giao diện chỉ thấy ảnh tĩnh, không bắt được lỗi lúc chạy (nút bấm không phản hồi, dialog không mở, lỗi JS, request hỏng). Bộ e2e tự động hoá phần lớn checklist smoke để chạy được sau **mỗi** task, thay vì chỉ ở 5 mốc. Bộ e2e Protractor cũ (`e2e/`) đã gỡ ở Task 2 và không dùng lại.
+
+**Files:**
+- Create: `tools/e2e/package.json`, `tools/e2e/playwright.config.ts`, `tools/e2e/global-setup.ts`, `tools/e2e/fixtures.ts`, `tools/e2e/known-console-errors.json`, `tools/e2e/KNOWN_ISSUES.md`, `tools/e2e/.env.example`, `tools/e2e/tests/*.spec.ts`
+- Modify: `.gitignore`, `docs/plan/angular_22_smoke_checklist.md`
+
+**Interfaces:**
+- Produces:
+  - `yarn --cwd tools/e2e test:ro`: chạy các test gắn tag `@ro`, chỉ đọc dữ liệu, an toàn trên database dùng để chụp ảnh.
+  - `yarn --cwd tools/e2e test:rw`: chạy các test gắn tag `@rw`, có thêm, sửa, xoá dữ liệu; từ chối chạy nếu `E2E_ALLOW_WRITE` khác `1`.
+  - `yarn --cwd tools/e2e test:routes`: chỉ chạy test mở mọi route (nhanh, dùng khi đang sửa lỗi biên dịch).
+  - Biến môi trường trong `tools/e2e/.env`: `E2E_BASE_URL` (mặc định `http://localhost:3105`), `E2E_USER`, `E2E_PASS`, `E2E_ALLOW_WRITE`, `E2E_RESTORE_CMD` (lệnh khôi phục database bản sao, do người phụ trách backend cung cấp).
+
+Công cụ nằm trong `tools/e2e/` với `package.json` riêng (`@playwright/test`, `dotenv`), giống `tools/visual/`, để `ng update` không đụng tới. Dùng chung Chromium với `tools/visual`.
+
+- [ ] **Step 1:** Thêm vào `.gitignore`: `/tools/e2e/node_modules`, `/tools/e2e/.env`, `/tools/e2e/.auth`, `/tools/e2e/report`, `/tools/e2e/test-results`. Report, ảnh và trace chứa dữ liệu cá nhân của người có công: không commit, không tải lên dịch vụ bên ngoài.
+- [ ] **Step 2: Cấu hình.** `playwright.config.ts`: viewport 1440×900, `workers: 1` (backend local và dữ liệu dùng chung), `retries: 1`, `trace: 'off'` (bật `--trace on` khi chạy lại một test lỗi để gỡ), `screenshot: 'only-on-failure'`, reporter `list` và `html` vào `report/`. `global-setup.ts` đăng nhập một lần bằng form đăng nhập (cùng selector với `tools/visual/capture.mjs`: `input[formcontrolname="username"]`, `input[formcontrolname="password"]`, `#kt_login_signin_submit`) rồi lưu `storageState` vào `.auth/user.json`.
+- [ ] **Step 3: Fixture bắt lỗi lúc chạy.** `fixtures.ts` mở rộng `test` của Playwright: mỗi test tự fail nếu trong lúc chạy có `pageerror` (exception JS chưa bắt), `console.error` không nằm trong `known-console-errors.json`, response từ API có status `>= 500`, hoặc request tải chunk JS/CSS của app thất bại. Danh sách lỗi console đã biết được chốt trên Angular 13 ở Step 6 và chỉ được thu hẹp, không được mở rộng nếu không có người phụ trách duyệt.
+- [ ] **Step 4: Test `@ro` (chỉ đọc).** Mỗi file một nhóm chức năng:
+  - `routes.spec.ts`: với mọi mục trong `tools/visual/screens.json` không có `steps`, mở `path`, chờ hết `mat-progress-bar`/`mat-spinner`, kiểm tra không bị đưa về `/auth/login`, có tiêu đề trang hoặc bảng hiển thị, và không có lỗi theo fixture. Đây là test bắt lỗi rộng nhất (module lazy-load hỏng, component thiếu provider).
+  - `auth.spec.ts`: đăng nhập, đăng xuất, mở route cần quyền khi chưa đăng nhập thì bị chuyển về đăng nhập. Hết phiên ng-idle: dùng `page.clock.install()` rồi `page.clock.runFor(<thời gian idle + timeout>)`, kiểm tra hiện cảnh báo hết phiên và bị đưa về đăng nhập.
+  - `layout.spec.ts`: menu trái mở và thu gọn; dropdown người dùng trên topbar mở và đóng; bảng thông báo mở và chuyển tab; đổi ngôn ngữ thì một nhãn cố định đổi chữ.
+  - `list.spec.ts`: trên 3 danh sách đại diện (một danh mục, hồ sơ NCC, một danh sách bảo hiểm y tế): chuyển trang thì dòng đầu đổi; bấm tiêu đề cột thì thứ tự đổi; nhập ô lọc thì số dòng giảm hoặc hiện trạng thái rỗng; mở dialog thêm mới rồi bấm Huỷ thì dialog đóng và không gửi request `POST`/`PUT`/`DELETE` nào.
+  - `form.spec.ts`: mở form hồ sơ NCC, bấm Lưu khi để trống thì hiện lỗi validate ở các ô bắt buộc và không gửi request ghi; ô chọn có tìm kiếm lọc được lựa chọn; datepicker mở và chọn được ngày; ô có mask chỉ nhận đúng định dạng. Đóng form không lưu.
+  - `widgets.spec.ts`: biểu đồ dashboard và Quản lý quỹ vẽ ra `canvas` có pixel khác màu nền; carousel dashboard tự chuyển slide; TinyMCE tạo iframe editor; CKEditor tạo instance; angular-editor hiện thanh công cụ; avatar trong bình luận hiện ảnh hoặc chữ viết tắt.
+  - `print-export.spec.ts`: thay `window.print` bằng hàm giả trước khi bấm In ở Bảo hiểm y tế → Thống kê theo đối tượng, kiểm tra hàm được gọi và vùng in có nội dung; bấm Xuất PDF, chờ sự kiện `download`, kiểm tra file có đuôi `.pdf` và lớn hơn 1 KB.
+  - `realtime.spec.ts`: sau đăng nhập có request `negotiate` của SignalR trả 200 và kết nối WebSocket được mở.
+- [ ] **Step 5: Test `@rw` (có ghi).** Chỉ chạy khi `E2E_ALLOW_WRITE=1` và backend đang trỏ vào database bản sao (ví dụ `ncc_e2e`). Trước lượt chạy, `global-setup.ts` gọi `E2E_RESTORE_CMD` để khôi phục bản sao về trạng thái chuẩn; nếu biến này trống thì dừng với thông báo lỗi. Mọi bản ghi tạo ra có tiền tố `E2E-` kèm thời gian để dễ nhận ra.
+  - `crud-danh-muc.spec.ts`: thêm, sửa, xoá (có hộp xác nhận) một bản ghi ở một danh mục đơn giản; snackbar hiện sau mỗi thao tác; danh sách cập nhật.
+  - `ho-so-ncc.spec.ts`: thêm hồ sơ NCC đủ trường bắt buộc, sửa một trường, kiểm tra giá trị sau khi tải lại trang.
+  - `upload.spec.ts`: upload một file mẫu nhỏ (file giả, không chứa dữ liệu thật) rồi mở bằng file viewer.
+  - `chip.spec.ts`: thêm và xoá chip ở form có chip.
+- [ ] **Step 6: Chốt baseline trên Angular 13.** `cd tools/e2e && yarn install`. Chạy `yarn start`, rồi `test:ro` ba lần liên tiếp. Expected: cả ba lần PASS. Test nào lúc đạt lúc không thì sửa cách chờ (`waitFor`, chờ request) cho tới khi ổn định; lỗi console có sẵn trên Angular 13 thì ghi vào `known-console-errors.json`; chức năng hỏng sẵn trên Angular 13 thì đánh dấu `test.fixme` và ghi vào `KNOWN_ISSUES.md` để người phụ trách duyệt. Bộ test không ổn định trên bản gốc thì không dùng làm cổng được.
+- [ ] **Step 7:** Có database bản sao thì chạy `test:rw` hai lần liên tiếp (mỗi lần khôi phục lại). Expected: PASS cả hai. Chưa có database bản sao thì ghi vào `KNOWN_ISSUES.md` là nhóm `@rw` chưa chạy, và các mục tương ứng trong checklist vẫn kiểm bằng tay.
+- [ ] **Step 8:** Trong `angular_22_smoke_checklist.md`, đánh dấu `(e2e)` sau mỗi mục đã có test tự động. Mục không đánh dấu vẫn phải kiểm tay ở các mốc smoke: reCAPTCHA (cần nhập sai nhiều lần, dễ khoá tài khoản), hiệu ứng ripple/hover/nhãn nổi, in ra máy in thật, thông báo thời gian thực giữa hai người dùng.
+- [ ] **Step 9:** Commit `tools/e2e/` (không gồm các thư mục đã ignore), `.gitignore`, checklist: `chore: e2e smoke tests`.
+- [ ] **Step 10:** Tag `upgrade/ng13-baseline` vào commit `489ca4e` và push tag (xem mục "Phương án rollback").
 
 ---
 
@@ -279,7 +361,8 @@ Bảng thay thế:
 - [ ] **Step 5:** `yarn verify:dev` và `yarn verify:prod`. Expected: PASS.
 - [ ] **Step 5b:** Cổng giao diện, nhãn `task9` so với `task7`. Expected: PASS, không có ngoại lệ (đổi cú pháp SCSS không được làm đổi CSS sinh ra).
 - [ ] **Step 6:** Commit: `refactor: material theming to @use api`.
-- [ ] **Step 7: Mốc smoke A.** Chạy `yarn start`, đi hết `angular_22_smoke_checklist.md`. Mọi mục phải đạt trước khi sang Chặng 2. Đây là lần kiểm tra các thay thế ở Task 5–7.
+- [ ] **Step 7: Mốc smoke A.** Chạy `yarn start`. Chạy `yarn --cwd tools/e2e test:ro` và `test:rw` (trên database bản sao), cả hai phải PASS, rồi đi tay các mục chưa có `(e2e)` trong checklist. Mọi mục phải đạt trước khi sang Chặng 2. Đây là lần kiểm tra các thay thế ở Task 5–7.
+- [ ] **Step 8:** Lưu bản build `prod` của Step 5 vào `build/_release_upgrade-ng13-clean/`, tag `upgrade/ng13-clean`, merge `main` theo mục "Đồng bộ với `main`".
 
 ---
 
@@ -311,15 +394,16 @@ Bảng thay thế:
 - [ ] **Step 7:** `yarn verify:dev` và `yarn verify:prod`. Expected: PASS.
 - [ ] **Step 8: Sửa giao diện theo báo cáo.** `yarn --cwd tools/visual capture task12` rồi `compare task7 task12`. Ở bước này gần như mọi màn hình đều lệch; báo cáo là danh sách việc cần làm. Sửa SCSS override theo tên class MDC mới (`.mat-mdc-*`, `.mdc-*`) ở các file dùng chung trước, theo thứ tự số chỗ override: `.mat-table`, `.mat-icon-button`, `.mat-header-cell`, `.mat-form-field`, nút, checkbox, dialog. Sau mỗi nhóm sửa, chụp và so lại. Mục tiêu: chiều cao dòng, khoảng cách, cỡ chữ, màu, đường viền của form, bảng, dialog khớp ảnh gốc và giao diện mẫu.
 - [ ] **Step 9: Duyệt.** Khi không còn giảm được mức lệch, đưa báo cáo cho người phụ trách. Từng màn hình còn lệch phải được duyệt hoặc trả lại để sửa tiếp. Không sang Task 13 khi còn màn hình chưa duyệt.
-- [ ] **Step 10: Mốc smoke B.** Đi hết checklist tay, chú ý những thứ ảnh tĩnh không bắt được: hiệu ứng nhãn nổi của ô nhập khi focus, ripple, trạng thái hover và disabled, snackbar, tooltip, cuộn trong dialog dài.
+- [ ] **Step 10: Mốc smoke B.** Chạy `yarn --cwd tools/e2e test:ro` và `test:rw` (trên database bản sao), cả hai phải PASS, rồi đi tay các mục chưa có `(e2e)` trong checklist. Chú ý những thứ ảnh tĩnh không bắt được: hiệu ứng nhãn nổi của ô nhập khi focus, ripple, trạng thái hover và disabled, snackbar, tooltip, cuộn trong dialog dài.
 - [ ] **Step 11:** Sau khi được duyệt, bộ ảnh gốc hiện hành là `task12`.
 - [ ] **Step 12:** Commit: `refactor: material legacy to mdc`.
+- [ ] **Step 13:** Lưu bản build `prod` của Step 7 vào `build/_release_upgrade-ng15-mdc/`, tag `upgrade/ng15-mdc`, merge `main`.
 
 ### Task 13: Angular 15 → 16
 
 - [ ] **Step 1:** Chạy Quy trình chuẩn với `N = 16`. Ở bước 5 cài thêm `rxjs@^7.8.0` và `tinymce@^6.8`.
 - [ ] **Step 2:** Sửa lỗi biên dịch do RxJS 7 (kiểu trả về của `toPromise()` thành `T | undefined`) và do `@ngx-translate/core` 17.
-- [ ] **Step 3: Mốc smoke C.** Đi hết checklist. Đây là bản đầu tiên không còn ngcc và dùng RxJS 7, TinyMCE 6.
+- [ ] **Step 3: Mốc smoke C.** Chạy `yarn --cwd tools/e2e test:ro` và `test:rw` (trên database bản sao), cả hai phải PASS, rồi đi tay các mục chưa có `(e2e)` trong checklist. Đây là bản đầu tiên không còn ngcc và dùng RxJS 7, TinyMCE 6.
 
 ### Task 14: Angular 16 → 17
 
@@ -339,8 +423,9 @@ Bảng thay thế:
 - [ ] **Step 5:** `ls build/_verify_prod/tinymce/tinymce.min.js` và `ls build/_verify_prod/sw.js`. Expected: cả hai tồn tại.
 - [ ] **Step 6:** Xoá `--max_old_space_size=8192` khỏi các script trong `package.json` nếu `yarn verify:prod` vẫn PASS khi không có nó.
 - [ ] **Step 6b:** Cổng giao diện, nhãn `ng18-esbuild` so với `task12`. Expected: PASS. Builder mới xử lý thứ tự CSS khác webpack, nên lệch ở đây thường do thứ tự nạp style trong `angular.json`.
-- [ ] **Step 7: Mốc smoke D.** Đi hết checklist trên `yarn start`. Chú ý mọi màn hình có ngày giờ (moment), biểu đồ, in ấn.
+- [ ] **Step 7: Mốc smoke D.** Trên `yarn start`: Chạy `yarn --cwd tools/e2e test:ro` và `test:rw` (trên database bản sao), cả hai phải PASS, rồi đi tay các mục chưa có `(e2e)` trong checklist. Chạy thêm `test:ro` một lần với `E2E_BASE_URL` trỏ vào bản build `prod` phục vụ bằng `node tools/visual/serve.mjs build/_verify_prod 3106`, vì builder mới có thể chạy khác giữa dev server và bản build. Chú ý mọi màn hình có ngày giờ (moment), biểu đồ, in ấn.
 - [ ] **Step 8:** Commit: `build: switch to application builder`.
+- [ ] **Step 9:** Lưu bản build `prod` vào `build/_release_upgrade-ng18-esbuild/`, tag `upgrade/ng18-esbuild`, merge `main`.
 
 ### Task 16: Angular 18 → 19
 
@@ -380,9 +465,10 @@ Bảng thay thế:
 - [ ] **Step 3:** Build đủ 6 cấu hình, mỗi cấu hình phải PASS: `dev`, `production`, `test`, `prod`, `prod_SOTBVL`, `prod_KG`.
 - [ ] **Step 4:** `yarn start` lên được ở cổng 3105.
 - [ ] **Step 4b:** Cổng giao diện lần cuối, nhãn `ng22-final` so với `task12`, và thêm một lượt so với `reference` (giao diện mẫu). Expected: PASS, hoặc mọi khác biệt đã có trong `tools/visual/approved.md`.
-- [ ] **Step 5: Mốc smoke E.** Đi hết checklist lần cuối trên bản build `prod` được phục vụ như môi trường thật.
+- [ ] **Step 5: Mốc smoke E.** Trên bản build `prod` được phục vụ như môi trường thật (`node tools/visual/serve.mjs <thư mục build> 3106`, `E2E_BASE_URL=http://localhost:3106`): Chạy `yarn --cwd tools/e2e test:ro` và `test:rw` (trên database bản sao), cả hai phải PASS, rồi đi tay các mục chưa có `(e2e)` trong checklist.
 - [ ] **Step 6:** Ghi vào đầu file plan này một dòng trạng thái "Hoàn thành ngày ..." và cập nhật `README.md` với yêu cầu Node `>= 24.15`.
 - [ ] **Step 7:** Commit: `chore: finalize angular 22 upgrade`.
+- [ ] **Step 8:** Lưu bản build `prod` vào `build/_release_upgrade-ng22/`, tag `upgrade/ng22`. Viết vào `README.md` cách chạy `tools/e2e` để dùng tiếp cho các lần sửa sau nâng cấp.
 
 ## Quyết định cần người phụ trách xác nhận
 
@@ -392,5 +478,15 @@ Plan đã chọn sẵn phương án mặc định cho từng mục; chỉ cần 
 |---|---|---|
 | ng-bootstrap | Gỡ, thay bằng Material và markup Bootstrap 4 (Task 6) | Giữ và nâng theo từng bản; kéo theo nâng theme lên Bootstrap 5 |
 | Giao diện sau MDC | **Đã chốt 2026-11-14:** phải giống giao diện hiện tại và giao diện mẫu; kiểm bằng cổng giao diện, người phụ trách duyệt từng màn hình còn lệch | — |
-| Karma và 6 file spec | Giữ nguyên, không dùng làm điều kiện nghiệm thu | Xoá hẳn ở Task 20, hoặc chuyển sang Vitest |
+| Karma và 6 file spec | Giữ nguyên, không dùng làm điều kiện nghiệm thu. Lưu ý `src/test.ts` dùng `require.context` nên `ng test` sẽ không chạy được sau Task 15 | Xoá hẳn ở Task 20, hoặc chuyển sang Vitest |
+| Test e2e | Playwright trong `tools/e2e/` (Task 1C), nhóm `@ro` làm cổng ở mọi task, nhóm `@rw` ở các mốc smoke | Chỉ smoke test tay ở 5 mốc như bản plan cũ |
+| Database cho nhóm e2e `@rw` | Bản sao riêng, khôi phục trước mỗi lượt bằng `E2E_RESTORE_CMD` do người phụ trách backend cung cấp | Không chạy `@rw`, kiểm tay các thao tác ghi |
+| Timebox mỗi bản major trước khi rollback | 2 ngày làm việc (MDC: 5 ngày) | Con số khác |
 | TinyMCE | Dừng ở 6.x (giấy phép MIT) | Lên 8.x, chấp nhận GPL hoặc mua license |
+
+## Nhật ký vướng mắc
+
+Ghi mỗi lần rollback mức 2 trở lên: ngày, task, commit bị revert, triệu chứng, nguyên nhân (nếu đã biết), hướng xử lý người phụ trách chọn.
+
+| Ngày | Task | Commit | Triệu chứng | Nguyên nhân | Hướng xử lý |
+|---|---|---|---|---|---|
