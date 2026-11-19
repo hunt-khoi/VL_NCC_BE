@@ -6,7 +6,7 @@
 	<div class="users-container">
 		<div class="user-item" (click)="select(user)" *ngFor="let user of filteredUsers | async">
 			<label>
-				@{{user.username}}
+				&#64;{{user.username}}
 			</label>
 			<div>
 				<img src="{{user.image}}" alt="">

@@ -195,18 +195,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "metronic:build:dev"
+            "buildTarget": "metronic:build:dev"
           },
           "configurations": {
             "production": {
-              "browserTarget": "metronic:build:production"
+              "buildTarget": "metronic:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "metronic:build"
+            "buildTarget": "metronic:build"
           }
         },
         "test": {

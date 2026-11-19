@@ -75,7 +75,7 @@ export function initializeLayoutConfig(appConfig: LayoutConfigService) {
 		}),
 		EffectsModule.forRoot([]),
 		StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
-		!environment.production ? StoreDevtoolsModule.instrument() : [],
+		!environment.production ? StoreDevtoolsModule.instrument({connectInZone: true}) : [],
 		AuthModule.forRoot(),
 		TranslateModule.forRoot(),
 		MatProgressSpinnerModule,
