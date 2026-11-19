@@ -84,10 +84,6 @@ Lưu kèm mỗi tag phát hành được: bản build `prod` của tag đó tron
 4. **Đã deploy lên server rồi phát hiện lỗi.**
    Chỉ deploy từ tag phát hành được. Server giữ thư mục build của bản đang chạy trước đó (tên thư mục build đã có ngày, ví dụ `prod_260428`); deploy bản mới vào thư mục mới rồi đổi đường dẫn site sang thư mục đó. Rollback = trỏ đường dẫn site về thư mục cũ, không cần build lại. Backend và database không đổi trong suốt quá trình nâng cấp nên rollback frontend không cần đụng tới backend. `sw.js` không cache file của app (handler `fetch` chỉ đọc cache, không ghi), nhưng vẫn phải đặt `Cache-Control: no-cache` cho `index.html` trên server để trình duyệt nhận bản rollback ngay.
 
-### Đồng bộ với `main`
-
-Nhánh nâng cấp sống lâu, `main` vẫn có thể có bản sửa lỗi gấp. Ở cuối mỗi chặng (sau Task 9, Task 12, Task 15, trước Task 20): `git fetch origin main && git merge --no-edit origin/main`. Khi xung đột `yarn.lock`, giữ bản của nhánh nâng cấp rồi chạy lại `yarn install`. Sau khi merge phải chạy lại `yarn verify:dev`, cổng e2e `@ro`, và tag lại điểm rollback của chặng đó nếu có thay đổi.
-
 ### Hai bước khó quay lui
 
 Task 12 (MDC) và Task 15 (application builder) đổi nhiều file nhất. Trước khi bắt đầu hai task này phải có tag của bước liền trước, bản build `prod` trong `build/_release_<tag>/` và báo cáo cổng giao diện đã lưu, để khi cần quay lui thì so sánh được ngay.
@@ -362,7 +358,7 @@ Bảng thay thế:
 - [ ] **Step 5b:** Cổng giao diện, nhãn `task9` so với `task7`. Expected: PASS, không có ngoại lệ (đổi cú pháp SCSS không được làm đổi CSS sinh ra).
 - [ ] **Step 6:** Commit: `refactor: material theming to @use api`.
 - [ ] **Step 7: Mốc smoke A.** Chạy `yarn start`. Chạy `yarn --cwd tools/e2e test:ro` và `test:rw` (trên database bản sao), cả hai phải PASS, rồi đi tay các mục chưa có `(e2e)` trong checklist. Mọi mục phải đạt trước khi sang Chặng 2. Đây là lần kiểm tra các thay thế ở Task 5–7.
-- [ ] **Step 8:** Lưu bản build `prod` của Step 5 vào `build/_release_upgrade-ng13-clean/`, tag `upgrade/ng13-clean`, merge `main` theo mục "Đồng bộ với `main`".
+- [ ] **Step 8:** Lưu bản build `prod` của Step 5 vào `build/_release_upgrade-ng13-clean/`, tag `upgrade/ng13-clean`.
 
 ---
 
@@ -397,7 +393,7 @@ Bảng thay thế:
 - [ ] **Step 10: Mốc smoke B.** Chạy `yarn --cwd tools/e2e test:ro` và `test:rw` (trên database bản sao), cả hai phải PASS, rồi đi tay các mục chưa có `(e2e)` trong checklist. Chú ý những thứ ảnh tĩnh không bắt được: hiệu ứng nhãn nổi của ô nhập khi focus, ripple, trạng thái hover và disabled, snackbar, tooltip, cuộn trong dialog dài.
 - [ ] **Step 11:** Sau khi được duyệt, bộ ảnh gốc hiện hành là `task12`.
 - [ ] **Step 12:** Commit: `refactor: material legacy to mdc`.
-- [ ] **Step 13:** Lưu bản build `prod` của Step 7 vào `build/_release_upgrade-ng15-mdc/`, tag `upgrade/ng15-mdc`, merge `main`.
+- [ ] **Step 13:** Lưu bản build `prod` của Step 7 vào `build/_release_upgrade-ng15-mdc/`, tag `upgrade/ng15-mdc`.
 
 ### Task 13: Angular 15 → 16
 
@@ -425,7 +421,7 @@ Bảng thay thế:
 - [ ] **Step 6b:** Cổng giao diện, nhãn `ng18-esbuild` so với `task12`. Expected: PASS. Builder mới xử lý thứ tự CSS khác webpack, nên lệch ở đây thường do thứ tự nạp style trong `angular.json`.
 - [ ] **Step 7: Mốc smoke D.** Trên `yarn start`: Chạy `yarn --cwd tools/e2e test:ro` và `test:rw` (trên database bản sao), cả hai phải PASS, rồi đi tay các mục chưa có `(e2e)` trong checklist. Chạy thêm `test:ro` một lần với `E2E_BASE_URL` trỏ vào bản build `prod` phục vụ bằng `node tools/visual/serve.mjs build/_verify_prod 3106`, vì builder mới có thể chạy khác giữa dev server và bản build. Chú ý mọi màn hình có ngày giờ (moment), biểu đồ, in ấn.
 - [ ] **Step 8:** Commit: `build: switch to application builder`.
-- [ ] **Step 9:** Lưu bản build `prod` vào `build/_release_upgrade-ng18-esbuild/`, tag `upgrade/ng18-esbuild`, merge `main`.
+- [ ] **Step 9:** Lưu bản build `prod` vào `build/_release_upgrade-ng18-esbuild/`, tag `upgrade/ng18-esbuild`.
 
 ### Task 16: Angular 18 → 19
 
