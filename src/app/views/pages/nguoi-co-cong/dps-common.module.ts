@@ -100,7 +100,7 @@ import { PopoverModule } from '../../partials/lib/popover/popover';
 import { CommentService } from './components/comment/comment.service';
 import { DynamicProcessService } from './services/dynamic-process.service';
 import { RouterModule } from '@angular/router';
-import { NgxMaskModule, IConfig } from 'ngx-mask';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 import { AvatarModule } from 'ngx-avatars';
 import { LoadingService } from './services/loading.service';
 import { LoadingInterceptor } from './services/loading.interceptor';
@@ -112,8 +112,6 @@ import { CookieService } from 'ngx-cookie-service';
 import { CanvasDemoModule } from './components/canvas-demo/canvas-demo.module';
 import { ChartsModule } from '../../partials/lib/ng2-charts';
 import { CKEditorModule } from 'ckeditor4-angular';
-
-export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
 
 @NgModule({ declarations: [
         ColumnFilterComponent,
@@ -193,7 +191,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
         MatExpansionModule,
         NgxPrintModule,
         PopoverModule,
-        NgxMaskModule,
+        NgxMaskDirective,
+        NgxMaskPipe,
         AngularEditorModule,
         AvatarModule,
         ChartsModule,
@@ -275,7 +274,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
         MatToolbarModule,
         MatCardModule,
         PopoverModule,
-        NgxMaskModule.forRoot(),
+        NgxMaskDirective,
+        NgxMaskPipe,
         //NgIdleKeepaliveModule.forRoot(),
         AngularEditorModule,
         EditorModule,
@@ -283,6 +283,8 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
         CanvasDemoModule,
         ChartsModule,
         CKEditorModule], providers: [
+        // ngx-mask 16+ bo NgxMaskModule.forRoot(): directive/pipe standalone + provider.
+        provideNgxMask(),
         InterceptService,
         {
             provide: HTTP_INTERCEPTORS,
