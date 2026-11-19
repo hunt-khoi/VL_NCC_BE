@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MatPaginator } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { QueryParamsModel, LayoutUtilsService } from '../../../../../core/_base/crud';

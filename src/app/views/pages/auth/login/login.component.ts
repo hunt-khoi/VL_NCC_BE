@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { ReCaptchaComponent } from '../../../partials/lib/recaptcha/recaptcha';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthNoticeService, AuthService } from '../../../../core/auth';
 import { LayoutConfigService } from '../../../../core/_base/layout';

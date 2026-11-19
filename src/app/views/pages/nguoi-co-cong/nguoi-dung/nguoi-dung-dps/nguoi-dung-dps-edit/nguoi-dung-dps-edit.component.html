@@ -215,13 +215,13 @@
                 <!-- <div class="col-md-12 kt-margin-bottom-10-mobile">
                     <label>Đơn vị quan tâm</label>
                     <mat-form-field class="mat-form-field-fluid example-chip-list">
-                        <mat-chip-list #chipList aria-label="Đơn vị quan tâm">
-                            <mat-chip *ngFor="let dv of NguoiDungDPS.DonViQuanTam" [selectable]="selectable && allowEdit" 
+                        <mat-chip-listbox #chipList aria-label="Đơn vị quan tâm">
+                            <mat-chip-option *ngFor="let dv of NguoiDungDPS.DonViQuanTam" [selectable]="selectable && allowEdit" 
                                 [removable]="removable && allowEdit" (removed)="remove(dv, 1)">
                                 {{dv.title}}
                                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                            </mat-chip>
-                        </mat-chip-list>
+                            </mat-chip-option>
+                        </mat-chip-listbox>
                         <button mat-icon-button matSuffix (click)="dv(1)" color="primary" matTooltip="Chọn đơn vị" style="margin-right: 5px;" [disabled]="!allowEdit">
 							<mat-icon>supervisor_account</mat-icon>
 						</button>
@@ -233,13 +233,13 @@
                 <div class="col-md-12 kt-margin-bottom-10-mobile">
                     <label>Đơn vị lấy hạn xử lý</label>
                     <mat-form-field class="mat-form-field-fluid example-chip-list">
-                        <mat-chip-list #chipList aria-label="Đơn vị lấy hạn xử lý">
-                            <mat-chip *ngFor="let dv of NguoiDungDPS.DonViLayHanXuLy" [selectable]="selectable && allowEdit" 
+                        <mat-chip-listbox #chipList aria-label="Đơn vị lấy hạn xử lý">
+                            <mat-chip-option *ngFor="let dv of NguoiDungDPS.DonViLayHanXuLy" [selectable]="selectable && allowEdit" 
                                 [removable]="removable && allowEdit" (removed)="remove(dv, 2)">
                                 {{dv.title}}
                                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                            </mat-chip>
-                        </mat-chip-list>
+                            </mat-chip-option>
+                        </mat-chip-listbox>
                         <button mat-icon-button matSuffix (click)="dv(2)" color="primary" matTooltip="Chọn đơn vị" style="margin-right: 5px;" [disabled]="!allowEdit">
 							<mat-icon>supervisor_account</mat-icon>
 						</button>
@@ -251,13 +251,13 @@
                 <div class="col-md-12 kt-margin-bottom-10-mobile" *ngIf="Capcocau==1">
                     <label>Đối tượng người có công được quản lý</label>
                     <mat-form-field class="mat-form-field-fluid example-chip-list">
-                        <mat-chip-list #chipList aria-label="Đối tượng người có công được quản lý">
-                            <mat-chip *ngFor="let dt of NguoiDungDPS.lstDoiTuongNCC" [selectable]="selectable && allowEdit" 
+                        <mat-chip-listbox #chipList aria-label="Đối tượng người có công được quản lý">
+                            <mat-chip-option *ngFor="let dt of NguoiDungDPS.lstDoiTuongNCC" [selectable]="selectable && allowEdit" 
                                 [removable]="removable && allowEdit" (removed)="remove(dt)">
                                 {{dt.title}}
                                 <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-                            </mat-chip>
-                        </mat-chip-list>
+                            </mat-chip-option>
+                        </mat-chip-listbox>
                         <button mat-icon-button matSuffix (click)="dv()" color="primary" matTooltip="Chọn đối tượng NCC" style="margin-right: 5px;" [disabled]="!allowEdit">
 							<mat-icon>supervisor_account</mat-icon>
 						</button>

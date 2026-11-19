@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, HostListener, OnDestroy } from '@angular/core';
 import { CommonService } from '../../../../pages/nguoi-co-cong/services/common.service';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { NgbDropdown } from '../../../lib/ngb/ngb-lite.module';
 import { Router } from '@angular/router';
 import { SignalRService } from '../../../../pages/nguoi-co-cong/services/signalR.service';

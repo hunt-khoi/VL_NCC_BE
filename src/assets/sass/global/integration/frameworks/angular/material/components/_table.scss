@@ -10,22 +10,22 @@
 		min-height: 100%;
 	}
 
-    .mat-table {
+    .mat-mdc-table {
         min-width: 1000px;
 
-        .mat-cell, 
-        .mat-footer-cell, 
-        .mat-header-cell {
+        .mat-mdc-cell, 
+        .mat-mdc-footer-cell, 
+        .mat-mdc-header-cell {
             padding-right: 10px;
         }
         
-        .mat-cell:last-child, 
-        .mat-footer-cell:last-child, 
-        .mat-header-cell:last-child {
+        .mat-mdc-cell:last-child, 
+        .mat-mdc-footer-cell:last-child, 
+        .mat-mdc-header-cell:last-child {
             padding-right: 0;
         }
             
-        .mat-row {
+        .mat-mdc-row {
             transition: padding 0.3s ease;
         }
 
@@ -44,7 +44,7 @@
             display: flex;
             align-items: center;
         }
-        .mat-spinner {
+        .mat-mdc-progress-spinner {
             margin-left: 12px;
             margin-right: 8px;
         }
@@ -59,8 +59,9 @@
     .mat-column-checkbox {
          padding-left: 20px;
 
-        .mat-checkbox {
-            .mat-checkbox-layout {
+        .mat-mdc-checkbox {
+            // MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+            .mdc-form-field {
                 margin-top: 0.25rem;
                 margin-bottom: 0.25rem;
             }
@@ -72,34 +73,34 @@
     }
 }
 
-.mat-table__wrapper .mat-table {
+.mat-table__wrapper .mat-mdc-table {
 	min-width: 1000px;
 	width: 100%;
 }
 
-.mat-table__wrapper--dashboard .mat-table {
+.mat-table__wrapper--dashboard .mat-mdc-table {
 	min-width: 600px !important;
 }
 
-.mat-table__wrapper .mat-table .email-cell {
+.mat-table__wrapper .mat-mdc-table .email-cell {
 	word-wrap: normal;
 	width: 180px;
 	flex: auto;
 }
 
-.mat-table__wrapper--sub .mat-table {
+.mat-table__wrapper--sub .mat-mdc-table {
 	min-width: 400px;
 
-	.mat-cell:last-child {
+	.mat-mdc-cell:last-child {
 		flex: 0 0 100px;
 	}
 
-	.mat-header-cell:last-child {
+	.mat-mdc-header-cell:last-child {
 		flex: 0 0 100px;
 	}
 }
 
-.mat-table-sticky {
+.mat-mdc-table-sticky {
     z-index: 97 !important;
 }
 
@@ -135,7 +136,7 @@
 	flex: 0 0 170px;
 }
 
-.mat-table__wrapper .mat-table .mat-row-editing.mat-row-inactive {
+.mat-table__wrapper .mat-mdc-table .mat-row-editing.mat-row-inactive {
 	height: 0;
 	min-height: 0;
 	padding: 0 !important;

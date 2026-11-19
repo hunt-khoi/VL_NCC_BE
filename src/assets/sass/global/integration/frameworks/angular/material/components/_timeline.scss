@@ -17,8 +17,9 @@
 
 	.kt-timeline-3__item-child {
 		margin-left: 27px;
-		.mat-checkbox:not(.mat-checkbox-disabled).mat-accent
-			.mat-checkbox-ripple
+		// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+		.mat-mdc-checkbox:not(.mat-mdc-checkbox-disabled).mat-accent
+			.mat-mdc-checkbox-ripple
 			.mat-ripple-element {
 			background-color: rgba(54, 163, 247, 0.26);
 		}

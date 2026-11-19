@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ArrayDataSource, SelectionModel } from '@angular/cdk/collections';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';

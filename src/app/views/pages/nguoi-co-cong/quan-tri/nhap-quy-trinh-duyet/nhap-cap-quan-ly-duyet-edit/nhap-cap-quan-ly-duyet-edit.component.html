@@ -181,11 +181,11 @@
 					<mat-form-field class="mat-form-field-fluid">
 						<input matInput placeholder="{{ 'QUY_TRINH_DUYET.dsnhanthongbao' | translate }}" readonly="true" 
 							[value]="listNguoiNhanEmail.length>0 ? ' ' : ''">
-						<mat-chip-list #chipList>
-							<mat-chip *ngFor="let n of listNguoiNhanEmail" (removed)="removethemnguoinhanemail(n)">
+						<mat-chip-listbox #chipList>
+							<mat-chip-option *ngFor="let n of listNguoiNhanEmail" (removed)="removethemnguoinhanemail(n)">
 								{{n.HoTen}}<mat-icon matChipRemove>cancel</mat-icon>
-							</mat-chip>
-						</mat-chip-list>
+							</mat-chip-option>
+						</mat-chip-listbox>
 						<img matSuffix src="https://img.icons8.com/color/96/000000/plus.png" class="icon" *ngIf="allowEdit"
 							(click)="themnguoinhanemail()" matTooltip="{{ 'QUY_TRINH_DUYET.themnguoinhanemail' | translate }}">
 					</mat-form-field>

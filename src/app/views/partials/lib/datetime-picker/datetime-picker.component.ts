@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation, forwardRef, Input, Output, EventEmitter, ViewChild, Injectable, OnChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validators } from '@angular/forms';
-import { MatLegacyMenuTrigger as MatMenuTrigger } from '@angular/material/legacy-menu';
+import { MatMenuTrigger } from '@angular/material/menu';
 import { MatCalendar } from '@angular/material/datepicker';
 import { NgbTimeAdapter, NgbTimeStruct } from '../ngb/ngb-lite.module';
 import moment$1 from 'moment';

@@ -59,7 +59,7 @@
     "ngx-cookie-service": "14.0.1",
     "ngx-drag-drop": "14.0.0",
     "ngx-mask": "14.3.3",
-    "ngx-mat-select-search": "4.2.1",
+    "ngx-mat-select-search": "7.0.10",
     "ngx-permissions": "14.1.0",
     "ngx-print": "1.3.1",
     "object-path": "^0.11.4",

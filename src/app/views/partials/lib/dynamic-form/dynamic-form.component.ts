@@ -2,7 +2,7 @@ import { Component, OnInit, OnChanges, OnDestroy, EventEmitter, ChangeDetectorRe
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { DynamicFormService } from './dynamic-form.service';
 import { BehaviorSubject } from 'rxjs';
 import moment__default from 'moment';

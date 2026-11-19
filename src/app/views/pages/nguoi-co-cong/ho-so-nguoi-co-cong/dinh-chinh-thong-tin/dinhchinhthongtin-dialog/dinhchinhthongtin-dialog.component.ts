@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ReplaySubject } from 'rxjs';
 import { Router } from '@angular/router';

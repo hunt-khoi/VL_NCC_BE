@@ -45,7 +45,7 @@
     width: 100%
 }
 
-.btn.btn-outline-primary.dl-drop-tree-custom-css .mat-form-field {
+.btn.btn-outline-primary.dl-drop-tree-custom-css .mat-mdc-form-field {
     border: none
 }
 
@@ -74,7 +74,8 @@
     display: block
 }
 
-.btn.dl-drop-tree-custom-css .mat-form-field-flex .mat-form-field-infix::before {
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+.btn.dl-drop-tree-custom-css .mat-mdc-form-field-flex .mat-mdc-form-field-infix::before {
     position: absolute;
     right: 0;
     top: 50%;
@@ -112,7 +113,7 @@
     background: url(/assets/images/dot.png) 9px repeat-y
 }
 
-.dl-tree-dropdown .dl-out-let .example-tree-node:last-child .mat-icon-button {
+.dl-tree-dropdown .dl-out-let .example-tree-node:last-child .mat-mdc-icon-button {
     background-repeat: no-repeat
 }
 
@@ -134,7 +135,7 @@ html .m-body .m-content {
     background-position: -31px -4px
 }
 
-.dl-tree-dropdown .example-tree-node .dl-name-node .mat-icon-button {
+.dl-tree-dropdown .example-tree-node .dl-name-node .mat-mdc-icon-button {
     width: auto;
     height: auto;
     line-height: 30px;
@@ -145,7 +146,7 @@ html .m-body .m-content {
     background-position: -99px -4px
 }
 
-.dl-tree-dropdown .dl-out-let .example-tree-node .mat-icon-button {
+.dl-tree-dropdown .dl-out-let .example-tree-node .mat-mdc-icon-button {
     width: auto;
     height: auto
 }

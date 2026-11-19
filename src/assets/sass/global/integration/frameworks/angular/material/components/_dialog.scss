@@ -1,6 +1,6 @@
 // Dialog
 .kt-mat-dialog-container__wrapper {
-	.mat-dialog-container {
+	.mat-mdc-dialog-container {
 	   	padding: 0;
 	   	overflow-x: hidden;
 
@@ -15,7 +15,7 @@
 	}
 }
 
-.kt-mat-dialog-container__wrapper .mat-dialog-container {
+.kt-mat-dialog-container__wrapper .mat-mdc-dialog-container {
 	padding: 0;
 	overflow-x: hidden;
 
@@ -29,7 +29,7 @@
 	}
 }
 
-.mat-dialog-actions {
+.mat-mdc-dialog-actions {
 	margin-bottom: 0 !important;
 }
 
@@ -38,7 +38,7 @@
 	.kt-mat-dialog-container__wrapper {
 		max-width: 90%;
 		
-		.mat-dialog-container {
+		.mat-mdc-dialog-container {
 		   	.kt-portlet {
 		       	.kt-portlet__body {
 		       		overflow: auto;

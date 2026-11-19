@@ -1,27 +1,27 @@
-::ng-deep .mat-tab-group.vertical {
+::ng-deep .mat-mdc-tab-group.vertical {
 	flex-direction: row;
 
-	.mat-tab-header {
+	.mat-mdc-tab-header {
 		border-bottom: none;
 		width: 100%;
 	}
-
-	.mat-tab-list {
+	// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+	.mat-mdc-tab-list {
 		width: 100%;
 	}
-
-	.mat-tab-labels {
+	// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+	.mat-mdc-tab-labels {
 		flex-direction: column;
-
-		.mat-tab-label {
+		// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+		.mat-mdc-tab {
 			justify-content: left;
-
-			&.mat-tab-label-active {
+			// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+			&.mdc-tab--active {
 				background-color: #0274b5;
 				color: white;
 			}
-
-			.mat-tab-label-content {
+			// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+			.mdc-tab__text-label {
 				width: 100%;
 				display: contents;
 
@@ -129,7 +129,8 @@
 	font-size: 24px !important;
 }
 
-:host ::ng-deep .mat-tab-label-active .mat-tab-label-content {
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+:host ::ng-deep .mdc-tab--active .mdc-tab__text-label {
 	color: #5867dd;
 }
 
@@ -138,14 +139,15 @@
 	border-bottom: none !important;
 }
 
-:host ::ng-deep .mat-input-element.require,
-:host ::ng-deep .mat-select-required .mat-select-value,
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+:host ::ng-deep .mat-mdc-input-element.require,
+:host ::ng-deep .mat-mdc-select-required .mat-mdc-select-value,
 :host ::ng-deep m-datetime-picker[required] {
 	/* color: #3699ff !important; */
 	color: rgb(12, 12, 12);
 }
 
-:host ::ng-deep .mat-form-field {
+:host ::ng-deep .mat-mdc-form-field {
 	color: rgb(12, 12, 12);
 	margin-bottom: -0.95em;
 
@@ -158,12 +160,13 @@
 	}
 
 	&.mat-focused {
-		.mat-form-field-label {
+		// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+		.mdc-floating-label {
 			color: #0008ff;
 		}
 	}
-
-	&.mat-form-field-invalid .mat-form-field-label {
+	// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+	&.mat-form-field-invalid .mdc-floating-label {
 		color: #fd397a;
 	}
 }
@@ -172,6 +175,7 @@
 	color: #0008ff;
 }
 
-::ng-deep .timkiem .mat-form-field .mat-form-field-label {
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+::ng-deep .timkiem .mat-mdc-form-field .mdc-floating-label {
 	font-weight: bold;
 }

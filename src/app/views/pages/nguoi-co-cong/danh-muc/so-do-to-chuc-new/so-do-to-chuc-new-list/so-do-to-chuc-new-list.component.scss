@@ -48,7 +48,7 @@
     list-style: none;
 }
 
-.btn.btn-outline-primary.dl-drop-tree-custom-css .mat-form-field {
+.btn.btn-outline-primary.dl-drop-tree-custom-css .mat-mdc-form-field {
     border: none;
 }
 
@@ -113,7 +113,7 @@
     background-position: 9px;
 }
 
-.dl-tree-dropdown .dl-out-let .example-tree-node:last-child .mat-icon-button {
+.dl-tree-dropdown .dl-out-let .example-tree-node:last-child .mat-mdc-icon-button {
     background-repeat: no-repeat;
 }
 
@@ -135,7 +135,7 @@ html .m-body .m-content {
     background-position: -31px -4px;
 }
 
-.dl-tree-dropdown .example-tree-node .dl-name-node .mat-icon-button {
+.dl-tree-dropdown .example-tree-node .dl-name-node .mat-mdc-icon-button {
     width: auto;
     height: auto;
     line-height: 30px;
@@ -146,7 +146,7 @@ html .m-body .m-content {
     background-position: -99px -4px;
 }
 
-.dl-tree-dropdown .dl-out-let .example-tree-node .mat-icon-button {
+.dl-tree-dropdown .dl-out-let .example-tree-node .mat-mdc-icon-button {
     width: auto;
     height: auto;
 }

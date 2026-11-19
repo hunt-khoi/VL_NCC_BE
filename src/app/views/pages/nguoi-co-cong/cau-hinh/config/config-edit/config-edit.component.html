@@ -44,14 +44,14 @@
 				</div>
 				<div class="col-md-12 kt-margin-bottom-10-mobile">
 					<mat-form-field class="mat-form-field-fluid example-chip-list" *ngIf="Config.Type==='LIST'">
-						<mat-chip-list #chipList aria-label="Giá trị" required formControlName="value">
-							<mat-chip *ngFor="let chip of chips" [selectable]="allowEdit" [removable]="allowEdit" (removed)="remove(chip)">
+						<mat-chip-grid #chipList aria-label="Giá trị" required formControlName="value">
+							<mat-chip-row *ngFor="let chip of chips" [selectable]="allowEdit" [removable]="allowEdit" (removed)="remove(chip)">
 								{{chip}}
 								<mat-icon matChipRemove *ngIf="allowEdit">cancel</mat-icon>
-							</mat-chip>
+							</mat-chip-row>
 							<input placeholder="Giá trị" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
 								[matChipInputFor]="chipList" (matChipInputTokenEnd)="add($event)">
-						</mat-chip-list>
+						</mat-chip-grid>
 						<mat-error>
 							Giá trị
 							<strong *ngIf="itemForm.controls['value'].errors && itemForm.controls['value'].errors.required"> bắt buộc nhập</strong>

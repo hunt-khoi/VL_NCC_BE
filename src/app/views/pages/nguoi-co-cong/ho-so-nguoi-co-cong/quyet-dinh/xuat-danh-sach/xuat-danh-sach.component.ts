@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';

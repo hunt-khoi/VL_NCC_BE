@@ -46,16 +46,18 @@
     display: none;
 }
 
-:host ::ng-deep .mat-checkbox>label.mat-checkbox-layout>div.mat-checkbox-inner-container {
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+:host ::ng-deep .mat-mdc-checkbox>.mdc-checkbox {
     width: 14px;
     height: 14px;
 }
 
-:host ::ng-deep .mat-checkbox>label {
+:host ::ng-deep .mat-mdc-checkbox>label {
     margin-bottom: .5rem;
 }
 
-:host ::ng-deep .chk-sty.mat-checkbox-checked .mat-checkbox-checkmark {
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+:host ::ng-deep .chk-sty.mat-mdc-checkbox-checked .mdc-checkbox__checkmark {
     opacity: 0;
 }
 

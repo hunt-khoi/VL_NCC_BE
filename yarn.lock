@@ -7283,10 +7283,10 @@ ngx-mask@14.3.3:
   dependencies:
     tslib "^2.3.0"
 
-ngx-mat-select-search@4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/ngx-mat-select-search/-/ngx-mat-select-search-4.2.1.tgz#8970763746728c69b622a42d8decff12a4ef8678"
-  integrity sha512-bKHpOSIXyqwZw35OB6yi87tcRRV/69mu49PN0M2ZzVbiWBPg/IN58aJnCHUDxDG6CdK0vbGJ/2eCPniZ1nf9KA==
+ngx-mat-select-search@7.0.10:
+  version "7.0.10"
+  resolved "https://registry.yarnpkg.com/ngx-mat-select-search/-/ngx-mat-select-search-7.0.10.tgz#15e316738ca6242855cd63433bfcc9774880bb5d"
+  integrity sha512-aygVGuOVJKfY8cQuOinz36sROEMaj2KU0IXB1f8VvKjbRAet5y5RAojo3ElnHR2FPaMQ6IMbp563kNyv2I4XrQ==
   dependencies:
     tslib "^2.4.0"
 

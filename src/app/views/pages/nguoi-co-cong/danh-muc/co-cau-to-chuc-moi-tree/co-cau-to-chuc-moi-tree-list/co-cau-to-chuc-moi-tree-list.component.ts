@@ -6,7 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import { cocautochucMoiTreeService } from '../Services/co-cau-to-chuc-moi-tree.service';
 import { OrgStructureModel } from '../Model/CoCauToChuc.model';
 import { CoCauToChucEditComponent } from '../co-cau-to-chuc-moi-tree-edit/co-cau-to-chuc-moi-tree-edit.component';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CoCauMapDialogComponent } from '../co-cau-map/co-cau-map-dialog.component';

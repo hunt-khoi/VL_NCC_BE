@@ -30,13 +30,15 @@
 
 // Panels
 .example-panel-Suspended {
-    .mat-select-content {
+    // MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+    .mat-mdc-select-panel {
         background: rgba(255, 0, 0, 0.5);
     }
 }
   
 .example-panel-Active {
-    .mat-select-content {
+    // MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+    .mat-mdc-select-panel {
         background:  rgba(0, 255, 0, 0.5);
     }
 }
@@ -51,16 +53,19 @@
 }
 
 // Tabs
-.mat-tab-body-content {
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+.mat-mdc-tab-body-content {
     overflow: visible !important;
     padding-top: 20px !important;
 }
 
-.mat-tab-label-icon {
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+.mat-mdc-tab .mat-icon {
 	margin-right: 5px;
 }
 
-.mat-form-field-infix {
+// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+.mat-mdc-form-field-infix {
 	    input:-webkit-autofill,
 	    input:-webkit-autofill:hover,
 	    input:-webkit-autofill:focus,

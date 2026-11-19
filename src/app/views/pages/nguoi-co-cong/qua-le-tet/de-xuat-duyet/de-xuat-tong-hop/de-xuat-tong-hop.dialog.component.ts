@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewEncapsulation, HostListener, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DomSanitizer } from '@angular/platform-browser';

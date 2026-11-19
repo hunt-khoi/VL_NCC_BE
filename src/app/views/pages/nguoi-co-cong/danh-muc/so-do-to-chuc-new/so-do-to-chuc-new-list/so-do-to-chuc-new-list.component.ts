@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, Injectable, OnDestroy } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { ArrayDataSource } from '@angular/cdk/collections';
 import { TranslateService } from '@ngx-translate/core';

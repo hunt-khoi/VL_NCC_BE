@@ -3,7 +3,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ReviewExportComponent } from '../../../components';
 import { CommonService } from '../../../services/common.service';
 import { DeXuatService } from '../Services/de-xuat.service';

@@ -1,17 +1,21 @@
 // Buttons
-.mat-fab,
-.mat-mini-fab,
-.mat-button,
-.mat-raised-button,
-.mat-stroked-button,
-.mat-icon-button {
+.mat-mdc-fab,
+.mat-mdc-mini-fab,
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-icon-button {
     outline: none !important;
 }
 
+// MDC: khong phai class noi bo cua Material MDC, giu nguyen (Task 12).
 mat-radio-button {
 	padding-right: 16px;
 }
 
+// MDC: khong phai class noi bo cua Material MDC, giu nguyen (Task 12).
+// MDC: khong phai class noi bo cua Material MDC, giu nguyen (Task 12).
 mat-radio-button {
-	.mat-radio-label { margin-bottom: 4px; }
+	// MDC: selector doi sang class MDC (Task 12), can kiem tra bang mat.
+	.mdc-label { margin-bottom: 4px; }
 }

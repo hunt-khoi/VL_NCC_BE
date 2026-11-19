@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { merge, BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
