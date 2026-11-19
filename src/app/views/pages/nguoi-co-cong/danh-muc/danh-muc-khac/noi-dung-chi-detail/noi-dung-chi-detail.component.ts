@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { NoiDungChiService } from '../Services/noi-dung-chi.service';
+import { NoiDungChiService } from '../services/noi-dung-chi.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

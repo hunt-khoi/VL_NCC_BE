@@ -12,7 +12,7 @@ import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_ba
 import { TableModel } from './../../../../../partials/table/table.model';
 import { NoiDungChiModel } from '../Models/danh-muc-khac.model';
 import { TableService } from './../../../../../partials/table/table.service';
-import { NoiDungChiService } from '../Services/noi-dung-chi.service';
+import { NoiDungChiService } from '../services/noi-dung-chi.service';
 import { NoDungChiDataSource } from '../Models/data-sources/noi-dung-chi.datasource';
 import { NoiDungChiDetailComponent } from '../noi-dung-chi-detail/noi-dung-chi-detail.component';
 import { CookieService } from 'ngx-cookie-service';

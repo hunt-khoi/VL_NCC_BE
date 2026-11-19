@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../../../../../core/_base/crud';
-import { DanhMucKhacService } from '../../Services/danh-muc-khac.service';
+import { DanhMucKhacService } from '../../services/danh-muc-khac.service';
 
 export class DanhMucKhacDataSource extends BaseDataSource {
 	constructor(private apiService: DanhMucKhacService) {

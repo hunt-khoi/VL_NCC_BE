@@ -1,6 +1,6 @@
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { ChucDanhService } from '../../Services/chucdanh.service';
+import { ChucDanhService } from '../../services/chucdanh.service';
 import { BaseDataSource, QueryResultsModel, QueryParamsModel } from '../../../../../../../core/_base/crud';
 
 export class ChucDanhDataSource extends BaseDataSource {

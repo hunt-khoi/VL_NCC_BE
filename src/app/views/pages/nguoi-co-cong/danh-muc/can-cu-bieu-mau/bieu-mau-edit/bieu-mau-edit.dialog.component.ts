@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
 import { CommonService } from './../../../services/common.service';
-import { BieuMauService } from '../Services/bieu-mau.service';
+import { BieuMauService } from '../services/bieu-mau.service';
 import { KeyWordListDialogComponent } from '../key-word-list-dialog/key-word-list-dialog.component';
 
 @Component({

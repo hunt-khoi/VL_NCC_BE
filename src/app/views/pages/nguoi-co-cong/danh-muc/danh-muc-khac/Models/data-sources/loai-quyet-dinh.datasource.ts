@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../../../../../core/_base/crud';
-import { LoaiQuyetDinhService } from '../../Services/loai-quyet-dinh.service';
+import { LoaiQuyetDinhService } from '../../services/loai-quyet-dinh.service';
 
 export class LoaiQuyetDinhDataSource extends BaseDataSource {
 	constructor(private apiService: LoaiQuyetDinhService) {

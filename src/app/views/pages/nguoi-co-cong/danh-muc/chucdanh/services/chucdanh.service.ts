@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
-import { ChucDanhModel } from '../Model/chucdanh.model';
+import { ChucDanhModel } from '../model/chucdanh.model';
 import { environment } from '../../../../../../../environments/environment';
 
 const API_PRODUCTS_URL = environment.ApiRoot + '/chuc-danh';

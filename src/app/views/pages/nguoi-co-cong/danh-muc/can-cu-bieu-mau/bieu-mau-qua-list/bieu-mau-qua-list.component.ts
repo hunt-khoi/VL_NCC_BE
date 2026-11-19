@@ -11,7 +11,7 @@ import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
-import { BieuMauQuaService } from '../Services/bieu-mau-qua.service';
+import { BieuMauQuaService } from '../services/bieu-mau-qua.service';
 import { CanCuBieuMauDataSource } from '../Models/data-sources/can-cu-bieu-mau.datasource';
 import { BieuMauQuaEditDialogComponent } from '../bieu-mau-qua-edit/bieu-mau-qua-edit.dialog.component';
 import { CookieService } from 'ngx-cookie-service';

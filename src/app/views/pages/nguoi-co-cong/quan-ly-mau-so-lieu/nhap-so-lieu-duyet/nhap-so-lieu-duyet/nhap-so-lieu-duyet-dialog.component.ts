@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { NhapSoLieuDuyetService } from '../Services/nhap-so-lieu-duyet.service';
+import { NhapSoLieuDuyetService } from '../services/nhap-so-lieu-duyet.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

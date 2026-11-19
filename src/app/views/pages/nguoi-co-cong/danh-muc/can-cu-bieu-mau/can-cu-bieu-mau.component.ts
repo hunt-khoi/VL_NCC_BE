@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
-import { BieuMauService } from './Services/bieu-mau.service';
-import { CanCuService } from './Services/can-cu.service';
+import { BieuMauService } from './services/bieu-mau.service';
+import { CanCuService } from './services/can-cu.service';
 
 @Component({
     selector: 'kt-can-cu-bieu-mau',

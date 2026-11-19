@@ -14,7 +14,7 @@ import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
 import { SettingProcessComponent } from '../../../components';
 import { NhapSoLieuModel } from '../../nhap-so-lieu/Model/nhap-so-lieu.model';
-import { NhapSoLieuDuyetService } from '../Services/nhap-so-lieu-duyet.service';
+import { NhapSoLieuDuyetService } from '../services/nhap-so-lieu-duyet.service';
 import { NhapSoLieuDuyetDataSource } from '../Model/data-sources/nhap-so-lieu-duyet.datasource';
 import { NhapSoLieuDuyetDialogComponent } from '../nhap-so-lieu-duyet/nhap-so-lieu-duyet-dialog.component';
 import { NhapSoLieuEditDialogComponent } from '../../nhap-so-lieu/nhap-so-lieu-edit/nhap-so-lieu-edit-dialog.component';

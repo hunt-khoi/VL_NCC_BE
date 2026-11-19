@@ -5,8 +5,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { ChucDanhModel } from '../Model/chucdanh.model';
-import { ChucDanhService } from '../Services/chucdanh.service';
+import { ChucDanhModel } from '../model/chucdanh.model';
+import { ChucDanhService } from '../services/chucdanh.service';
 
 @Component({
     selector: 'm-chucdanh-edit-dialog',

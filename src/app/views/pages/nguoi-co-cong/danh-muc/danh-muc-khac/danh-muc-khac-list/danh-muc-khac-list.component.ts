@@ -13,7 +13,7 @@ import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_ba
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
 import { TokenStorage } from './../../../../../../core/auth/_services/token-storage.service';
-import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
+import { DanhMucKhacService } from '../services/danh-muc-khac.service';
 import { DanhmuckhacModel } from '../Models/danh-muc-khac.model';
 import { DanhMucKhacDataSource } from './../Models/data-sources/danh-muc-khac.datasource';
 import { DanhmuckhacDetailComponent } from './../danhmuckhac-detail/danhmuckhac-detail.component';

@@ -8,9 +8,9 @@ import { merge, Subject } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
-import { ChucDanhModel } from '../Model/chucdanh.model';
-import { ChucDanhService } from '../Services/chucdanh.service';
-import { ChucDanhDataSource } from '../Model/data-sources/chucdanh.datasource';
+import { ChucDanhModel } from '../model/chucdanh.model';
+import { ChucDanhService } from '../services/chucdanh.service';
+import { ChucDanhDataSource } from '../model/data-sources/chucdanh.datasource';
 import { ChucDanhEditDialogComponent } from '../chucdanh-edit/chucdanh-edit.dialog.component';
 
 @Component({

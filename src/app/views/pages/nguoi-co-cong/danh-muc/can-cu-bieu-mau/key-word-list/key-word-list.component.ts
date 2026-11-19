@@ -4,8 +4,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { BieuMauService } from '../Services/bieu-mau.service';
-import { BieuMauQuaService } from '../Services/bieu-mau-qua.service';
+import { BieuMauService } from '../services/bieu-mau.service';
+import { BieuMauQuaService } from '../services/bieu-mau-qua.service';
 
 @Component({
     selector: 'kt-key-word-list',

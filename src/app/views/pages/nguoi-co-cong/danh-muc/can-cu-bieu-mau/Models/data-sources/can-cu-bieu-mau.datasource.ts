@@ -1,9 +1,9 @@
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../../../../../core/_base/crud';
-import { BieuMauQuaService } from '../../Services/bieu-mau-qua.service';
-import { BieuMauService } from '../../Services/bieu-mau.service';
-import { CanCuService } from '../../Services/can-cu.service';
+import { BieuMauQuaService } from '../../services/bieu-mau-qua.service';
+import { BieuMauService } from '../../services/bieu-mau.service';
+import { CanCuService } from '../../services/can-cu.service';
 
 export class CanCuBieuMauDataSource extends BaseDataSource {
 

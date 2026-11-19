@@ -11,7 +11,7 @@ import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
-import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
+import { DanhMucKhacService } from '../services/danh-muc-khac.service';
 import { DanhmucTrocapModel } from '../Models/danh-muc-tro-cap.model';
 import { DanhMucTroCapDataSource } from '../Models/data-sources/danh-muc-khac.datasource';
 import { TroCapDetailComponent } from './../tro-cap-detail/tro-cap-detail.component';

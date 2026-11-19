@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { BaseDataSource, QueryParamsModel, QueryResultsModel } from '../../../../../../../core/_base/crud';
-import { NoiDungChiService } from '../../Services/noi-dung-chi.service';
+import { NoiDungChiService } from '../../services/noi-dung-chi.service';
 
 export class NoDungChiDataSource extends BaseDataSource {
 	constructor(private apiService: NoiDungChiService) {

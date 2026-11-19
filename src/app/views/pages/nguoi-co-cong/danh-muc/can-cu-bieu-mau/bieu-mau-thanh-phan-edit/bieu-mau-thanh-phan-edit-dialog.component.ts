@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
-import { BieuMauService } from '../Services/bieu-mau.service';
+import { BieuMauService } from '../services/bieu-mau.service';
 
 @Component({
     selector: 'kt-bieu-mau-thanh-phan-edit-dialog',

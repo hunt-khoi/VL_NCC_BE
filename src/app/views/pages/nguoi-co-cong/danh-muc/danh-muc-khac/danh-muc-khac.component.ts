@@ -3,7 +3,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
-import { DanhMucKhacService } from './Services/danh-muc-khac.service';
+import { DanhMucKhacService } from './services/danh-muc-khac.service';
 
 @Component({
     selector: 'kt-danh-muc-khac',

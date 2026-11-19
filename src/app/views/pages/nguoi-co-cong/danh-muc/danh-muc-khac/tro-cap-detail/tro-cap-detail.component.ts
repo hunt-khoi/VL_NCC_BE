@@ -7,7 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
 import { CommonService } from './../../../services/common.service';
 import { DanhmucTrocapModel } from './../Models/danh-muc-tro-cap.model';
-import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
+import { DanhMucKhacService } from '../services/danh-muc-khac.service';
 
 @Component({
     selector: 'kt-tro-cap-detail',

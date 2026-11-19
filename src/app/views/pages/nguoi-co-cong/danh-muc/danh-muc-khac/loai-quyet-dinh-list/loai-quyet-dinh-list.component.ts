@@ -11,7 +11,7 @@ import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_base/crud';
 import { TableModel } from './../../../../../partials/table/table.model';
 import { TableService } from './../../../../../partials/table/table.service';
-import { LoaiQuyetDinhService } from '../Services/loai-quyet-dinh.service';
+import { LoaiQuyetDinhService } from '../services/loai-quyet-dinh.service';
 import { LoaiQuyetDinhDataSource } from './../Models/data-sources/loai-quyet-dinh.datasource';
 import { LoaiQuyetDinhDetailComponent } from './../loai-quyet-dinh-detail/loai-quyet-dinh-detail.component';
 import { CookieService } from 'ngx-cookie-service';

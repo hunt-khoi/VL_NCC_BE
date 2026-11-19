@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
 import { CommonService } from './../../../services/common.service';
-import { CanCuService } from '../Services/can-cu.service';
+import { CanCuService } from '../services/can-cu.service';
 
 @Component({
     selector: 'kt-can-cu-edit',

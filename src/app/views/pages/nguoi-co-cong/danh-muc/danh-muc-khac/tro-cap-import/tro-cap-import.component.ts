@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
-import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
+import { DanhMucKhacService } from '../services/danh-muc-khac.service';
 
 @Component({
     selector: 'kt-tro-cap-import',

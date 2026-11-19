@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DPSCommonModule } from '../../dps-common.module';
-import { ChucDanhService } from './Services/chucdanh.service';
+import { ChucDanhService } from './services/chucdanh.service';
 import { ChucDanhComponent } from './chucdanh.component';
 import { ChucDanhListComponent } from './chucdanh-list/chucdanh-list.component';
 import { ChucDanhEditDialogComponent } from './chucdanh-edit/chucdanh-edit.dialog.component';

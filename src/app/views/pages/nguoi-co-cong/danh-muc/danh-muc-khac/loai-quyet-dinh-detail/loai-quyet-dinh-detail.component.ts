@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/layout-utils.service';
-import { LoaiQuyetDinhService } from '../Services/loai-quyet-dinh.service';
+import { LoaiQuyetDinhService } from '../services/loai-quyet-dinh.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

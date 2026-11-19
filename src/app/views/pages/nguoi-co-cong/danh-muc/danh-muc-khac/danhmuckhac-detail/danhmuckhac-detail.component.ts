@@ -6,7 +6,7 @@ import { LayoutUtilsService } from './../../../../../../core/_base/crud/utils/la
 import { CommonService } from './../../../services/common.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
+import { DanhMucKhacService } from '../services/danh-muc-khac.service';
 import { DanhmuckhacModel } from './../Models/danh-muc-khac.model';
 import { ChonNhieuBieuMauListComponent, ChonNhieuDoiTuongListComponent } from '../../../components';
 
