@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-19, tạm dừng để tiếp tục ở phiên mới):** đã lên **Angular 22.3**, cả 6 cấu hình build qua với 0 lỗi; bộ e2e đã viết. **Chưa nghiệm thu:** chưa smoke test với backend, bộ e2e chưa chạy với backend, nhiều thư viện bên thứ ba chưa nâng theo bảng version. Việc tiếp theo: mục "Tiếp tục từ đâu". **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
+> **Trạng thái (2026-11-19, tạm dừng để tiếp tục ở phiên mới):** đã lên **Angular 22.3**; RxJS 7 và mọi thư viện bên thứ ba đã lên bản cho Angular 22 (trừ Chart.js 2.9, cố ý giữ); cả 6 cấu hình build qua với 0 lỗi; bộ e2e đã viết. **Chưa nghiệm thu:** chưa đăng nhập vào app lần nào sau nâng cấp (chưa smoke test với backend), bộ e2e chưa chạy với backend. Việc tiếp theo: mục "Tiếp tục từ đâu". **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -39,7 +39,8 @@ Nhánh `upgrade-angular-22` (trùng với nhánh phiên cloud `ccr-4b9d79c1-rjbq
 | 17 | Angular 19 → 20 | `9620de7` | Xong; `PortalInjector` (đã bị CDK 20 xoá) thay bằng `Injector.create` trong `LoadingService` |
 | 18 | Angular 20 → 21 | `928a949`, `681753a`, `78b9bb2` | Xong; NgRx 21.1.1; migration Material không đổi gì; sửa 2 lỗi template do migration control flow (xem dưới) |
 | 19 | Angular 21 → 22 | `177eef7` | Xong; Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0; chỉ kiểm màn hình đăng nhập (không có backend) |
-| 20 | Hoàn thiện, nghiệm thu | `980bbe4` | Build xong cả 6 cấu hình; ESLint 22; README; **smoke test tay chưa làm, thư viện bên thứ ba chưa nâng** (xem "Tiếp tục từ đâu") |
+| 20 | Hoàn thiện, nghiệm thu | `980bbe4` | Build xong cả 6 cấu hình; ESLint 22; README; **smoke test tay chưa làm** |
+| 20b | RxJS 7 và thư viện bên thứ ba lên bản cho Angular 22 (ngoài plan gốc: các task 10–19 đã bỏ sót bảng version) | `73f4b03` … `2613038` | Xong; build 6/6, chỉ kiểm được trang đăng nhập và TinyMCE trên trang thử (xem dưới) |
 
 ### Tiếp tục từ đâu
 
@@ -47,52 +48,56 @@ Nhánh `upgrade-angular-22` (trùng với nhánh phiên cloud `ccr-4b9d79c1-rjbq
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Nhánh | `upgrade-angular-22` trên GitHub, đầu nhánh có commit `6a78ada` (e2e) và các commit docs sau đó |
-| Phiên bản | Angular/CLI 22.3.0, Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0.3, angular-eslint 22.8.0, RxJS 6.6.7, zone.js 0.15.1 |
+| Nhánh | `upgrade-angular-22` trên GitHub (trùng `ccr-4b9d79c1-rjbqa4`); xem `git log` để biết commit cuối |
+| Phiên bản | Angular/CLI 22.3.0, Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0.3, angular-eslint 22.8.0, RxJS 7.8.2, zone.js 0.15.1; thư viện bên thứ ba xem bảng ở việc số 5 |
 | Build | 6/6 cấu hình PASS, 0 lỗi (bảng dưới) |
-| Chạy thử | Màn hình đăng nhập của bản `dev` và `prod` lên được, không lỗi JS. Chưa đăng nhập vào app lần nào sau khi nâng cấp (môi trường làm không có backend) |
+| Chạy thử | Màn hình đăng nhập của bản `dev` và `prod` lên được, chữ dịch đúng, không lỗi JS (e2e `@nologin` PASS). TinyMCE 6 khởi tạo được với đúng config của app trên một trang thử. Chưa đăng nhập vào app lần nào sau khi nâng cấp (môi trường làm không có backend) |
 | Smoke test tay | **Chưa làm.** Giao diện chưa được kiểm bằng mắt từ Task 5 |
 | E2E | 83 test đã viết (`tools/e2e/`); mới chạy 2 test `@nologin` (PASS) |
 | Lint | `yarn lint` chạy được; 409 lỗi có từ trước (361 là `template/eqeqeq`), không chặn build |
 | Tag | `upgrade/ng22` chưa có trên GitHub (xem việc số 2) |
 
-Kết quả build Task 20 (container Linux, Node 22.23.5):
+Kết quả build sau khi nâng thư viện (container Linux, Node 22.23.5, 2026-11-19):
 
 | Cấu hình | Kết quả | Thời gian |
 |---|---|---|
-| `dev` | PASS, 0 lỗi | 24 giây |
-| `production` | PASS, 0 lỗi | 25 giây |
-| `test` | PASS, 0 lỗi | 21 giây |
-| `prod` | PASS, 0 lỗi; initial 3,21 MB (535 kB nén) | 22 giây |
-| `prod_SOTBVL` | PASS, 0 lỗi | 23 giây |
+| `dev` | PASS, 0 lỗi | 19 giây |
+| `production` | PASS, 0 lỗi; initial 3,21 MB (539 kB nén) | 24 giây |
+| `test` | PASS, 0 lỗi | 22 giây |
+| `prod` | PASS, 0 lỗi; initial 3,21 MB (539 kB nén) | 24 giây |
+| `prod_SOTBVL` | PASS, 0 lỗi | 24 giây |
 | `prod_KG` | PASS, 0 lỗi | 22 giây |
 
-Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation, 5 thư viện CommonJS (`moment`, `html2canvas`, `chartjs-plugin-labels`, `dompurify`, `rgbcolor`). Output `prod` có đủ `.htaccess`, `sw.js`, `tinymce/`.
+Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation; 5 thư viện CommonJS (`moment`, `html2canvas`, `chartjs-plugin-labels`, `dompurify`, `rgbcolor`); ở các cấu hình tối ưu có 3 dòng `Unable to locate stylesheet` cho `line-awesome.css`, `flaticon.css`, `flaticon2.css` (bước inline critical CSS chạy trước khi chép `assets`; file vẫn có trong output, không ảnh hưởng). Output `prod` có đủ `.htaccess`, `sw.js`, `tinymce/`.
 
 #### Việc còn lại, theo thứ tự
 
 1. **Nâng Node trên máy phát triển** lên `>= 24.15.0` (hoặc `^22.22.3`); máy đang dùng 24.14.0 không chạy được Angular 22. Rồi `yarn install`, `yarn start`.
 2. **Tag `upgrade/ng22`** trỏ vào `35b31b3` (bản build được sau Task 20). Phiên cloud bị GitHub chặn push tag (403), nên tạo từ máy người phụ trách: `git fetch origin`, `git tag -a upgrade/ng22 35b31b3 -m "Angular 22.3"`, `git push origin upgrade/ng22`. Bản build `prod` không lưu trong repo (`build/` bị ignore); build lại từ tag khi cần.
 3. **Chạy bộ e2e lần đầu với backend:** điền `tools/e2e/.env` (xem `tools/e2e/README.md`), `yarn --cwd tools/e2e install`, `npx --prefix tools/e2e playwright install chromium`, `yarn --cwd tools/e2e test:ro`. Selector lấy từ mã nguồn, chưa chạy thật: sửa selector/cách chờ theo `tools/e2e/KNOWN_ISSUES.md`, chạy 3 lần liên tiếp PASS thì coi là baseline. Nhóm `@rw` cần database bản sao và `E2E_RESTORE_CMD`; viết nốt test sửa/xoá đang `test.fixme`.
-4. **Smoke test tay** theo `docs/plan/angular_22_smoke_checklist.md` (mục không có `(e2e)` bắt buộc làm tay). Ưu tiên: 33 chỗ SCSS có comment `// MDC:`; 2 dialog chọn nhiều có nút đóng vừa sửa (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`); các nút In (đổi sang `this.in(...)`); tooltip/tab/dropdown của `NgbLiteModule` (`ComponentFactoryResolver` đã bỏ); icon SVG (`ng-inline-svg-2` 20); 2 template còn cú pháp cũ (`config-edit`, `comment`).
-5. **Thư viện bên thứ ba chưa nâng theo bảng version.** Build Angular 22 vẫn qua (linker xử lý được bản partial-Ivy cũ) nhưng có thể lỗi lúc chạy; đây là rủi ro lớn nhất còn lại. Kiểm các màn hình dùng chúng ở bước 4 trước, rồi quyết định nâng từng gói:
+4. **Smoke test tay** theo `docs/plan/angular_22_smoke_checklist.md` (mục không có `(e2e)` bắt buộc làm tay). Ưu tiên: 33 chỗ SCSS có comment `// MDC:`; 2 dialog chọn nhiều có nút đóng vừa sửa (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`); các nút In (đổi sang `this.in(...)`); tooltip/tab/dropdown của `NgbLiteModule` (`ComponentFactoryResolver` đã bỏ); icon SVG (`ng-inline-svg-2` 20); 2 template còn cú pháp cũ (`config-edit`, `comment`); các thư viện vừa nâng ở việc số 5, nhất là ô có mask, TinyMCE, upload, in.
+5. **Kiểm lúc chạy các thư viện vừa nâng (2026-11-19).** Build qua nhưng chưa chạy với backend; gộp vào smoke test (việc số 4). Đã nâng:
 
-   | Gói | Plan dự kiến ở 22 | Đang cài | Ghi chú |
+   | Gói | Trước | Sau | Đổi mã / rủi ro cần kiểm |
    |---|---|---|---|
-   | `@ngx-translate/core` | 18.1.0 | 14.0.0 | 15+ đổi API (`provideTranslateService`) |
-   | `ng2-file-upload` | 12.0.0 | 3.0.0 | Peer `@angular/core ^14` |
-   | `@kolkov/angular-editor` | 3.4.0 | 2.1.0 | |
-   | `@tinymce/tinymce-angular` | 9.1.2 | 7.0.0 | Đi cùng `tinymce` |
-   | `tinymce` | ^6.8 | 5.10.9 | Dừng ở 6.x vì 7+ là GPL (mục "Quyết định") |
-   | `@ng-idle/core`, `@ng-idle/keepalive` | 16.0.0 | 12.0.4 | |
-   | `@ngx-loading-bar/core` | 7.0.1 | 6.0.2 | |
-   | `ngx-mat-select-search` | 9.0.0 | 7.0.10 | Peer Material `<= 19` |
-   | `ngx-avatars` | 1.10.3 | 1.4.1 | |
-   | `ngx-print` | ^22 | 1.3.1 | |
-   | `ckeditor4-angular` | 5.2.1 | 4.0.1 | Ghim `editorUrl` CDN 4.21.0 (Task 10) |
-   | `chart.js`, `ng2-charts` | 4 / 11 | 2.9.4 / mã chép | Cố ý giữ (Task 7) |
+   | `rxjs` | 6.6.7 | 7.8.2 | `Subject<void>` ở 3 màn auth; `race()` trong `ngb/util/autoclose.ts`. 20 chỗ `toPromise()` giữ nguyên (deprecated, vẫn chạy) |
+   | `@ngx-translate/core` | 14.0.0 | 18.1.0 | Bỏ `TranslateModule`: `provideTranslateService()` ở `AppModule`, các module import `TranslatePipe`/`TranslateDirective`; `setDefaultLang` → `setFallbackLang`. Đã kiểm: trang đăng nhập dịch đúng. Kiểm thêm: nhãn trong app, phân trang (`CustomMatPaginatorIntl`) |
+   | `ngx-mask` | 14.3.3 | 22.2.5 | Bỏ `NgxMaskModule.forRoot()`: `DPSCommonModule` dùng `NgxMaskDirective`/`NgxMaskPipe` + `provideNgxMask()`. **Kiểm kỹ:** 26 template có `mask=` (nhất là `separator,3` với `thousandSeparator` ở form trợ cấp: giá trị lưu xuống có đúng là số không) và pipe `mask` ở hồ sơ nhà ở |
+   | `tinymce` / `@tinymce/tinymce-angular` | 5.10.9 / 7.0.0 | 6.8.6 / 9.1.2 | Config ở `CommonService.tinyConfig`: bỏ plugin đã vào core (`print`, `hr`, `textpattern`, `noneditable`) hoặc trả phí (`toc`, `imagetools`); đổi tên nút toolbar và tuỳ chọn; `promotion: false`. Giao diện editor của bản 6 khác bản 5 (skin oxide mới). Kiểm ở Căn cứ biểu mẫu → Biểu mẫu |
+   | `ckeditor4-angular` | 4.0.1 | 5.2.1 | Không đổi mã; thẻ `<ckeditor>` duy nhất vẫn ghim CDN 4.21.0 (mặc định mới là 4.25.1-lts, bản thương mại) |
+   | `@ng-idle/core`, `keepalive` | 12.0.4 | 16.0.0 | Không đổi mã. Kiểm tự đăng xuất khi hết phiên (e2e có test) |
+   | `ng2-file-upload` | 3.0.0 | 12.0.0 | Không đổi mã. Kiểm upload file |
+   | `@kolkov/angular-editor` | 2.1.0 | 3.4.0 | Không đổi mã. Kiểm thanh công cụ editor |
+   | `ngx-print` | 1.3.1 | 22.2.1 | Không đổi mã. Kiểm các nút In |
+   | `ngx-avatars` | 1.4.1 | 1.10.3 | Không đổi mã |
+   | `ngx-mat-select-search` | 7.0.10 | 9.0.0 | Không đổi mã. Kiểm ô chọn có tìm kiếm |
+   | `@ngx-loading-bar/core` | 6.0.2 | 7.0.1 | Không đổi mã |
+   | `ngx-cookie-service` | 14.0.1 | 22.2.0 | Không đổi mã |
+   | `ngx-drag-drop` | 14.0.0 | 22.1.0 | Không đổi mã. Kiểm kéo thả ở Sơ đồ tổ chức |
+   | `ngx-permissions` | 14.1.0 | 19.0.0 | Không đổi mã. Kiểm ẩn/hiện menu và nút theo quyền |
+   | `chart.js`, `ng2-charts` | 2.9.4 / mã chép | giữ nguyên | Cố ý giữ (Task 7) |
 
-   Cũng chưa nâng: `ngx-cookie-service` 14, `ngx-drag-drop` 14, `ngx-permissions` 14, `ngx-mask` 14, RxJS 6 (Angular 22 vẫn hỗ trợ `^6.5.3`).
+   Lỗi có từ trước, chưa sửa: config TinyMCE đặt `language: 'vi'` nhưng gói `tinymce` (cả bản 5 lẫn 6) không có `langs/vi.js`, nên trình duyệt báo `Unexpected token '<'` (server trả `index.html`) và editor hiện tiếng Anh. Muốn editor tiếng Việt thì thêm gói ngôn ngữ (ví dụ `tinymce-i18n`) vào `assets`; nếu không thì bỏ dòng `language`.
 6. **Karma/`ng test`:** chưa xử lý. `src/test.ts` dùng `require.context` nên `ng test` không chạy với builder esbuild; quyết định xoá hoặc chuyển Vitest (`ng update @angular/cli --name migrate-karma-to-vitest`).
 7. Tuỳ chọn, không chặn phát hành: sửa lỗi lint; chuyển 2 template còn `*ngIf`/`*ngFor`; Sass `@import` → `@use` cho theme Metronic; bỏ `baseUrl` (TypeScript 7 sẽ không hỗ trợ).
 
@@ -142,6 +147,9 @@ Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation, 5 t
 | 1C | Viết và chốt baseline trên Angular 13 | Viết sau khi đã lên 22; baseline sẽ là lần chạy đầu trên 22 | Nhánh đã qua bản 15 trước khi làm Task 1C |
 | 1C | Đủ các nhóm test trong Step 4–5 | Có: routes, auth, layout, list, form, widgets, realtime, 1 test `@rw` (thêm mới). Chưa có: lọc, sửa/xoá (`test.fixme`), editor, upload, in/PDF, chip, mask, bình luận | Không có backend để xác định selector cho các thao tác phức tạp; các mục này vẫn kiểm tay |
 | 1C | `@playwright/test` mới nhất | Ghim 1.63.0 | Trùng bản Chromium có sẵn trong môi trường làm |
+| 20b | Thư viện nâng dần theo bảng version ở Task 10–19 | Các task 10–19 chỉ chạy `ng update` cho Angular/Material/NgRx; thư viện bên thứ ba nâng một lượt ở 22 (RxJS 7 trước vì nhiều gói đòi) | Bản cũ vẫn build được qua linker nên không bị phát hiện ở từng task |
+| 20b | `@ngx-translate/core` 18 theo cách cũ | Chuyển hẳn sang API mới (không còn `TranslateModule`) | Bản 17+ xoá `TranslateModule` và `setDefaultLang` |
+| 20b | — | `tools/e2e/fixtures.ts`: khi `E2E_OFFLINE=1` bỏ qua lỗi theo đối tượng `HttpErrorResponse` thay vì theo chữ | Bản `prod` đổi tên class rút gọn sau mỗi lần build |
 | Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
 
 ### Quyết định của người phụ trách trong lúc làm
@@ -153,6 +161,7 @@ Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation, 5 t
 - 2026-11-19: làm tiếp Angular 21 từ commit WIP (không revert); nâng tiếp lên 22 và làm Task 20, cho phép build `prod`.
 - 2026-11-19: đưa toàn bộ nhánh phiên cloud về `upgrade-angular-22` (fast-forward); tạo tag `upgrade/ng22`.
 - 2026-11-19: làm Task 1C (e2e) dù không có backend; chạy và sửa ở phiên sau trên máy có backend.
+- 2026-11-19: nâng RxJS 7 và toàn bộ thư viện bên thứ ba lên bản cho Angular 22 ngay (không đợi smoke test).
 
 ## Global Constraints
 
@@ -626,7 +635,7 @@ Plan đã chọn sẵn phương án mặc định cho từng mục; chỉ cần 
 | Karma và 6 file spec | Giữ nguyên, không dùng làm điều kiện nghiệm thu. `src/test.ts` dùng `require.context` nên `ng test` không chạy được từ Task 15. **Chưa quyết định** (việc số 6 trong "Tiếp tục từ đâu") | Xoá hẳn ở Task 20, hoặc chuyển sang Vitest |
 | Test e2e | Playwright trong `tools/e2e/` (Task 1C). **Đã viết** 2026-11-19 trên Angular 22 (83 test); chưa chạy với backend. Baseline là lần chạy ổn định đầu tiên trên 22 | Chỉ smoke test tay ở cuối |
 | Database cho nhóm e2e `@rw` | Bản sao riêng, khôi phục trước mỗi lượt bằng `E2E_RESTORE_CMD` do người phụ trách backend cung cấp | Không chạy `@rw`, kiểm tay các thao tác ghi |
-| TinyMCE | Dừng ở 6.x (giấy phép MIT). **Thực tế vẫn ở 5.10.9**, chưa nâng (việc số 5) | Lên 8.x, chấp nhận GPL hoặc mua license |
+| TinyMCE | **Đã làm:** 6.8.6 (giấy phép MIT), 2026-11-19 | Lên 8.x, chấp nhận GPL hoặc mua license |
 
 ## Nhật ký vướng mắc
 

@@ -25,5 +25,8 @@ Plan gốc yêu cầu chốt baseline trên Angular 13; không làm được vì
 
 ## Ghi chú
 
+- Sau khi nâng thư viện (2026-11-19), khi chạy với backend dễ lộ lỗi ở: ô có mask (`ngx-mask` 22), TinyMCE 6, upload (`ng2-file-upload` 12), nút In (`ngx-print` 22). Xem việc số 5 trong plan.
+- Trang có TinyMCE sẽ báo lỗi console `Unexpected token '<'` do thiếu `tinymce/langs/vi.js` (lỗi có từ trước, xem plan). Nếu chưa sửa thì ghi vào `known-console-errors.json` sau khi người phụ trách duyệt.
+
 - Giao diện không có bộ chọn ngôn ngữ; test chỉ kiểm không còn khoá dịch (dạng `COMMON.CREATE`) trên trang đăng nhập và dashboard.
 - Nhóm `@rw` chưa chạy: chưa có database bản sao và `E2E_RESTORE_CMD`.

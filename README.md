@@ -1,6 +1,6 @@
 # VL_NCC_BE (frontend)
 
-Angular 22, Angular Material 22 (MDC), NgRx 22, TypeScript 6. Build bằng `@angular/build:application` (esbuild).
+Angular 22, Angular Material 22 (MDC), NgRx 22, RxJS 7, TypeScript 6. Build bằng `@angular/build:application` (esbuild). Thư viện bên thứ ba đã lên bản cho Angular 22 (trừ Chart.js 2.9, cố ý giữ); danh sách ở plan nâng cấp.
 
 ## Yêu cầu
 
@@ -41,4 +41,4 @@ Cấu hình ở `eslint.config.js`, giữ bộ rule cũ (bộ khuyến nghị c�
 
 ## Lịch sử nâng cấp
 
-Nâng từ Angular 13 lên 22 theo `docs/plan/2026-11-14-angular-22-implementation-plan.md`; các chỗ làm khác plan và việc còn lại ghi trong file đó (mục "Tiếp tục từ đâu"). **Chưa nghiệm thu:** chưa smoke test với backend và nhiều thư viện bên thứ ba chưa nâng. Checklist kiểm tra tay: `docs/plan/angular_22_smoke_checklist.md`. Test e2e: `tools/e2e/README.md`.
+Nâng từ Angular 13 lên 22 theo `docs/plan/2026-11-14-angular-22-implementation-plan.md`; các chỗ làm khác plan và việc còn lại ghi trong file đó (mục "Tiếp tục từ đâu"). **Chưa nghiệm thu:** chưa smoke test với backend (chưa đăng nhập vào app lần nào sau nâng cấp). Checklist kiểm tra tay: `docs/plan/angular_22_smoke_checklist.md`. Test e2e: `tools/e2e/README.md`.
