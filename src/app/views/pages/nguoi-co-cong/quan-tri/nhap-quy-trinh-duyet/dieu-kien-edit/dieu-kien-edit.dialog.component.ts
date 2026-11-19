@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, HostListener, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ChangeDetectorRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -11,6 +11,7 @@ import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.servi
 @Component({
     selector: 'kt-dieu-kien-edit',
     templateUrl: './dieu-kien-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

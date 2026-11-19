@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectorRef, OnChanges, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectorRef, OnChanges, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -16,6 +16,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'kt-dm-nguoi-dung-don-vi-list',
     templateUrl: './dm-nguoi-dung-don-vi-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

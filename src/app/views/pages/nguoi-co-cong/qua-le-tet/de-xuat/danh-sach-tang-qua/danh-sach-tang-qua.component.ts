@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,6 +13,7 @@ import { TangQuaDialogComponent } from './../tang-qua-dialog/tang-qua-dialog.com
 @Component({
     selector: 'kt-danh-sach-tang-qua',
     templateUrl: './danh-sach-tang-qua.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

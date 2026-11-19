@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 @Component({
     selector: 'kt-action-natification',
     templateUrl: './action-notification.component.html',
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ActionNotificationComponent implements OnInit {

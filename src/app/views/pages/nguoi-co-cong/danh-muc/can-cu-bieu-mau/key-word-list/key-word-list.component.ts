@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, Input, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, Input, ViewChild, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -10,6 +10,7 @@ import { BieuMauQuaService } from '../services/bieu-mau-qua.service';
 @Component({
     selector: 'kt-key-word-list',
     templateUrl: './key-word-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

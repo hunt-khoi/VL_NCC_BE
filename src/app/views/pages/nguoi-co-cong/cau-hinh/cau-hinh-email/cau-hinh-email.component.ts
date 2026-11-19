@@ -1,4 +1,4 @@
-import { Component, OnInit, Injectable } from '@angular/core';
+import { Component, OnInit, Injectable, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from 'app/core/_base/crud';
 import { CauHinhEmailService } from './Services/cau-hinh-email.service';
@@ -6,6 +6,7 @@ import { CauHinhEmailService } from './Services/cau-hinh-email.service';
 @Component({
     selector: 'kt-cau-hinh-email',
     templateUrl: './cau-hinh-email.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CauHinhEmailComponent implements OnInit {

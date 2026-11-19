@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,6 +11,7 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 @Component({
     selector: 'm-capquanly-edit-dialog',
     templateUrl: './capquanly-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class capquanlyEditDialogComponent implements OnInit, OnDestroy {

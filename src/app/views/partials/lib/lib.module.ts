@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbLiteModule } from './ngb/ngb-lite.module';
 import { CdkTreeModule } from '@angular/cdk/tree';
@@ -57,7 +57,7 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
         MatNativeDateModule,
         FileUploadModule], providers: [
         DatePipe,
-        provideHttpClient(withInterceptorsFromDi())
+        provideHttpClient(withXhr(), withInterceptorsFromDi())
     ] })
 
 export class LibModule { }

@@ -1,6 +1,6 @@
 import { LayoutUtilsService } from 'app/core/_base/crud';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { PhatQuaModel } from './../Model/phat-qua.model';
@@ -9,6 +9,7 @@ import { PhatQuaService } from './../Services/phat-qua.service';
 @Component({
     selector: 'kt-tang-qua-dialog',
     templateUrl: './tang-qua-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class TangQuaDialogComponent implements OnInit, OnDestroy {

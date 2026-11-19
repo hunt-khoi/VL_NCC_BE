@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
@@ -10,6 +10,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'kt-so-to-trinh-edit',
     templateUrl: './so-to-trinh-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SoToTrinhEditDialogComponent implements OnInit, OnDestroy {

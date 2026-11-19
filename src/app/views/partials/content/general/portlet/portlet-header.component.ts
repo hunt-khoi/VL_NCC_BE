@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostBinding, HostListener, Inject, Input, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, HostListener, Inject, Input, OnDestroy, OnInit, PLATFORM_ID, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { KtDialogService, StickyDirective } from '../../../../../core/_base/layout';
 import { Observable, Subscription } from 'rxjs';
 
@@ -25,6 +25,7 @@ import { Observable, Subscription } from 'rxjs';
 		<div class="kt-portlet__head-toolbar" #refTools [hidden]="hideTools">
 		  <ng-content select="[ktPortletTools]"></ng-content>
 		</div>`,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PortletHeaderComponent implements OnInit, AfterViewInit, OnDestroy {

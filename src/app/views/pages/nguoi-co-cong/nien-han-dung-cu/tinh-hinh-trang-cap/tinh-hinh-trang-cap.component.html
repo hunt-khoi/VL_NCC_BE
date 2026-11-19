@@ -13,9 +13,9 @@
 				<button type="button" mat-menu-item color="primary" (click)="view()">Xem</button>
 				<button mat-raised-button color="info" matTooltip="Xuất báo cáo" [matMenuTriggerFor]="menu">Tải về</button>&nbsp;
 				<mat-menu #menu="matMenu">
-					<!-- <button mat-menu-item (click)="in(3)">PDF</button>
-					<button mat-menu-item (click)="in(1)">Word</button> -->
-					<button mat-menu-item (click)="in(2)">Excel</button>
+					<!-- <button mat-menu-item (click)="this.in(3)">PDF</button>
+					<button mat-menu-item (click)="this.in(1)">Word</button> -->
+					<button mat-menu-item (click)="this.in(2)">Excel</button>
 				</mat-menu>
 				<button type="button" mat-menu-item color="primary" printSectionId="print-section" ngxPrint> In</button>
 			</mat-menu>
@@ -24,9 +24,9 @@
 				<button type="button" mat-raised-button color="primary" (click)="view()">Xem</button>
 				<button mat-raised-button color="info" matTooltip="Xuất báo cáo" [matMenuTriggerFor]="menu">Tải về</button>&nbsp;
 				<mat-menu #menu="matMenu">
-					<!-- <button mat-menu-item (click)="in(3)">PDF</button>
-					<button mat-menu-item (click)="in(1)">Word</button> -->
-					<button mat-menu-item (click)="in(2)">Excel</button>
+					<!-- <button mat-menu-item (click)="this.in(3)">PDF</button>
+					<button mat-menu-item (click)="this.in(1)">Word</button> -->
+					<button mat-menu-item (click)="this.in(2)">Excel</button>
 				</mat-menu>
 				<button type="button" mat-raised-button color="primary" printSectionId="print-section" ngxPrint>In</button>
 			</div>	

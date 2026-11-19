@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, HostListener, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -13,6 +13,7 @@ import { KeyWordListDialogComponent } from '../key-word-list-dialog/key-word-lis
 @Component({
     selector: 'kt-bieu-mau-edit',
     templateUrl: './bieu-mau-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BieuMauEditDialogComponent implements OnInit, OnDestroy {

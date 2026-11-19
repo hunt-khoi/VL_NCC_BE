@@ -1,4 +1,4 @@
-import { Component, OnInit, Injectable } from '@angular/core';
+import { Component, OnInit, Injectable, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from 'app/core/_base/crud';
 import { CauHinhSMSService } from './Services/cau-hinh-sms.service';
@@ -6,6 +6,7 @@ import { CauHinhSMSService } from './Services/cau-hinh-sms.service';
 @Component({
     selector: 'kt-cau-hinh-sms',
     templateUrl: './cau-hinh-sms.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CauHinhSMSComponent implements OnInit {

@@ -1,5 +1,5 @@
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Inject, Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Inject, Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, Validators, FormBuilder, FormControl } from '@angular/forms';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { DynamicProcessService } from '../../services/dynamic-process.service';
@@ -8,6 +8,7 @@ import { DynamicProcessService } from '../../services/dynamic-process.service';
     // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'canvas-demo-dialog',
     templateUrl: 'canvas-demo-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CanvasDemoDialogComponent implements OnInit {

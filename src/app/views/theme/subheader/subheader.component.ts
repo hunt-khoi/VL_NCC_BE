@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { LayoutConfigService } from '../../../core/_base/layout';
 import objectPath from 'object-path';
 
 @Component({
     selector: 'kt-subheader',
     templateUrl: './subheader.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SubheaderComponent implements OnInit {

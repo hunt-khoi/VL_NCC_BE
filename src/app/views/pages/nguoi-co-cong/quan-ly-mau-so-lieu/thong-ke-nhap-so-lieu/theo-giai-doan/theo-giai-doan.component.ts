@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
@@ -10,6 +10,7 @@ import { ThongKeNhapSoLieuService } from '../Services/thong-ke-nhap-so-lieu.serv
 @Component({
     selector: 'kt-theo-giai-doan',
     templateUrl: './theo-giai-doan.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class TheoGiaiDoanComponent implements OnInit, OnDestroy {

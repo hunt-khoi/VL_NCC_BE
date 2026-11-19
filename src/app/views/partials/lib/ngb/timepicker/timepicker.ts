@@ -11,7 +11,8 @@ import {
   Input,
   OnChanges,
   SimpleChanges,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
@@ -51,7 +52,7 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
           <input type="text" class="ngb-tp-input form-control" [class.form-control-sm]="isSmallSize"
             [class.form-control-lg]="isLargeSize"
             maxlength="2" inputmode="numeric" placeholder="HH" i18n-placeholder="@@ngb.timepicker.HH"
-            [value]="formatHour(model?.hour)" (change)="updateHour($event.target.value)"
+            [value]="formatHour($safeNavigationMigration(model?.hour))" (change)="updateHour($event.target.value)"
             [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Hours" i18n-aria-label="@@ngb.timepicker.hours"
             (input)="formatInput($event.target)"
             (keydown.ArrowUp)="changeHour(hourStep); $event.preventDefault()"
@@ -77,7 +78,7 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
           }
           <input type="text" class="ngb-tp-input form-control" [class.form-control-sm]="isSmallSize" [class.form-control-lg]="isLargeSize"
             maxlength="2" inputmode="numeric" placeholder="MM" i18n-placeholder="@@ngb.timepicker.MM"
-            [value]="formatMinSec(model?.minute)" (change)="updateMinute($event.target.value)"
+            [value]="formatMinSec($safeNavigationMigration(model?.minute))" (change)="updateMinute($event.target.value)"
             [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Minutes" i18n-aria-label="@@ngb.timepicker.minutes"
             (input)="formatInput($event.target)"
             (keydown.ArrowUp)="changeMinute(minuteStep); $event.preventDefault()"
@@ -106,7 +107,7 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
             }
             <input type="text" class="ngb-tp-input form-control" [class.form-control-sm]="isSmallSize" [class.form-control-lg]="isLargeSize"
               maxlength="2" inputmode="numeric" placeholder="SS" i18n-placeholder="@@ngb.timepicker.SS"
-              [value]="formatMinSec(model?.second)" (change)="updateSecond($event.target.value)"
+              [value]="formatMinSec($safeNavigationMigration(model?.second))" (change)="updateSecond($event.target.value)"
               [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Seconds" i18n-aria-label="@@ngb.timepicker.seconds"
               (input)="formatInput($event.target)"
               (keydown.ArrowUp)="changeSecond(secondStep); $event.preventDefault()"
@@ -141,6 +142,7 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
     </fieldset>
     `,
     providers: [NGB_TIMEPICKER_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class NgbTimepicker implements ControlValueAccessor,

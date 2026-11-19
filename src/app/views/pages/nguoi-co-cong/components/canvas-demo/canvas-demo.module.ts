@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { TranslateModule } from '@ngx-translate/core';
 import { PartialsModule } from '../../../../partials/partials.module';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -86,6 +86,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         TypesUtilsService,
         LayoutUtilsService,
         HttpUtilsService,
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
     ] })
 export class CanvasDemoModule { }

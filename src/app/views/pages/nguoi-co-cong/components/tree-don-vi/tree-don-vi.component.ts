@@ -1,9 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 @Component({
     selector: 'm-tree-don-vi',
     templateUrl: './tree-don-vi.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

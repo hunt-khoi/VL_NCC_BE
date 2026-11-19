@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, forwardRef, ChangeDetectorRef, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, ViewEncapsulation, forwardRef, ChangeDetectorRef, Input, ViewChild, ElementRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS } from '@angular/forms';
 import { FileUploader } from 'ng2-file-upload';
 
@@ -35,6 +35,7 @@ const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
             multi: true
         }
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ImageControlComponent implements OnInit {

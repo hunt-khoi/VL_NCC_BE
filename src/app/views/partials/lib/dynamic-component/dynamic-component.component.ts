@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, Directive, EventEmitter, Input, Output, ViewChild, ViewContainerRef, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, ChangeDetectorRef, Directive, EventEmitter, Input, Output, ViewChild, ViewContainerRef, OnDestroy, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { Subject } from 'rxjs';
 
 @Directive({
@@ -15,6 +15,7 @@ export class InsertionDirective {
     selector: 'lib-dynamic-component',
     templateUrl: './dynamic-component.component.html',
     styleUrls: ['./dynamic-component.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DynamicComponentComponent implements OnDestroy, AfterViewInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
@@ -8,6 +8,7 @@ import { DanhMucKhacService } from './services/danh-muc-khac.service';
 @Component({
     selector: 'kt-danh-muc-khac',
     templateUrl: './danh-muc-khac.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DanhMucKhacComponent implements OnInit, OnDestroy {

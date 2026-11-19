@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SelectionModel } from '@angular/cdk/collections'
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,6 +14,7 @@ import { ChonNhieuNhanVienListDataSource } from './chon-nhieu-nhan-vien-list.dat
 @Component({
     selector: 'm-chon-nhieu-nhan-vien-list',
     templateUrl: './chon-nhieu-nhan-vien-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ChonNhieuNhanVienListComponent implements OnInit {

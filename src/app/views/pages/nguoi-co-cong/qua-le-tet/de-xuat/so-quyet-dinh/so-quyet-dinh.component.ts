@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { merge, BehaviorSubject, Subject } from 'rxjs';
@@ -11,6 +11,7 @@ import { DeXuatService } from '../Services/de-xuat.service';
     selector: 'kt-so-quyet-dinh',
     templateUrl: './so-quyet-dinh.component.html',
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

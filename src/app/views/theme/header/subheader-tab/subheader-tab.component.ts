@@ -1,5 +1,5 @@
 import { Router, NavigationEnd } from '@angular/router';
-import { Component, Input, OnDestroy, ChangeDetectorRef, OnChanges, Renderer2 } from '@angular/core';
+import { Component, Input, OnDestroy, ChangeDetectorRef, OnChanges, Renderer2, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { HtmlClassService } from '../../html-class.service';
@@ -10,6 +10,7 @@ import { QueryParamsModel } from 'app/core/_base/crud';
     selector: 'kt-subheader-tab',
     templateUrl: './subheader-tab.component.html',
     styleUrls: ['./subheader-tab.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SubheaderTabComponent implements OnChanges, OnDestroy {

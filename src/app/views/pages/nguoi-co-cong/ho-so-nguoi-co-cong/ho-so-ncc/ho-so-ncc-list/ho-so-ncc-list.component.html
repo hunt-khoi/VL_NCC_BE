@@ -338,7 +338,7 @@ background-color: rgb(225, 224, 224);
                     <span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
                   </a>
                   @if (filterStatus===2) {
-                    <button (click)="in(object)" mat-button [ngClass]="btnClass"
+                    <button (click)="this.in(object)" mat-button [ngClass]="btnClass"
                       matTooltip="Xuất hồ sơ" color="info">
                       <mat-icon>print</mat-icon>
                       <span class="button-text">Xuất</span>

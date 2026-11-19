@@ -220,7 +220,7 @@
               <mat-icon>remove_red_eye</mat-icon>
               <span class="button-text">{{ 'COMMON.DETAIL' | translate }}</span>
             </a>
-            <button mat-button (click)="in(object.Id,1)" [ngClass]="btnClass" matTooltip="Xuất hồ sơ" color="info" [hidden]="true" >
+            <button mat-button (click)="this.in(object.Id,1)" [ngClass]="btnClass" matTooltip="Xuất hồ sơ" color="info" [hidden]="true" >
               <mat-icon>print</mat-icon>
               <span class="button-text">Xuất hồ sơ</span>
             </button>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -20,6 +20,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'kt-bieu-mau-list',
     templateUrl: './bieu-mau-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BieuMauListComponent implements OnInit, OnDestroy {

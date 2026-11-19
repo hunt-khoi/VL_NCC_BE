@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
@@ -7,6 +7,7 @@ import { DM_DonViService } from '../../danh-muc/dm-don-vi/Services/dm-don-vi.ser
 @Component({
     selector: 'kt-tree-don-vi-dialog',
     templateUrl: './tree-don-vi-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 	

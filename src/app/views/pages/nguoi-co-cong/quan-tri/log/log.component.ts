@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { LogService } from './Services/log.service';
@@ -6,6 +6,7 @@ import { LogService } from './Services/log.service';
 @Component({
     selector: 'kt-log',
     templateUrl: './log.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class LogComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, HostListener, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, HostListener, ChangeDetectorRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,6 +13,7 @@ import { PhiSoLieuEditDialogComponent } from '../phi-so-lieu-edit/phi-so-lieu-ed
 @Component({
     selector: 'kt-mau-so-lieu-detail-edit-dialog',
     templateUrl: './mau-so-lieu-detail-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

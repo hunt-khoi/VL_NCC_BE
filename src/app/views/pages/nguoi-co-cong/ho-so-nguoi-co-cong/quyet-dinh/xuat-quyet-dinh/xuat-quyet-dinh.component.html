@@ -212,7 +212,7 @@ margin-bottom: 10px;
               <mat-menu #menuPrint="matMenu">
                 @for (bm of item.data; track bm) {
                   @if (bm.id_dt === object.Id_DoiTuongNCC && (filterCC===0 || bm.Id_CanCu===filterCC)) {
-                    <button mat-menu-item (click)="in(bm.id, object.Id)" matTooltip="{{bm.title}}"
+                    <button mat-menu-item (click)="this.in(bm.id, object.Id)" matTooltip="{{bm.title}}"
                       >
                       {{bm.title}}
                     </button>
@@ -229,7 +229,7 @@ margin-bottom: 10px;
               <mat-menu #menuExport="matMenu">
                 @for (bm of item.data; track bm) {
                   @if (bm.id_dt === object.Id_DoiTuongNCC && (filterCC===0 || bm.Id_CanCu===filterCC)) {
-                    <button mat-menu-item (click)="in(bm.id, object.Id, false)" matTooltip="{{bm.title}}"
+                    <button mat-menu-item (click)="this.in(bm.id, object.Id, false)" matTooltip="{{bm.title}}"
                       >
                       {{bm.title}}
                     </button>

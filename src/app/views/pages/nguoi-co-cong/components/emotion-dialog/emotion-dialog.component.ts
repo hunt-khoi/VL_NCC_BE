@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { CommonService } from '../../services/common.service';
 
@@ -6,6 +6,7 @@ import { CommonService } from '../../services/common.service';
 @Component({
     selector: 'kt-emotion-dialog',
     templateUrl: './emotion-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class EmotionDialogComponent implements OnInit {

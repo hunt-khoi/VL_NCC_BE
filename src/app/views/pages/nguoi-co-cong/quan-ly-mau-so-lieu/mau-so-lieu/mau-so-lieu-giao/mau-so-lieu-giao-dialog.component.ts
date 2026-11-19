@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonService } from '../../../services/common.service';
@@ -15,6 +15,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'kt-mau-so-lieu-giao-dialog',
     templateUrl: './mau-so-lieu-giao-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

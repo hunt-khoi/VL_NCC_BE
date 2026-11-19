@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from 'app/core/_base/crud';
 import { SMSHistoryService } from './Services/sms-history.service';
@@ -6,6 +6,7 @@ import { SMSHistoryService } from './Services/sms-history.service';
 @Component({
     selector: 'kt-sms-history',
     templateUrl: './sms-history.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SMSHistoryComponent implements OnInit {

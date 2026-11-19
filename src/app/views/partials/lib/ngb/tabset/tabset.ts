@@ -14,7 +14,8 @@ import {
   Output,
   QueryList,
   TemplateRef,
-  ViewEncapsulation
+  ViewEncapsulation,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {NgbTabsetConfig} from './tabset-config';
 
@@ -122,7 +123,7 @@ export interface NgbTabChangeEvent {
             href (click)="select(tab.id); $event.preventDefault()" role="tab" [attr.tabindex]="(tab.disabled ? '-1': undefined)"
             [attr.aria-controls]="(!destroyOnHide || tab.id === activeId ? tab.id + '-panel' : null)"
             [attr.aria-selected]="tab.id === activeId" [attr.aria-disabled]="tab.disabled">
-            {{tab.title}}<ng-template [ngTemplateOutlet]="tab.titleTpl?.templateRef"></ng-template>
+            {{tab.title}}<ng-template [ngTemplateOutlet]="$safeNavigationMigration(tab.titleTpl?.templateRef)"></ng-template>
           </a>
         </li>
       }
@@ -134,12 +135,13 @@ export interface NgbTabChangeEvent {
             class="tab-pane {{tab.id === activeId ? 'active' : null}}"
             role="tabpanel"
             [attr.aria-labelledby]="tab.id" id="{{tab.id}}-panel">
-            <ng-template [ngTemplateOutlet]="tab.contentTpl?.templateRef"></ng-template>
+            <ng-template [ngTemplateOutlet]="$safeNavigationMigration(tab.contentTpl?.templateRef)"></ng-template>
           </div>
         }
       }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class NgbTabset implements AfterContentChecked {

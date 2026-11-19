@@ -2,7 +2,7 @@
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, Inject, ChangeDetectorRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
 import { LayoutUtilsService } from 'app/core/_base/crud/utils/layout-utils.service';
 import { HDSDService } from '../Services/hdsd.service';
@@ -10,6 +10,7 @@ import { HDSDService } from '../Services/hdsd.service';
 @Component({
     selector: 'kt-hdsd-edit',
     templateUrl: './hdsd-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class HDSDEditDialogComponent implements OnInit {

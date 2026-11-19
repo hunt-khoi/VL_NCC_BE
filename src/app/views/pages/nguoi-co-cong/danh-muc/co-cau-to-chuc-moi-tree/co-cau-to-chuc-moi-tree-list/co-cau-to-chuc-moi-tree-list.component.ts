@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { ArrayDataSource } from '@angular/cdk/collections';
 import { Observable, BehaviorSubject, of, Subject } from 'rxjs';
@@ -26,6 +26,7 @@ interface TreeNode {
     templateUrl: './co-cau-to-chuc-moi-tree-list.component.html',
     styleUrls: ['./co-cau-to-chuc-moi-tree-list.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 export interface ISearchResult {
 	icon: string;
@@ -12,6 +12,7 @@ export interface ISearchResult {
     selector: 'kt-search-result',
     templateUrl: './search-result.component.html',
     styleUrls: ['./search-result.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SearchResultComponent {

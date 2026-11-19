@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import objectPath from 'object-path';
 import { LayoutConfigService, MenuConfigService } from '../../../core/_base/layout';
@@ -11,6 +11,7 @@ import { MenuConfig } from '../../../core/_config/menu.config';
     templateUrl: './base.component.html',
     styleUrls: ['./base.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BaseComponent implements OnInit, OnDestroy {

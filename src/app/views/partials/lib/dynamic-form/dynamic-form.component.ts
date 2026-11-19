@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, OnDestroy, EventEmitter, ChangeDetectorRef, Input, Output, ViewChildren, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy, EventEmitter, ChangeDetectorRef, Input, Output, ViewChildren, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -11,6 +11,7 @@ import moment__default from 'moment';
     selector: 'kt-dynamic-form',
     templateUrl: './dynamic-form.component.html',
     styleUrls: ['./dynamic-form.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {

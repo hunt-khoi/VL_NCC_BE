@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ComponentRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ComponentRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { CommonService } from '../../services/common.service';
@@ -9,6 +9,7 @@ import moment from 'moment';
     // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'tr[cancu-lietsi-row-edit]',
     templateUrl: './cancu-lietsi-row-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

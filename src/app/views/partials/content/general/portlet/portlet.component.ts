@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { LoadingBarService } from '@ngx-loading-bar/core';
 import { Observable } from 'rxjs';
 import { PortletBodyComponent } from './portlet-body.component';
@@ -13,6 +13,7 @@ export interface PortletOptions {
     selector: 'kt-portlet',
     templateUrl: './portlet.component.html',
     exportAs: 'ktPortlet',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PortletComponent {

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { LayoutConfigService } from '../../../../core/_base/layout';
@@ -8,6 +8,7 @@ import { LayoutConfigService } from '../../../../core/_base/layout';
     templateUrl: './error-page.component.html',
     styleUrls: ['./error-page.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ErrorPageComponent implements OnInit, OnDestroy {

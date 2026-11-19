@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -22,6 +22,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'kt-danh-muc-khac-list',
     templateUrl: './danh-muc-khac-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DanhMucKhacListComponent implements OnInit, OnDestroy {

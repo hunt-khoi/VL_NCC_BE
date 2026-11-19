@@ -1,4 +1,4 @@
-import { Component, OnInit, Injectable } from '@angular/core';
+import { Component, OnInit, Injectable, ChangeDetectionStrategy } from '@angular/core';
 import { NhomNguoiDungDPSService } from './Services/nhom-nguoi-dung-dps.service';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from 'app/core/_base/crud';
@@ -6,6 +6,7 @@ import { QueryParamsModel } from 'app/core/_base/crud';
 @Component({
     selector: 'kt-nhom-nguoi-dung-dps',
     templateUrl: './nhom-nguoi-dung-dps.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 @Injectable()

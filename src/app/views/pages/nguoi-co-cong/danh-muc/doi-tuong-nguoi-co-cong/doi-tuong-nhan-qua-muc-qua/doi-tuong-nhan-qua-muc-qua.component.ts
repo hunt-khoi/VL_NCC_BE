@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, HostListener, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
@@ -9,6 +9,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'kt-doi-tuong-nhan-qua-muc-qua',
     templateUrl: './doi-tuong-nhan-qua-muc-qua.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

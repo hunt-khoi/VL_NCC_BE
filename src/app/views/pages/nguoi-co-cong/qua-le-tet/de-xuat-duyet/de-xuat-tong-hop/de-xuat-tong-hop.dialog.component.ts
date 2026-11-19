@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewEncapsulation, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, ViewEncapsulation, HostListener, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -12,6 +12,7 @@ import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
     selector: 'kt-de-xuat-tong-hop',
     templateUrl: './de-xuat-tong-hop.dialog.component.html',
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

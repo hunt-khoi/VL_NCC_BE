@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -19,6 +19,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'kt-loai-quyet-dinh-list',
     templateUrl: './loai-quyet-dinh-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

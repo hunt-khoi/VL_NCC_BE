@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { QuaTrinhKhongCoNguoiDuyetService } from './Services/qua-trinh-khong-co-nguoi-duyet.service';
@@ -6,6 +6,7 @@ import { QuaTrinhKhongCoNguoiDuyetService } from './Services/qua-trinh-khong-co-
 @Component({
     selector: 'kt-qua-trinh-khong-co-nguoi-duyet',
     templateUrl: './qua-trinh-khong-co-nguoi-duyet.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class QuaTrinhKhongCoNguoiDuyetComponent implements OnInit {

@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -25,6 +25,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'kt-dinh-chinh-thong-tin',
     templateUrl: './dinh-chinh-thong-tin.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DinhChinhThongTinComponent implements OnInit {

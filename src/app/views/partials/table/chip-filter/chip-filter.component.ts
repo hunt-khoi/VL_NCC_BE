@@ -4,6 +4,7 @@ import { TableService } from '../table.service';
 @Component({
     selector: 'kt-chip-filter',
     templateUrl: './chip-filter.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ChipFilterComponent {

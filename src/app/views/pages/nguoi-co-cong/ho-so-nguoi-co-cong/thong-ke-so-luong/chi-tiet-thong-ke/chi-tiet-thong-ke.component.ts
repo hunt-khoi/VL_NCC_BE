@@ -1,7 +1,7 @@
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Component, OnInit, ViewChild, ApplicationRef, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ApplicationRef, Inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs';
@@ -19,6 +19,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'kt-chi-tiet-thong-ke',
     templateUrl: './chi-tiet-thong-ke.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ChiTietThongKeComponent implements OnInit {

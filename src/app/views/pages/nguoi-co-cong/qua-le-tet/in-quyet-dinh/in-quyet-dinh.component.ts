@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
 import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
@@ -12,6 +12,7 @@ import { InQuyetDinhService } from './Services/in-quyet-dinh.service';
     selector: 'kt-in-quyet-dinh',
     templateUrl: './in-quyet-dinh.component.html',
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

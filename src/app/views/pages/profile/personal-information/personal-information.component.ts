@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
 import { LayoutUtilsService } from 'app/core/_base/crud';
@@ -7,6 +7,7 @@ import { LayoutUtilsService } from 'app/core/_base/crud';
     selector: 'kt-personal-information',
     templateUrl: './personal-information.component.html',
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PersonalInformationComponent implements OnInit {

@@ -16,5 +16,8 @@
 		"main.ts",
 		"polyfills.ts",
 		"typings.d.ts"
-	]
+  ],
+  "angularCompilerOptions": {
+    "strictTemplates": false
+  }
 }

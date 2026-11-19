@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { BieuMauService } from './services/bieu-mau.service';
@@ -7,6 +7,7 @@ import { CanCuService } from './services/can-cu.service';
 @Component({
     selector: 'kt-can-cu-bieu-mau',
     templateUrl: './can-cu-bieu-mau.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class CanCuBieuMauComponent implements OnInit {

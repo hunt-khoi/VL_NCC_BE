@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { LayoutConfigService, ToggleOptions } from '../../../../core/_base/layout';
 
 @Component({
     selector: 'kt-header-mobile',
     templateUrl: './header-mobile.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class HeaderMobileComponent implements OnInit {

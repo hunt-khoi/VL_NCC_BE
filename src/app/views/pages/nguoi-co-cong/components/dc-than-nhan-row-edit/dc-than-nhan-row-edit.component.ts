@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ComponentRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ComponentRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import moment from 'moment';
@@ -10,6 +10,7 @@ import { CommonService } from '../../services/common.service';
     // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'tr[dc-than-nhan-row-edit]',
     templateUrl: './dc-than-nhan-row-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 

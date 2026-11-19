@@ -8,8 +8,9 @@
  */
 /* eslint-disable */
 import {
-	ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, EventEmitter, HostListener,
-	Input, NgModule, Output, Renderer2, SimpleChanges, ViewChild, ViewContainerRef,
+  ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, EventEmitter, HostListener,
+  Input, NgModule, Output, Renderer2, SimpleChanges, ViewChild, ViewContainerRef,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -27,6 +28,7 @@ export class PopoverPlacement {
 @Component({
     selector: 'popover-content',
     template: ``,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class PopoverContentComponent {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { LayoutConfigService, SplashScreenService, TranslationService } from '../../../core/_base/layout';
 import { AuthNoticeService } from '../../../core/auth';
 
@@ -7,6 +7,7 @@ import { AuthNoticeService } from '../../../core/auth';
     templateUrl: './auth.component.html',
     styleUrls: ['./auth.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class AuthComponent implements OnInit {

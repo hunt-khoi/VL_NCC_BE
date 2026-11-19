@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthNotice, AuthNoticeService } from '../../../../core/auth/';
 
 @Component({
     selector: 'kt-auth-notice',
     templateUrl: './auth-notice.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class AuthNoticeComponent implements OnInit, OnDestroy {

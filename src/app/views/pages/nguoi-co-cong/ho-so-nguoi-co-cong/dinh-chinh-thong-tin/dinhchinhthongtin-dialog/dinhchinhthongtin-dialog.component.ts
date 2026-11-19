@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject, ChangeDetectorRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormControl } from '@angular/forms';
@@ -16,6 +16,7 @@ import moment from 'moment';
 @Component({
     selector: 'kt-dinhchinhthongtin-dialog',
     templateUrl: './dinhchinhthongtin-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DinhchinhthongtinDialogComponent implements OnInit {

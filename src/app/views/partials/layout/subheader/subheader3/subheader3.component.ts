@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SubheaderService } from '../../../../../core/_base/layout';
 import { Breadcrumb } from '../../../../../core/_base/layout/services/subheader.service';
@@ -7,6 +7,7 @@ import { Breadcrumb } from '../../../../../core/_base/layout/services/subheader.
     selector: 'kt-subheader3',
     templateUrl: './subheader3.component.html',
     styleUrls: ['./subheader3.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class Subheader3Component implements OnDestroy, AfterViewInit {

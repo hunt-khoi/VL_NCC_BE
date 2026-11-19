@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, Type, ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef, ChangeDetectorRef, Type, ViewContainerRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -103,7 +103,7 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 	nhapHD: boolean = true;
 	nhapDC: boolean = true;
 
-	constructor(private componentFactoryResolver: ComponentFactoryResolver,
+	constructor(
 		public dialogRef: MatDialogRef<HoSoNCCEditDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: any,
 		private fb: FormBuilder,
@@ -666,10 +666,9 @@ export class HoSoNCCEditDialogComponent implements OnInit {
 
 	addTC() {
 		if (!this.insertionPoint) return;
-		let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.childComponentType);
 		//let viewContainerRef = this.insertionPoint;
 		//viewContainerRef.clear();
-		let componentRef = this.insertionPoint.createComponent(componentFactory);
+		let componentRef = this.insertionPoint.createComponent(this.childComponentType);
 		let instance = componentRef.instance;
 		instance.cmpRef = componentRef;
 		instance.data = {

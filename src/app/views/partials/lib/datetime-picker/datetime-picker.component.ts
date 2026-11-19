@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, forwardRef, Input, Output, EventEmitter, ViewChild, Injectable, OnChanges } from '@angular/core';
+import { Component, ViewEncapsulation, forwardRef, Input, Output, EventEmitter, ViewChild, Injectable, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validators } from '@angular/forms';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatCalendar } from '@angular/material/datepicker';
@@ -49,6 +49,7 @@ export class NgbTimeStringAdapter extends NgbTimeAdapter<string> {
             multi: true
         }
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DatetimePickerComponent implements OnChanges {

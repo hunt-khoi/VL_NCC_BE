@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -11,6 +11,7 @@ import { BaoCaoTinhHinhService } from './Services/bao-cao-tinh-hinh.service';
     selector: 'kt-bao-cao-tinh-hinh',
     templateUrl: './bao-cao-tinh-hinh.component.html',
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class BaoCaoTinhHinhComponent implements OnInit, OnDestroy {

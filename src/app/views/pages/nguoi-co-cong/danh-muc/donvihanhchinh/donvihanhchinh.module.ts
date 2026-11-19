@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule, } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { PartialsModule } from '../../../../partials/partials.module';
 import { DPSCommonModule } from '../../dps-common.module';
 import { CommonService } from '../../services/common.service';
@@ -40,7 +40,7 @@ const routes: Routes = [
         DPSCommonModule], providers: [
         donvihanhchinhService,
         CommonService,
-        provideHttpClient(withInterceptorsFromDi())
+        provideHttpClient(withXhr(), withInterceptorsFromDi())
     ] })
 
 export class DonViHanhChinh_Module { }

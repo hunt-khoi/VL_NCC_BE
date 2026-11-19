@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
@@ -14,6 +14,7 @@ var swRegistration: any = null;
 @Component({
     selector: 'kt-user-profile',
     templateUrl: './user-profile.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class UserProfileComponent implements OnInit {

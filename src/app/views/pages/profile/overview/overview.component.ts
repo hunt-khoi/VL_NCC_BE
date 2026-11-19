@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
 
@@ -6,6 +6,7 @@ import { CommonService } from '../../nguoi-co-cong/services/common.service';
     selector: 'kt-overview',
     templateUrl: './overview.component.html',
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class OverviewComponent implements OnInit {

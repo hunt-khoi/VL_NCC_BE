@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -12,6 +12,7 @@ import { ChonNhieuDungCuListDataSource } from './chon-nhieu-dung-cu-list.datasou
 @Component({
     selector: 'm-chon-nhieu-dung-cu-list',
     templateUrl: './chon-nhieu-dung-cu-list.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ChonNhieuDungCuListComponent implements OnInit {

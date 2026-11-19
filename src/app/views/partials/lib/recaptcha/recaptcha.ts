@@ -5,7 +5,7 @@
  * Giu nguyen selector, input, output va phuong thuc ma man dang nhap dang dung,
  * va cung mot cach nap script cua Google nhu thu vien cu.
  */
-import { Component, ElementRef, EventEmitter, Injectable, Input, NgModule, NgZone, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Injectable, Input, NgModule, NgZone, OnInit, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 
@@ -43,6 +43,7 @@ export class ReCaptchaService {
 @Component({
     selector: 're-captcha',
     template: '<div #target></div>',
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ReCaptchaComponent implements OnInit {

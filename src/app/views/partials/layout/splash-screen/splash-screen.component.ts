@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { LayoutConfigService, SplashScreenService } from '../../../../core/_base/layout';
 import objectPath from 'object-path';
 
@@ -6,6 +6,7 @@ import objectPath from 'object-path';
     selector: 'kt-splash-screen',
     templateUrl: './splash-screen.component.html',
     styleUrls: ['./splash-screen.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SplashScreenComponent implements OnInit {
