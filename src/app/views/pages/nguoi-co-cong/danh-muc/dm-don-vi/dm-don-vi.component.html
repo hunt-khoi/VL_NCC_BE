@@ -1,18 +1,20 @@
 <kt-portlet>
-    <kt-portlet-body class="pd-0">
-        <div class="row">
-            <div class="col-sm-12 col-lg-4">
-                <kt-portlet-header [sticky]="true" [title]="'Quản lý đơn vị'" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
-                </kt-portlet-header>
-                <m-tree-don-vi *ngIf="dataTreeDonVi ? dataTreeDonVi.length > 0 : false" [showCheck]="false" 
-                    [classIconLeaf]="'fas fa-torii-gate'" [classIconRoot]="'fas fa-landmark'" [nameNode]="'text'" [propNameChild]="'children'" 
-                    [valuePhanQuyen]="dataTreeDonVi" [textFeildRoof]="'Tất cả'" [idRoleKey]="'IdGroup'" (NodeActiveChange)="treeDonViChanged($event)">
-                </m-tree-don-vi>
-            </div>
-            <div class="col-sm-12 col-lg-8">
-                <m-dm-don-vi-list [donvi]="donvi" (ChangeTreDonVi)="GetTreeDonVi()" (ChangeListUser)="ChangeListUser($event)"></m-dm-don-vi-list>
-                <kt-dm-nguoi-dung-don-vi-list [donvi]="donvi_user"></kt-dm-nguoi-dung-don-vi-list>
-            </div>
-        </div>
-    </kt-portlet-body>
+  <kt-portlet-body class="pd-0">
+    <div class="row">
+      <div class="col-sm-12 col-lg-4">
+        <kt-portlet-header [sticky]="true" [title]="'Quản lý đơn vị'" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+        </kt-portlet-header>
+        @if (dataTreeDonVi ? dataTreeDonVi.length > 0 : false) {
+          <m-tree-don-vi [showCheck]="false"
+            [classIconLeaf]="'fas fa-torii-gate'" [classIconRoot]="'fas fa-landmark'" [nameNode]="'text'" [propNameChild]="'children'"
+            [valuePhanQuyen]="dataTreeDonVi" [textFeildRoof]="'Tất cả'" [idRoleKey]="'IdGroup'" (NodeActiveChange)="treeDonViChanged($event)">
+          </m-tree-don-vi>
+        }
+      </div>
+      <div class="col-sm-12 col-lg-8">
+        <m-dm-don-vi-list [donvi]="donvi" (ChangeTreDonVi)="GetTreeDonVi()" (ChangeListUser)="ChangeListUser($event)"></m-dm-don-vi-list>
+        <kt-dm-nguoi-dung-don-vi-list [donvi]="donvi_user"></kt-dm-nguoi-dung-don-vi-list>
+      </div>
+    </div>
+  </kt-portlet-body>
 </kt-portlet>

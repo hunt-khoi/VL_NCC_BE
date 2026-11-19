@@ -116,27 +116,30 @@ export interface NgbTabChangeEvent {
     encapsulation: ViewEncapsulation.None,
     template: `
     <ul [class]="'nav nav-' + type + (orientation == 'horizontal'?  ' ' + justifyClass : ' flex-column')" role="tablist">
-      <li class="nav-item" *ngFor="let tab of tabs">
-        <a [id]="tab.id" class="nav-link" [class.active]="tab.id === activeId" [class.disabled]="tab.disabled"
-          href (click)="select(tab.id); $event.preventDefault()" role="tab" [attr.tabindex]="(tab.disabled ? '-1': undefined)"
-          [attr.aria-controls]="(!destroyOnHide || tab.id === activeId ? tab.id + '-panel' : null)"
-          [attr.aria-selected]="tab.id === activeId" [attr.aria-disabled]="tab.disabled">
-          {{tab.title}}<ng-template [ngTemplateOutlet]="tab.titleTpl?.templateRef"></ng-template>
-        </a>
-      </li>
+      @for (tab of tabs; track tab) {
+        <li class="nav-item">
+          <a [id]="tab.id" class="nav-link" [class.active]="tab.id === activeId" [class.disabled]="tab.disabled"
+            href (click)="select(tab.id); $event.preventDefault()" role="tab" [attr.tabindex]="(tab.disabled ? '-1': undefined)"
+            [attr.aria-controls]="(!destroyOnHide || tab.id === activeId ? tab.id + '-panel' : null)"
+            [attr.aria-selected]="tab.id === activeId" [attr.aria-disabled]="tab.disabled">
+            {{tab.title}}<ng-template [ngTemplateOutlet]="tab.titleTpl?.templateRef"></ng-template>
+          </a>
+        </li>
+      }
     </ul>
     <div class="tab-content">
-      <ng-template ngFor let-tab [ngForOf]="tabs">
-        <div
-          class="tab-pane {{tab.id === activeId ? 'active' : null}}"
-          *ngIf="!destroyOnHide || tab.id === activeId"
-          role="tabpanel"
-          [attr.aria-labelledby]="tab.id" id="{{tab.id}}-panel">
-          <ng-template [ngTemplateOutlet]="tab.contentTpl?.templateRef"></ng-template>
-        </div>
-      </ng-template>
+      @for (tab of tabs; track tab) {
+        @if (!destroyOnHide || tab.id === activeId) {
+          <div
+            class="tab-pane {{tab.id === activeId ? 'active' : null}}"
+            role="tabpanel"
+            [attr.aria-labelledby]="tab.id" id="{{tab.id}}-panel">
+            <ng-template [ngTemplateOutlet]="tab.contentTpl?.templateRef"></ng-template>
+          </div>
+        }
+      }
     </div>
-  `,
+    `,
     standalone: false
 })
 export class NgbTabset implements AfterContentChecked {

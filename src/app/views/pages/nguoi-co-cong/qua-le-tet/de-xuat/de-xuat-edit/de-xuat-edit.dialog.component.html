@@ -1,472 +1,498 @@
-﻿﻿<style>
-	.row_nguon {
-		background-color: #dee2e6;
-		color: red;
-	}
+﻿<style>
+  .row_nguon {
+  background-color: #dee2e6;
+  color: red;
+}
 
-	.row_tang {
-		background-color: lightgreen;
-	}
+.row_tang {
+background-color: lightgreen;
+}
 
-	.row_muc {
-		background-color: #dee2e6;
-	}
+.row_muc {
+background-color: #dee2e6;
+}
 
-	.kt-portlet__body {
-		max-height: 72vh !important;
-	}
+.kt-portlet__body {
+max-height: 72vh !important;
+}
 </style>
 <div class="btn-close-container">
-	<button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn"
-			title="Đóng">
-		<mat-icon>clear</mat-icon>
-	</button>
+  <button class="btn-close" type="button" mat-mini-fab color="" (click)="close()" [disabled]="disabledBtn"
+    title="Đóng">
+    <mat-icon>clear</mat-icon>
+  </button>
 </div>
 <div class="kt-portlet"
-	 [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
-	<div class="kt-portlet__head kt-portlet__head__custom">
-		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
-			 style="margin-top: 20px;">
-			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
-		</div>
-		<div class="col-md-{{item.Id === 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile" 
-			style="margin-top: 10px; text-align: right;">
-			<button type="button" mat-raised-button color="info" (click)="export()" matTooltip="Xuất danh sách" *ngIf="item.Id>0">
-				Export
-			</button>
-			<ng-container *ngIf="allowEdit">
-				<button type="button" mat-raised-button color="primary" (click)="addDoiTuong()" 
-					matTooltip="{{ 'DE_XUAT.themdt_tooltip' | translate }}" *ngIf="!visibleTangGiam">
-					{{ 'DE_XUAT.themdt' | translate }}
-				</button>
-				<button type="button" mat-raised-button color="accent" (click)="addDoiTuong(true)" 
-					matTooltip="{{ 'DE_XUAT.themvabaotang_tooltip' | translate }}" *ngIf="visibleTangGiam">
-					{{ 'DE_XUAT.themvabaotang' | translate }}
-				</button>
-				<button type="button" mat-raised-button color="accent" (click)="onSubmit()" [disabled]="disabledBtn" 
-					matTooltip="{{'COMMON.LUU_DONG' | translate}}" *ngIf="!(visibleTangGiam && item.Id>0)">
-					<span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
-				</button>
-			</ng-container>
-		</div>
-	</div>
+  [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
+  <div class="kt-portlet__head kt-portlet__head__custom">
+    <div class="col-md-{{item.Id === 0 ? (isZoomSize ? '7' : '5') : (isZoomSize ? '9' : '7')}} kt-margin-bottom-10-mobile"
+      style="margin-top: 20px;">
+      <h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+    </div>
+    <div class="col-md-{{item.Id === 0 ? (isZoomSize ? '5' : '7') : (isZoomSize ? '3' : '5')}} kt-margin-bottom-10-mobile"
+      style="margin-top: 10px; text-align: right;">
+      @if (item.Id>0) {
+        <button type="button" mat-raised-button color="info" (click)="export()" matTooltip="Xuất danh sách">
+          Export
+        </button>
+      }
+      @if (allowEdit) {
+        @if (!visibleTangGiam) {
+          <button type="button" mat-raised-button color="primary" (click)="addDoiTuong()"
+            matTooltip="{{ 'DE_XUAT.themdt_tooltip' | translate }}">
+            {{ 'DE_XUAT.themdt' | translate }}
+          </button>
+        }
+        @if (visibleTangGiam) {
+          <button type="button" mat-raised-button color="accent" (click)="addDoiTuong(true)"
+            matTooltip="{{ 'DE_XUAT.themvabaotang_tooltip' | translate }}">
+            {{ 'DE_XUAT.themvabaotang' | translate }}
+          </button>
+        }
+        @if (!(visibleTangGiam && item.Id>0)) {
+          <button type="button" mat-raised-button color="accent" (click)="onSubmit()" [disabled]="disabledBtn"
+            matTooltip="{{'COMMON.LUU_DONG' | translate}}">
+            <span translate="COMMON.LUU_DONG"></span>&nbsp;&nbsp;
+          </button>
+        }
+      }
+    </div>
+  </div>
 
-	<form class="kt-form" [formGroup]="itemForm">
-		<div class="kt-portlet__body">
-			<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
-				Không thể lưu, vui lòng nhập đủ thông tin!
-			</kt-alert>
-			<div class="row">
-				<div class="col-lg-6 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid">
-						<mat-select formControlName="DotTangQua" placeholder="{{'DOT_TANG_QUA.NAME' | translate }}" [disabled]="true">
-							<mat-option *ngFor="let opt of listDotTangQua;" [value]="opt.id">
-								{{opt.title}}
-							</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
-				<div class="col-lg-6 m--margin-bottom-20-mobile">
-					<mat-form-field class="mat-form-field-fluid">
-						<input matInput [(ngModel)]="Filter" [ngModelOptions]="{standalone: true}" (input)="onFilterInput()"
-							placeholder="Tìm kiếm theo số hồ sơ, họ tên, thân nhân, địa chỉ"/>
-						<button mat-icon-button matSuffix (click)="clearFilter($event)" matTooltip="Xóa tìm kiếm">
-							<mat-icon>clear</mat-icon>
-						</button>
-					</mat-form-field>
-				</div>
-				<!-- <div class="col-lg-4 m--margin-bottom-20-mobile" *ngIf="item.Id == 0 && itemForm.controls['DotTangQua'].value" [hidden]="true">
-					<button type="button" (click)="showImport=true" mat-raised-button color="primary" matTooltip="Import chi tiết">
-						Import
-					</button>&nbsp;
-					<button type="button" (click)="downFile()" mat-raised-button color="info" matTooltip="Tải file mẫu">
-						{{ 'COMMON.DOWNLOAD' | translate }}
-					</button>
-				</div> -->
-			</div>
-			<!-- <div class="row" [hidden]="!showImport">
-				<div class="col-lg-12 m--margin-bottom-20-mobile">
-					<dl-image-control formControlName="file" type=".xls,.xlsx" nameButton="Chọn file" [multiple]="false" [disabled]="false" [required]="false">
-					</dl-image-control>
-					<button type="button" (click)="loadImport()" mat-raised-button color="primary" matTooltip="Load">
-						Load
-					</button>
-				</div>
-			</div> -->
+  <form class="kt-form" [formGroup]="itemForm">
+    <div class="kt-portlet__body">
+      @if (hasFormErrors) {
+        <kt-alert type="warn" [showCloseButton]="true" [duration]="0" (close)="onAlertClose()">
+          Không thể lưu, vui lòng nhập đủ thông tin!
+        </kt-alert>
+      }
+      <div class="row">
+        <div class="col-lg-6 m--margin-bottom-20-mobile">
+          <mat-form-field class="mat-form-field-fluid">
+            <mat-select formControlName="DotTangQua" placeholder="{{'DOT_TANG_QUA.NAME' | translate }}" [disabled]="true">
+              @for (opt of listDotTangQua; track opt) {
+                <mat-option [value]="opt.id">
+                  {{opt.title}}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-lg-6 m--margin-bottom-20-mobile">
+          <mat-form-field class="mat-form-field-fluid">
+            <input matInput [(ngModel)]="Filter" [ngModelOptions]="{standalone: true}" (input)="onFilterInput()"
+              placeholder="Tìm kiếm theo số hồ sơ, họ tên, thân nhân, địa chỉ"/>
+              <button mat-icon-button matSuffix (click)="clearFilter($event)" matTooltip="Xóa tìm kiếm">
+                <mat-icon>clear</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+          <!-- <div class="col-lg-4 m--margin-bottom-20-mobile" *ngIf="item.Id == 0 && itemForm.controls['DotTangQua'].value" [hidden]="true">
+          <button type="button" (click)="showImport=true" mat-raised-button color="primary" matTooltip="Import chi tiết">
+            Import
+          </button>&nbsp;
+          <button type="button" (click)="downFile()" mat-raised-button color="info" matTooltip="Tải file mẫu">
+            {{ 'COMMON.DOWNLOAD' | translate }}
+          </button>
+        </div> -->
+      </div>
+      <!-- <div class="row" [hidden]="!showImport">
+      <div class="col-lg-12 m--margin-bottom-20-mobile">
+        <dl-image-control formControlName="file" type=".xls,.xlsx" nameButton="Chọn file" [multiple]="false" [disabled]="false" [required]="false">
+        </dl-image-control>
+        <button type="button" (click)="loadImport()" mat-raised-button color="primary" matTooltip="Load">
+          Load
+        </button>
+      </div>
+    </div> -->
 
-			<!-- xem chi tiết đề xuất đã nhập -->
-			<div class="row" *ngIf="!allowEdit">
-				<div class="col-md-12">
-					<mat-tab-group [selectedIndex]="selected_tab" (selectedIndexChange)="changed_tab($event)">
-						<mat-tab label="{{ 'DE_XUAT.danhsachnhan' | translate }}"></mat-tab>
-						<mat-tab label="{{ 'DE_XUAT.danhsachtang' | translate }}"></mat-tab>
-						<mat-tab label="{{ 'DE_XUAT.danhsachgiam' | translate }}"></mat-tab>
-					</mat-tab-group>
-					<!-- header cố định -->
-					<ng-container *ngIf="flatRowsView.length > 0">
-						<table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-bottom:0;">
-							<colgroup>
-								<col style="width:45px">
-								<col>
-								<col style="width:90px">
-								<col>
-								<col>
-								<col>
-								<col style="width:80px">
-								<col style="width:120px">
-							</colgroup>
-							<thead>
-								<tr>
-									<th class="text-center">STT</th>
-									<th class="text-center">Họ tên</th>
-									<th class="text-center">Số hồ sơ</th>
-									<th class="text-center">Cư trú</th>
-									<th class="text-center">Họ tên liệt sỹ</th>
-									<th class="text-center">Quan hệ với liệt sỹ</th>
-									<th class="text-center">Số tiền</th>
-									<th class="text-center">Ghi chú</th>
-								</tr>
-							</thead>
-						</table>
-						<!-- virtual scroll body -->
-						<cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsView, 55)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
-							<table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
-								<colgroup>
-									<col style="width:45px">
-									<col>
-									<col style="width:90px">
-									<col>
-									<col>
-									<col>
-									<col style="width:80px">
-									<col style="width:120px">
-								</colgroup>
-								<tbody>
-									<tr *cdkVirtualFor="let row of flatRowsView; trackBy: trackByFlatRow"
-										[ngSwitch]="row.type"
-										[ngClass]="{'row_nguon': row.type==='nguon', 'row_muc': row.type==='muc', 'row_tang': row.type==='ncc' && row.ncc.IsTang}">
-										<ng-container *ngSwitchCase="'nguon'">
-											<td colspan="5">Nguồn kinh phí: <b>{{row.ng.NguonKinhPhi}}</b></td>
-											<td>Số lượng: <b>{{tongSLNguon[row.j]}}</b></td>
-											<td class="text-right"><b>{{tongTienNguon[row.j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
-											<td></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'muc'">
-											<td colspan="5"><b>Mức {{row.muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
-											<td>Số lượng: <b>{{tongSL[row.j][row.i]}}</b></td>
-											<td class="text-right"><b>{{tongMuc[row.j][row.i]}}</b></td>
-											<td></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'dt'">
-											<td class="text-center"></td>
-											<td colspan="7"><b><i>{{row.dt.DoiTuong}}</i></b></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'ncc'">
-											<td class="text-center">{{row.k + 1}}</td>
-											<td>{{row.ncc.HoTen}}</td>
-											<td>{{row.ncc.SoHoSo}}</td>
-											<td>{{row.ncc.DiaChi}}</td>
-											<td>{{row.ncc.NguoiThoCungLietSy}}</td>
-											<td>{{row.ncc.QuanHeVoiLietSy}}</td>
-											<td class="text-right">{{row.ncc.SoTien}}</td>
-											<td>{{row.ncc.IsGiam ? row.ncc.GhiChuGiam : row.ncc.GhiChuTang}}</td>
-										</ng-container>
-									</tr>
-								</tbody>
-							</table>
-						</cdk-virtual-scroll-viewport>
-						<!-- footer tổng số -->
-						<table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-top:0;">
-							<colgroup>
-								<col style="width:45px">
-								<col>
-								<col style="width:90px">
-								<col>
-								<col>
-								<col>
-								<col style="width:80px">
-								<col style="width:120px">
-							</colgroup>
-							<tr style="color: red;">
-								<td colspan="5"><b>Tổng số</b></td>
-								<td>Số lượng: <b>{{TongSo}}</b></td>
-								<td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
-								<td></td>
-							</tr>
-						</table>
-					</ng-container>
-				</div>
-			</div>
+    <!-- xem chi tiết đề xuất đã nhập -->
+    @if (!allowEdit) {
+      <div class="row">
+        <div class="col-md-12">
+          <mat-tab-group [selectedIndex]="selected_tab" (selectedIndexChange)="changed_tab($event)">
+            <mat-tab label="{{ 'DE_XUAT.danhsachnhan' | translate }}"></mat-tab>
+            <mat-tab label="{{ 'DE_XUAT.danhsachtang' | translate }}"></mat-tab>
+            <mat-tab label="{{ 'DE_XUAT.danhsachgiam' | translate }}"></mat-tab>
+          </mat-tab-group>
+          <!-- header cố định -->
+          @if (flatRowsView.length > 0) {
+            <table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-bottom:0;">
+              <colgroup>
+              <col style="width:45px">
+              <col>
+                <col style="width:90px">
+                <col>
+                  <col>
+                    <col>
+                      <col style="width:80px">
+                      <col style="width:120px">
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th class="text-center">STT</th>
+                        <th class="text-center">Họ tên</th>
+                        <th class="text-center">Số hồ sơ</th>
+                        <th class="text-center">Cư trú</th>
+                        <th class="text-center">Họ tên liệt sỹ</th>
+                        <th class="text-center">Quan hệ với liệt sỹ</th>
+                        <th class="text-center">Số tiền</th>
+                        <th class="text-center">Ghi chú</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <!-- virtual scroll body -->
+                  <cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsView, 55)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
+                    <table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
+                      <colgroup>
+                      <col style="width:45px">
+                      <col>
+                        <col style="width:90px">
+                        <col>
+                          <col>
+                            <col>
+                              <col style="width:80px">
+                              <col style="width:120px">
+                            </colgroup>
+                            <tbody>
+                              <tr *cdkVirtualFor="let row of flatRowsView; trackBy: trackByFlatRow"
+                                [ngClass]="{'row_nguon': row.type==='nguon', 'row_muc': row.type==='muc', 'row_tang': row.type==='ncc' && row.ncc.IsTang}">
+                              @switch (row.type) {
+                                @case ('nguon') {
+                                  <td colspan="5">Nguồn kinh phí: <b>{{row.ng.NguonKinhPhi}}</b></td>
+                                  <td>Số lượng: <b>{{tongSLNguon[row.j]}}</b></td>
+                                  <td class="text-right"><b>{{tongTienNguon[row.j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+                                  <td></td>
+                                }
+                                @case ('muc') {
+                                  <td colspan="5"><b>Mức {{row.muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
+                                  <td>Số lượng: <b>{{tongSL[row.j][row.i]}}</b></td>
+                                  <td class="text-right"><b>{{tongMuc[row.j][row.i]}}</b></td>
+                                  <td></td>
+                                }
+                                @case ('dt') {
+                                  <td class="text-center"></td>
+                                  <td colspan="7"><b><i>{{row.dt.DoiTuong}}</i></b></td>
+                                }
+                                @case ('ncc') {
+                                  <td class="text-center">{{row.k + 1}}</td>
+                                  <td>{{row.ncc.HoTen}}</td>
+                                  <td>{{row.ncc.SoHoSo}}</td>
+                                  <td>{{row.ncc.DiaChi}}</td>
+                                  <td>{{row.ncc.NguoiThoCungLietSy}}</td>
+                                  <td>{{row.ncc.QuanHeVoiLietSy}}</td>
+                                  <td class="text-right">{{row.ncc.SoTien}}</td>
+                                  <td>{{row.ncc.IsGiam ? row.ncc.GhiChuGiam : row.ncc.GhiChuTang}}</td>
+                                }
+                              }
+                            </tr>
+                          </tbody>
+                        </table>
+                      </cdk-virtual-scroll-viewport>
+                      <!-- footer tổng số -->
+                      <table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-top:0;">
+                        <colgroup>
+                        <col style="width:45px">
+                        <col>
+                          <col style="width:90px">
+                          <col>
+                            <col>
+                              <col>
+                                <col style="width:80px">
+                                <col style="width:120px">
+                              </colgroup>
+                              <tr style="color: red;">
+                                <td colspan="5"><b>Tổng số</b></td>
+                                <td>Số lượng: <b>{{TongSo}}</b></td>
+                                <td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+                                <td></td>
+                              </tr>
+                            </table>
+                          }
+                        </div>
+                      </div>
+                    }
 
-			<!-- đợt gốc: ko hiện tăng giảm -->
-			<div class="row" *ngIf="allowEdit && !visibleTangGiam">
-				<div class="col-md-12">
-					<mat-label>{{ 'DE_XUAT.danhsachnhan' | translate }}</mat-label>
-					<div class="table-responsive">
-						<table class="table-bordered table-sm" style="width:100%; overflow-y: hidden;">
-							<tr>
-								<th class="text-center">Chọn</th>
-								<th class="text-center">Họ tên</th>
-								<th class="text-center">Số hồ sơ</th>
-								<th class="text-center">Cư trú</th>
-								<th class="text-center">Họ tên liệt sỹ</th>
-								<th class="text-center">Quan hệ với liệt sỹ</th>
-								<th class="text-center">Số tiền</th>
-								<th class="text-center">Ghi chú</th>
-							</tr>
-							<ng-container *ngFor="let ng of treeNguoiNhan; let j=index; trackBy: trackByIndex">
-								<tr class="row_nguon">
-								<td colspan="5">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
-								<td>Số lượng: <b>{{tongSLNguon[j]}}</b></td>
-								<td class="text-right"><b>{{tongTienNguon[j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
-								<td></td>
-								</tr>
-								<ng-container *ngFor="let muc of ng.data; let i=index; trackBy: trackByIndex">
-									<tr class="row_muc">
-										<td colspan="5">
-											<b>Mức {{muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b>
-										</td>
-										<td>Số lượng: <b>{{tongSL[j][i]}}</b></td>
-										<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
-										<td></td>
-									</tr>
-									<ng-container *ngFor="let dt of muc.DoiTuongs; trackBy: trackByIndex">
-										<tr>
-											<td colspan="8"><b><i>{{dt.DoiTuong}}</i></b></td>
-										</tr>
-										<tr [ngClass]="{'row_tang': ncc.IsTang}" *ngFor="let ncc of dt.NCCs; trackBy: trackByNCC">
-											<!-- *ngIf="ncc.Checked || (!ncc.Checked && allowEdit)" -->
-											<td class="text-center">
-												<mat-checkbox [(ngModel)]="ncc.Checked" [ngModelOptions]="{standalone: true}" 
-													[disabled]="!allowEdit" (change)="chon(ncc, j, i)">
-												</mat-checkbox>
-											</td>
-											<td>{{ncc.HoTen}}</td>
-											<td>{{ncc.SoHoSo}}</td>
-											<td>{{ncc.DiaChi}}</td>
-											<td>{{ncc.NguoiThoCungLietSy}}</td>
-											<td>{{ncc.QuanHeVoiLietSy}}</td>
-											<td class="text-right">{{ncc.SoTien}}</td>
-											<td>{{ncc.GhiChuTang}}</td>
-										</tr>
-									</ng-container>
-								</ng-container>
-							</ng-container>
-							<tr style=" color: red;">
-								<td colspan="5"><b>Tổng số</b></td>
-								<td>Số lượng: <b>{{TongSo}}</b></td>
-								<td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
-								<td></td>
-							</tr>
-						</table>
-					</div>
-				</div>
-			</div>
-			
-			<!-- hiện tăng giảm -->
-			<ng-container *ngIf="allowEdit && visibleTangGiam">
-				<div class="row">
-					<div class="col-md-12">
-						<mat-label><h6>{{ 'DE_XUAT.danhsachnhan' | translate }}</h6></mat-label>
-						<!-- header cố định -->
-						<table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-bottom:0;">
-							<colgroup>
-								<col style="width:45px">
-								<col>
-								<col style="width:90px">
-								<col>
-								<col>
-								<col>
-								<col style="width:80px">
-								<col style="width:100px">
-								<col style="width:190px">
-							</colgroup>
-							<thead>
-								<tr>
-									<th class="text-center">Chọn</th>
-									<th class="text-center">Họ tên</th>
-									<th class="text-center">Số hồ sơ</th>
-									<th class="text-center">Cư trú</th>
-									<th class="text-center">Họ tên liệt sỹ</th>
-									<th class="text-center">Quan hệ với liệt sỹ</th>
-									<th class="text-center">Số tiền</th>
-									<th class="text-center">Báo giảm</th>
-									<th class="text-center">Ghi chú giảm</th>
-								</tr>
-							</thead>
-						</table>
-						<!-- virtual scroll body -->
-						<cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsNhan, 48)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
-							<table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
-								<colgroup>
-									<col style="width:45px">
-									<col>
-									<col style="width:90px">
-									<col>
-									<col>
-									<col>
-									<col style="width:80px">
-									<col style="width:100px">
-									<col style="width:190px">
-								</colgroup>
-								<tbody>
-									<tr *cdkVirtualFor="let row of flatRowsNhan; trackBy: trackByFlatRow"
-										[ngSwitch]="row.type"
-										[ngClass]="{'row_nguon': row.type==='nguon', 'row_muc': row.type==='muc'}">
-										<ng-container *ngSwitchCase="'nguon'">
-											<td colspan="5">Nguồn kinh phí: <b>{{row.ng.NguonKinhPhi}}</b></td>
-											<td>Số lượng: <b>{{tongSLNguon[row.j]}}</b></td>
-											<td class="text-right"><b>{{tongTienNguon[row.j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
-											<td></td><td></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'muc'">
-											<td colspan="5"><b>Mức {{row.muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
-											<td>Số lượng: <b>{{tongSL[row.j][row.i]}}</b></td>
-											<td class="text-right"><b>{{tongMuc[row.j][row.i]}}</b></td>
-											<td></td><td></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'dt'">
-											<td class="text-center"></td>
-											<td colspan="8"><b><i>{{row.dt.DoiTuong}}</i></b></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'ncc'">
-											<td class="text-center">
-												<mat-checkbox (change)="huybaotang(row.ncc, row.j, row.i)"
-													[(ngModel)]="row.ncc.Checked" [ngModelOptions]="{standalone: true}"
-													[disabled]="!row.ncc.IsTang && (!allowEdit || visibleTangGiam)">
-												</mat-checkbox>
-											</td>
-											<td>{{row.ncc.HoTen}}</td>
-											<td>{{row.ncc.SoHoSo}}</td>
-											<td>{{row.ncc.DiaChi}}</td>
-											<td>{{row.ncc.NguoiThoCungLietSy}}</td>
-											<td>{{row.ncc.QuanHeVoiLietSy}}</td>
-											<td class="text-right">{{row.ncc.SoTien}}</td>
-											<td class="text-center">
-												<mat-form-field style="width: 80px;" *ngIf="row.ncc.IsGiam">
-													<mat-select [(ngModel)]="row.ncc.LyDo" [ngModelOptions]="{standalone: true}" placeholder="Lý do"
-														[disabled]="row.ncc.DisabledGiam" (selectionChange)="updateLyDo(row.ncc)">
-														<mat-option *ngFor="let opt of lydos" [value]="opt.id">{{opt.title}}</mat-option>
-													</mat-select>
-												</mat-form-field>
-											</td>
-											<td class="text-center">
-												<mat-form-field style="width: 140px;" *ngIf="row.ncc.IsGiam">
-													<input matInput [(ngModel)]="row.ncc.GhiChuGiam" [ngModelOptions]="{standalone: true}"
-														placeholder="Ghi chú giảm" [disabled]="row.ncc.DisabledGiam" (change)="updateLyDo(row.ncc)" />
-												</mat-form-field>&nbsp;
-												<mat-checkbox color="warn" [(ngModel)]="row.ncc.IsGiam" [ngModelOptions]="{standalone: true}"
-													[disabled]="row.ncc.DisabledGiam" (change)="baoGiam($event, row.ncc)" matTooltip="Báo giảm">
-												</mat-checkbox>
-											</td>
-										</ng-container>
-									</tr>
-								</tbody>
-							</table>
-						</cdk-virtual-scroll-viewport>
-						<!-- footer tổng số -->
-						<table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-top:0;">
-							<colgroup>
-								<col style="width:45px">
-								<col>
-								<col style="width:90px">
-								<col>
-								<col>
-								<col>
-								<col style="width:80px">
-								<col style="width:100px">
-								<col style="width:190px">
-							</colgroup>
-							<tr style="color: red;">
-								<td colspan="5"><b>Tổng số</b></td>
-								<td>Số lượng: <b>{{TongSo}}</b></td>
-								<td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
-								<td></td>
-								<td></td>
-							</tr>
-						</table>
-					</div>
-				</div>
+                    <!-- đợt gốc: ko hiện tăng giảm -->
+                    @if (allowEdit && !visibleTangGiam) {
+                      <div class="row">
+                        <div class="col-md-12">
+                          <mat-label>{{ 'DE_XUAT.danhsachnhan' | translate }}</mat-label>
+                          <div class="table-responsive">
+                            <table class="table-bordered table-sm" style="width:100%; overflow-y: hidden;">
+                              <tr>
+                                <th class="text-center">Chọn</th>
+                                <th class="text-center">Họ tên</th>
+                                <th class="text-center">Số hồ sơ</th>
+                                <th class="text-center">Cư trú</th>
+                                <th class="text-center">Họ tên liệt sỹ</th>
+                                <th class="text-center">Quan hệ với liệt sỹ</th>
+                                <th class="text-center">Số tiền</th>
+                                <th class="text-center">Ghi chú</th>
+                              </tr>
+                              @for (ng of treeNguoiNhan; track trackByIndex(j, ng); let j = $index) {
+                                <tr class="row_nguon">
+                                  <td colspan="5">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+                                  <td>Số lượng: <b>{{tongSLNguon[j]}}</b></td>
+                                  <td class="text-right"><b>{{tongTienNguon[j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+                                  <td></td>
+                                </tr>
+                                @for (muc of ng.data; track trackByIndex(i, muc); let i = $index) {
+                                  <tr class="row_muc">
+                                    <td colspan="5">
+                                      <b>Mức {{muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b>
+                                    </td>
+                                    <td>Số lượng: <b>{{tongSL[j][i]}}</b></td>
+                                    <td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
+                                    <td></td>
+                                  </tr>
+                                  @for (dt of muc.DoiTuongs; track trackByIndex($index, dt)) {
+                                    <tr>
+                                      <td colspan="8"><b><i>{{dt.DoiTuong}}</i></b></td>
+                                    </tr>
+                                    @for (ncc of dt.NCCs; track trackByNCC($index, ncc)) {
+                                      <tr [ngClass]="{'row_tang': ncc.IsTang}">
+                                        <!-- *ngIf="ncc.Checked || (!ncc.Checked && allowEdit)" -->
+                                        <td class="text-center">
+                                          <mat-checkbox [(ngModel)]="ncc.Checked" [ngModelOptions]="{standalone: true}"
+                                            [disabled]="!allowEdit" (change)="chon(ncc, j, i)">
+                                          </mat-checkbox>
+                                        </td>
+                                        <td>{{ncc.HoTen}}</td>
+                                        <td>{{ncc.SoHoSo}}</td>
+                                        <td>{{ncc.DiaChi}}</td>
+                                        <td>{{ncc.NguoiThoCungLietSy}}</td>
+                                        <td>{{ncc.QuanHeVoiLietSy}}</td>
+                                        <td class="text-right">{{ncc.SoTien}}</td>
+                                        <td>{{ncc.GhiChuTang}}</td>
+                                      </tr>
+                                    }
+                                  }
+                                }
+                              }
+                              <tr style=" color: red;">
+                                <td colspan="5"><b>Tổng số</b></td>
+                                <td>Số lượng: <b>{{TongSo}}</b></td>
+                                <td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+                                <td></td>
+                              </tr>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    }
 
-				<div class="form-group kt-form__group row">
-					<div class="col-md-12">
-						<mat-label><h6>{{ 'DE_XUAT.danhsachtang' | translate }}</h6></mat-label>
-						<!-- header cố định -->
-						<table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-bottom:0;">
-							<colgroup>
-								<col>
-								<col style="width:90px">
-								<col>
-								<col>
-								<col>
-								<col style="width:80px">
-								<col style="width:150px">
-								<col style="width:50px">
-							</colgroup>
-							<thead>
-								<tr>
-									<th class="text-center">Họ tên</th>
-									<th class="text-center">Số hồ sơ</th>
-									<th class="text-center">Cư trú</th>
-									<th class="text-center">Họ tên liệt sỹ</th>
-									<th class="text-center">Quan hệ với liệt sỹ</th>
-									<th class="text-center">Số tiền</th>
-									<th class="text-center">Ghi chú</th>
-									<th class="text-center">Chọn</th>
-								</tr>
-							</thead>
-						</table>
-						<!-- virtual scroll body -->
-						<cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsTang, 50)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
-							<table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
-								<colgroup>
-									<col>
-									<col style="width:90px">
-									<col>
-									<col>
-									<col>
-									<col style="width:80px">
-									<col style="width:150px">
-									<col style="width:50px">
-								</colgroup>
-								<tbody>
-									<tr *cdkVirtualFor="let row of flatRowsTang; trackBy: trackByFlatRow"
-										[ngSwitch]="row.type"
-										[ngClass]="{'row_nguon': row.type==='nguon', 'row_muc': row.type==='muc'}">
-										<ng-container *ngSwitchCase="'nguon'">
-											<td colspan="8">Nguồn kinh phí: <b>{{row.ng.NguonKinhPhi}}</b></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'muc'">
-											<td colspan="8"><b>Mức {{row.muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'dt'">
-											<td class="text-center"></td>
-											<td colspan="7"><b><i>{{row.dt.DoiTuong}}</i></b></td>
-										</ng-container>
-										<ng-container *ngSwitchCase="'ncc'">
-											<td>{{row.ncc.HoTen}}</td>
-											<td>{{row.ncc.SoHoSo}}</td>
-											<td>{{row.ncc.DiaChi}}</td>
-											<td>{{row.ncc.NguoiThoCungLietSy}}</td>
-											<td>{{row.ncc.QuanHeVoiLietSy}}</td>
-											<td class="text-right">{{row.ncc.SoTien}}</td>
-											<td class="text-center">
-												<input [(ngModel)]="row.ncc.GhiChuTang" [ngModelOptions]="{standalone: true}"
-													placeholder="Ghi chú tăng" style="width:100%;" />
-											</td>
-											<td class="text-center">
-												<mat-checkbox [(ngModel)]="row.ncc.IsTang" [ngModelOptions]="{standalone: true}"
-													(change)="baoTang($event, row.ncc)"></mat-checkbox>
-											</td>
-										</ng-container>
-									</tr>
-								</tbody>
-							</table>
-						</cdk-virtual-scroll-viewport>
-					</div>
-				</div>
-			</ng-container>
+                    <!-- hiện tăng giảm -->
+                    @if (allowEdit && visibleTangGiam) {
+                      <div class="row">
+                        <div class="col-md-12">
+                          <mat-label><h6>{{ 'DE_XUAT.danhsachnhan' | translate }}</h6></mat-label>
+                          <!-- header cố định -->
+                          <table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-bottom:0;">
+                            <colgroup>
+                            <col style="width:45px">
+                            <col>
+                              <col style="width:90px">
+                              <col>
+                                <col>
+                                  <col>
+                                    <col style="width:80px">
+                                    <col style="width:100px">
+                                    <col style="width:190px">
+                                  </colgroup>
+                                  <thead>
+                                    <tr>
+                                      <th class="text-center">Chọn</th>
+                                      <th class="text-center">Họ tên</th>
+                                      <th class="text-center">Số hồ sơ</th>
+                                      <th class="text-center">Cư trú</th>
+                                      <th class="text-center">Họ tên liệt sỹ</th>
+                                      <th class="text-center">Quan hệ với liệt sỹ</th>
+                                      <th class="text-center">Số tiền</th>
+                                      <th class="text-center">Báo giảm</th>
+                                      <th class="text-center">Ghi chú giảm</th>
+                                    </tr>
+                                  </thead>
+                                </table>
+                                <!-- virtual scroll body -->
+                                <cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsNhan, 48)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
+                                  <table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
+                                    <colgroup>
+                                    <col style="width:45px">
+                                    <col>
+                                      <col style="width:90px">
+                                      <col>
+                                        <col>
+                                          <col>
+                                            <col style="width:80px">
+                                            <col style="width:100px">
+                                            <col style="width:190px">
+                                          </colgroup>
+                                          <tbody>
+                                            <tr *cdkVirtualFor="let row of flatRowsNhan; trackBy: trackByFlatRow"
+                                              [ngClass]="{'row_nguon': row.type==='nguon', 'row_muc': row.type==='muc'}">
+                                              @switch (row.type) {
+                                                @case ('nguon') {
+                                                  <td colspan="5">Nguồn kinh phí: <b>{{row.ng.NguonKinhPhi}}</b></td>
+                                                  <td>Số lượng: <b>{{tongSLNguon[row.j]}}</b></td>
+                                                  <td class="text-right"><b>{{tongTienNguon[row.j] | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+                                                  <td></td><td></td>
+                                                }
+                                                @case ('muc') {
+                                                  <td colspan="5"><b>Mức {{row.muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
+                                                  <td>Số lượng: <b>{{tongSL[row.j][row.i]}}</b></td>
+                                                  <td class="text-right"><b>{{tongMuc[row.j][row.i]}}</b></td>
+                                                  <td></td><td></td>
+                                                }
+                                                @case ('dt') {
+                                                  <td class="text-center"></td>
+                                                  <td colspan="8"><b><i>{{row.dt.DoiTuong}}</i></b></td>
+                                                }
+                                                @case ('ncc') {
+                                                  <td class="text-center">
+                                                    <mat-checkbox (change)="huybaotang(row.ncc, row.j, row.i)"
+                                                      [(ngModel)]="row.ncc.Checked" [ngModelOptions]="{standalone: true}"
+                                                      [disabled]="!row.ncc.IsTang && (!allowEdit || visibleTangGiam)">
+                                                    </mat-checkbox>
+                                                  </td>
+                                                  <td>{{row.ncc.HoTen}}</td>
+                                                  <td>{{row.ncc.SoHoSo}}</td>
+                                                  <td>{{row.ncc.DiaChi}}</td>
+                                                  <td>{{row.ncc.NguoiThoCungLietSy}}</td>
+                                                  <td>{{row.ncc.QuanHeVoiLietSy}}</td>
+                                                  <td class="text-right">{{row.ncc.SoTien}}</td>
+                                                  <td class="text-center">
+                                                    @if (row.ncc.IsGiam) {
+                                                      <mat-form-field style="width: 80px;">
+                                                        <mat-select [(ngModel)]="row.ncc.LyDo" [ngModelOptions]="{standalone: true}" placeholder="Lý do"
+                                                          [disabled]="row.ncc.DisabledGiam" (selectionChange)="updateLyDo(row.ncc)">
+                                                          @for (opt of lydos; track opt) {
+                                                            <mat-option [value]="opt.id">{{opt.title}}</mat-option>
+                                                          }
+                                                        </mat-select>
+                                                      </mat-form-field>
+                                                    }
+                                                  </td>
+                                                  <td class="text-center">
+                                                    @if (row.ncc.IsGiam) {
+                                                      <mat-form-field style="width: 140px;">
+                                                        <input matInput [(ngModel)]="row.ncc.GhiChuGiam" [ngModelOptions]="{standalone: true}"
+                                                          placeholder="Ghi chú giảm" [disabled]="row.ncc.DisabledGiam" (change)="updateLyDo(row.ncc)" />
+                                                        </mat-form-field>
+                                                        }&nbsp;
+                                                        <mat-checkbox color="warn" [(ngModel)]="row.ncc.IsGiam" [ngModelOptions]="{standalone: true}"
+                                                          [disabled]="row.ncc.DisabledGiam" (change)="baoGiam($event, row.ncc)" matTooltip="Báo giảm">
+                                                        </mat-checkbox>
+                                                      </td>
+                                                    }
+                                                  }
+                                                </tr>
+                                              </tbody>
+                                            </table>
+                                          </cdk-virtual-scroll-viewport>
+                                          <!-- footer tổng số -->
+                                          <table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-top:0;">
+                                            <colgroup>
+                                            <col style="width:45px">
+                                            <col>
+                                              <col style="width:90px">
+                                              <col>
+                                                <col>
+                                                  <col>
+                                                    <col style="width:80px">
+                                                    <col style="width:100px">
+                                                    <col style="width:190px">
+                                                  </colgroup>
+                                                  <tr style="color: red;">
+                                                    <td colspan="5"><b>Tổng số</b></td>
+                                                    <td>Số lượng: <b>{{TongSo}}</b></td>
+                                                    <td class="text-right"><b>{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                  </tr>
+                                                </table>
+                                              </div>
+                                            </div>
+                                            <div class="form-group kt-form__group row">
+                                              <div class="col-md-12">
+                                                <mat-label><h6>{{ 'DE_XUAT.danhsachtang' | translate }}</h6></mat-label>
+                                                <!-- header cố định -->
+                                                <table class="table-bordered table-sm" style="width:calc(100% - 17px); table-layout:fixed; margin-bottom:0;">
+                                                  <colgroup>
+                                                  <col>
+                                                    <col style="width:90px">
+                                                    <col>
+                                                      <col>
+                                                        <col>
+                                                          <col style="width:80px">
+                                                          <col style="width:150px">
+                                                          <col style="width:50px">
+                                                        </colgroup>
+                                                        <thead>
+                                                          <tr>
+                                                            <th class="text-center">Họ tên</th>
+                                                            <th class="text-center">Số hồ sơ</th>
+                                                            <th class="text-center">Cư trú</th>
+                                                            <th class="text-center">Họ tên liệt sỹ</th>
+                                                            <th class="text-center">Quan hệ với liệt sỹ</th>
+                                                            <th class="text-center">Số tiền</th>
+                                                            <th class="text-center">Ghi chú</th>
+                                                            <th class="text-center">Chọn</th>
+                                                          </tr>
+                                                        </thead>
+                                                      </table>
+                                                      <!-- virtual scroll body -->
+                                                      <cdk-virtual-scroll-viewport itemSize="35" [style.height]="viewportH(flatRowsTang, 50)" style="overflow-y:scroll; border:1px solid #dee2e6; border-top:none;">
+                                                        <table class="table-bordered table-sm" style="width:100%; table-layout:fixed;">
+                                                          <colgroup>
+                                                          <col>
+                                                            <col style="width:90px">
+                                                            <col>
+                                                              <col>
+                                                                <col>
+                                                                  <col style="width:80px">
+                                                                  <col style="width:150px">
+                                                                  <col style="width:50px">
+                                                                </colgroup>
+                                                                <tbody>
+                                                                  <tr *cdkVirtualFor="let row of flatRowsTang; trackBy: trackByFlatRow"
+                                                                    [ngClass]="{'row_nguon': row.type==='nguon', 'row_muc': row.type==='muc'}">
+                                                                  @switch (row.type) {
+                                                                    @case ('nguon') {
+                                                                      <td colspan="8">Nguồn kinh phí: <b>{{row.ng.NguonKinhPhi}}</b></td>
+                                                                    }
+                                                                    @case ('muc') {
+                                                                      <td colspan="8"><b>Mức {{row.muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
+                                                                    }
+                                                                    @case ('dt') {
+                                                                      <td class="text-center"></td>
+                                                                      <td colspan="7"><b><i>{{row.dt.DoiTuong}}</i></b></td>
+                                                                    }
+                                                                    @case ('ncc') {
+                                                                      <td>{{row.ncc.HoTen}}</td>
+                                                                      <td>{{row.ncc.SoHoSo}}</td>
+                                                                      <td>{{row.ncc.DiaChi}}</td>
+                                                                      <td>{{row.ncc.NguoiThoCungLietSy}}</td>
+                                                                      <td>{{row.ncc.QuanHeVoiLietSy}}</td>
+                                                                      <td class="text-right">{{row.ncc.SoTien}}</td>
+                                                                      <td class="text-center">
+                                                                        <input [(ngModel)]="row.ncc.GhiChuTang" [ngModelOptions]="{standalone: true}"
+                                                                          placeholder="Ghi chú tăng" style="width:100%;" />
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                          <mat-checkbox [(ngModel)]="row.ncc.IsTang" [ngModelOptions]="{standalone: true}"
+                                                                          (change)="baoTang($event, row.ncc)"></mat-checkbox>
+                                                                        </td>
+                                                                      }
+                                                                    }
+                                                                  </tr>
+                                                                </tbody>
+                                                              </table>
+                                                            </cdk-virtual-scroll-viewport>
+                                                          </div>
+                                                        </div>
+                                                      }
 
-		</div>
-	</form>
-</div>
+                                                    </div>
+                                                  </form>
+                                                </div>

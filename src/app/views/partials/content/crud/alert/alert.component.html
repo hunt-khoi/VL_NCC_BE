@@ -1,13 +1,15 @@
 <div class="kt-mat-alert  kt-mat-alert--{{type}}" id="alertForm" role="alert">
-	<div class="kt-mat-alert__icon">
-		<i class="la la-warning"></i>
-	</div>
-	<div class="kt-mat-alert__text">
-		<ng-content></ng-content>
-	</div>
-	<div class="kt-mat-alert__close" *ngIf="showCloseButton">
-		<button mat-icon-button (click)="closeAlert()" color="warn" type="button">
-			<mat-icon class="material-icons">clear</mat-icon>
-		</button>
-	</div>
+  <div class="kt-mat-alert__icon">
+    <i class="la la-warning"></i>
+  </div>
+  <div class="kt-mat-alert__text">
+    <ng-content></ng-content>
+  </div>
+  @if (showCloseButton) {
+    <div class="kt-mat-alert__close">
+      <button mat-icon-button (click)="closeAlert()" color="warn" type="button">
+        <mat-icon class="material-icons">clear</mat-icon>
+      </button>
+    </div>
+  }
 </div>

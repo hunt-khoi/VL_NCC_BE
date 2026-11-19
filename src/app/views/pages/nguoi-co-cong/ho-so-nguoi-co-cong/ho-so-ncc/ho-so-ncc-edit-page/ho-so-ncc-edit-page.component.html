@@ -1,67 +1,81 @@
 <kt-portlet [options]="{headLarge: true}">
-	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
-		<ng-container ktPortletTitle>
-			<div class="kt-form__filtration">
-				<h3 class="kt-portlet__head-title">
-					<span>Tiếp nhận hồ sơ</span>
-				</h3>
-			</div>
-		</ng-container>
-		<ng-container ktPortletTools>
-			<button mat-raised-button (click)="onSubmit(true)" [disabled]="disabledBtn"
-				matTooltip="{{'COMMON.LUU_DONG' | translate}}" color="accent" type="button">
-				<span translate="COMMON.LUU_DONG"></span>
-			</button>
-			<button mat-raised-button (click)="back()" matTooltip="{{ 'COMMON.THOAT' | translate }}">
-				<span translate="COMMON.THOAT"></span>
-			</button>
-		</ng-container>
-	</kt-portlet-header>
-	<div class="kt-portlet__body">
-		<div class="row">
-			<div class="col-md-3">
-				<ng-container *ngIf="lstLoai$ | async as lstLoai">
-					<mat-accordion class="cus-expansion" cdkDropList [cdkDropListData]="lstLoai"
-						(cdkDropListDropped)="drop($event)">
-						<mat-expansion-panel disabled style="height: 61px;">
-							<mat-expansion-panel-header>
-								<mat-panel-title *ngIf="isExpand">
-									<span style="font-weight:bold; color: #0008ff;">Chọn loại hồ sơ</span>
-								</mat-panel-title>
-								<div class="timkiem">
-									<mat-form-field class="mat-form-field-fluid" style="width: 350px" *ngIf="!isExpand">
-										<input matInput [(ngModel)]="tenloai" placeholder="Đối tượng"
-											(change)="filterBanks()" (keydown)="handleInput($event)" />
-									</mat-form-field>
-								</div>
-							</mat-expansion-panel-header>
-						</mat-expansion-panel>
-						<div style="max-height: 80vh; overflow: auto;">
-							<mat-expansion-panel *ngFor="let dt of lstLoai; let i=index" [ngClass]="{'active': _item.Id_DoiTuongNCC===dt.id}" 
-							(opened)="clearAllBut(dt.id)" (closed)="reloadListLoai()" #panel hideToggle cdkDrag>
-								<mat-expansion-panel-header>
-									<mat-panel-title>
-										<mat-icon *ngIf="panel.expanded" style="padding-right: 3.2px;">keyboard_arrow_left</mat-icon>
-										{{dt.title}}
-									</mat-panel-title>
-									<mat-panel-description>
-										<mat-icon *ngIf="!panel.expanded">keyboard_arrow_right</mat-icon>
-									</mat-panel-description>
-								</mat-expansion-panel-header>
-								<div *ngFor="let l of dt.data;" (click)="changeTab(l.id, dt.id)" class="cls-loai"
-									[ngClass]="{'active': _item.Id_LoaiHoSo===l.id && _item.Id_DoiTuongNCC===dt.id}">
-									<span class="dot">&#9632;</span>{{l.title}}
-								</div>
-							</mat-expansion-panel>
-						</div>
-					</mat-accordion>
-				</ng-container>
-			</div>
-			<div class="col-md-9" style="background-color:white; border-radius: 3px; min-height: 80vh;">
-				<lib-dynamic-component [childComponentType]="childComponentType" [data]="childComponentData"
-					(getInstance)="getInstance($event)" *ngIf="childComponentType">
-				</lib-dynamic-component>
-			</div>
-		</div>
-	</div>
-</kt-portlet>
+  <kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+    <ng-container ktPortletTitle>
+      <div class="kt-form__filtration">
+        <h3 class="kt-portlet__head-title">
+          <span>Tiếp nhận hồ sơ</span>
+        </h3>
+      </div>
+    </ng-container>
+    <ng-container ktPortletTools>
+      <button mat-raised-button (click)="onSubmit(true)" [disabled]="disabledBtn"
+        matTooltip="{{'COMMON.LUU_DONG' | translate}}" color="accent" type="button">
+        <span translate="COMMON.LUU_DONG"></span>
+      </button>
+      <button mat-raised-button (click)="back()" matTooltip="{{ 'COMMON.THOAT' | translate }}">
+        <span translate="COMMON.THOAT"></span>
+      </button>
+    </ng-container>
+  </kt-portlet-header>
+  <div class="kt-portlet__body">
+    <div class="row">
+      <div class="col-md-3">
+        @if (lstLoai$ | async; as lstLoai) {
+          <mat-accordion class="cus-expansion" cdkDropList [cdkDropListData]="lstLoai"
+            (cdkDropListDropped)="drop($event)">
+            <mat-expansion-panel disabled style="height: 61px;">
+              <mat-expansion-panel-header>
+                @if (isExpand) {
+                  <mat-panel-title>
+                    <span style="font-weight:bold; color: #0008ff;">Chọn loại hồ sơ</span>
+                  </mat-panel-title>
+                }
+                <div class="timkiem">
+                  @if (!isExpand) {
+                    <mat-form-field class="mat-form-field-fluid" style="width: 350px">
+                      <input matInput [(ngModel)]="tenloai" placeholder="Đối tượng"
+                        (change)="filterBanks()" (keydown)="handleInput($event)" />
+                      </mat-form-field>
+                    }
+                  </div>
+                </mat-expansion-panel-header>
+              </mat-expansion-panel>
+              <div style="max-height: 80vh; overflow: auto;">
+                @for (dt of lstLoai; track dt; let i = $index) {
+                  <mat-expansion-panel [ngClass]="{'active': _item.Id_DoiTuongNCC===dt.id}"
+                    (opened)="clearAllBut(dt.id)" (closed)="reloadListLoai()" #panel hideToggle cdkDrag>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        @if (panel.expanded) {
+                          <mat-icon style="padding-right: 3.2px;">keyboard_arrow_left</mat-icon>
+                        }
+                        {{dt.title}}
+                      </mat-panel-title>
+                      <mat-panel-description>
+                        @if (!panel.expanded) {
+                          <mat-icon>keyboard_arrow_right</mat-icon>
+                        }
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+                    @for (l of dt.data; track l) {
+                      <div (click)="changeTab(l.id, dt.id)" class="cls-loai"
+                        [ngClass]="{'active': _item.Id_LoaiHoSo===l.id && _item.Id_DoiTuongNCC===dt.id}">
+                        <span class="dot">&#9632;</span>{{l.title}}
+                      </div>
+                    }
+                  </mat-expansion-panel>
+                }
+              </div>
+            </mat-accordion>
+          }
+        </div>
+        <div class="col-md-9" style="background-color:white; border-radius: 3px; min-height: 80vh;">
+          @if (childComponentType) {
+            <lib-dynamic-component [childComponentType]="childComponentType" [data]="childComponentData"
+              (getInstance)="getInstance($event)">
+            </lib-dynamic-component>
+          }
+        </div>
+      </div>
+    </div>
+  </kt-portlet>

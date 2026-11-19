@@ -1,19 +1,25 @@
 <mat-chip-listbox>
-	<ng-container *ngFor="let chip of gridService.model.lstChip">
-		<mat-chip-option removable="true" *ngIf="chip.type===2" (removed)="gridService.removeText(chip.key)">
-			{{chip.title}}: {{chip.data}}
-			<mat-icon matChipRemove>cancel</mat-icon>
-		</mat-chip-option>
-		<ng-container *ngIf="chip.type===1">
-			<mat-chip-option *ngFor="let item of chip.data" removable="true"
-				(removed)="gridService.remove(item,chip.key); gridService.showClearAllButton()">
-				{{chip.title}}: {{item.name}}
-				<mat-icon matChipRemove>cancel</mat-icon>
-			</mat-chip-option>
-		</ng-container>
-	</ng-container>
-	<mat-chip-option class="flt-clear" color="primary" removable="true" *ngIf="gridService.model.isClearAll"
-		(click)="gridService.Clear()">
-		Đặt lại
-	</mat-chip-option>
+  @for (chip of gridService.model.lstChip; track chip) {
+    @if (chip.type===2) {
+      <mat-chip-option removable="true" (removed)="gridService.removeText(chip.key)">
+        {{chip.title}}: {{chip.data}}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip-option>
+    }
+    @if (chip.type===1) {
+      @for (item of chip.data; track item) {
+        <mat-chip-option removable="true"
+          (removed)="gridService.remove(item,chip.key); gridService.showClearAllButton()">
+          {{chip.title}}: {{item.name}}
+          <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip-option>
+      }
+    }
+  }
+  @if (gridService.model.isClearAll) {
+    <mat-chip-option class="flt-clear" color="primary" removable="true"
+      (click)="gridService.Clear()">
+      Đặt lại
+    </mat-chip-option>
+  }
 </mat-chip-listbox>

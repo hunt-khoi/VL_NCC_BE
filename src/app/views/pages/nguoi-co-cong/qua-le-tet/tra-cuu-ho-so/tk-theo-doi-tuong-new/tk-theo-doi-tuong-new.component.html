@@ -1,158 +1,180 @@
 <style>
-	.dt-overflow {
-		overflow: hidden;
-		line-height: 2rem;
-		max-height: 6rem;
-		-webkit-box-orient: vertical;
-		display: block;
-		display: -webkit-box;
-		overflow: hidden !important;
-		text-overflow: ellipsis;
-		-webkit-line-clamp: 2;
-		line-clamp: 2;
-	}
+  .dt-overflow {
+  overflow: hidden;
+  line-height: 2rem;
+  max-height: 6rem;
+  -webkit-box-orient: vertical;
+  display: block;
+  display: -webkit-box;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
 
-	.min-th {
-		min-width: 160px;
-	}
+.min-th {
+min-width: 160px;
+}
 
-	.min-width-200px {
-		min-width: 200px;
-	}
+.min-width-200px {
+min-width: 200px;
+}
 
-	.table-scroll-container {
-		overflow: auto;
-		max-height: 420px;
-	}
+.table-scroll-container {
+overflow: auto;
+max-height: 420px;
+}
 
-	.table-scroll-container table thead {
-		position: sticky;
-		top: 0;
-		z-index: 3;
-		background: #fff;
-	}
+.table-scroll-container table thead {
+position: sticky;
+top: 0;
+z-index: 3;
+background: #fff;
+}
 
-	.table-scroll-container table tfoot {
-		position: sticky;
-		bottom: 0;
-		z-index: 3;
-		background: #fff;
-	}
+.table-scroll-container table tfoot {
+position: sticky;
+bottom: 0;
+z-index: 3;
+background: #fff;
+}
 
-	.col-sticky-1 {
-		position: sticky;
-		left: 0;
-		z-index: 2;
-		background: #fff;
-	}
+.col-sticky-1 {
+position: sticky;
+left: 0;
+z-index: 2;
+background: #fff;
+}
 
-	.col-sticky-2 {
-		position: sticky;
-		left: 30px;
-		z-index: 2;
-		background: #fff;
-	}
+.col-sticky-2 {
+position: sticky;
+left: 30px;
+z-index: 2;
+background: #fff;
+}
 
-	.table-scroll-container table thead .col-sticky-1,
-	.table-scroll-container table thead .col-sticky-2,
-	.table-scroll-container table tfoot .col-sticky-1,
-	.table-scroll-container table tfoot .col-sticky-2 {
-		z-index: 4;
-	}
+.table-scroll-container table thead .col-sticky-1,
+.table-scroll-container table thead .col-sticky-2,
+.table-scroll-container table tfoot .col-sticky-1,
+.table-scroll-container table tfoot .col-sticky-2 {
+z-index: 4;
+}
 
-	@media print {
-		.table-scroll-container {
-			max-height: none !important;
-			overflow: visible !important;
-		}
+@media print {
+.table-scroll-container {
+max-height: none !important;
+overflow: visible !important;
+}
 
-		.table-scroll-container table thead,
-		.table-scroll-container table tfoot {
-			position: static !important;
-		}
+.table-scroll-container table thead,
+.table-scroll-container table tfoot {
+position: static !important;
+}
 
-		.col-sticky-1,
-		.col-sticky-2 {
-			position: static !important;
-		}
-	}
+.col-sticky-1,
+.col-sticky-2 {
+position: static !important;
+}
+}
 </style>
 <kt-portlet-header [sticky]="true" [title]="_name" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
-	<ng-container ktPortletTools>
-		<button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">
-			{{ 'COMMON.XEMTK' | translate }}
-		</button>
-		<button class="show-view-sm" *ngIf="allowExport" mat-raised-button [matMenuTriggerFor]="chucnang"
-			color="primary">
-			{{ 'COMMON.CHUCNANG' | translate }}
-		</button>
-		<mat-menu #chucnang="matMenu">
-			<button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">{{ 'COMMON.XEMTK' | translate }}</button>
-			<button (click)="export()" mat-menu-item color="info" matTooltip="Xuất thống kê" *ngIf="allowExport">Export</button>
-			<button mat-menu-item color="primary" matTooltip="In thống kê" printTitle={{this._name}}
-				[printStyle]="style_print" printSectionId="print-section" ngxPrint>
-				{{ 'COMMON.PRINT' | translate }}
-			</button>
-		</mat-menu>
-		<!-- view nhỏ hơn 768 bị ẩn -->
-		<div class="hide-view-sm" style="display: contents;">
-			<button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">{{ 'COMMON.XEMTK' | translate }}</button>
-			<button (click)="export()" mat-raised-button color="info" matTooltip="Xuất thống kê" *ngIf="allowExport">Export</button>
-			<button mat-raised-button color="primary" matTooltip="In thống kê" *ngIf="allowExport"
-				printTitle={{this._name}} [printStyle]="style_print" printSectionId="print-section" ngxPrint>
-				{{ 'COMMON.PRINT' | translate }}
-			</button>
-		</div>
-	</ng-container>
+  <ng-container ktPortletTools>
+    <button class="show-view-sm" (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">
+      {{ 'COMMON.XEMTK' | translate }}
+    </button>
+    @if (allowExport) {
+      <button class="show-view-sm" mat-raised-button [matMenuTriggerFor]="chucnang"
+        color="primary">
+        {{ 'COMMON.CHUCNANG' | translate }}
+      </button>
+    }
+    <mat-menu #chucnang="matMenu">
+      <button (click)="loadData()" mat-menu-item color="primary" matTooltip="Xem thống kê">{{ 'COMMON.XEMTK' | translate }}</button>
+      @if (allowExport) {
+        <button (click)="export()" mat-menu-item color="info" matTooltip="Xuất thống kê">Export</button>
+      }
+      <button mat-menu-item color="primary" matTooltip="In thống kê" printTitle={{this._name}}
+        [printStyle]="style_print" printSectionId="print-section" ngxPrint>
+        {{ 'COMMON.PRINT' | translate }}
+      </button>
+    </mat-menu>
+    <!-- view nhỏ hơn 768 bị ẩn -->
+    <div class="hide-view-sm" style="display: contents;">
+      <button (click)="loadData()" mat-raised-button color="primary" matTooltip="Xem thống kê">{{ 'COMMON.XEMTK' | translate }}</button>
+      @if (allowExport) {
+        <button (click)="export()" mat-raised-button color="info" matTooltip="Xuất thống kê">Export</button>
+      }
+      @if (allowExport) {
+        <button mat-raised-button color="primary" matTooltip="In thống kê"
+          printTitle={{this._name}} [printStyle]="style_print" printSectionId="print-section" ngxPrint>
+          {{ 'COMMON.PRINT' | translate }}
+        </button>
+      }
+    </div>
+  </ng-container>
 </kt-portlet-header>
 
 <kt-portlet-body style="padding-top: 5px;">
-	<div class="form-group kt-form__group row">
-		<div class="col-md-3 kt-margin-bottom-10-mobile">
-			<mat-form-field class="mat-form-field-fluid">
-				<mat-select [(ngModel)]="IdDotTangQua" placeholder="Đợt tặng quà" (selectionChange)="display=false">
-					<mat-option [value]="0" disabled>--Chọn đợt tặng quà--</mat-option>
-					<mat-option [value]="opt.id" *ngFor="let opt of lstDot">{{opt.title}}</mat-option>
-				</mat-select>
-			</mat-form-field>
-		</div>
-		<div class="col-md-3 kt-margin-bottom-10-mobile" style="padding-top: 12px;" *ngIf="display && Capcocau === 1">
-			<mat-checkbox [(ngModel)]="hideEmptyRows" (change)="onToggleHideEmpty()">
-				Ẩn dòng không có dữ liệu
-			</mat-checkbox>
-		</div>
-	</div>
+  <div class="form-group kt-form__group row">
+    <div class="col-md-3 kt-margin-bottom-10-mobile">
+      <mat-form-field class="mat-form-field-fluid">
+        <mat-select [(ngModel)]="IdDotTangQua" placeholder="Đợt tặng quà" (selectionChange)="display=false">
+          <mat-option [value]="0" disabled>--Chọn đợt tặng quà--</mat-option>
+          @for (opt of lstDot; track opt) {
+            <mat-option [value]="opt.id">{{opt.title}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    @if (display && Capcocau === 1) {
+      <div class="col-md-3 kt-margin-bottom-10-mobile" style="padding-top: 12px;">
+        <mat-checkbox [(ngModel)]="hideEmptyRows" (change)="onToggleHideEmpty()">
+          Ẩn dòng không có dữ liệu
+        </mat-checkbox>
+      </div>
+    }
+  </div>
 
-	<div id="print-section" *ngIf="display">
-		<div class="row">
-			<div class="col-lg-12 kt-margin-bottom-10-mobile">
-				<div class="table-scroll-container">
-					<table class="table-bordered table-sm" style="width: 100%;">
-						<thead>
-							<tr>
-								<th class="col-sticky-1 text-center" style="width: 30px;">STT</th>
-								<th class="col-sticky-2 text-center" style="min-width: 200px;">Phường xã</th>
-								<th class="text-center min-th" *ngFor="let dt of dataThongKe.DoiTuongs">
-									<span class="dt-overflow" matTooltip="{{dt.b}}">{{dt.b}}</span>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr *ngFor="let item of dataFiltered; let i=index">
-								<td class="col-sticky-1 text-center">{{i+1}}</td>
-								<td class="col-sticky-2">{{item.TenXa}}</td>
-								<td style="text-align: right;" *ngFor="let dt of dataThongKe.DoiTuongs">
-									{{getValue(item,dt.a)}}</td>
-							</tr>
-							<tr *ngIf="dataThongKe.data.length === 0">
-								<td [attr.colspan]="dataThongKe.DoiTuongs.length+2" class="text-center">
-									<b>Không có dữ liệu</b>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+  @if (display) {
+    <div id="print-section">
+      <div class="row">
+        <div class="col-lg-12 kt-margin-bottom-10-mobile">
+          <div class="table-scroll-container">
+            <table class="table-bordered table-sm" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th class="col-sticky-1 text-center" style="width: 30px;">STT</th>
+                  <th class="col-sticky-2 text-center" style="min-width: 200px;">Phường xã</th>
+                  @for (dt of dataThongKe.DoiTuongs; track dt) {
+                    <th class="text-center min-th">
+                      <span class="dt-overflow" matTooltip="{{dt.b}}">{{dt.b}}</span>
+                    </th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of dataFiltered; track item; let i = $index) {
+                  <tr>
+                    <td class="col-sticky-1 text-center">{{i+1}}</td>
+                    <td class="col-sticky-2">{{item.TenXa}}</td>
+                    @for (dt of dataThongKe.DoiTuongs; track dt) {
+                      <td style="text-align: right;">
+                      {{getValue(item,dt.a)}}</td>
+                    }
+                  </tr>
+                }
+                @if (dataThongKe.data.length === 0) {
+                  <tr>
+                    <td [attr.colspan]="dataThongKe.DoiTuongs.length+2" class="text-center">
+                      <b>Không có dữ liệu</b>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </kt-portlet-body>

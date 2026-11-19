@@ -1,2 +1,4 @@
-<kt-splash-screen *ngIf="loader"></kt-splash-screen>
+@if (loader) {
+  <kt-splash-screen></kt-splash-screen>
+}
 <router-outlet></router-outlet>

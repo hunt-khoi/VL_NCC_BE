@@ -1,202 +1,208 @@
 <style>
-    ::ng-deep .mat-sort-header-container {
-        display: flex;
-        justify-content: left;
-    }
+  ::ng-deep .mat-sort-header-container {
+  display: flex;
+  justify-content: left;
+}
 
-    /*#filter*/
-    .dl-table-flt .mat-mdc-header-cell {
-        position: relative;
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop {
-        position: absolute;
-        left: 0;
-        margin-top: -12px;
-        top: 50%;
-    }
-    
-    .dl-border-bottom {
-        margin-bottom: 5px;
-        border-bottom: 1px solid #aaa
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop .dropdown-menu.show .drop-area {
-        max-height: 190px;
-        overflow: auto;
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn {
-        padding: 0;
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn.flt-focus .fa-filter {
-        color: #5d5f61;
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn .fa-filter {
-        color: #c5c4c4;
-    }
-    
-    .flt-btn-action {
-        width: 100%;
-        display: inline-flex;
-    }
-    
-    .flt-btn-action .btn {
-        width: 50%;
-    }
-    
-    .exist-flt.mat-table__bottom {
-        align-items: baseline;
-        justify-content: flex-start;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-page {
-        display: flex;
-        margin-left: auto;
-        width: 40%;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-selected {
-        display: flex;
-        max-width: 60%;
-        margin-top: 10px;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-selected .mat-chip {
-        margin: 5px 0;
-        font-size: 11px;
-        padding: 0 5px 0 10px;
-        min-height: 24px;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-selected .mat-chip.flt-clear {
-        padding: 0 10px;
-        background-color: #1a75f3;
-        color: #fff;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-selected .mat-chip.flt-clear .mat-mdc-chip-remove.mat-icon {
-        margin: 0;
-        color: #fff;
-    }
-    /*end css filter*/
+/*#filter*/
+.dl-table-flt .mat-mdc-header-cell {
+position: relative;
+}
 
-    #spanOptions:hover {
-        opacity: 0.8;
-    }
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop {
+position: absolute;
+left: 0;
+margin-top: -12px;
+top: 50%;
+}
 
-    .m--padding-10 {
-        text-align: left;
-        padding-bottom: 4px;
-    }
+.dl-border-bottom {
+margin-bottom: 5px;
+border-bottom: 1px solid #aaa
+}
+
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop .dropdown-menu.show .drop-area {
+max-height: 190px;
+overflow: auto;
+}
+
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn {
+padding: 0;
+}
+
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn.flt-focus .fa-filter {
+color: #5d5f61;
+}
+
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn .fa-filter {
+color: #c5c4c4;
+}
+
+.flt-btn-action {
+width: 100%;
+display: inline-flex;
+}
+
+.flt-btn-action .btn {
+width: 50%;
+}
+
+.exist-flt.mat-table__bottom {
+align-items: baseline;
+justify-content: flex-start;
+}
+
+.exist-flt.mat-table__bottom .flt-page {
+display: flex;
+margin-left: auto;
+width: 40%;
+}
+
+.exist-flt.mat-table__bottom .flt-selected {
+display: flex;
+max-width: 60%;
+margin-top: 10px;
+}
+
+.exist-flt.mat-table__bottom .flt-selected .mat-chip {
+margin: 5px 0;
+font-size: 11px;
+padding: 0 5px 0 10px;
+min-height: 24px;
+}
+
+.exist-flt.mat-table__bottom .flt-selected .mat-chip.flt-clear {
+padding: 0 10px;
+background-color: #1a75f3;
+color: #fff;
+}
+
+.exist-flt.mat-table__bottom .flt-selected .mat-chip.flt-clear .mat-mdc-chip-remove.mat-icon {
+margin: 0;
+color: #fff;
+}
+/*end css filter*/
+
+#spanOptions:hover {
+opacity: 0.8;
+}
+
+.m--padding-10 {
+text-align: left;
+padding-bottom: 4px;
+}
 </style>
 
 <kt-portlet-header [sticky]="true" [title]="'Đơn vị cấp dưới'" [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSourceDV.loading$">
-    <ng-container ktPortletTools>
-        <kt-column-option [gridService]="gridService"></kt-column-option>
-    </ng-container>
+  <ng-container ktPortletTools>
+    <kt-column-option [gridService]="gridService"></kt-column-option>
+  </ng-container>
 </kt-portlet-header>
 
 <div class="kt-form">
-    <div class="row align-items-center collapse kt-form__group-actions kt-margin-top-20 kt-margin-bottom-20" 
-        [ngClass]="{'show' : selection.selected.length > 0}">
-        <div class="col-xl-12">
-            <div class="kt-form__group kt-form__group--inline">
-                <div class="kt-form__label kt-form__label-no-wrap">
-                    <label class="kt--font-bold kt-font-danger-">Số lượng đã chọn: {{ selection.selected.length }}</label>
-                </div>
-                <div class="kt-form__control kt-form__group--inline">
-                    <button mat-raised-button color="warn" (click)="deletes()" matTooltip="Xóa đơn vị được chọn" class="mat-button-mt-4" >
-                        Xóa đơn vị
-                    </button>&nbsp;
-                </div>
-            </div>
+  <div class="row align-items-center collapse kt-form__group-actions kt-margin-top-20 kt-margin-bottom-20"
+    [ngClass]="{'show' : selection.selected.length > 0}">
+    <div class="col-xl-12">
+      <div class="kt-form__group kt-form__group--inline">
+        <div class="kt-form__label kt-form__label-no-wrap">
+          <label class="kt--font-bold kt-font-danger-">Số lượng đã chọn: {{ selection.selected.length }}</label>
         </div>
+        <div class="kt-form__control kt-form__group--inline">
+          <button mat-raised-button color="warn" (click)="deletes()" matTooltip="Xóa đơn vị được chọn" class="mat-button-mt-4" >
+            Xóa đơn vị
+          </button>&nbsp;
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="mat-table__wrapper d-block" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}" >
-    <table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSourceDV" matSort 
-        #sort1="matSort" matSortActive="Priority" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
-        <ng-container matColumnDef="select">
-            <th mat-header-cell *matHeaderCellDef class="mat-column-checkbox" style="padding-right: 20px; width: 20px;">
-                <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" 
-                    [indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'">
-                </mat-checkbox>
-            </th>
-            <td mat-cell *matCellDef="let row" class="mat-column-checkbox" style="padding-right: 20px;">
-                <mat-checkbox (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" 
-                    (click)="$event.stopPropagation()" [color]="'primary'">
-                </mat-checkbox>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="STT">
-            <th mat-header-cell *matHeaderCellDef class="stt-cell">STT</th>
-            <td mat-cell style="padding-bottom: 4px" class="stt-cell" *matCellDef="let vi = index">{{vi + 1}}</td>
-        </ng-container>
-        <ng-container matColumnDef="DonVi">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="DonVi" column_title="{{ 'DONVI.TEN' | translate }}"></kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">
-                <a href="javascript:void(0)" (click)="view(item)" matTooltip="Xem chi tiết">{{item.DonVi}}</a>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="MaDonvi">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="MaDonvi" column_title="{{ 'DONVI.MA' | translate }}"></kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.MaDonvi}}</td>
-        </ng-container>
-        <ng-container matColumnDef="Locked">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Locked" column_title="Trạng thái"></kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">
-                <span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--{{ getItemCssClassByStatus(item.Locked) }} kt-badge--wide">
-                    {{ getItemStatusString(item.Locked) }}
-                </span>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="Priority">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header style="white-space: nowrap;">Thứ tự</th>
-            <td mat-cell class="m--padding-10 num-cell" style="text-align: left" *matCellDef="let item">
-                {{commonService.formatNumber(item.Priority)}}
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="CreatedDate">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header style="white-space: nowrap;">Ngày tạo</th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.CreatedDate}}</td>
-        </ng-container>
+  <table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSourceDV" matSort
+    #sort1="matSort" matSortActive="Priority" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
+    <ng-container matColumnDef="select">
+      <th mat-header-cell *matHeaderCellDef class="mat-column-checkbox" style="padding-right: 20px; width: 20px;">
+        <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()" [color]="'primary'">
+        </mat-checkbox>
+      </th>
+      <td mat-cell *matCellDef="let row" class="mat-column-checkbox" style="padding-right: 20px;">
+        <mat-checkbox (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
+          (click)="$event.stopPropagation()" [color]="'primary'">
+        </mat-checkbox>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="STT">
+      <th mat-header-cell *matHeaderCellDef class="stt-cell">STT</th>
+      <td mat-cell style="padding-bottom: 4px" class="stt-cell" *matCellDef="let vi = index">{{vi + 1}}</td>
+    </ng-container>
+    <ng-container matColumnDef="DonVi">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="DonVi" column_title="{{ 'DONVI.TEN' | translate }}"></kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">
+        <a href="javascript:void(0)" (click)="view(item)" matTooltip="Xem chi tiết">{{item.DonVi}}</a>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="MaDonvi">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="MaDonvi" column_title="{{ 'DONVI.MA' | translate }}"></kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.MaDonvi}}</td>
+    </ng-container>
+    <ng-container matColumnDef="Locked">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Locked" column_title="Trạng thái"></kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">
+        <span class="kt-badge kt-badge--inline kt-badge--pill kt-badge--{{ getItemCssClassByStatus(item.Locked) }} kt-badge--wide">
+          {{ getItemStatusString(item.Locked) }}
+        </span>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="Priority">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header style="white-space: nowrap;">Thứ tự</th>
+      <td mat-cell class="m--padding-10 num-cell" style="text-align: left" *matCellDef="let item">
+        {{commonService.formatNumber(item.Priority)}}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="CreatedDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header style="white-space: nowrap;">Ngày tạo</th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.CreatedDate}}</td>
+    </ng-container>
 
-        <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef style="width: 100px;">
-                <span translate="COMMON.TACVU"></span>
-            </th>
-            <td mat-cell *matCellDef="let item" style="white-space: nowrap; text-align: left; width: 100px;">
-                <!-- <button mat-icon-button (click)="getListUser(item)" 
-                    matTooltip="Danh sách người dùng" color="info" type="button">
-                    <mat-icon>supervisor_account</mat-icon>
-                </button> -->
-            </td>
-        </ng-container>
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef style="width: 100px;">
+        <span translate="COMMON.TACVU"></span>
+      </th>
+      <td mat-cell *matCellDef="let item" style="white-space: nowrap; text-align: left; width: 100px;">
+        <!-- <button mat-icon-button (click)="getListUser(item)"
+        matTooltip="Danh sách người dùng" color="info" type="button">
+        <mat-icon>supervisor_account</mat-icon>
+      </button> -->
+    </td>
+  </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
-    </table>
-    <div class="mat-table__message" *ngIf="!dataSourceDV.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
+  <tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
+</table>
+@if (!dataSourceDV.hasItems) {
+  <div class="mat-table__message">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
+}
 </div>
 
 <div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
-    <div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
-        <kt-chip-filter [gridService]="gridService"></kt-chip-filter>
+  @if (gridService.model.haveFilter) {
+    <div class="flt-selected" style="max-width:50%;">
+      <kt-chip-filter [gridService]="gridService"></kt-chip-filter>
     </div>
-    <div class="flt-page" style="width: 50%;">
-        <mat-spinner [diameter]="20" *ngIf="dataSourceDV.loading$ | async"></mat-spinner>
-        <mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize" 
-            [length]="dataSourceDV.paginatorTotal$ | async" [showFirstLastButtons]="true">
-        </mat-paginator>
-    </div>
+  }
+  <div class="flt-page" style="width: 50%;">
+    @if (dataSourceDV.loading$ | async) {
+      <mat-spinner [diameter]="20"></mat-spinner>
+    }
+    <mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize"
+      [length]="dataSourceDV.paginatorTotal$ | async" [showFirstLastButtons]="true">
+    </mat-paginator>
+  </div>
 </div>

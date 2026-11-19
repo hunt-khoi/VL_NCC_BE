@@ -7,15 +7,23 @@ import { Observable, Subscription } from 'rxjs';
     styleUrls: ['portlet-header.component.scss'],
     template: `
 		<div class="kt-portlet__head-label" [hidden]="noTitle">
-			<span class="kt-portlet__head-icon" #refIcon [hidden]="hideIcon">
-				<ng-content *ngIf="!icon" select="[ktPortletIcon]"></ng-content>
-				<i *ngIf="icon" [ngClass]="icon"></i>
-			</span>
-			<ng-content *ngIf="!title" select="[ktPortletTitle]"></ng-content>
-			<h3 *ngIf="title" class="kt-portlet__head-title" [innerHTML]="title"></h3>
+		  <span class="kt-portlet__head-icon" #refIcon [hidden]="hideIcon">
+		    @if (!icon) {
+		      <ng-content select="[ktPortletIcon]"></ng-content>
+		    }
+		    @if (icon) {
+		      <i [ngClass]="icon"></i>
+		    }
+		  </span>
+		  @if (!title) {
+		    <ng-content select="[ktPortletTitle]"></ng-content>
+		  }
+		  @if (title) {
+		    <h3 class="kt-portlet__head-title" [innerHTML]="title"></h3>
+		  }
 		</div>
 		<div class="kt-portlet__head-toolbar" #refTools [hidden]="hideTools">
-			<ng-content select="[ktPortletTools]"></ng-content>
+		  <ng-content select="[ktPortletTools]"></ng-content>
 		</div>`,
     standalone: false
 })

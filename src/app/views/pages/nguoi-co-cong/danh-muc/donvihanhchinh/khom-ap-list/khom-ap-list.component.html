@@ -1,124 +1,140 @@
 <kt-portlet-header [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
-	<ng-container ktPortletTitle>
-		<div class="kt-form__filtration">
-			<h3 class="kt-portlet__head-title">
-				<span translate="OBJECT.LIST" [translateParams]="{name:this._name.toLowerCase()}"></span>
-			</h3>
-		</div>
-	</ng-container>
-	<ng-container ktPortletTools>
-		<button mat-raised-button (click)="Add()" *ngIf="apiService.ReadOnlyControl" 
-			matTooltip="{{ 'COMMON.CREATE' | translate }}"color="accent" type="button">
-			<span translate="COMMON.CREATE"></span>
-		</button>
-		<kt-column-option [gridService]="gridService"></kt-column-option>
-	</ng-container>
+  <ng-container ktPortletTitle>
+    <div class="kt-form__filtration">
+      <h3 class="kt-portlet__head-title">
+        <span translate="OBJECT.LIST" [translateParams]="{name:this._name.toLowerCase()}"></span>
+      </h3>
+    </div>
+  </ng-container>
+  <ng-container ktPortletTools>
+    @if (apiService.ReadOnlyControl) {
+      <button mat-raised-button (click)="Add()"
+        matTooltip="{{ 'COMMON.CREATE' | translate }}"color="accent" type="button">
+        <span translate="COMMON.CREATE"></span>
+      </button>
+    }
+    <kt-column-option [gridService]="gridService"></kt-column-option>
+  </ng-container>
 </kt-portlet-header>
 
 <div class="kt-portlet__body">
-	<div class="kt-form">
-		<div class="kt-form__filtration">
-			<div class="row align-items-center">
-				<div class="col-md-3 kt--margin-bottom-10-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select class="mat-form-field mat-form-field-fluid" [(value)]="filterprovinces" 
-							placeholder="{{'PROVINCE.NAME' | translate}}" disabled="true">
-							<mat-option [value]="val.id_row" *ngFor="let val of listprovinces;">
-								{{val.Province}}
-							</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
-				<div class="col-md-3 kt--margin-bottom-10-mobile">
-					<mat-form-field class="mat-form-field-fluid ">
-						<mat-select class="mat-form-field mat-form-field-fluid" [(value)]="filterward" 
-							placeholder="{{'WARD.NAME' | translate}}" (selectionChange)="loadDataList()">
-							<mat-option>
-								<ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'"
-									[noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrlWard"
-									[ngModelOptions]="{standalone: true}" (ngModelChange)="filterWard()">
-								</ngx-mat-select-search>
-							</mat-option>
-							<mat-option value="">Tất cả</mat-option>
-							<mat-option value="{{val.ID_Row}}" *ngFor="let val of filteredListWard | async">
-								{{val.Ward}}
-							</mat-option>
-						</mat-select>
-					</mat-form-field>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="kt-form">
+    <div class="kt-form__filtration">
+      <div class="row align-items-center">
+        <div class="col-md-3 kt--margin-bottom-10-mobile">
+          <mat-form-field class="mat-form-field-fluid ">
+            <mat-select class="mat-form-field mat-form-field-fluid" [(value)]="filterprovinces"
+              placeholder="{{'PROVINCE.NAME' | translate}}" disabled="true">
+              @for (val of listprovinces; track val) {
+                <mat-option [value]="val.id_row">
+                  {{val.Province}}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-3 kt--margin-bottom-10-mobile">
+          <mat-form-field class="mat-form-field-fluid ">
+            <mat-select class="mat-form-field mat-form-field-fluid" [(value)]="filterward"
+              placeholder="{{'WARD.NAME' | translate}}" (selectionChange)="loadDataList()">
+              <mat-option>
+                <ngx-mat-select-search [placeholderLabel]="'Tìm kiếm...'"
+                  [noEntriesFoundLabel]="'Không tìm thấy kết quả phù hợp'" [(ngModel)]="FilterCtrlWard"
+                  [ngModelOptions]="{standalone: true}" (ngModelChange)="filterWard()">
+                </ngx-mat-select-search>
+              </mat-option>
+              <mat-option value="">Tất cả</mat-option>
+              @for (val of filteredListWard | async; track val) {
+                <mat-option value="{{val.ID_Row}}">
+                  {{val.Ward}}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
 
-	<div class="mat-table__wrapper">
-		<table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" style="width: 100%" matSort matSortActive="Title" 
-			matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
-			<ng-container matColumnDef="RowID">
-				<th mat-header-cell *matHeaderCellDef style="justify-content: center" class="stt-cell">ID</th>
-				<td mat-cell *matCellDef="let item" style="justify-content: center">{{item.RowID}}</td>
-			</ng-container>
-			<ng-container matColumnDef="Title">
-				<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode" style="flex: 0 0 40%">
-					<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Title" [column_title]="_name"> </kt-column-filter>
-				</th>
-				<td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.Title}}</td>
-			</ng-container>
-			<ng-container matColumnDef="WardName">
-				<th mat-header-cell *matHeaderCellDef class="mat-column-vinCode" style="flex: 0 0 40%">
-					<kt-column-filter [gridService]="gridService" enable_sort="true" column_name="WardName" column_title="Phường xã"> </kt-column-filter>
-				</th>
-				<td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.WardName}}</td>
-			</ng-container>
-			<ng-container matColumnDef="NguoiCapNhat">
-				<th mat-header-cell *matHeaderCellDef style="justify-content: center">
-					<span translate="COMMON.UPDATED_BY"></span>
-				</th>
-				<td mat-cell *matCellDef="let item" style="justify-content: center">{{item.NguoiCapNhat}}</td>
-			</ng-container>
-			<ng-container matColumnDef="NgayCapNhat">
-				<th mat-header-cell *matHeaderCellDef style="justify-content: center">
-					<span translate="COMMON.UPDATED_DATE"></span>
-				</th>
-				<td mat-cell *matCellDef="let item" style="justify-content: center">
-					{{item.LastModified | date: 'dd/MM/yyyy HH:mm' }}
-				</td>
-			</ng-container>
+  <div class="mat-table__wrapper">
+    <table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" style="width: 100%" matSort matSortActive="Title"
+      matSortDirection="asc" matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}">
+      <ng-container matColumnDef="RowID">
+        <th mat-header-cell *matHeaderCellDef style="justify-content: center" class="stt-cell">ID</th>
+        <td mat-cell *matCellDef="let item" style="justify-content: center">{{item.RowID}}</td>
+      </ng-container>
+      <ng-container matColumnDef="Title">
+        <th mat-header-cell *matHeaderCellDef class="mat-column-vinCode" style="flex: 0 0 40%">
+          <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Title" [column_title]="_name"> </kt-column-filter>
+        </th>
+        <td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.Title}}</td>
+      </ng-container>
+      <ng-container matColumnDef="WardName">
+        <th mat-header-cell *matHeaderCellDef class="mat-column-vinCode" style="flex: 0 0 40%">
+          <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="WardName" column_title="Phường xã"> </kt-column-filter>
+        </th>
+        <td mat-cell *matCellDef="let item" class="mat-column-vinCode">{{item.WardName}}</td>
+      </ng-container>
+      <ng-container matColumnDef="NguoiCapNhat">
+        <th mat-header-cell *matHeaderCellDef style="justify-content: center">
+          <span translate="COMMON.UPDATED_BY"></span>
+        </th>
+        <td mat-cell *matCellDef="let item" style="justify-content: center">{{item.NguoiCapNhat}}</td>
+      </ng-container>
+      <ng-container matColumnDef="NgayCapNhat">
+        <th mat-header-cell *matHeaderCellDef style="justify-content: center">
+          <span translate="COMMON.UPDATED_DATE"></span>
+        </th>
+        <td mat-cell *matCellDef="let item" style="justify-content: center">
+          {{item.LastModified | date: 'dd/MM/yyyy HH:mm' }}
+        </td>
+      </ng-container>
 
-			<ng-container matColumnDef="actions">
-				<th mat-header-cell *matHeaderCellDef style="justify-content: center; width: 125px" class="text-center">
-					<span translate="COMMON.TACVU"></span>
-				</th>
-				<td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button ? 'list-button' : ''">
-					<button mat-button (click)="Update(item)" [ngClass]="btnClass" *ngIf="apiService.ReadOnlyControl"
-						matTooltip="{{ 'COMMON.UPDATE' | translate }}" color="primary" type="button">
-						<mat-icon>create</mat-icon>
-						<span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
-					</button>
-					<button mat-button (click)="Delete(item)" [ngClass]="btnClass" *ngIf="apiService.ReadOnlyControl"
-						matTooltip="{{ 'COMMON.DELETE' | translate }}" color="warn" type="button">
-						<mat-icon>delete</mat-icon>
-						<span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
-					</button>&nbsp;
-				</td>
-			</ng-container>
-			
-			<tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
-			<tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted" 
-				[ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
-			</tr>
-		</table>
-		<div class="mat-table__message" *ngIf="!dataSource.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
-	</div>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef style="justify-content: center; width: 125px" class="text-center">
+          <span translate="COMMON.TACVU"></span>
+        </th>
+        <td mat-cell *matCellDef="let item" class="action-cell" [ngClass]="list_button ? 'list-button' : ''">
+          @if (apiService.ReadOnlyControl) {
+            <button mat-button (click)="Update(item)" [ngClass]="btnClass"
+              matTooltip="{{ 'COMMON.UPDATE' | translate }}" color="primary" type="button">
+              <mat-icon>create</mat-icon>
+              <span class="button-text">{{ 'COMMON.UPDATE' | translate }}</span>
+            </button>
+          }
+          @if (apiService.ReadOnlyControl) {
+            <button mat-button (click)="Delete(item)" [ngClass]="btnClass"
+              matTooltip="{{ 'COMMON.DELETE' | translate }}" color="warn" type="button">
+              <mat-icon>delete</mat-icon>
+              <span class="button-text">{{ 'COMMON.DELETE' | translate }}</span>
+            </button>
+            }&nbsp;
+          </td>
+        </ng-container>
 
-	<div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
-		<div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width:50%;">
-			<kt-chip-filter [gridService]="gridService"></kt-chip-filter>
-		</div>
-		<div class="flt-page" style="width: 50%;">
-			<mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-			<mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]" 
-				[length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
-			</mat-paginator>
-		</div>
-	</div>
-</div>
+        <tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted"
+          [ngClass]="{hovered: row.hovered, highlighted: row.highlighted}" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
+        </tr>
+      </table>
+      @if (!dataSource.hasItems) {
+        <div class="mat-table__message">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
+      }
+    </div>
+
+    <div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
+      @if (gridService.model.haveFilter) {
+        <div class="flt-selected" style="max-width:50%;">
+          <kt-chip-filter [gridService]="gridService"></kt-chip-filter>
+        </div>
+      }
+      <div class="flt-page" style="width: 50%;">
+        @if (dataSource.loading$ | async) {
+          <mat-spinner [diameter]="20"></mat-spinner>
+        }
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"
+          [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+        </mat-paginator>
+      </div>
+    </div>
+  </div>

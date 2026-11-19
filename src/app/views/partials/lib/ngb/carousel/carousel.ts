@@ -68,24 +68,34 @@ export class NgbSlide {
         '(keydown.arrowRight)': 'keyboard && next(NgbSlideEventSource.ARROW_RIGHT)'
     },
     template: `
-    <ol class="carousel-indicators" *ngIf="showNavigationIndicators">
-      <li *ngFor="let slide of slides" [id]="slide.id" [class.active]="slide.id === activeId"
+    @if (showNavigationIndicators) {
+      <ol class="carousel-indicators">
+        @for (slide of slides; track slide) {
+          <li [id]="slide.id" [class.active]="slide.id === activeId"
           (click)="select(slide.id, NgbSlideEventSource.INDICATOR)"></li>
-    </ol>
+        }
+      </ol>
+    }
     <div class="carousel-inner">
-      <div *ngFor="let slide of slides" class="carousel-item" [class.active]="slide.id === activeId">
-        <ng-template [ngTemplateOutlet]="slide.tplRef"></ng-template>
-      </div>
+      @for (slide of slides; track slide) {
+        <div class="carousel-item" [class.active]="slide.id === activeId">
+          <ng-template [ngTemplateOutlet]="slide.tplRef"></ng-template>
+        </div>
+      }
     </div>
-    <a class="carousel-control-prev" role="button" (click)="prev(NgbSlideEventSource.ARROW_LEFT)" *ngIf="showNavigationArrows">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="sr-only" i18n="@@ngb.carousel.previous">Previous</span>
-    </a>
-    <a class="carousel-control-next" role="button" (click)="next(NgbSlideEventSource.ARROW_RIGHT)" *ngIf="showNavigationArrows">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="sr-only" i18n="@@ngb.carousel.next">Next</span>
-    </a>
-  `,
+    @if (showNavigationArrows) {
+      <a class="carousel-control-prev" role="button" (click)="prev(NgbSlideEventSource.ARROW_LEFT)">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only" i18n="@@ngb.carousel.previous">Previous</span>
+      </a>
+    }
+    @if (showNavigationArrows) {
+      <a class="carousel-control-next" role="button" (click)="next(NgbSlideEventSource.ARROW_RIGHT)">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only" i18n="@@ngb.carousel.next">Next</span>
+      </a>
+    }
+    `,
     standalone: false
 })
 export class NgbCarousel implements AfterContentChecked,

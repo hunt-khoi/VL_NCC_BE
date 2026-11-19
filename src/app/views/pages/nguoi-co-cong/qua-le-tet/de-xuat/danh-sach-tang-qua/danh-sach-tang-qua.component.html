@@ -1,123 +1,129 @@
 <style>
-	.table-scroll-wrapper {
-		max-height: 75vh;
-		overflow-y: auto;
-		position: relative;
-	}
-	.table-scroll-wrapper table {
-		border-collapse: collapse;
-	}
-	.table-scroll-wrapper thead tr {
-		position: sticky;
-		top: 0;
-		z-index: 3;
-	}
-	.table-scroll-wrapper thead th {
-		background: #fff;
-	}
-	.row_nguon {
-		position: sticky;
-		top: var(--thead-height, 0px);
-		z-index: 2;
-		background-color: #dee2e6;
-		color: red;
-	}
-	.row_nguon td {
-		background-color: #dee2e6;
-	}
-	.row_muc {
-		position: sticky;
-		top: calc(var(--thead-height, 0px) + var(--nguon-height, 0px));
-		z-index: 1;
-		background-color: #dee2e6;
-	}
-	.row_muc td {
-		background-color: #dee2e6;
-	}
-	.row_tang {
-		background-color: lightgreen;
-	}
+  .table-scroll-wrapper {
+  max-height: 75vh;
+  overflow-y: auto;
+  position: relative;
+}
+.table-scroll-wrapper table {
+border-collapse: collapse;
+}
+.table-scroll-wrapper thead tr {
+position: sticky;
+top: 0;
+z-index: 3;
+}
+.table-scroll-wrapper thead th {
+background: #fff;
+}
+.row_nguon {
+position: sticky;
+top: var(--thead-height, 0px);
+z-index: 2;
+background-color: #dee2e6;
+color: red;
+}
+.row_nguon td {
+background-color: #dee2e6;
+}
+.row_muc {
+position: sticky;
+top: calc(var(--thead-height, 0px) + var(--nguon-height, 0px));
+z-index: 1;
+background-color: #dee2e6;
+}
+.row_muc td {
+background-color: #dee2e6;
+}
+.row_tang {
+background-color: lightgreen;
+}
 </style>
 <div class="kt-portlet" [ngClass]="{ 'kt-portlet--body-progress' : viewLoading, 'kt-portlet--body-progress-overlay' : loadingAfterSubmit }">
-	<kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
-		<ng-container ktPortletTitle>
-			<h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
-		</ng-container>
-		<ng-container ktPortletTools>
-			<button mat-raised-button (click)="Back()">{{ 'COMMON.BACK' | translate }}</button>
-		</ng-container>
-	</kt-portlet-header>
+  <kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+    <ng-container ktPortletTitle>
+      <h3 class="kt-portlet__head-title">{{getTitle()}}</h3>
+    </ng-container>
+    <ng-container ktPortletTools>
+      <button mat-raised-button (click)="Back()">{{ 'COMMON.BACK' | translate }}</button>
+    </ng-container>
+  </kt-portlet-header>
 
-	<kt-portlet-body>
-		<div class="form-group kt-form__group row">
-			<div class="col-md-12">
-				<div class="table-scroll-wrapper" #tableWrapper>
-				<table class="table-bordered table-sm" style="width:100%;">
-					<thead #tableHead>
-						<tr>
-							<th class="text-center">STT</th>
-							<th class="text-center">Họ tên</th>
-							<th class="text-center">Số hồ sơ</th>
-							<th class="text-center">Cư trú</th>
-							<th class="text-center">Người thờ cúng liệt sỹ</th>
-							<th class="text-center">Quan hệ với liệt sỹ</th>
-							<th class="text-center">Số tiền</th>
-							<th class="text-center">Người nhận</th>
-							<th class="text-center">Thời gian</th>
-						</tr>
-					</thead>
-					<ng-container *ngFor="let ng of DanhSach; let j=index; trackBy: trackByIndex">
-						<tbody>
-							<tr class="row_nguon">
-								<td colspan="6">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
-								<td class="text-right"><b>{{tongNguon[j]}}</b></td>
-								<td class="text-right"><b>{{tienDaPhatNguon[j]}}</b></td>
-								<td></td>
-							</tr>
-							<ng-container *ngFor="let muc of ng.data; let i=index; trackBy: trackByIndex">
-								<tr class="row_muc">
-									<td colspan="6"><b>Mức {{muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
-									<td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
-									<td class="text-right"><b>{{tienDaPhat[j][i]}}</b></td>
-									<td></td>
-								</tr>
-								<ng-container *ngFor="let dt of muc.DoiTuongs; trackBy: trackByIndex">
-									<tr>
-										<td colspan="9"><b><i>{{dt.DoiTuong}}</i></b></td>
-									</tr>
-									<tr *ngFor="let ncc of dt.NCCs; let nccIndex=index; trackBy: trackByIndex">
-										<td>{{nccIndex+1}}</td>
-										<td>{{ncc.HoTen}}</td>
-										<td>{{ncc.SoHoSo}}</td>
-										<td>{{ncc.DiaChi}}</td>
-										<td>{{ncc.NguoiThoCungLietSy}}</td>
-										<td>{{ncc.QuanHeVoiLietSy}}</td>
-										<td class="text-right">{{ncc.SoTien}}</td>
-										<td>
-											<span *ngIf="ncc.Received">{{ncc.NguoiNhan}}</span>
-											<button *ngIf="!ncc.Received" class="btn btn-primary btn-sm" (click)="Nhanqua(ncc)">Phát quà</button>
-										</td>
-										<td>{{parseViDate(ncc.ThoiGianNhan) | date:'dd/MM/yyyy - HH:mm'}}</td>
-									</tr>
-								</ng-container>
-							</ng-container>
-						</tbody>
-					</ng-container>
-					<tr style=" color: red;">
-						<td colspan="4"><b>Tổng số</b></td>
-						<td>Số lượng: <b>{{TongSo}}</b></td>
-						<td class="text-right">
-							<b matTooltip="Tiền trợ cấp">{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b>
-						</td>
-						<td class="text-right">
-							<b matTooltip="Tiền đã phát">{{TongPhat | mask: 'separator':danhMucService.thousandSeparator}}</b>
-						</td>
-						<td></td>
-						<td></td>
-					</tr>
-				</table>
-				</div>
-			</div>
-		</div>
-	</kt-portlet-body>
+  <kt-portlet-body>
+    <div class="form-group kt-form__group row">
+      <div class="col-md-12">
+        <div class="table-scroll-wrapper" #tableWrapper>
+          <table class="table-bordered table-sm" style="width:100%;">
+            <thead #tableHead>
+              <tr>
+                <th class="text-center">STT</th>
+                <th class="text-center">Họ tên</th>
+                <th class="text-center">Số hồ sơ</th>
+                <th class="text-center">Cư trú</th>
+                <th class="text-center">Người thờ cúng liệt sỹ</th>
+                <th class="text-center">Quan hệ với liệt sỹ</th>
+                <th class="text-center">Số tiền</th>
+                <th class="text-center">Người nhận</th>
+                <th class="text-center">Thời gian</th>
+              </tr>
+            </thead>
+            @for (ng of DanhSach; track trackByIndex(j, ng); let j = $index) {
+              <tbody>
+                <tr class="row_nguon">
+                  <td colspan="6">Nguồn kinh phí: <b>{{ng.NguonKinhPhi}}</b></td>
+                  <td class="text-right"><b>{{tongNguon[j]}}</b></td>
+                  <td class="text-right"><b>{{tienDaPhatNguon[j]}}</b></td>
+                  <td></td>
+                </tr>
+                @for (muc of ng.data; track trackByIndex(i, muc); let i = $index) {
+                  <tr class="row_muc">
+                    <td colspan="6"><b>Mức {{muc.MucQua | mask: 'separator':danhMucService.thousandSeparator}} vnđ</b></td>
+                    <td class="text-right"><b>{{tongMuc[j][i]}}</b></td>
+                    <td class="text-right"><b>{{tienDaPhat[j][i]}}</b></td>
+                    <td></td>
+                  </tr>
+                  @for (dt of muc.DoiTuongs; track trackByIndex($index, dt)) {
+                    <tr>
+                      <td colspan="9"><b><i>{{dt.DoiTuong}}</i></b></td>
+                    </tr>
+                    @for (ncc of dt.NCCs; track trackByIndex(nccIndex, ncc); let nccIndex = $index) {
+                      <tr>
+                        <td>{{nccIndex+1}}</td>
+                        <td>{{ncc.HoTen}}</td>
+                        <td>{{ncc.SoHoSo}}</td>
+                        <td>{{ncc.DiaChi}}</td>
+                        <td>{{ncc.NguoiThoCungLietSy}}</td>
+                        <td>{{ncc.QuanHeVoiLietSy}}</td>
+                        <td class="text-right">{{ncc.SoTien}}</td>
+                        <td>
+                          @if (ncc.Received) {
+                            <span>{{ncc.NguoiNhan}}</span>
+                          }
+                          @if (!ncc.Received) {
+                            <button class="btn btn-primary btn-sm" (click)="Nhanqua(ncc)">Phát quà</button>
+                          }
+                        </td>
+                        <td>{{parseViDate(ncc.ThoiGianNhan) | date:'dd/MM/yyyy - HH:mm'}}</td>
+                      </tr>
+                    }
+                  }
+                }
+              </tbody>
+            }
+            <tr style=" color: red;">
+              <td colspan="4"><b>Tổng số</b></td>
+              <td>Số lượng: <b>{{TongSo}}</b></td>
+              <td class="text-right">
+                <b matTooltip="Tiền trợ cấp">{{TongTien | mask: 'separator':danhMucService.thousandSeparator}}</b>
+              </td>
+              <td class="text-right">
+                <b matTooltip="Tiền đã phát">{{TongPhat | mask: 'separator':danhMucService.thousandSeparator}}</b>
+              </td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </kt-portlet-body>
 </div>

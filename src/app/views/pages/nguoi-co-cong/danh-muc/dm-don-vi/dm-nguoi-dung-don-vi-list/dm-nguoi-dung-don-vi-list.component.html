@@ -1,167 +1,173 @@
 <style>
-    ::ng-deep .mat-sort-header-container {
-        display: flex;
-        justify-content: left;
-    }
+  ::ng-deep .mat-sort-header-container {
+  display: flex;
+  justify-content: left;
+}
 
-    /*#filter*/
-    .dl-table-flt .mat-mdc-header-cell {
-        position: relative;
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop {
-        position: absolute;
-        left: 0;
-        margin-top: -12px;
-        top: 50%;
-    }
-    
-    .dl-border-bottom {
-        margin-bottom: 5px;
-        border-bottom: 1px solid #aaa
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop .dropdown-menu.show .drop-area {
-        max-height: 190px;
-        overflow: auto;
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn {
-        padding: 0;
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn.flt-focus .fa-filter {
-        color: #5d5f61;
-    }
-    
-    .dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn .fa-filter {
-        color: #c5c4c4;
-    }
-    
-    .flt-btn-action {
-        width: 100%;
-        display: inline-flex;
-    }
-    
-    .flt-btn-action .btn {
-        width: 50%;
-    }
-    
-    .exist-flt.mat-table__bottom {
-        align-items: baseline;
-        justify-content: flex-start;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-page {
-        display: flex;
-        margin-left: auto;
-        width: 40%;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-selected {
-        display: flex;
-        max-width: 60%;
-        margin-top: 10px;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-selected .mat-chip {
-        margin: 5px 0;
-        font-size: 11px;
-        padding: 0 5px 0 10px;
-        min-height: 24px;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-selected .mat-chip.flt-clear {
-        padding: 0 10px;
-        background-color: #1a75f3;
-        color: #fff;
-    }
-    
-    .exist-flt.mat-table__bottom .flt-selected .mat-chip.flt-clear .mat-mdc-chip-remove.mat-icon {
-        margin: 0;
-        color: #fff;
-    }
-    /*end css filter*/
-    
-    #spanOptions:hover {
-        opacity: 0.8;
-    }
+/*#filter*/
+.dl-table-flt .mat-mdc-header-cell {
+position: relative;
+}
 
-    .m--padding-10 {
-        text-align: left;
-        padding-bottom: 4px;
-    }
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop {
+position: absolute;
+left: 0;
+margin-top: -12px;
+top: 50%;
+}
+
+.dl-border-bottom {
+margin-bottom: 5px;
+border-bottom: 1px solid #aaa
+}
+
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop .dropdown-menu.show .drop-area {
+max-height: 190px;
+overflow: auto;
+}
+
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn {
+padding: 0;
+}
+
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn.flt-focus .fa-filter {
+color: #5d5f61;
+}
+
+.dl-table-flt .mat-mdc-header-cell .dl-flt-drop .drop-btn .fa-filter {
+color: #c5c4c4;
+}
+
+.flt-btn-action {
+width: 100%;
+display: inline-flex;
+}
+
+.flt-btn-action .btn {
+width: 50%;
+}
+
+.exist-flt.mat-table__bottom {
+align-items: baseline;
+justify-content: flex-start;
+}
+
+.exist-flt.mat-table__bottom .flt-page {
+display: flex;
+margin-left: auto;
+width: 40%;
+}
+
+.exist-flt.mat-table__bottom .flt-selected {
+display: flex;
+max-width: 60%;
+margin-top: 10px;
+}
+
+.exist-flt.mat-table__bottom .flt-selected .mat-chip {
+margin: 5px 0;
+font-size: 11px;
+padding: 0 5px 0 10px;
+min-height: 24px;
+}
+
+.exist-flt.mat-table__bottom .flt-selected .mat-chip.flt-clear {
+padding: 0 10px;
+background-color: #1a75f3;
+color: #fff;
+}
+
+.exist-flt.mat-table__bottom .flt-selected .mat-chip.flt-clear .mat-mdc-chip-remove.mat-icon {
+margin: 0;
+color: #fff;
+}
+/*end css filter*/
+
+#spanOptions:hover {
+opacity: 0.8;
+}
+
+.m--padding-10 {
+text-align: left;
+padding-bottom: 4px;
+}
 </style>
 
 <kt-portlet-header [sticky]="true" [title]="'Danh sách người dùng'" [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
 </kt-portlet-header>
 
 <div class="mat-table__wrapper d-block" [ngStyle]="{'overflow-x': gridService.model.haveFilter?'unset':'auto'}" >
-    <table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource" 
-        matSort #sort1="matSort" matSortActive="Username" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
-        <ng-container matColumnDef="STT">
-            <th mat-header-cell *matHeaderCellDef class="stt-cell">STT</th>
-            <td mat-cell style="padding-bottom: 4px" class="stt-cell" *matCellDef="let i=index">{{i + 1}}</td>
-        </ng-container>
-        <ng-container matColumnDef="Username">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Username" column_title="Tên đăng nhập">
-                </kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.Username}}</td>
-        </ng-container>
-        <ng-container matColumnDef="FullName">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="FullName" column_title="Họ và tên">
-                </kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.FullName}}</td>
-        </ng-container>
-        <ng-container matColumnDef="ChucVu">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="ChucVu" column_title="Chức vụ">
-                </kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.ChucVu}}</td>
-        </ng-container>
-        <ng-container matColumnDef="PhoneNumber">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="PhoneNumber" column_title="Số điện thoại">
-                </kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.PhoneNumber}}</td>
-        </ng-container>
-        <ng-container matColumnDef="Email">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Email" column_title="Email"></kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.Email}}</td>
-        </ng-container>
-        <ng-container matColumnDef="Active">
-            <th mat-header-cell *matHeaderCellDef>
-                <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Active" column_title="Trạng thái"></kt-column-filter>
-            </th>
-            <td mat-cell class="m--padding-10" *matCellDef="let item">
-                <span class="kt-badge kt-badge--inline kt-badge--pill {{ getItemCssClassByStatus(item.Active) }} kt-badge--wide">
-                    {{ getItemStatusString(item.Active) }}
-                </span>
-            </td>
-        </ng-container>
+  <table mat-table class="lmat-elevation-z8" [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" #table [dataSource]="dataSource"
+    matSort #sort1="matSort" matSortActive="Username" matSortDirection="asc" matSortDisableClear cdkDropListGroup>
+    <ng-container matColumnDef="STT">
+      <th mat-header-cell *matHeaderCellDef class="stt-cell">STT</th>
+      <td mat-cell style="padding-bottom: 4px" class="stt-cell" *matCellDef="let i=index">{{i + 1}}</td>
+    </ng-container>
+    <ng-container matColumnDef="Username">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Username" column_title="Tên đăng nhập">
+        </kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.Username}}</td>
+    </ng-container>
+    <ng-container matColumnDef="FullName">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="FullName" column_title="Họ và tên">
+        </kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.FullName}}</td>
+    </ng-container>
+    <ng-container matColumnDef="ChucVu">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="ChucVu" column_title="Chức vụ">
+        </kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.ChucVu}}</td>
+    </ng-container>
+    <ng-container matColumnDef="PhoneNumber">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="PhoneNumber" column_title="Số điện thoại">
+        </kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.PhoneNumber}}</td>
+    </ng-container>
+    <ng-container matColumnDef="Email">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Email" column_title="Email"></kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">{{item.Email}}</td>
+    </ng-container>
+    <ng-container matColumnDef="Active">
+      <th mat-header-cell *matHeaderCellDef>
+        <kt-column-filter [gridService]="gridService" enable_sort="true" column_name="Active" column_title="Trạng thái"></kt-column-filter>
+      </th>
+      <td mat-cell class="m--padding-10" *matCellDef="let item">
+        <span class="kt-badge kt-badge--inline kt-badge--pill {{ getItemCssClassByStatus(item.Active) }} kt-badge--wide">
+          {{ getItemStatusString(item.Active) }}
+        </span>
+      </td>
+    </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
-    </table>
-    <div class="mat-table__message" *ngIf="!dataSource.hasItems">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
+    <tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns"></tr>
+  </table>
+  @if (!dataSource.hasItems) {
+    <div class="mat-table__message">{{'COMMON.NO_RECORD_FOUND'|translate}}</div>
+  }
 </div>
 
 <div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
-    <div class="flt-selected" *ngIf="gridService.model.haveFilter" style="max-width: 50%;">
-        <kt-chip-filter [gridService]="gridService"></kt-chip-filter>
+  @if (gridService.model.haveFilter) {
+    <div class="flt-selected" style="max-width: 50%;">
+      <kt-chip-filter [gridService]="gridService"></kt-chip-filter>
     </div>
-    <div class="flt-page" style="width: 50%;">
-        <mat-spinner [diameter]="20" *ngIf="dataSource.loading$ | async"></mat-spinner>
-        <mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize" 
-            [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
-        </mat-paginator>
-    </div>
+  }
+  <div class="flt-page" style="width: 50%;">
+    @if (dataSource.loading$ | async) {
+      <mat-spinner [diameter]="20"></mat-spinner>
+    }
+    <mat-paginator [pageSize]="10" [pageSizeOptions]="gridService.model.pageSize"
+      [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+    </mat-paginator>
+  </div>
 </div>
