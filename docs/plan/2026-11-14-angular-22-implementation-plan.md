@@ -80,7 +80,7 @@ Lưu kèm mỗi tag phát hành được: bản build `prod` của tag đó tron
 2. **Một task đã commit nhưng gây lỗi phát hiện muộn.**
    `git revert <commit>` (một commit cho mỗi task nên revert gọn), `yarn install --frozen-lockfile`, `yarn verify:dev`, cổng e2e `@ro`. Ghi lỗi và commit bị revert vào mục "Nhật ký vướng mắc" ở cuối plan.
 3. **Một bản major không qua được.**
-   Timebox: mỗi bản major tối đa **2 ngày làm việc** kể từ lúc chạy `ng update` (riêng Task 12 MDC: 5 ngày). Quá hạn mà `verify:dev` hoặc cổng e2e vẫn đỏ thì dừng: `git revert --no-commit <commit đầu của task>..HEAD`, commit `revert: angular <N-1> to <N> (blocked)`, xác nhận code trùng với tag `upgrade/ng<N-1>` bằng `git diff upgrade/ng<N-1> --stat` (chỉ được khác ở `docs/`). Báo người phụ trách kèm nhật ký lỗi và chọn một trong ba hướng: chờ bản vá thư viện, thay thư viện gây lỗi, hoặc tạm dừng nâng cấp ở `N-1`.
+   Chỉ làm khi người phụ trách quyết định rollback: `git revert --no-commit <commit đầu của task>..HEAD`, commit `revert: angular <N-1> to <N> (blocked)`, xác nhận code trùng với tag `upgrade/ng<N-1>` bằng `git diff upgrade/ng<N-1> --stat` (chỉ được khác ở `docs/`). Ghi lại vào "Nhật ký vướng mắc".
 4. **Đã deploy lên server rồi phát hiện lỗi.**
    Chỉ deploy từ tag phát hành được. Server giữ thư mục build của bản đang chạy trước đó (tên thư mục build đã có ngày, ví dụ `prod_260428`); deploy bản mới vào thư mục mới rồi đổi đường dẫn site sang thư mục đó. Rollback = trỏ đường dẫn site về thư mục cũ, không cần build lại. Backend và database không đổi trong suốt quá trình nâng cấp nên rollback frontend không cần đụng tới backend. `sw.js` không cache file của app (handler `fetch` chỉ đọc cache, không ghi), nhưng vẫn phải đặt `Cache-Control: no-cache` cho `index.html` trên server để trình duyệt nhận bản rollback ngay.
 
@@ -129,7 +129,7 @@ Với `N` là bản đích:
 9. Cổng giao diện với nhãn `ngN` so với bộ ảnh gốc hiện hành. Phải PASS.
 10. Cổng e2e: `yarn --cwd tools/e2e test:ro`. Phải PASS.
 11. Commit: `upgrade angular <N-1> to <N>`.
-12. Tag điểm rollback `upgrade/ng<N>` theo mục "Phương án rollback". Nếu tới hạn timebox mà bước 8–10 chưa PASS, làm theo mức rollback 3.
+12. Tag điểm rollback `upgrade/ng<N>` theo mục "Phương án rollback".
 
 `--force` cần thiết vì thư viện bên thứ ba ở bước 5 chưa được nâng lúc `ng update` kiểm tra peer dependency.
 
@@ -477,7 +477,6 @@ Plan đã chọn sẵn phương án mặc định cho từng mục; chỉ cần 
 | Karma và 6 file spec | Giữ nguyên, không dùng làm điều kiện nghiệm thu. Lưu ý `src/test.ts` dùng `require.context` nên `ng test` sẽ không chạy được sau Task 15 | Xoá hẳn ở Task 20, hoặc chuyển sang Vitest |
 | Test e2e | Playwright trong `tools/e2e/` (Task 1C), nhóm `@ro` làm cổng ở mọi task, nhóm `@rw` ở các mốc smoke | Chỉ smoke test tay ở 5 mốc như bản plan cũ |
 | Database cho nhóm e2e `@rw` | Bản sao riêng, khôi phục trước mỗi lượt bằng `E2E_RESTORE_CMD` do người phụ trách backend cung cấp | Không chạy `@rw`, kiểm tay các thao tác ghi |
-| Timebox mỗi bản major trước khi rollback | 2 ngày làm việc (MDC: 5 ngày) | Con số khác |
 | TinyMCE | Dừng ở 6.x (giấy phép MIT) | Lên 8.x, chấp nhận GPL hoặc mua license |
 
 ## Nhật ký vướng mắc
