@@ -5,8 +5,9 @@
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
+    "esModuleInterop": true,
     "module": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
@@ -18,7 +19,6 @@
       "es2018",
       "dom"
     ],
-    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "useDefineForClassFields": false
   }

@@ -2,7 +2,7 @@
 @use '@angular/material' as mat;
 
 // Mau chu cua Material (giong gia tri trong @angular/material/core/theming/_palette.scss).
-// API @use khong cong khai cac bien nay, truoc day lay tu @import '~@angular/material/theming'.
+// API @use khong cong khai cac bien nay, truoc day lay tu @import '@angular/material/theming'.
 $dark-primary-text: rgba(black, 0.87);
 $dark-secondary-text: rgba(black, 0.54);
 $dark-disabled-text: rgba(black, 0.38);
