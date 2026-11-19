@@ -1017,10 +1017,10 @@
   resolved "https://registry.yarnpkg.com/@keyv/serialize/-/serialize-1.1.1.tgz#0c01dd3a3483882af7cf3878d4e71d505c81fc4a"
   integrity sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==
 
-"@kolkov/angular-editor@2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@kolkov/angular-editor/-/angular-editor-2.1.0.tgz#02dd5baa5eee585d8e0b1d5cd3a91ffa6ef5e3a7"
-  integrity sha512-KmWIDg89eptvnz5PJbnZUwA3TUmm9XXdvAN3yJ1+euYls+kP4zcHsEmlA0icgDag2OlbMFmksgNvJrpdZnVr4Q==
+"@kolkov/angular-editor@3.4.0":
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/@kolkov/angular-editor/-/angular-editor-3.4.0.tgz#cc0073604c0767040e2d3cbb3b6a2af353710121"
+  integrity sha512-42KiNq2gfKHnOd5SnpQ7jWZv6TJxT6fDfLXs7Uc7/c2XtTfocAcEzhCRrFWHw6aEeOXk1TQDYFbXA1ZesMdiMw==
   dependencies:
     tslib "^2.3.0"
 
@@ -1244,19 +1244,19 @@
   dependencies:
     "@tybys/wasm-util" "^0.10.3"
 
-"@ng-idle/core@12.0.4":
-  version "12.0.4"
-  resolved "https://registry.yarnpkg.com/@ng-idle/core/-/core-12.0.4.tgz#cd2d15c7c656ff88f0c8928b3a8eb3ca4592464e"
-  integrity sha512-rTFutcv4aEZ/B0JtjyDlmKS+ky2OOXqrosdecZ+hwA3YBj91if4vmvq54TUlCxBoqCdddw52/JvPFBWypz7ZZA==
+"@ng-idle/core@16.0.0":
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/@ng-idle/core/-/core-16.0.0.tgz#ee90a4b8d4b274b30cbb916c6ab465d49faf10e3"
+  integrity sha512-R8DACP2+WIaipfaTXJVEMHpRqXxqCw4AkHQnfnUG60Fu8FWljiU+tqxlB2AR/Ji7CveBi642SNS9KROboQM/aw==
   dependencies:
-    tslib "^2.0.0"
+    tslib "^2.6.0"
 
-"@ng-idle/keepalive@12.0.4":
-  version "12.0.4"
-  resolved "https://registry.yarnpkg.com/@ng-idle/keepalive/-/keepalive-12.0.4.tgz#d23898429605fc00abe2e48898ddab36ee200b49"
-  integrity sha512-GY1Ayvm80XzpEvwqzBpWWBJv7gBZD9WC11dXTJN7tPMWNjdsqcgqfAg/hQSmDuiiQ6SyD0XOM3rZW6yTCpvXJw==
+"@ng-idle/keepalive@16.0.0":
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/@ng-idle/keepalive/-/keepalive-16.0.0.tgz#7bd57afa68bff8f4ab3ecaa70a04f900c4339a7c"
+  integrity sha512-/nKT9U+8SYdKqIKa9R+a9YvhE9onImNFMABTUUe61qhpGLXsJvbMscPSmxi8JuoOj/uv95Rg1Z+ZR8lvO5t99Q==
   dependencies:
-    tslib "^2.0.0"
+    tslib "^2.6.0"
 
 "@ngrx/effects@~22.0.1":
   version "22.0.1"
@@ -2430,10 +2430,10 @@ chokidar@^5.0.0:
   dependencies:
     readdirp "^5.0.0"
 
-ckeditor4-angular@4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/ckeditor4-angular/-/ckeditor4-angular-4.0.1.tgz#fb8e3cd815be2fa6ec3aaa20c9970ee5ce5c5247"
-  integrity sha512-oiPQ9pCBhXhLpja8TGRiVn9puQJ21em6A3+H9Z1uZ8gJRHCptPfdumCvjFqD76Pog8KymbvHl24GBee67nhqMw==
+ckeditor4-angular@5.2.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/ckeditor4-angular/-/ckeditor4-angular-5.2.1.tgz#31c9a189ab2a820a59d92f2d06bdea26ebff9639"
+  integrity sha512-XziCgRzLJ/DCG639rTslC+0iCFBF0fTs51L4hwTW7m7TtZ487U3VkPSQSjYROJFOHwBOLf+Et1wkyhIAjvO/gQ==
   dependencies:
     ckeditor4-integrations-common "^1.0.0"
     tslib "^2.3.0"
@@ -4087,10 +4087,10 @@ ng-inline-svg-2@20.0.2:
   resolved "https://registry.yarnpkg.com/ng-inline-svg-2/-/ng-inline-svg-2-20.0.2.tgz#89defdc87441f08647d3dde64df174e0459ea3e9"
   integrity sha512-32psHcJNlvijS0qhyCLlfo33MU+h6jhz6GzXmFnoI0VEcld7wUxPMTxtWbV7i5paX6OS/xouKqAHNjI1oBOeMQ==
 
-ng2-file-upload@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/ng2-file-upload/-/ng2-file-upload-3.0.0.tgz#55ce8752a93cf234a754fe1009ceff40c625582c"
-  integrity sha512-Xz7Pa9bC9loZ7eu1EzdAyPb3dpLbGe1G1nHgf+YUvtqQepxdQ3OBtd04Jbg3yx8r+nhi8tKGmdajsBAkeA87rA==
+ng2-file-upload@12.0.0:
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/ng2-file-upload/-/ng2-file-upload-12.0.0.tgz#315616af5541185df42535e18bb559f7b9d02978"
+  integrity sha512-KzQxldYjf1E+KLmNMn7n4fn9pjMPUsUHNOhKMoYAuJfJLwab2NT8aY7i54QKhH5+i6WKV5Raftr33x9drIhj1Q==
   dependencies:
     tslib "^2.3.0"
 
@@ -5206,7 +5206,7 @@ tslib@^2.0.0, tslib@^2.1.0, tslib@^2.3.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
 
-tslib@^2.4.0, tslib@^2.8.1:
+tslib@^2.4.0, tslib@^2.6.0, tslib@^2.8.1:
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.9.1.tgz#8986213ba2f17f38ba39a7c43d0e565a9134ff5f"
   integrity sha512-a4Ux9VKuIMHsOS7ENbEq6hK2ZGYIT27Rtl0E4eD9KqwxhKiQeMZE/9xb3IdYwWaSOyIBQLExhQgXDTYoiCxnWA==
