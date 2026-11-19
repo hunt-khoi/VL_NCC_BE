@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { LayoutConfigService, ToggleOptions } from '../../../../core/_base/layout';
 
 @Component({
-	selector: 'kt-header-mobile',
-	templateUrl: './header-mobile.component.html',
+    selector: 'kt-header-mobile',
+    templateUrl: './header-mobile.component.html',
+    standalone: false
 })
 export class HeaderMobileComponent implements OnInit {
 	headerLogo: string = "";

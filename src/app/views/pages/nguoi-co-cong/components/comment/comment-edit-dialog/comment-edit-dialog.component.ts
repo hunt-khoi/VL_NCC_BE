@@ -3,9 +3,10 @@ import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dial
 import { CommentService } from '../comment.service';
 
 @Component({
-	selector: 'kt-comment-edit-dialog',
-	templateUrl: './comment-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-comment-edit-dialog',
+    templateUrl: './comment-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CommentEditDialogComponent implements OnInit {
 	comment: any = {};

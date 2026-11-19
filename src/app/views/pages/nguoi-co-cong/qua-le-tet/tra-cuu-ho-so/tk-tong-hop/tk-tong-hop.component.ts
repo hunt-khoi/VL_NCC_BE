@@ -11,7 +11,8 @@ import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.se
 @Component({
     selector: 'm-tk-tong-hop',
     templateUrl: './tk-tong-hop.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class thongKeTongHopComponent implements OnInit, OnDestroy {

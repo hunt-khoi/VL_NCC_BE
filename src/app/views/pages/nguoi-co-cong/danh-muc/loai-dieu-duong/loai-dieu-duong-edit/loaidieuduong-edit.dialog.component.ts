@@ -10,9 +10,10 @@ import { loaiDieuDuongModel } from '../Model/loaidieuduong.model';
 import { loaiDieuDuongServices } from '../Services/loaidieuduong.service';
 
 @Component({
-	selector: 'kt-loai-dieu-duong-edit',
-	templateUrl: './loaidieuduong-edit.dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-loai-dieu-duong-edit',
+    templateUrl: './loaidieuduong-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class LoaiDieuDuongEditDialogComponent implements OnInit, OnDestroy {

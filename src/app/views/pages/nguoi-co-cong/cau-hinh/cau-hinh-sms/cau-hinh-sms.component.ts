@@ -6,6 +6,7 @@ import { CauHinhSMSService } from './Services/cau-hinh-sms.service';
 @Component({
     selector: 'kt-cau-hinh-sms',
     templateUrl: './cau-hinh-sms.component.html',
+    standalone: false
 })
 export class CauHinhSMSComponent implements OnInit {
   constructor(private apiService : CauHinhSMSService) {}

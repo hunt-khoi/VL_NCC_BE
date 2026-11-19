@@ -13,9 +13,10 @@ import { QuaTrinhHoatDongEditComponent, TroCapRowEditComponent, DiChuyenEditComp
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-ho-so-ncc-edit',
-	templateUrl: './ho-so-ncc-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc-edit',
+    templateUrl: './ho-so-ncc-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HoSoNCCEditDialogComponent implements OnInit {

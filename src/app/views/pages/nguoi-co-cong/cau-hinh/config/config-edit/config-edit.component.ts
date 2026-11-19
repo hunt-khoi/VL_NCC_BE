@@ -10,9 +10,10 @@ import { SysConfigModel } from '../Model/config.model';
 import { ConfigService } from '../Services/config.service';
 
 @Component({
-	selector: 'kt-config-edit',
-	templateUrl: './config-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-config-edit',
+    templateUrl: './config-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class ConfigEditComponent implements OnInit, OnDestroy {

@@ -19,9 +19,10 @@ import { DoiTuongNguoiCoCongEditDialogComponent } from './../doi-tuong-nguoi-co-
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-doi-tuong-nguoi-co-cong-list',
-	templateUrl: './doi-tuong-nguoi-co-cong-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-doi-tuong-nguoi-co-cong-list',
+    templateUrl: './doi-tuong-nguoi-co-cong-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DoiTuongNguoiCoCongListComponent implements OnInit, OnDestroy {

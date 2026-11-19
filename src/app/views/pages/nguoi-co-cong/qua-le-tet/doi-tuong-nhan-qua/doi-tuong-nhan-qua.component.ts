@@ -4,9 +4,10 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { DoiTuongNhanQuaService } from './Services/doi-tuong-nhan-qua.service';
 
 @Component({
-	selector: 'kt-doi-tuong-nhan-qua',
-	templateUrl: './doi-tuong-nhan-qua.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-doi-tuong-nhan-qua',
+    templateUrl: './doi-tuong-nhan-qua.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DoiTuongNhanQuaComponent implements OnInit {

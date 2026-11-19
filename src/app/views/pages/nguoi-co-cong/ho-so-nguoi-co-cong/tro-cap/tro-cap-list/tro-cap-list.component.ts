@@ -20,9 +20,10 @@ import { QuyetDinhEditDialogComponent } from '../../quyet-dinh/quyet-dinh-edit/q
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-tro-cap-list',
-	templateUrl: './tro-cap-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-tro-cap-list',
+    templateUrl: './tro-cap-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class TroCapListComponent implements OnInit {

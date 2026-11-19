@@ -10,9 +10,10 @@ import { AuthNoticeService, AuthService, Register, User } from '../../../../core
 import { ConfirmPasswordValidator } from './confirm-password.validator';
 
 @Component({
-	selector: 'kt-register',
-	templateUrl: './register.component.html',
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-register',
+    templateUrl: './register.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class RegisterComponent implements OnInit, OnDestroy {
 	itemForm: FormGroup = new FormGroup({});

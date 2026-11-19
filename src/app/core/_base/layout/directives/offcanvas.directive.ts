@@ -8,8 +8,9 @@ export interface OffcanvasOptions {
 }
 
 @Directive({
-	selector: '[ktOffcanvas]',
-	exportAs: 'ktOffcanvas',
+    selector: '[ktOffcanvas]',
+    exportAs: 'ktOffcanvas',
+    standalone: false
 })
 export class OffcanvasDirective implements AfterViewInit {
 	@Input() options: OffcanvasOptions | undefined;

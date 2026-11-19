@@ -17,9 +17,10 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-ward-list',
-	templateUrl: './ward-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-ward-list',
+    templateUrl: './ward-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class wardListComponent implements OnInit, OnDestroy {

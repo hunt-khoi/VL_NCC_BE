@@ -9,11 +9,12 @@ import { TokenStorage } from '../../../../../core/auth/_services/token-storage.s
 import { DynamicProcessService } from '../../services/dynamic-process.service';
 
 @Component({
-	selector: 'kt-canvas-demo',
-	templateUrl: './canvas-demo.component.html',
-	styleUrls: ['./canvas-demo.component.scss'],
-	encapsulation: ViewEncapsulation.None,
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-canvas-demo',
+    templateUrl: './canvas-demo.component.html',
+    styleUrls: ['./canvas-demo.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CanvasDemoComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() API: string | undefined;

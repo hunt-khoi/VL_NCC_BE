@@ -18,8 +18,9 @@ import { DoiTuongBaoHiemEditComponent } from '../doi-tuong-bao-hiem-edit/doi-tuo
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-  selector: 'kt-dm-doi-tuong-bao-hiem-list',
-  templateUrl: './doi-tuong-bao-hiem-list.component.html',
+    selector: 'kt-dm-doi-tuong-bao-hiem-list',
+    templateUrl: './doi-tuong-bao-hiem-list.component.html',
+    standalone: false
 })
 
 export class DoiTuongBaoHiemListComponent implements OnInit, OnDestroy {

@@ -7,9 +7,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-qua-trinh-hoat-dong-edit',
-	templateUrl: './qua-trinh-hoat-dong-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-qua-trinh-hoat-dong-edit',
+    templateUrl: './qua-trinh-hoat-dong-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class QuaTrinhHoatDongEditComponent implements OnInit {

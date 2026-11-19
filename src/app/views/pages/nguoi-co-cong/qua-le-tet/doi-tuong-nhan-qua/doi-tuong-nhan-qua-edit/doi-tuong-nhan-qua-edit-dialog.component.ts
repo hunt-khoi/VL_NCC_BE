@@ -12,9 +12,10 @@ import { DoiTuongNhanQuaModel } from '../../doi-tuong-nhan-qua/Model/doi-tuong-n
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-doi-tuong-nhan-qua-edit',
-	templateUrl: './doi-tuong-nhan-qua-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-doi-tuong-nhan-qua-edit',
+    templateUrl: './doi-tuong-nhan-qua-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DoiTuongNhanQuaEditDialogComponent implements OnInit, OnDestroy {

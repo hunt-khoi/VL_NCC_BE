@@ -2,8 +2,9 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
-	selector: 'kt-delete-entity-dialog',
-	templateUrl: './delete-entity-dialog.component.html'
+    selector: 'kt-delete-entity-dialog',
+    templateUrl: './delete-entity-dialog.component.html',
+    standalone: false
 })
 export class DeleteEntityDialogComponent {
 	viewLoading: boolean = false;

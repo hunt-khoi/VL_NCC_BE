@@ -14,8 +14,9 @@ import { DinhChinhThongTinService } from './../Services/dinh-chinh-thong-tin.ser
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-dinhchinhthongtin-dialog',
-	templateUrl: './dinhchinhthongtin-dialog.component.html',
+    selector: 'kt-dinhchinhthongtin-dialog',
+    templateUrl: './dinhchinhthongtin-dialog.component.html',
+    standalone: false
 })
 export class DinhchinhthongtinDialogComponent implements OnInit {
 	item: any;

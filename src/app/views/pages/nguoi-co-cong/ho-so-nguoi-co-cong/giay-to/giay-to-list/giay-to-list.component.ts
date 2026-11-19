@@ -19,9 +19,10 @@ import { GiayToEditDialogComponent } from './../giay-to-edit/giay-to-edit-dialog
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-giay-to-list',
-	templateUrl: './giay-to-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-giay-to-list',
+    templateUrl: './giay-to-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class GiayToListComponent implements OnInit {
 	// Table fields

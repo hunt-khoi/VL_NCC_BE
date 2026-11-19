@@ -19,10 +19,11 @@ import { SysConfigModel } from '../Model/config.model';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-config-list',
-	templateUrl: './config-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-config-list',
+    templateUrl: './config-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 export class ConfigListComponent implements OnInit, OnDestroy {
 	// Table fields

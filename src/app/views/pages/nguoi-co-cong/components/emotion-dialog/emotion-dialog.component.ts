@@ -4,8 +4,9 @@ import { CommonService } from '../../services/common.service';
 
 
 @Component({
-	selector: 'kt-emotion-dialog',
-	templateUrl: './emotion-dialog.component.html',
+    selector: 'kt-emotion-dialog',
+    templateUrl: './emotion-dialog.component.html',
+    standalone: false
 })
 export class EmotionDialogComponent implements OnInit {
 	viewLoading: boolean = false;

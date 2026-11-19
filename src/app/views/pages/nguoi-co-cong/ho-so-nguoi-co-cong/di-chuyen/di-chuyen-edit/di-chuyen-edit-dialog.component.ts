@@ -6,9 +6,10 @@ import { DiChuyenEditComponent } from '../../../components';
 import { DiChuyenService } from '../Services/di-chuyen.service';
 
 @Component({
-	selector: 'kt-di-chuyen-edit-dialog',
-	templateUrl: './di-chuyen-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-di-chuyen-edit-dialog',
+    templateUrl: './di-chuyen-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DiChuyenEditDialogComponent implements OnInit {

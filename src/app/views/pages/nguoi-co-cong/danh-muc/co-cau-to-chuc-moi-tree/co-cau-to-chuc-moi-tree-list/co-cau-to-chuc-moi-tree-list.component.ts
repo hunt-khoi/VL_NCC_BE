@@ -22,10 +22,11 @@ interface TreeNode {
 }
 
 @Component({
-	selector: 'm-co-cau-to-chuc-moi-tree-list',
-	templateUrl: './co-cau-to-chuc-moi-tree-list.component.html',
-	styleUrls: ['./co-cau-to-chuc-moi-tree-list.component.scss'],
-	encapsulation: ViewEncapsulation.None
+    selector: 'm-co-cau-to-chuc-moi-tree-list',
+    templateUrl: './co-cau-to-chuc-moi-tree-list.component.html',
+    styleUrls: ['./co-cau-to-chuc-moi-tree-list.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 
 export class cocautochucmoitreeComponent implements OnInit, OnDestroy {

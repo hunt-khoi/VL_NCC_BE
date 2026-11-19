@@ -3,7 +3,8 @@ import { Subject } from 'rxjs';
 
 @Directive({
     // eslint-disable-next-line @angular-eslint/directive-selector
-    selector: '[libInsertion]'
+    selector: '[libInsertion]',
+    standalone: false
 })
 export class InsertionDirective {
     constructor(public viewContainerRef: ViewContainerRef) { }
@@ -13,7 +14,8 @@ export class InsertionDirective {
     // eslint-disable-next-line @angular-eslint/component-selector
     selector: 'lib-dynamic-component',
     templateUrl: './dynamic-component.component.html',
-    styleUrls: ['./dynamic-component.component.scss']
+    styleUrls: ['./dynamic-component.component.scss'],
+    standalone: false
 })
 export class DynamicComponentComponent implements OnDestroy, AfterViewInit {
     @Input() childComponentType: any;

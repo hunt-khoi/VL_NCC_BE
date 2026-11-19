@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { OffcanvasOptions } from '../../../../core/_base/layout';
 
 @Component({
-	selector: 'kt-quick-panel',
-	templateUrl: './quick-panel.component.html',
-	styleUrls: ['./quick-panel.component.scss']
+    selector: 'kt-quick-panel',
+    templateUrl: './quick-panel.component.html',
+    styleUrls: ['./quick-panel.component.scss'],
+    standalone: false
 })
 export class QuickPanelComponent {
 	offcanvasOptions: OffcanvasOptions = {

@@ -12,9 +12,10 @@ export class TodoItemNode {
 	id?: any;
 }
 @Component({
-	selector: 'kt-list-file-dinh-kem',
-	templateUrl: './list-file-dinh-kem.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-list-file-dinh-kem',
+    templateUrl: './list-file-dinh-kem.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ListFileDinhKemComponent implements OnInit {
 	viewLoading: boolean = false;

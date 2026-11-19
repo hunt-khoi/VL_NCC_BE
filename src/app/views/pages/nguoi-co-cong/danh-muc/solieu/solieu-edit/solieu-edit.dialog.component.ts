@@ -10,8 +10,9 @@ import { ReplaySubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'm-solieu-edit-dialog',
-	templateUrl: './solieu-edit.dialog.component.html',
+    selector: 'm-solieu-edit-dialog',
+    templateUrl: './solieu-edit.dialog.component.html',
+    standalone: false
 })
 
 export class solieuEditDialogComponent implements OnInit, OnDestroy {

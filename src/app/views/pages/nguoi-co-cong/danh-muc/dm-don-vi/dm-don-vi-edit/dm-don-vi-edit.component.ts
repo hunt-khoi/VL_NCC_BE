@@ -10,9 +10,10 @@ import { TreeDonViDialogComponent } from '../../../components/tree-don-vi-dialog
 import { environment } from 'environments/environment';
 
 @Component({
-	selector: 'kt-dm-don-vi-edit',
-	templateUrl: './dm-don-vi-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-dm-don-vi-edit',
+    templateUrl: './dm-don-vi-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DM_DonViEditComponent implements OnInit, OnDestroy {
 	// Public properties

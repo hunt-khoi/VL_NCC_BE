@@ -12,9 +12,10 @@ import { ChonNhieuDonViComponent } from '../../../components/chon-nhieu-don-vi/c
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-nguoi-dung-dps-edit',
-	templateUrl: './nguoi-dung-dps-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nguoi-dung-dps-edit',
+    templateUrl: './nguoi-dung-dps-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NguoiDungDPSEditComponent implements OnInit, OnDestroy {

@@ -4,9 +4,10 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { DeXuatService } from '../de-xuat/Services/de-xuat.service';
 
 @Component({
-	selector: 'm-de-xuat-duyet',
-	templateUrl: './de-xuat-duyet.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-de-xuat-duyet',
+    templateUrl: './de-xuat-duyet.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DeXuatDuyetComponent implements OnInit {
 	constructor(private apiService: DeXuatService) { }

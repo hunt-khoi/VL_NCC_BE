@@ -9,9 +9,10 @@ import { CommonService } from '../../../services/common.service';
 import { DeXuatService } from '../Services/de-xuat.service';
 
 @Component({
-	selector: 'kt-de-xuat-don-vi',
-	templateUrl: './de-xuat-don-vi.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-de-xuat-don-vi',
+    templateUrl: './de-xuat-don-vi.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DeXuatDonViComponent implements OnInit, OnDestroy {

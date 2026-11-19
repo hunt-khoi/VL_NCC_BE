@@ -11,8 +11,9 @@ import { HoSoNCCService } from '../../ho-so-ncc/Services/ho-so-ncc.service';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-info',
-	templateUrl: './info.component.html',
+    selector: 'kt-info',
+    templateUrl: './info.component.html',
+    standalone: false
 })
 
 export class InfoComponent implements OnInit {

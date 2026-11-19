@@ -4,9 +4,10 @@ import { BehaviorSubject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
-	selector: 'kt-review-docx',
-	templateUrl: './review-docx.component.html',
-	encapsulation: ViewEncapsulation.None,
+    selector: 'kt-review-docx',
+    templateUrl: './review-docx.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ReviewDocxComponent implements OnInit {
 	loadingSubject = new BehaviorSubject<boolean>(false);

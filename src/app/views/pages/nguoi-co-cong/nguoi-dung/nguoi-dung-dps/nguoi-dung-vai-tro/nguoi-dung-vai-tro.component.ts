@@ -8,9 +8,10 @@ import { ChonDonViComponent } from '../../../components/chon-don-vi/chon-don-vi.
 import { ChonVaiTroComponent } from '../../../components/chon-vai-tro/chon-vai-tro.component';
 
 @Component({
-	selector: 'kt-nguoi-dung-vai-tro',
-	templateUrl: './nguoi-dung-vai-tro.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nguoi-dung-vai-tro',
+    templateUrl: './nguoi-dung-vai-tro.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NguoiDungVaiTroComponent implements OnInit, OnDestroy {

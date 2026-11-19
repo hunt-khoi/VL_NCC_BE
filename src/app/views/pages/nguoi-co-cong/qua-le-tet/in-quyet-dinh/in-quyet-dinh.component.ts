@@ -9,9 +9,10 @@ import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { InQuyetDinhService } from './Services/in-quyet-dinh.service';
 
 @Component({
-	selector: 'kt-in-quyet-dinh',
-	templateUrl: './in-quyet-dinh.component.html',
-	encapsulation: ViewEncapsulation.None,
+    selector: 'kt-in-quyet-dinh',
+    templateUrl: './in-quyet-dinh.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 
 export class InQuyetDinhComponent implements OnInit, OnDestroy {

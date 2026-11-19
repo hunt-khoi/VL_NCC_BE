@@ -8,9 +8,10 @@ import { ThanNhanModel } from '../../than-nhan/Model/than-nhan.model';
 import { ThanNhanEditComponent } from '../../../components/than-nhan-edit/than-nhan-edit.component';
 
 @Component({
-	selector: 'kt-than-nhan-edit-dialog',
-	templateUrl: './than-nhan-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-than-nhan-edit-dialog',
+    templateUrl: './than-nhan-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class ThanNhanEditDialogComponent implements OnInit {

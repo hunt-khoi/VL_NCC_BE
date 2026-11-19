@@ -9,9 +9,10 @@ import { QuanHeGiaDinhService } from './../Services/quan-he-gia-dinh.service';
 import { QuanHeGiaDinhModel } from './../Model/quan-he-gia-dinh.model';
 
 @Component({
-	selector: 'kt-quan-he-gia-dinh-edit',
-	templateUrl: './quan-he-gia-dinh-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-quan-he-gia-dinh-edit',
+    templateUrl: './quan-he-gia-dinh-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class QuanHeGiaDinhEditDialogComponent implements OnInit, OnDestroy {

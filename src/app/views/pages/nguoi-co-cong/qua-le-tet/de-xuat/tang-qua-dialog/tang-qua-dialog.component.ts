@@ -7,8 +7,9 @@ import { PhatQuaModel } from './../Model/phat-qua.model';
 import { PhatQuaService } from './../Services/phat-qua.service';
 
 @Component({
-	selector: 'kt-tang-qua-dialog',
-	templateUrl: './tang-qua-dialog.component.html',
+    selector: 'kt-tang-qua-dialog',
+    templateUrl: './tang-qua-dialog.component.html',
+    standalone: false
 })
 export class TangQuaDialogComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

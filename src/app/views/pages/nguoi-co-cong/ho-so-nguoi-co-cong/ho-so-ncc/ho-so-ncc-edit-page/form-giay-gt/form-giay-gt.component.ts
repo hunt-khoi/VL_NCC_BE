@@ -11,9 +11,10 @@ import { HoSoNCCService } from './../../Services/ho-so-ncc.service';
 import { TroCapRowEditComponent } from '../../../../components';
 
 @Component({
-	selector: 'kt-form-giay-gt',
-	templateUrl: './form-giay-gt.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-giay-gt',
+    templateUrl: './form-giay-gt.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormGiayGTComponent extends FormBaseComponent implements OnInit, OnDestroy {

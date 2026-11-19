@@ -14,9 +14,10 @@ import { LayoutUtilsService, QueryParamsModel } from '../../../../../../core/_ba
 import { CommonService } from '../../../services/common.service';
 
 @Component({
-	selector: 'm-ngay-le-list',
-	templateUrl: './ngay-le-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-ngay-le-list',
+    templateUrl: './ngay-le-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HolidaysListComponent implements OnInit, OnDestroy {

@@ -9,9 +9,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-duyet-so-lieu-page',
-	templateUrl: './duyet-so-lieu-page.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-duyet-so-lieu-page',
+    templateUrl: './duyet-so-lieu-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DuyetSoLieuPageComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

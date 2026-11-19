@@ -5,10 +5,11 @@ import { ReplaySubject } from 'rxjs';
 import { CommonService } from '../../services/common.service';
 
 @Component({
-	selector: 'kt-choose-users',
-	templateUrl: './choose-users.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-choose-users',
+    templateUrl: './choose-users.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 
 export class ChooseUsersComponent implements OnInit, OnChanges {

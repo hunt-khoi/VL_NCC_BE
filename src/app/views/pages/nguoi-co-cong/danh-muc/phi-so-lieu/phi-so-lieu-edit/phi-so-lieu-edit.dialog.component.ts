@@ -11,9 +11,10 @@ import { PhiSoLieuServices } from '../Services/phi-so-lieu.service';
 import { ReplaySubject } from 'rxjs';
 
 @Component({
-	selector: 'kt-phi-so-lieu-edit',
-	templateUrl: './phi-so-lieu-edit.dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-phi-so-lieu-edit',
+    templateUrl: './phi-so-lieu-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class PhiSoLieuDialogComponent implements OnInit, OnDestroy {

@@ -1,9 +1,10 @@
 import { Component, HostBinding, Input, OnInit } from '@angular/core';
 
 @Component({
-	selector: 'kt-portlet-footer',
-	template: `
-		<ng-content></ng-content>`
+    selector: 'kt-portlet-footer',
+    template: `
+		<ng-content></ng-content>`,
+    standalone: false
 })
 export class PortletFooterComponent implements OnInit {
 	@HostBinding('class') classList = 'kt-portlet__foot';

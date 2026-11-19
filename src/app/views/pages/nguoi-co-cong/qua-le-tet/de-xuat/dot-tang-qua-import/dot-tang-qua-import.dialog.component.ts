@@ -8,9 +8,10 @@ import { DeXuatModel } from '../Model/de-xuat.model';
 import { DeXuatService } from '../Services/de-xuat.service';
 
 @Component({
-	selector: 'm-dot-tang-qua-import-dialog',
-	templateUrl: './dot-tang-qua-import.dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'm-dot-tang-qua-import-dialog',
+    templateUrl: './dot-tang-qua-import.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class dottangquaImportDialogComponent implements OnInit, OnDestroy {

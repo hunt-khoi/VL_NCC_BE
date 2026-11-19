@@ -6,9 +6,10 @@ import { AuthService } from '../../../../../core/auth';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';
 
 @Component({
-	selector: 'kt-vai-tro',
-	templateUrl: './vai-tro.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-vai-tro',
+    templateUrl: './vai-tro.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class VaiTroComponent implements OnInit, OnDestroy {

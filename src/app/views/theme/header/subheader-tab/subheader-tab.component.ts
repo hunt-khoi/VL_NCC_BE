@@ -7,9 +7,10 @@ import { MenuHorizontalService } from 'app/core/_base/layout';
 import { QueryParamsModel } from 'app/core/_base/crud';
 
 @Component({
-	selector: 'kt-subheader-tab',
-	templateUrl: './subheader-tab.component.html',
-	styleUrls: ['./subheader-tab.component.scss'],
+    selector: 'kt-subheader-tab',
+    templateUrl: './subheader-tab.component.html',
+    styleUrls: ['./subheader-tab.component.scss'],
+    standalone: false
 })
 export class SubheaderTabComponent implements OnChanges, OnDestroy {
 	@Input() fluid: boolean = false;

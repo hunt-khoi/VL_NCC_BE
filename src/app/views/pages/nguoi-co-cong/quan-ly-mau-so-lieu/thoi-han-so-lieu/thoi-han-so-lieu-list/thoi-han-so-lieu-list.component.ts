@@ -19,9 +19,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-thoi-han-so-lieu-list',
-	templateUrl: './thoi-han-so-lieu-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-thoi-han-so-lieu-list',
+    templateUrl: './thoi-han-so-lieu-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class ThoiHanSoLieuListComponent implements OnInit, OnDestroy {

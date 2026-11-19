@@ -11,8 +11,9 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { TokenStorage } from '../../../../../../core/auth/_services/token-storage.service';
 
 @Component({
-	selector: 'm-co-cau-to-chuc-moi-tree-edit',
-	templateUrl: './co-cau-to-chuc-moi-tree-edit.component.html',
+    selector: 'm-co-cau-to-chuc-moi-tree-edit',
+    templateUrl: './co-cau-to-chuc-moi-tree-edit.component.html',
+    standalone: false
 })
 
 export class CoCauToChucEditComponent implements OnInit, OnDestroy {

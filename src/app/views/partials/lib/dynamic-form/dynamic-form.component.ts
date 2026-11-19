@@ -10,7 +10,8 @@ import moment__default from 'moment';
 @Component({
     selector: 'kt-dynamic-form',
     templateUrl: './dynamic-form.component.html',
-    styleUrls: ['./dynamic-form.component.scss']
+    styleUrls: ['./dynamic-form.component.scss'],
+    standalone: false
 })
 export class DynamicFormComponent implements OnInit, OnChanges, OnDestroy {
     @Input() set Data(data: any) {

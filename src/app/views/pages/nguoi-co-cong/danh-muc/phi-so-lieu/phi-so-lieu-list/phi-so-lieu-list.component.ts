@@ -18,9 +18,10 @@ import { PhiSoLieuDialogComponent } from '../phi-so-lieu-edit/phi-so-lieu-edit.d
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-phi-so-lieu-list',
-	templateUrl: './phi-so-lieu-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-phi-so-lieu-list',
+    templateUrl: './phi-so-lieu-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class PhiSoLieuListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

@@ -1,9 +1,10 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-	selector: 'kt-ho-so-ncc-duyet',
-	templateUrl: './ho-so-ncc-duyet.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc-duyet',
+    templateUrl: './ho-so-ncc-duyet.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HoSoNCCDuyetComponent { }

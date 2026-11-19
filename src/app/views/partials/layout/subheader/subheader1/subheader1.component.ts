@@ -4,9 +4,10 @@ import { SubheaderService } from '../../../../../core/_base/layout';
 import { Breadcrumb } from '../../../../../core/_base/layout/services/subheader.service';
 
 @Component({
-	selector: 'kt-subheader1',
-	templateUrl: './subheader1.component.html',
-	styleUrls: ['./subheader1.component.scss']
+    selector: 'kt-subheader1',
+    templateUrl: './subheader1.component.html',
+    styleUrls: ['./subheader1.component.scss'],
+    standalone: false
 })
 export class Subheader1Component implements OnDestroy, AfterViewInit {
 	// Public properties

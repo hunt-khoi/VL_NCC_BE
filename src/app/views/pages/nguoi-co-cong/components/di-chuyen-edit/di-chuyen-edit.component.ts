@@ -8,9 +8,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-di-chuyen-edit',
-	templateUrl: './di-chuyen-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-di-chuyen-edit',
+    templateUrl: './di-chuyen-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DiChuyenEditComponent implements OnInit {

@@ -20,7 +20,8 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'm-nhomletet-list',
     templateUrl: './nhomletet-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class nhomletetListComponent implements OnInit, OnDestroy {

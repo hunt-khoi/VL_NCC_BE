@@ -18,9 +18,10 @@ import { DienChinhHinhEditDialogComponent } from './../dien-chinh-hinh-edit/dien
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-dien-chinh-hinh-list',
-	templateUrl: './dien-chinh-hinh-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-dien-chinh-hinh-list',
+    templateUrl: './dien-chinh-hinh-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DienChinhHinhListComponent implements OnInit, OnDestroy {

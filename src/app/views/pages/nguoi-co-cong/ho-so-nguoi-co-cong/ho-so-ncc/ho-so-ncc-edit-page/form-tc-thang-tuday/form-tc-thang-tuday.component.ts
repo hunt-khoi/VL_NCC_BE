@@ -11,9 +11,10 @@ import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-tc-thang-tuday',
-	templateUrl: './form-tc-thang-tuday.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-tc-thang-tuday',
+    templateUrl: './form-tc-thang-tuday.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormTCThang_TuDayComponent extends FormBaseComponent implements OnInit, OnDestroy {

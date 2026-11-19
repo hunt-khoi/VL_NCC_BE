@@ -6,9 +6,10 @@ import { HtmlClassService } from '../html-class.service';
 import objectPath from 'object-path';
 
 @Component({
-	selector: 'kt-header',
-	templateUrl: './header.component.html',
-	styleUrls: ['./header.component.scss'],
+    selector: 'kt-header',
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.scss'],
+    standalone: false
 })
 
 export class HeaderComponent implements OnInit, AfterViewInit {

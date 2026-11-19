@@ -9,8 +9,9 @@ import { ChucDanhModel } from '../Model/chucdanh.model';
 import { ChucDanhService } from '../Services/chucdanh.service';
 
 @Component({
-	selector: 'm-chucdanh-edit-dialog',
-	templateUrl: './chucdanh-edit.dialog.component.html',
+    selector: 'm-chucdanh-edit-dialog',
+    templateUrl: './chucdanh-edit.dialog.component.html',
+    standalone: false
 })
 
 export class ChucDanhEditDialogComponent implements OnInit, OnDestroy {

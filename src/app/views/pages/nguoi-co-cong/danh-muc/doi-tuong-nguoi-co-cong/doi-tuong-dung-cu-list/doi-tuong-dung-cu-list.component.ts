@@ -18,8 +18,9 @@ import { DoiTuongDungCuEditComponent } from '../doi-tuong-dung-cu-edit/doi-tuong
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-  selector: 'kt-dm-doi-tuong-dung-cu-list',
-  templateUrl: './doi-tuong-dung-cu-list.component.html',
+    selector: 'kt-dm-doi-tuong-dung-cu-list',
+    templateUrl: './doi-tuong-dung-cu-list.component.html',
+    standalone: false
 })
 
 export class DoiTuongDungCuListComponent implements OnInit, OnDestroy {

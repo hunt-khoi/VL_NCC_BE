@@ -18,9 +18,10 @@ import { QuaTrinhHoatDongEditDialogComponent } from '../qua-trinh-hoat-dong-edit
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-qua-trinh-hoat-dong-list',
-	templateUrl: './qua-trinh-hoat-dong-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-qua-trinh-hoat-dong-list',
+    templateUrl: './qua-trinh-hoat-dong-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class QuaTrinhHoatDongListComponent implements OnInit {

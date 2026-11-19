@@ -8,9 +8,10 @@ import { QuyetDinhService } from '../Services/quyet-dinh.service';
 import { QuyetDinhEditComponent } from '../../../components';
 
 @Component({
-	selector: 'kt-quyet-dinh-edit-dialog',
-	templateUrl: './quyet-dinh-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-quyet-dinh-edit-dialog',
+    templateUrl: './quyet-dinh-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class QuyetDinhEditDialogComponent implements OnInit {

@@ -2,9 +2,10 @@ import { Component, ChangeDetectionStrategy, Input, OnInit, ChangeDetectorRef, O
 import { TableService } from '../table.service';
 
 @Component({
-	selector: 'kt-column-filter',
-	templateUrl: './column-filter.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-column-filter',
+    templateUrl: './column-filter.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ColumnFilterComponent implements OnInit, OnDestroy {
 	@Input() enable_sort: boolean = false;

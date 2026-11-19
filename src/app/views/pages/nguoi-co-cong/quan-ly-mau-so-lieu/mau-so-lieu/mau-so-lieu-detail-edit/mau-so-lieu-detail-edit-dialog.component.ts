@@ -11,8 +11,9 @@ import { FormMauSoLieuDetailModel } from '../Model/detail-list.model';
 import { PhiSoLieuEditDialogComponent } from '../phi-so-lieu-edit/phi-so-lieu-edit-dialog.component';
 
 @Component({
-	selector: 'kt-mau-so-lieu-detail-edit-dialog',
-	templateUrl: './mau-so-lieu-detail-edit-dialog.component.html',
+    selector: 'kt-mau-so-lieu-detail-edit-dialog',
+    templateUrl: './mau-so-lieu-detail-edit-dialog.component.html',
+    standalone: false
 })
 
 export class MauSoLieuDetailEditDialogComponent implements OnInit, OnDestroy {

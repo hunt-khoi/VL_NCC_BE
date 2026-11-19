@@ -2,8 +2,9 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { TableService } from '../table.service';
 
 @Component({
-	selector: 'kt-chip-filter',
-	templateUrl: './chip-filter.component.html',
+    selector: 'kt-chip-filter',
+    templateUrl: './chip-filter.component.html',
+    standalone: false
 })
 export class ChipFilterComponent {
 	@Input() gridService: TableService | undefined;

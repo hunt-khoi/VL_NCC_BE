@@ -10,9 +10,10 @@ import { SMSHistoryModel } from '../Model/sms-history.model';
 import { SMSHistoryService } from '../Services/sms-history.service';
 
 @Component({
-	selector: 'kt-sms-history-edit',
-	templateUrl: './sms-history-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-sms-history-edit',
+    templateUrl: './sms-history-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class SMSHistoryEditComponent implements OnInit, OnDestroy {

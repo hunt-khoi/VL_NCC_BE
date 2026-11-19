@@ -11,9 +11,10 @@ import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-tdc-ls',
-	templateUrl: './form-tdc-ls.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-tdc-ls',
+    templateUrl: './form-tdc-ls.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormTDC_LSComponent extends FormBaseComponent implements OnInit, OnDestroy {

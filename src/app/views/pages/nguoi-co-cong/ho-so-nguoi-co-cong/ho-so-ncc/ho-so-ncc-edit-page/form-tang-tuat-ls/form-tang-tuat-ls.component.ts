@@ -11,9 +11,10 @@ import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-tang-tuat-ls',
-	templateUrl: './form-tang-tuat-ls.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-tang-tuat-ls',
+    templateUrl: './form-tang-tuat-ls.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormTangTuatLSComponent extends FormBaseComponent implements OnInit, OnDestroy {

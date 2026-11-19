@@ -10,9 +10,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-doi-tuong-nguoi-co-cong',
-	templateUrl: './doi-tuong-nguoi-co-cong-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-doi-tuong-nguoi-co-cong',
+    templateUrl: './doi-tuong-nguoi-co-cong-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DoiTuongNguoiCoCongEditDialogComponent implements OnInit, OnDestroy {

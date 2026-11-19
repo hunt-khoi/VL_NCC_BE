@@ -16,7 +16,8 @@ import { chucvuEditDialogComponent } from '../chucvu-edit/chucvu-edit.dialog.com
 @Component({
     selector: 'm-chucvu-list',
     templateUrl: './chucvu-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class chucvuListComponent implements OnInit, OnDestroy {

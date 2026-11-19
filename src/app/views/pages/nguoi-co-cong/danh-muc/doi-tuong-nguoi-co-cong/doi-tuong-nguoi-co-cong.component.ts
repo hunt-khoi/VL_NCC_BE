@@ -7,9 +7,10 @@ import { DoiTuongNguoiCoCongService } from './Services/doi-tuong-nguoi-co-cong.s
 
 
 @Component({
-	selector: 'kt-doi-tuong-nguoi-co-cong',
-	templateUrl: './doi-tuong-nguoi-co-cong.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-doi-tuong-nguoi-co-cong',
+    templateUrl: './doi-tuong-nguoi-co-cong.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DoiTuongNguoiCoCongComponent implements OnInit, OnDestroy {

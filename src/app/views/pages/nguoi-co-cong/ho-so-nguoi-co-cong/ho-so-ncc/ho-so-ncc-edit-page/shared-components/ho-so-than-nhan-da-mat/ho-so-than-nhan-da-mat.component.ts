@@ -2,8 +2,9 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 @Component({
-	selector: 'kt-ho-so-than-nhan-da-mat',
-	templateUrl: './ho-so-than-nhan-da-mat.component.html',
+    selector: 'kt-ho-so-than-nhan-da-mat',
+    templateUrl: './ho-so-than-nhan-da-mat.component.html',
+    standalone: false
 })
 export class HoSoThanNhanDaMatComponent implements OnInit {
 	@Input() parentForm!: FormGroup;

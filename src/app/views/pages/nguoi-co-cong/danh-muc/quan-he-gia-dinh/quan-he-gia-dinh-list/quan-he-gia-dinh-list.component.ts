@@ -18,9 +18,10 @@ import { QuanHeGiaDinhEditDialogComponent } from './../quan-he-gia-dinh-edit/qua
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-quan-he-gia-dinh-list',
-	templateUrl: './quan-he-gia-dinh-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-quan-he-gia-dinh-list',
+    templateUrl: './quan-he-gia-dinh-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class QuanHeGiaDinhListComponent implements OnInit, OnDestroy {

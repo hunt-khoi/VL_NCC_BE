@@ -33,10 +33,10 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
  * A directive that helps with wth picking hours, minutes and seconds.
  */
 @Component({
-  selector: 'ngb-timepicker',
-  encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./timepicker.scss'],
-  template: `
+    selector: 'ngb-timepicker',
+    encapsulation: ViewEncapsulation.None,
+    styleUrls: ['./timepicker.scss'],
+    template: `
     <fieldset [disabled]="disabled" [class.disabled]="disabled">
       <div class="ngb-tp">
         <div class="ngb-tp-input-container ngb-tp-hour">
@@ -117,7 +117,8 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
       </div>
     </fieldset>
   `,
-  providers: [NGB_TIMEPICKER_VALUE_ACCESSOR]
+    providers: [NGB_TIMEPICKER_VALUE_ACCESSOR],
+    standalone: false
 })
 export class NgbTimepicker implements ControlValueAccessor,
     OnChanges {

@@ -3,9 +3,10 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
-	selector: 'kt-display-html-content',
-	templateUrl: './display-html-content.component.html',
-	encapsulation: ViewEncapsulation.None,
+    selector: 'kt-display-html-content',
+    templateUrl: './display-html-content.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class DisplayHtmlContentComponent implements OnInit {
 	viewLoading: boolean = false;

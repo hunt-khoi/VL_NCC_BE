@@ -10,10 +10,11 @@ import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
 import { COMPONENT_MAPPING } from './ho-so-ncc.mapping';
 
 @Component({
-	selector: 'kt-ho-so-ncc-edit-page',
-	templateUrl: './ho-so-ncc-edit-page.component.html',
-	styleUrls: ['./ho-so-ncc-edit-page.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc-edit-page',
+    templateUrl: './ho-so-ncc-edit-page.component.html',
+    styleUrls: ['./ho-so-ncc-edit-page.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HoSoNCCEditPageComponent implements OnInit, OnDestroy {

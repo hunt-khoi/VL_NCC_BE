@@ -18,9 +18,10 @@ import { LoaiGiayToEditDialogComponent } from '../loaigiayto-edit/loaigiayto-edi
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-loai-giay-to-list',
-	templateUrl: './loaigiayto-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-loai-giay-to-list',
+    templateUrl: './loaigiayto-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class LoaiGiayToListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

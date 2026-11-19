@@ -9,9 +9,10 @@ import { DoiTuongNhanQuaService } from '../Services/doi-tuong-nhan-qua.service';
 import { DoiTuongNhanQuaModel } from '../Model/doi-tuong-nhan-qua.model';
 
 @Component({
-	selector: 'kt-doi-tuong-nhan-qua-import',
-	templateUrl: './doi-tuong-nhan-qua-import.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-doi-tuong-nhan-qua-import',
+    templateUrl: './doi-tuong-nhan-qua-import.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DoiTuongNhanQuaImportComponent implements OnInit, OnDestroy {

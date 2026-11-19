@@ -9,9 +9,10 @@ import { CommonService } from '../../../services/common.service';
 import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 
 @Component({
-	selector: 'kt-de-xuat-tong-hop',
-	templateUrl: './de-xuat-tong-hop.dialog.component.html',
-	encapsulation: ViewEncapsulation.None,
+    selector: 'kt-de-xuat-tong-hop',
+    templateUrl: './de-xuat-tong-hop.dialog.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 
 export class DeXuatTongHopDialogComponent implements OnInit, OnDestroy {

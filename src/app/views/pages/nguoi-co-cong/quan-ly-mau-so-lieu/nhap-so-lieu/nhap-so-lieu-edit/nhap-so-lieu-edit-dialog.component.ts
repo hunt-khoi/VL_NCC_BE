@@ -11,8 +11,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-nhap-so-lieu-edit-dialog',
-	templateUrl: './nhap-so-lieu-edit-dialog.component.html',
+    selector: 'kt-nhap-so-lieu-edit-dialog',
+    templateUrl: './nhap-so-lieu-edit-dialog.component.html',
+    standalone: false
 })
 
 export class NhapSoLieuEditDialogComponent implements OnInit, OnDestroy {

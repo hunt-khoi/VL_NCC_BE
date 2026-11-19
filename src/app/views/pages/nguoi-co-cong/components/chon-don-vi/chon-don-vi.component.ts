@@ -13,9 +13,10 @@ export class TodoItemNode {
 	id?: any;
 }
 @Component({
-	selector: 'kt-chon-don-vi',
-	templateUrl: './chon-don-vi.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-chon-don-vi',
+    templateUrl: './chon-don-vi.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ChonDonViComponent implements OnInit {
 	hasFormErrors: boolean = false;

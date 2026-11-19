@@ -19,8 +19,9 @@ import { UpdateMucQuaDialogComponent } from '../update-muc-qua/update-muc-qua.di
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-dm-doi-tuong-nhan-qua-muc-qua-list',
-	templateUrl: './doi-tuong-nhan-qua-muc-qua-list.component.html',
+    selector: 'kt-dm-doi-tuong-nhan-qua-muc-qua-list',
+    templateUrl: './doi-tuong-nhan-qua-muc-qua-list.component.html',
+    standalone: false
 })
 export class DoiTuongNhanQuaMucQuaListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

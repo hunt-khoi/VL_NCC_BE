@@ -9,8 +9,9 @@ import { ReplaySubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'm-cachnhap-edit-dialog',
-	templateUrl: './cachnhap-edit.dialog.component.html',
+    selector: 'm-cachnhap-edit-dialog',
+    templateUrl: './cachnhap-edit.dialog.component.html',
+    standalone: false
 })
 
 export class cachnhapEditDialogComponent implements OnInit, OnDestroy {

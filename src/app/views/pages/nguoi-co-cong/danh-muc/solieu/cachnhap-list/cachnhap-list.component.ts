@@ -18,9 +18,10 @@ import { cachnhapEditDialogComponent } from '../cachnhap-edit/cachnhap-edit.dial
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-cachnhap-list',
-	templateUrl: './cachnhap-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-cachnhap-list',
+    templateUrl: './cachnhap-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class cachNhapListComponent implements OnInit, OnDestroy {

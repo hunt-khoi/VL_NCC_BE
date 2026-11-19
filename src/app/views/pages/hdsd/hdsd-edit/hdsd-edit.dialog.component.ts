@@ -8,8 +8,9 @@ import { LayoutUtilsService } from 'app/core/_base/crud/utils/layout-utils.servi
 import { HDSDService } from '../Services/hdsd.service';
 
 @Component({
-	selector: 'kt-hdsd-edit',
-	templateUrl: './hdsd-edit.dialog.component.html',
+    selector: 'kt-hdsd-edit',
+    templateUrl: './hdsd-edit.dialog.component.html',
+    standalone: false
 })
 export class HDSDEditDialogComponent implements OnInit {
 	item: any;

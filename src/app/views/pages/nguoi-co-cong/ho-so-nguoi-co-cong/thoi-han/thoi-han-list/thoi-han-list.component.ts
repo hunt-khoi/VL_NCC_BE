@@ -18,9 +18,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-thoi-han-list',
-	templateUrl: './thoi-han-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-thoi-han-list',
+    templateUrl: './thoi-han-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ThoiHanListComponent implements OnInit {
 	// Table fields

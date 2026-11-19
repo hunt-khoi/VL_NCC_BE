@@ -8,9 +8,10 @@ import { CauHinhEmailService } from '../Services/cau-hinh-email.service';
 import { CauHinhEmailModel } from '../Model/cau-hinh-email.model';
 
 @Component({
-	selector: 'kt-cau-hinh-email-popup-donvicon',
-	templateUrl: './cau-hinh-email-popup-donvicon.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-cau-hinh-email-popup-donvicon',
+    templateUrl: './cau-hinh-email-popup-donvicon.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class CauHinhEmailPopupDVCComponent implements OnInit, OnDestroy {

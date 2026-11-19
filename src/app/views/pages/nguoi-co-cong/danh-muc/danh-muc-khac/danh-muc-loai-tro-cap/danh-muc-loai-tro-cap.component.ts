@@ -19,8 +19,9 @@ import { TroCapImportComponent } from '../tro-cap-import/tro-cap-import.componen
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-danh-muc-loai-tro-cap',
-	templateUrl: './danh-muc-loai-tro-cap.component.html',
+    selector: 'kt-danh-muc-loai-tro-cap',
+    templateUrl: './danh-muc-loai-tro-cap.component.html',
+    standalone: false
 })
 export class DanhMucLoaiTroCapComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

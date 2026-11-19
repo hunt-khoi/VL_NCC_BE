@@ -12,10 +12,11 @@ import * as jspdf from 'jspdf';
 import html2canvas from 'html2canvas';
 
 @Component({
-	selector: 'm-draw-chart-list',
-	templateUrl: './draw-chart-list.component.html',
-	styleUrls: ['./draw-chart-list.component.css'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-draw-chart-list',
+    templateUrl: './draw-chart-list.component.html',
+    styleUrls: ['./draw-chart-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DrawListComponent implements OnInit, OnDestroy {

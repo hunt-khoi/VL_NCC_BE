@@ -24,9 +24,10 @@ import { HoSoNCCImportComponent } from '../ho-so-ncc-import/ho-so-ncc-import.com
 import { QuyetDinhEditDialogComponent } from '../../quyet-dinh/quyet-dinh-edit/quyet-dinh-edit-dialog.component';
 
 @Component({
-	selector: 'kt-ho-so-ncc-list',
-	templateUrl: './ho-so-ncc-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc-list',
+    templateUrl: './ho-so-ncc-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HoSoNCCListComponent implements OnInit {

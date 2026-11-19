@@ -11,9 +11,10 @@ import { LogService } from '../Services/log.service';
 import { LogDataSource } from '../Model/data-sources/log.datasource';
 
 @Component({
-	selector: 'm-file-list',
-	templateUrl: './file-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-file-list',
+    templateUrl: './file-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FileListComponent implements OnInit {

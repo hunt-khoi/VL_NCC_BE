@@ -13,9 +13,10 @@ import { OrgChartService } from '../Services/so-do-to-chuc.service';
 import { chucvuEditDialogComponent } from '../../chucvu/chucvu-edit/chucvu-edit.dialog.component';
 
 @Component({
-	selector: 'm-so-do-to-chuc-edit',
-	templateUrl: './so-do-to-chuc-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-so-do-to-chuc-edit',
+    templateUrl: './so-do-to-chuc-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class sodotochuceditComponent implements OnInit, OnDestroy {

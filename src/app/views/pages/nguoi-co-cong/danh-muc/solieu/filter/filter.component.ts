@@ -20,9 +20,10 @@ import { TableService } from '../../../../../partials/table/table.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-filter',
-	templateUrl: './filter.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-filter',
+    templateUrl: './filter.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FilterComponent implements OnInit, OnDestroy {

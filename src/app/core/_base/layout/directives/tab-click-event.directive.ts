@@ -1,7 +1,8 @@
 import { Directive, HostListener, Renderer2 } from '@angular/core';
 
 @Directive({
-	selector: '[ktTabClickEvent]'
+    selector: '[ktTabClickEvent]',
+    standalone: false
 })
 export class TabClickEventDirective {
 

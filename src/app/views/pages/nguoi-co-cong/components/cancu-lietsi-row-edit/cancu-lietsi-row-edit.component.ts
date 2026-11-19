@@ -6,9 +6,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	// eslint-disable-next-line @angular-eslint/component-selector
-	selector: 'tr[cancu-lietsi-row-edit]',
-	templateUrl: './cancu-lietsi-row-edit.component.html',
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'tr[cancu-lietsi-row-edit]',
+    templateUrl: './cancu-lietsi-row-edit.component.html',
+    standalone: false
 })
 
 export class CanCuLSRowEditComponent implements OnInit {

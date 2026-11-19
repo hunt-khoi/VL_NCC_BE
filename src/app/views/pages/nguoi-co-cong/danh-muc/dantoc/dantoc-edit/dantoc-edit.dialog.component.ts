@@ -9,8 +9,9 @@ import { dantocModel } from '../../dantoc/Model/dantoc.model';
 import { dantocService } from '../Services/dantoc.service';
 
 @Component({
-	selector: 'm-dantoc-edit-dialog',
-	templateUrl: './dantoc-edit.dialog.component.html',
+    selector: 'm-dantoc-edit-dialog',
+    templateUrl: './dantoc-edit.dialog.component.html',
+    standalone: false
 })
 
 export class dantocEditDialogComponent implements OnInit, OnDestroy {

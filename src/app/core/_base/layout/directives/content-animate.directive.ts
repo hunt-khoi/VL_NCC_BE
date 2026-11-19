@@ -4,7 +4,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Directive({
-	selector: '[ktContentAnimate]'
+    selector: '[ktContentAnimate]',
+    standalone: false
 })
 export class ContentAnimateDirective implements OnInit, OnDestroy {
 	player: AnimationPlayer | undefined;

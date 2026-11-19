@@ -17,9 +17,10 @@ import { HoSoNCCDuyetService } from './../../../ho-so-nguoi-co-cong/ho-so-ncc-du
 // import { HoTroService } from '../../../quy-den-on-dap-nghia/ho-tro/Services/ho-tro.service';
 
 @Component({
-	selector: 'kt-qua-trinh-khong-co-nguoi-duyet-edit',
-	templateUrl: './qua-trinh-khong-co-nguoi-duyet-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-qua-trinh-khong-co-nguoi-duyet-edit',
+    templateUrl: './qua-trinh-khong-co-nguoi-duyet-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class QuaTrinhKhongCoNguoiDuyetEditComponent implements OnInit, OnDestroy {

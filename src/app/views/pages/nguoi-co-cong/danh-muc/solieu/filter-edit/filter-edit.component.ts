@@ -12,8 +12,9 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { CommonService } from '../../../services/common.service';
 
 @Component({
-	selector: 'kt-filter-edit',
-	templateUrl: './filter-edit.component.html',
+    selector: 'kt-filter-edit',
+    templateUrl: './filter-edit.component.html',
+    standalone: false
 })
 
 export class filterEditComponent implements OnInit, OnDestroy {

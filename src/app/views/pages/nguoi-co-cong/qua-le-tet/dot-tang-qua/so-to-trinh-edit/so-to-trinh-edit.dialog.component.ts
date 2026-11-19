@@ -8,8 +8,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-so-to-trinh-edit',
-	templateUrl: './so-to-trinh-edit.dialog.component.html'
+    selector: 'kt-so-to-trinh-edit',
+    templateUrl: './so-to-trinh-edit.dialog.component.html',
+    standalone: false
 })
 export class SoToTrinhEditDialogComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

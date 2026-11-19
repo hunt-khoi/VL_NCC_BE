@@ -9,8 +9,9 @@ import { chedouudaiService } from '../Services/che-do-uu-dai.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
-	selector: 'm-che-do-uu-dai-edit-dialog',
-	templateUrl: './che-do-uu-dai-edit.dialog.component.html',
+    selector: 'm-che-do-uu-dai-edit-dialog',
+    templateUrl: './che-do-uu-dai-edit.dialog.component.html',
+    standalone: false
 })
 
 export class chedouudaiEditDialogComponent implements OnInit, OnDestroy {

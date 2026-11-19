@@ -18,8 +18,9 @@ import { BieuMauEditDialogComponent } from '../bieu-mau-edit/bieu-mau-edit.dialo
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-bieu-mau-list',
-	templateUrl: './bieu-mau-list.component.html'
+    selector: 'kt-bieu-mau-list',
+    templateUrl: './bieu-mau-list.component.html',
+    standalone: false
 })
 export class BieuMauListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

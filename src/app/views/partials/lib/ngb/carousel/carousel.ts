@@ -36,7 +36,10 @@ let nextId = 0;
 /**
  * A directive that wraps the individual carousel slide.
  */
-@Directive({selector: 'ng-template[ngbSlide]'})
+@Directive({
+    selector: 'ng-template[ngbSlide]',
+    standalone: false
+})
 export class NgbSlide {
   /**
    * Slide id that must be unique for the entire document.
@@ -53,18 +56,18 @@ export class NgbSlide {
  * Allows to set intervals, change the way user interacts with the slides and provides a programmatic API.
  */
 @Component({
-  selector: 'ngb-carousel',
-  exportAs: 'ngbCarousel',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
-  host: {
-    'class': 'carousel slide',
-    '[style.display]': '"block"',
-    'tabIndex': '0',
-    '(keydown.arrowLeft)': 'keyboard && prev(NgbSlideEventSource.ARROW_LEFT)',
-    '(keydown.arrowRight)': 'keyboard && next(NgbSlideEventSource.ARROW_RIGHT)'
-  },
-  template: `
+    selector: 'ngb-carousel',
+    exportAs: 'ngbCarousel',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    host: {
+        'class': 'carousel slide',
+        '[style.display]': '"block"',
+        'tabIndex': '0',
+        '(keydown.arrowLeft)': 'keyboard && prev(NgbSlideEventSource.ARROW_LEFT)',
+        '(keydown.arrowRight)': 'keyboard && next(NgbSlideEventSource.ARROW_RIGHT)'
+    },
+    template: `
     <ol class="carousel-indicators" *ngIf="showNavigationIndicators">
       <li *ngFor="let slide of slides" [id]="slide.id" [class.active]="slide.id === activeId"
           (click)="select(slide.id, NgbSlideEventSource.INDICATOR)"></li>
@@ -82,7 +85,8 @@ export class NgbSlide {
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="sr-only" i18n="@@ngb.carousel.next">Next</span>
     </a>
-  `
+  `,
+    standalone: false
 })
 export class NgbCarousel implements AfterContentChecked,
     AfterContentInit, OnDestroy {

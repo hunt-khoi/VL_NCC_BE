@@ -9,8 +9,9 @@ import { DoiTuongNguoiCoCongService } from './../Services/doi-tuong-nguoi-co-con
 import { DoiTuongBHYTModel } from './../Model/doi-tuong-nguoi-co-cong.model';
 
 @Component({
-  selector: 'kt-doi-tuong-bao-hiem-edit',
-  templateUrl: './doi-tuong-bao-hiem-edit.component.html',
+    selector: 'kt-doi-tuong-bao-hiem-edit',
+    templateUrl: './doi-tuong-bao-hiem-edit.component.html',
+    standalone: false
 })
 
 export class DoiTuongBaoHiemEditComponent implements OnInit, OnDestroy {

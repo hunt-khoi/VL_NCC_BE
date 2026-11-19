@@ -10,8 +10,9 @@ import { DanhmucTrocapModel } from './../Models/danh-muc-tro-cap.model';
 import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
 
 @Component({
-	selector: 'kt-tro-cap-detail',
-	templateUrl: './tro-cap-detail.component.html',
+    selector: 'kt-tro-cap-detail',
+    templateUrl: './tro-cap-detail.component.html',
+    standalone: false
 })
 export class TroCapDetailComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

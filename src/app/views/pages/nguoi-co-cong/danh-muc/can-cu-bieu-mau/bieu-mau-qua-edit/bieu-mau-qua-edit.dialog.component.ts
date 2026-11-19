@@ -11,8 +11,9 @@ import { BieuMauQuaService } from '../Services/bieu-mau-qua.service';
 import { KeyWordListDialogComponent } from '../key-word-list-dialog/key-word-list-dialog.component';
 
 @Component({
-	selector: 'kt-bieu-mau-qua-edit',
-	templateUrl: './bieu-mau-qua-edit.dialog.component.html',
+    selector: 'kt-bieu-mau-qua-edit',
+    templateUrl: './bieu-mau-qua-edit.dialog.component.html',
+    standalone: false
 })
 export class BieuMauQuaEditDialogComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

@@ -18,9 +18,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-bao-cao-thong-ke-view',
-	templateUrl: './bao-cao-thong-ke-view.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-bao-cao-thong-ke-view',
+    templateUrl: './bao-cao-thong-ke-view.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class BaoCaoThongKeViewComponent implements OnInit {

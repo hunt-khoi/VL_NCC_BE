@@ -1,9 +1,10 @@
 import { Component, HostBinding, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
-	selector: 'kt-error',
-	templateUrl: './error.component.html',
-	styleUrls: ['./error.component.scss']
+    selector: 'kt-error',
+    templateUrl: './error.component.html',
+    styleUrls: ['./error.component.scss'],
+    standalone: false
 })
 export class ErrorComponent {
 	// type of error template to be used, accepted values; error-v1 | error-v2 | error-v3 | error-v4 | error-v5 | error-v6

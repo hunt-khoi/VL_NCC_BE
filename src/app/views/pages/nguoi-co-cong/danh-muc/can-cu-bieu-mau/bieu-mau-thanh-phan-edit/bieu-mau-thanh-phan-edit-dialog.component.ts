@@ -9,9 +9,10 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { BieuMauService } from '../Services/bieu-mau.service';
 
 @Component({
-	selector: 'kt-bieu-mau-thanh-phan-edit-dialog',
-	templateUrl: './bieu-mau-thanh-phan-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-bieu-mau-thanh-phan-edit-dialog',
+    templateUrl: './bieu-mau-thanh-phan-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class BieuMauThanhPhanEditDialogComponent implements OnInit, OnDestroy {

@@ -14,9 +14,10 @@ export class TodoItemNode {
 	id?: any;
 }
 @Component({
-	selector: 'kt-chon-nhieu-don-vi',
-	templateUrl: './chon-nhieu-don-vi.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-chon-nhieu-don-vi',
+    templateUrl: './chon-nhieu-don-vi.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ChonNhieuDonViComponent implements OnInit {
 	loadingSubject = new BehaviorSubject<boolean>(true);

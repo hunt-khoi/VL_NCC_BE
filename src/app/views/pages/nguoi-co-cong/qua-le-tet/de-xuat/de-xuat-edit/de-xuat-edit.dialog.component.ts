@@ -13,9 +13,10 @@ import { DeXuatImportDialogComponent } from '../de-xuat-import/de-xuat-import.di
 import { DoiTuongNhanQuaEditDialogComponent } from '../../doi-tuong-nhan-qua/doi-tuong-nhan-qua-edit/doi-tuong-nhan-qua-edit-dialog.component';
 
 @Component({
-	selector: 'm-de-xuat-edit-dialog',
-	templateUrl: './de-xuat-edit.dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'm-de-xuat-edit-dialog',
+    templateUrl: './de-xuat-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DeXuatEditDialogComponent implements OnInit, OnDestroy {

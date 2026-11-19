@@ -10,9 +10,10 @@ import { ChiTietThongKeComponent } from './../chi-tiet-thong-ke/chi-tiet-thong-k
 import { Moment } from 'moment';
 
 @Component({
-	selector: 'kt-thong-ke-so-luong-view',
-	templateUrl: './thong-ke-so-luong-view.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-thong-ke-so-luong-view',
+    templateUrl: './thong-ke-so-luong-view.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ThongKeSoLuongViewComponent implements OnInit {
 

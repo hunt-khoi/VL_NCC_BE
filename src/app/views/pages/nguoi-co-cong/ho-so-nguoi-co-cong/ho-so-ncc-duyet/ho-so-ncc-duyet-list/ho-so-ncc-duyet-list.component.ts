@@ -19,9 +19,10 @@ import { HoSoNCCDuyetDialogComponent } from '../ho-so-ncc-duyet/ho-so-ncc-duyet-
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-ho-so-ncc-duyet-list',
-	templateUrl: './ho-so-ncc-duyet-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc-duyet-list',
+    templateUrl: './ho-so-ncc-duyet-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HoSoNCCDuyetListComponent implements OnInit {

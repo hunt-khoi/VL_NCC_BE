@@ -17,9 +17,10 @@ import { BieuMauThanhPhanEditDialogComponent } from '../bieu-mau-thanh-phan-edit
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-bieu-mau-thanh-phan-list',
-	templateUrl: './bieu-mau-thanh-phan-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-bieu-mau-thanh-phan-list',
+    templateUrl: './bieu-mau-thanh-phan-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class BieuMauThanhPhanListComponent implements OnInit, OnDestroy {

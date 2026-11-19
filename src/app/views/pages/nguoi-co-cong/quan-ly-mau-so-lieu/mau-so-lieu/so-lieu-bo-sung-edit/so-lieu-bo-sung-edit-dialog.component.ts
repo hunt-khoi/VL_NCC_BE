@@ -10,8 +10,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-so-lieu-bo-sung-edit-dialog',
-	templateUrl: './so-lieu-bo-sung-edit-dialog.component.html',
+    selector: 'kt-so-lieu-bo-sung-edit-dialog',
+    templateUrl: './so-lieu-bo-sung-edit-dialog.component.html',
+    standalone: false
 })
 
 export class SoLieuBoSungEditDialogComponent implements OnInit, OnDestroy {

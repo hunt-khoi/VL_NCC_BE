@@ -10,9 +10,10 @@ export interface PortletOptions {
 }
 
 @Component({
-	selector: 'kt-portlet',
-	templateUrl: './portlet.component.html',
-	exportAs: 'ktPortlet'
+    selector: 'kt-portlet',
+    templateUrl: './portlet.component.html',
+    exportAs: 'ktPortlet',
+    standalone: false
 })
 export class PortletComponent {
 	@Input() loading$: Observable<boolean> | undefined;

@@ -9,9 +9,10 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.service';
 
 @Component({
-	selector: 'm-tk-phan-bo',
-	templateUrl: './tk-phan-bo.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-tk-phan-bo',
+    templateUrl: './tk-phan-bo.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class TKPhanBoComponent implements OnInit, OnDestroy {

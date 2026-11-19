@@ -14,9 +14,10 @@ import { capquanlyDataSource } from '../Model/data-sources/capquanly.datasource'
 import { capquanlyEditDialogComponent } from '../capquanly-edit/capquanly-edit.dialog.component';
 
 @Component({
-	selector: 'm-capquanly-list',
-	templateUrl: './capquanly-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-capquanly-list',
+    templateUrl: './capquanly-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class capquanlyListComponent implements OnInit, OnDestroy {

@@ -3,9 +3,10 @@ import { Observable } from 'rxjs';
 import { CommonService } from '../../nguoi-co-cong/services/common.service';
 
 @Component({
-	selector: 'kt-overview',
-	templateUrl: './overview.component.html',
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-overview',
+    templateUrl: './overview.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class OverviewComponent implements OnInit {
 	user$: Observable<any> | undefined;

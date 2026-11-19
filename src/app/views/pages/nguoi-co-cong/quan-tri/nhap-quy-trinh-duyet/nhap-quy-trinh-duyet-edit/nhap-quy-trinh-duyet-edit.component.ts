@@ -17,9 +17,10 @@ import { NhapCapQuanLyDuyetModel, PriorityAddData, NhapQuyTrinhDuyetModel } from
 import { NhapCapQuanLyDuyetEditComponent } from '../nhap-cap-quan-ly-duyet-edit/nhap-cap-quan-ly-duyet-edit.component';
 
 @Component({
-	selector: 'm-nhap-quy-trinh-duyet-edit',
-	templateUrl: './nhap-quy-trinh-duyet-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-nhap-quy-trinh-duyet-edit',
+    templateUrl: './nhap-quy-trinh-duyet-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NhapQuyTrinhDuyetEditComponent implements OnInit, OnDestroy {

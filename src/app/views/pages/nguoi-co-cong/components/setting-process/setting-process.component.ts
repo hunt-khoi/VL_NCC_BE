@@ -8,9 +8,10 @@ import { CommentService } from '../comment/comment.service';
 import { CommonService } from '../../services/common.service';
 
 @Component({
-	selector: 'kt-setting-process',
-	templateUrl: './setting-process.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-setting-process',
+    templateUrl: './setting-process.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SettingProcessComponent implements OnInit {
 	Object: any;

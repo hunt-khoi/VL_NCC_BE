@@ -7,8 +7,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-doi-tuong-nhan-qua-muc-qua',
-	templateUrl: './doi-tuong-nhan-qua-muc-qua.component.html'
+    selector: 'kt-doi-tuong-nhan-qua-muc-qua',
+    templateUrl: './doi-tuong-nhan-qua-muc-qua.component.html',
+    standalone: false
 })
 
 export class DoiTuongNhanQuaMucQuaComponent implements OnInit, OnDestroy {

@@ -9,9 +9,10 @@ import { HoSoNCCDuyetService } from '../Services/ho-so-ncc-duyet.service';
 import { HuongDanHuongThienDialogComponent } from '../huong-dan-hoan-thien/huong-dan-hoan-thien-dialog.component';
 
 @Component({
-	selector: 'kt-ho-so-ncc-duyet',
-	templateUrl: './ho-so-ncc-duyet-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc-duyet',
+    templateUrl: './ho-so-ncc-duyet-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HoSoNCCDuyetDialogComponent implements OnInit {

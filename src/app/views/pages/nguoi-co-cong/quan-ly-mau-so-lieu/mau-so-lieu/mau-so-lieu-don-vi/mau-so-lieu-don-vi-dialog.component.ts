@@ -13,8 +13,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-mau-so-lieu-don-vi-edit-dialog',
-	templateUrl: './mau-so-lieu-don-vi-dialog.component.html',
+    selector: 'kt-mau-so-lieu-don-vi-edit-dialog',
+    templateUrl: './mau-so-lieu-don-vi-dialog.component.html',
+    standalone: false
 })
 
 export class MauSoLieuDonViDialogComponent implements OnInit, OnDestroy {

@@ -15,9 +15,10 @@ import { AuthService } from '../../../../../core/auth';
 import { ReviewExportComponent } from '../review-export/review-export.component';
 
 @Component({
-	selector: 'kt-comment',
-	templateUrl: './comment.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-comment',
+    templateUrl: './comment.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class CommentComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
 	@Output() ListResult: EventEmitter<any> = new EventEmitter<any>();//event for component

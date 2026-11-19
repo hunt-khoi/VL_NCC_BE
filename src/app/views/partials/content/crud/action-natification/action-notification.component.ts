@@ -4,10 +4,10 @@ import { delay } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-	selector: 'kt-action-natification',
-	templateUrl: './action-notification.component.html',
-	changeDetection: ChangeDetectionStrategy.Default
-
+    selector: 'kt-action-natification',
+    templateUrl: './action-notification.component.html',
+    changeDetection: ChangeDetectionStrategy.Default,
+    standalone: false
 })
 export class ActionNotificationComponent implements OnInit {
 

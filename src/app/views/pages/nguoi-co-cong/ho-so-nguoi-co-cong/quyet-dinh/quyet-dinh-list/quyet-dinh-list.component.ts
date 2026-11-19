@@ -17,9 +17,10 @@ import { QuyetDinhEditDialogComponent } from './../quyet-dinh-edit/quyet-dinh-ed
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-quyet-dinh-list',
-	templateUrl: './quyet-dinh-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-quyet-dinh-list',
+    templateUrl: './quyet-dinh-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class QuyetDinhListComponent implements OnInit {

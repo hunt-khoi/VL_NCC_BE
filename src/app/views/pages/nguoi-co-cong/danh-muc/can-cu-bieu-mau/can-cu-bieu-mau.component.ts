@@ -5,8 +5,9 @@ import { BieuMauService } from './Services/bieu-mau.service';
 import { CanCuService } from './Services/can-cu.service';
 
 @Component({
-	selector: 'kt-can-cu-bieu-mau',
-	templateUrl: './can-cu-bieu-mau.component.html'
+    selector: 'kt-can-cu-bieu-mau',
+    templateUrl: './can-cu-bieu-mau.component.html',
+    standalone: false
 })
 export class CanCuBieuMauComponent implements OnInit {
 

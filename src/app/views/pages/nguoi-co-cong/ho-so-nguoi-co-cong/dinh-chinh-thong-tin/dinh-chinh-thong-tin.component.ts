@@ -23,8 +23,9 @@ import { QuyetDinhEditDialogComponent } from './../quyet-dinh/quyet-dinh-edit/qu
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-dinh-chinh-thong-tin',
-	templateUrl: './dinh-chinh-thong-tin.component.html'
+    selector: 'kt-dinh-chinh-thong-tin',
+    templateUrl: './dinh-chinh-thong-tin.component.html',
+    standalone: false
 })
 export class DinhChinhThongTinComponent implements OnInit {
 	// Table fields

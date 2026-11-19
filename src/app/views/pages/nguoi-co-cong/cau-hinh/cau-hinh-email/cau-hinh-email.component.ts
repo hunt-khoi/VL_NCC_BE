@@ -6,6 +6,7 @@ import { CauHinhEmailService } from './Services/cau-hinh-email.service';
 @Component({
     selector: 'kt-cau-hinh-email',
     templateUrl: './cau-hinh-email.component.html',
+    standalone: false
 })
 export class CauHinhEmailComponent implements OnInit {
   constructor(private apiService : CauHinhEmailService) { }

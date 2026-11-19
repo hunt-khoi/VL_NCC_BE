@@ -4,9 +4,10 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { HoSoNCCService } from './Services/ho-so-ncc.service';
 
 @Component({
-	selector: 'kt-ho-so-ncc',
-	templateUrl: './ho-so-ncc.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc',
+    templateUrl: './ho-so-ncc.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HoSoNCCComponent implements OnInit {

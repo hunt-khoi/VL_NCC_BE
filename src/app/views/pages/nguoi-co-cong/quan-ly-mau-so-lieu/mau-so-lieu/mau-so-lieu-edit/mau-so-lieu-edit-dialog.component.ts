@@ -15,8 +15,9 @@ import { MauSoLieuDetailEditDialogComponent } from '../mau-so-lieu-detail-edit/m
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-mau-so-lieu-edit-dialog',
-	templateUrl: './mau-so-lieu-edit-dialog.component.html',
+    selector: 'kt-mau-so-lieu-edit-dialog',
+    templateUrl: './mau-so-lieu-edit-dialog.component.html',
+    standalone: false
 })
 export class MauSoLieuEditDialogComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

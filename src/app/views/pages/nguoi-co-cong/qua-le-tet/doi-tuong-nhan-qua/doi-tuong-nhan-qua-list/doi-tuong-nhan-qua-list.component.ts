@@ -22,9 +22,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-doi-tuong-nhan-qua-list',
-	templateUrl: './doi-tuong-nhan-qua-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-doi-tuong-nhan-qua-list',
+    templateUrl: './doi-tuong-nhan-qua-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DoiTuongNhanQuaListComponent implements OnInit, OnDestroy {

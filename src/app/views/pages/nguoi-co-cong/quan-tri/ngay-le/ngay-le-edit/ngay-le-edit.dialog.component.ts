@@ -9,8 +9,9 @@ import { HolidaysModel } from '../../ngay-le/Model/ngay-le.model';
 import { HolidaysService } from '../Services/ngay-le.service';
 
 @Component({
-	selector: 'm-ngay-le-edit-dialog',
-	templateUrl: './ngay-le-edit.dialog.component.html',
+    selector: 'm-ngay-le-edit-dialog',
+    templateUrl: './ngay-le-edit.dialog.component.html',
+    standalone: false
 })
 
 export class HolidaysEditDialogComponent implements OnInit, OnDestroy {

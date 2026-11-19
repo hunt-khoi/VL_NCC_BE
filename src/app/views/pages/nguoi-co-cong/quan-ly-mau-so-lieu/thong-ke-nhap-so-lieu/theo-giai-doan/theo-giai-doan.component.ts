@@ -8,8 +8,9 @@ import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 import { ThongKeNhapSoLieuService } from '../Services/thong-ke-nhap-so-lieu.service';
 
 @Component({
-	selector: 'kt-theo-giai-doan',
-	templateUrl: './theo-giai-doan.component.html',
+    selector: 'kt-theo-giai-doan',
+    templateUrl: './theo-giai-doan.component.html',
+    standalone: false
 })
 export class TheoGiaiDoanComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

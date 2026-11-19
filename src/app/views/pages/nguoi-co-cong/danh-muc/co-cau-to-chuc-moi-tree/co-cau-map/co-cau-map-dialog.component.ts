@@ -16,9 +16,10 @@ export class TodoItemNode {
 }
 
 @Component({
-	selector: 'kt-co-cau-map',
-	templateUrl: './co-cau-map-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-co-cau-map',
+    templateUrl: './co-cau-map-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class CoCauMapDialogComponent implements OnInit, OnDestroy {

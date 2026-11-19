@@ -11,9 +11,10 @@ import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-tro-cap-1lan',
-	templateUrl: './form-tro-cap-1lan.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-tro-cap-1lan',
+    templateUrl: './form-tro-cap-1lan.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormTroCap1LanComponent extends FormBaseComponent implements OnInit, OnDestroy {

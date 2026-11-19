@@ -16,9 +16,10 @@ export class TodoItemNode {
 }
 
 @Component({
-	selector: 'kt-phan-quyen',
-	templateUrl: './phan-quyen.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-phan-quyen',
+    templateUrl: './phan-quyen.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class PhanQuyenComponent implements OnInit {

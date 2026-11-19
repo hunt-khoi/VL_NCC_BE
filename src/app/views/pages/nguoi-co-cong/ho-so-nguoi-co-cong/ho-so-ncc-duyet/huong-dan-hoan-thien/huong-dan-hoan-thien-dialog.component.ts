@@ -6,9 +6,10 @@ import { CommonService } from '../../../services/common.service';
 import { HoSoNCCDuyetService } from '../Services/ho-so-ncc-duyet.service';
 
 @Component({
-	selector: 'kt-huong-dan-hoan-thien',
-	templateUrl: './huong-dan-hoan-thien-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-huong-dan-hoan-thien',
+    templateUrl: './huong-dan-hoan-thien-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HuongDanHuongThienDialogComponent implements OnInit {

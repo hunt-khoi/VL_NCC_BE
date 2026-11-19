@@ -8,9 +8,10 @@ import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { BaoCaoTinhHinhService } from './Services/bao-cao-tinh-hinh.service';
 
 @Component({
-	selector: 'kt-bao-cao-tinh-hinh',
-	templateUrl: './bao-cao-tinh-hinh.component.html',
-	encapsulation: ViewEncapsulation.None,
+    selector: 'kt-bao-cao-tinh-hinh',
+    templateUrl: './bao-cao-tinh-hinh.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class BaoCaoTinhHinhComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

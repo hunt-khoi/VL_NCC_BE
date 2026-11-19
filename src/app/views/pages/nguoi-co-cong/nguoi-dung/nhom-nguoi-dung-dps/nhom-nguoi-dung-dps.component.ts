@@ -6,6 +6,7 @@ import { QueryParamsModel } from 'app/core/_base/crud';
 @Component({
     selector: 'kt-nhom-nguoi-dung-dps',
     templateUrl: './nhom-nguoi-dung-dps.component.html',
+    standalone: false
 })
 @Injectable()
 export class NhomNguoiDungDPSComponent implements OnInit {

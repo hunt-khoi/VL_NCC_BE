@@ -6,10 +6,11 @@ import { FormControl } from '@angular/forms';
 import { saveAs } from 'file-saver';
 
 @Component({
-	selector: 'kt-upload-file',
-	templateUrl: './upload-file.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-upload-file',
+    templateUrl: './upload-file.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 
 export class UploadFileComponent implements OnInit, OnChanges {

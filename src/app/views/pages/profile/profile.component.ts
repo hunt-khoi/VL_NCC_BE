@@ -7,9 +7,10 @@ import { VaiTroComponent } from 'app/views/partials/layout';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-profile',
-	templateUrl: './profile.component.html',
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-profile',
+    templateUrl: './profile.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ProfileComponent implements OnInit {
 	thoihan: string = '';

@@ -4,10 +4,11 @@ import { Subscription } from 'rxjs';
 import { LayoutConfigService } from '../../../../core/_base/layout';
 
 @Component({
-	selector: 'kt-error-page',
-	templateUrl: './error-page.component.html',
-	styleUrls: ['./error-page.component.scss'],
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-error-page',
+    templateUrl: './error-page.component.html',
+    styleUrls: ['./error-page.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ErrorPageComponent implements OnInit, OnDestroy {
 	// Public properties

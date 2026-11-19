@@ -6,10 +6,11 @@ import { HtmlClassService } from '../html-class.service';
 import objectPath from 'object-path';
 
 @Component({
-	selector: 'kt-aside-left',
-	templateUrl: './aside-left.component.html',
-	styleUrls: ['./aside-left.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-aside-left',
+    templateUrl: './aside-left.component.html',
+    styleUrls: ['./aside-left.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class AsideLeftComponent implements OnInit {
 

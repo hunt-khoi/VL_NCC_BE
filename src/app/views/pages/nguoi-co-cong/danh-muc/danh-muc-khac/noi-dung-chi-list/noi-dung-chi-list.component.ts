@@ -18,8 +18,9 @@ import { NoiDungChiDetailComponent } from '../noi-dung-chi-detail/noi-dung-chi-d
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-noi-dung-chi-list',
-	templateUrl: './noi-dung-chi-list.component.html'
+    selector: 'kt-noi-dung-chi-list',
+    templateUrl: './noi-dung-chi-list.component.html',
+    standalone: false
 })
 
 export class NoiDungChiListComponent implements OnInit, OnDestroy {

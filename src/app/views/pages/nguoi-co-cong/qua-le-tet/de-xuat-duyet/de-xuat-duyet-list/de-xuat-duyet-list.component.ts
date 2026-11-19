@@ -23,16 +23,17 @@ import { CookieService } from 'ngx-cookie-service';
 import moment from 'moment';
 
 @Component({
-	selector: 'm-de-xuat-duyet-list',
-	templateUrl: './de-xuat-duyet-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	animations: [
-		trigger('detailExpand', [
-			state('collapsed', style({ height: '0px', minHeight: '0' })),
-			state('expanded', style({ height: '*' })),
-			transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-		]),
-	],
+    selector: 'm-de-xuat-duyet-list',
+    templateUrl: './de-xuat-duyet-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    animations: [
+        trigger('detailExpand', [
+            state('collapsed', style({ height: '0px', minHeight: '0' })),
+            state('expanded', style({ height: '*' })),
+            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        ]),
+    ],
+    standalone: false
 })
 
 export class DeXuatDuyetListComponent implements OnInit, OnChanges, OnDestroy {

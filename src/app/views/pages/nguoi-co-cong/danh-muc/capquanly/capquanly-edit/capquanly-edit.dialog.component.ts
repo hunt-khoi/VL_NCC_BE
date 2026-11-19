@@ -9,8 +9,9 @@ import { capquanlyService } from '../Services/capquanly.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
-	selector: 'm-capquanly-edit-dialog',
-	templateUrl: './capquanly-edit.dialog.component.html',
+    selector: 'm-capquanly-edit-dialog',
+    templateUrl: './capquanly-edit.dialog.component.html',
+    standalone: false
 })
 export class capquanlyEditDialogComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

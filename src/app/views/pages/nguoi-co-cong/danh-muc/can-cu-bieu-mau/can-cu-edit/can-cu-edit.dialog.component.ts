@@ -9,8 +9,9 @@ import { CommonService } from './../../../services/common.service';
 import { CanCuService } from '../Services/can-cu.service';
 
 @Component({
-	selector: 'kt-can-cu-edit',
-	templateUrl: './can-cu-edit.dialog.component.html',
+    selector: 'kt-can-cu-edit',
+    templateUrl: './can-cu-edit.dialog.component.html',
+    standalone: false
 })
 export class CanCuEditDialogComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

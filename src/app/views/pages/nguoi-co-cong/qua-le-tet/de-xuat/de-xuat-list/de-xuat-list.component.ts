@@ -21,9 +21,10 @@ import { ReviewExportComponent } from '../../../components';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-de-xuat-list',
-	templateUrl: './de-xuat-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-de-xuat-list',
+    templateUrl: './de-xuat-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DeXuatListComponent implements OnInit, OnChanges, OnDestroy {

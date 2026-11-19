@@ -14,9 +14,10 @@ import { HDSDDataSource } from '../Model/data-sources/hdsd.datasource';
 import { HDSDEditDialogComponent } from '../hdsd-edit/hdsd-edit.dialog.component';
 
 @Component({
-	selector: 'm-hdsd-list',
-	templateUrl: './hdsd-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-hdsd-list',
+    templateUrl: './hdsd-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HDSDListComponent implements OnInit {

@@ -7,8 +7,9 @@ export interface ToggleOptions {
 }
 
 @Directive({
-	selector: '[ktToggle]',
-	exportAs: 'ktToggle'
+    selector: '[ktToggle]',
+    exportAs: 'ktToggle',
+    standalone: false
 })
 export class ToggleDirective implements AfterViewInit {
 	@Input() options: ToggleOptions | undefined;

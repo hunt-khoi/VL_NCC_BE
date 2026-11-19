@@ -18,10 +18,11 @@ import { CookieService } from 'ngx-cookie-service';
 import moment from 'moment';
 
 @Component({
-	selector: 'm-log-list',
-	templateUrl: './log-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-log-list',
+    templateUrl: './log-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 
 export class LogListComponent implements OnInit, OnDestroy {

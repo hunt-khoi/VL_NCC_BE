@@ -8,9 +8,10 @@ import { LayoutUtilsService, MessageType } from 'app/core/_base/crud';
 import { DanhMucKhacService } from '../Services/danh-muc-khac.service';
 
 @Component({
-	selector: 'kt-tro-cap-import',
-	templateUrl: './tro-cap-import.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-tro-cap-import',
+    templateUrl: './tro-cap-import.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class TroCapImportComponent implements OnInit, OnDestroy {

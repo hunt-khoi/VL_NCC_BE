@@ -8,8 +8,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-loai-quyet-dinh-detail',
-	templateUrl: './loai-quyet-dinh-detail.component.html',
+    selector: 'kt-loai-quyet-dinh-detail',
+    templateUrl: './loai-quyet-dinh-detail.component.html',
+    standalone: false
 })
 
 export class LoaiQuyetDinhDetailComponent implements OnInit, OnDestroy {

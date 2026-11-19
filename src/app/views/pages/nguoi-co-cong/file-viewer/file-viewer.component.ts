@@ -8,9 +8,10 @@ import { CommonService } from '../services/common.service';
 import { LayoutUtilsService } from '../../../../core/_base/crud';
 
 @Component({
-	selector: 'kt-file-viewer',
-	templateUrl: './file-viewer.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-file-viewer',
+    templateUrl: './file-viewer.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FileViewerComponent implements OnInit, AfterViewInit {
 	IdRow: number = 0;

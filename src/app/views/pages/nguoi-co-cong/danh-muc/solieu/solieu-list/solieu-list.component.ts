@@ -18,9 +18,10 @@ import { solieuEditDialogComponent } from '../solieu-edit/solieu-edit.dialog.com
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-solieu-list',
-	templateUrl: './solieu-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-solieu-list',
+    templateUrl: './solieu-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class solieuListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

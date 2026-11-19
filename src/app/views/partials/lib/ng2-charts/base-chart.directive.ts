@@ -68,9 +68,10 @@ enum UpdateType {
 }
 
 @Directive({
-  // tslint:disable-next-line:directive-selector
-  selector: 'canvas[baseChart]',
-  exportAs: 'base-chart'
+    // tslint:disable-next-line:directive-selector
+    selector: 'canvas[baseChart]',
+    exportAs: 'base-chart',
+    standalone: false
 })
 export class BaseChartDirective implements OnChanges, OnInit, OnDestroy, DoCheck {
   @Input() public data: SingleOrMultiDataSet;

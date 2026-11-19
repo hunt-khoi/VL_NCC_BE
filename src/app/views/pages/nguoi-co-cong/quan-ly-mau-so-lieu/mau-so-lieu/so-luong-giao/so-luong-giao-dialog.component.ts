@@ -9,8 +9,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-so-luong-giao-dialog',
-	templateUrl: './so-luong-giao-dialog.component.html',
+    selector: 'kt-so-luong-giao-dialog',
+    templateUrl: './so-luong-giao-dialog.component.html',
+    standalone: false
 })
 
 export class SoLuongGiaoDialogComponent implements OnInit, OnDestroy {

@@ -5,9 +5,10 @@ import { CommonService } from '../../services/common.service';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-to-trinh-edit',
-	templateUrl: './to-trinh-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-to-trinh-edit',
+    templateUrl: './to-trinh-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class ToTrinhEditComponent implements OnInit {

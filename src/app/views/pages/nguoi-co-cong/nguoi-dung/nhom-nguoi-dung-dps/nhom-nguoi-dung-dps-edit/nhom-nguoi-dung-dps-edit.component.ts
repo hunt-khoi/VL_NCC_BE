@@ -8,9 +8,10 @@ import { NhomNguoiDungDPSModel } from '../Model/nhom-nguoi-dung-dps.model';
 import { CommonService } from '../../../services/common.service';
 
 @Component({
-	selector: 'kt-nhom-nguoi-dung-dps-edit',
-	templateUrl: './nhom-nguoi-dung-dps-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nhom-nguoi-dung-dps-edit',
+    templateUrl: './nhom-nguoi-dung-dps-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NhomNguoiDungDPSEditComponent implements OnInit, OnDestroy {

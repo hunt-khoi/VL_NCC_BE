@@ -6,6 +6,7 @@ import { ConfigService } from './Services/config.service';
 @Component({
     selector: 'kt-config',
     templateUrl: './config.component.html',
+    standalone: false
 })
 export class ConfigComponent implements OnInit {
   constructor(private apiService : ConfigService) {}

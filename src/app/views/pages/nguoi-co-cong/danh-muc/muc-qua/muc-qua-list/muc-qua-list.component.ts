@@ -17,9 +17,10 @@ import { MucQuaEditDialogComponent } from './../muc-qua-edit/muc-qua-edit-dialog
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-muc-qua-list',
-	templateUrl: './muc-qua-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-muc-qua-list',
+    templateUrl: './muc-qua-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class MucQuaListComponent implements OnInit, OnDestroy {

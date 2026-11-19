@@ -9,8 +9,9 @@ import { loaisolieuService } from '../Services/loaisolieu.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
-	selector: 'm-loaisolieu-edit-dialog',
-	templateUrl: './loaisolieu-edit.dialog.component.html',
+    selector: 'm-loaisolieu-edit-dialog',
+    templateUrl: './loaisolieu-edit.dialog.component.html',
+    standalone: false
 })
 
 export class loaisolieuEditDialogComponent implements OnInit, OnDestroy {

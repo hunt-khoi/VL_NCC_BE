@@ -9,9 +9,10 @@ import { loaiGiayToServices } from '../Services/loaigiayto.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
-	selector: 'kt-loai-giay-to-edit',
-	templateUrl: './loaigiayto-edit.dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-loai-giay-to-edit',
+    templateUrl: './loaigiayto-edit.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class LoaiGiayToEditDialogComponent implements OnInit, OnDestroy {

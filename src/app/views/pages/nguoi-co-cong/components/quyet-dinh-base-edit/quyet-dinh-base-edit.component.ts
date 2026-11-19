@@ -5,9 +5,10 @@ import { CommonService } from '../../services/common.service';
 import { Moment } from 'moment';
 
 @Component({
-	selector: 'kt-quyet-dinh-base-edit',
-	templateUrl: './quyet-dinh-base-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-quyet-dinh-base-edit',
+    templateUrl: './quyet-dinh-base-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class QuyetDinhBaseEditComponent implements OnInit {

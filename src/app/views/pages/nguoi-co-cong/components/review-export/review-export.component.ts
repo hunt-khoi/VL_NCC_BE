@@ -4,9 +4,10 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
-	selector: 'kt-review-export',
-	templateUrl: './review-export.component.html',
-	encapsulation: ViewEncapsulation.None,
+    selector: 'kt-review-export',
+    templateUrl: './review-export.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ReviewExportComponent implements OnInit {
 	loadingSubject = new BehaviorSubject<boolean>(false);

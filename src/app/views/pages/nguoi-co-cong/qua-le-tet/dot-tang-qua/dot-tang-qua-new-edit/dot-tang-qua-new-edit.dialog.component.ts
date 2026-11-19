@@ -12,8 +12,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'm-dot-tang-qua-new-edit-dialog',
-	templateUrl: './dot-tang-qua-new-edit.dialog.component.html',
+    selector: 'm-dot-tang-qua-new-edit-dialog',
+    templateUrl: './dot-tang-qua-new-edit.dialog.component.html',
+    standalone: false
 })
 
 export class dottangquannewEditDialogComponent implements OnInit, OnDestroy {

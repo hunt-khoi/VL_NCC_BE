@@ -2,9 +2,10 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { TableService } from '../table.service';
 
 @Component({
-	selector: 'kt-column-option',
-	templateUrl: './column-option.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-column-option',
+    templateUrl: './column-option.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class ColumnOptionComponent {
 	@Input() gridService: TableService | undefined; //ko được xóa

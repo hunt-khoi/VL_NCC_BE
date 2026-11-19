@@ -3,10 +3,11 @@ import { LayoutConfigService, SplashScreenService, TranslationService } from '..
 import { AuthNoticeService } from '../../../core/auth';
 
 @Component({
-	selector: 'kt-auth',
-	templateUrl: './auth.component.html',
-	styleUrls: ['./auth.component.scss'],
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-auth',
+    templateUrl: './auth.component.html',
+    styleUrls: ['./auth.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class AuthComponent implements OnInit {
 	today: number = Date.now();

@@ -11,9 +11,10 @@ import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-di-chuyen',
-	templateUrl: './form-di-chuyen.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-di-chuyen',
+    templateUrl: './form-di-chuyen.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormDiChuyenComponent extends FormBaseComponent implements OnInit, OnDestroy {

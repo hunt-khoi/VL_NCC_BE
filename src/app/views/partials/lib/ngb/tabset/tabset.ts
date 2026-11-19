@@ -25,7 +25,10 @@ let nextId = 0;
  *
  * Alternatively you could use the `NgbTab.title` input for string titles.
  */
-@Directive({selector: 'ng-template[ngbTabTitle]'})
+@Directive({
+    selector: 'ng-template[ngbTabTitle]',
+    standalone: false
+})
 export class NgbTabTitle {
   constructor(public templateRef: TemplateRef<any>) {}
 }
@@ -33,7 +36,10 @@ export class NgbTabTitle {
 /**
  * A directive to wrap content to be displayed in a tab.
  */
-@Directive({selector: 'ng-template[ngbTabContent]'})
+@Directive({
+    selector: 'ng-template[ngbTabContent]',
+    standalone: false
+})
 export class NgbTabContent {
   constructor(public templateRef: TemplateRef<any>) {}
 }
@@ -41,7 +47,10 @@ export class NgbTabContent {
 /**
  * A directive representing an individual tab.
  */
-@Directive({selector: 'ngb-tab'})
+@Directive({
+    selector: 'ngb-tab',
+    standalone: false
+})
 export class NgbTab implements AfterContentChecked {
   /**
    * The tab identifier.
@@ -102,10 +111,10 @@ export interface NgbTabChangeEvent {
  * A component that makes it easy to create tabbed interface.
  */
 @Component({
-  selector: 'ngb-tabset',
-  exportAs: 'ngbTabset',
-  encapsulation: ViewEncapsulation.None,
-  template: `
+    selector: 'ngb-tabset',
+    exportAs: 'ngbTabset',
+    encapsulation: ViewEncapsulation.None,
+    template: `
     <ul [class]="'nav nav-' + type + (orientation == 'horizontal'?  ' ' + justifyClass : ' flex-column')" role="tablist">
       <li class="nav-item" *ngFor="let tab of tabs">
         <a [id]="tab.id" class="nav-link" [class.active]="tab.id === activeId" [class.disabled]="tab.disabled"
@@ -127,7 +136,8 @@ export interface NgbTabChangeEvent {
         </div>
       </ng-template>
     </div>
-  `
+  `,
+    standalone: false
 })
 export class NgbTabset implements AfterContentChecked {
   justifyClass: string;

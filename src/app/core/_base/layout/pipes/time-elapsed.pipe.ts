@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 
 @Pipe({
-	name: 'kTimeElapsed'
+    name: 'kTimeElapsed',
+    standalone: false
 })
 export class TimeElapsedPipe implements PipeTransform, OnDestroy {
 	private timer: any;

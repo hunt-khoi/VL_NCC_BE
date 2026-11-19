@@ -6,6 +6,7 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 @Component({
     selector: 'kt-nguoi-dung-dps',
     templateUrl: './nguoi-dung-dps.component.html',
+    standalone: false
 })
 
 @Injectable()

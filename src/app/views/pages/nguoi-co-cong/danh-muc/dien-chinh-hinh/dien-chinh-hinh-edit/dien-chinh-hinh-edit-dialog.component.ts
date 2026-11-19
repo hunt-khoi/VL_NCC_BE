@@ -9,9 +9,10 @@ import { DienChinhHinhService } from './../Services/dien-chinh-hinh.service';
 import { DienChinhHinhModel } from './../Model/dien-chinh-hinh.model';
 
 @Component({
-	selector: 'kt-dien-chinh-hinh-edit',
-	templateUrl: './dien-chinh-hinh-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-dien-chinh-hinh-edit',
+    templateUrl: './dien-chinh-hinh-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DienChinhHinhEditDialogComponent implements OnInit, OnDestroy {

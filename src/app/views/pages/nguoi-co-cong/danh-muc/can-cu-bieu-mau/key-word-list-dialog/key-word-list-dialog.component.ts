@@ -2,8 +2,9 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
-	selector: 'kt-key-word-list-dialog',
-	templateUrl: './key-word-list-dialog.component.html',
+    selector: 'kt-key-word-list-dialog',
+    templateUrl: './key-word-list-dialog.component.html',
+    standalone: false
 })
 export class KeyWordListDialogComponent implements OnInit {
 	_name: string = "Danh sách từ khóa";

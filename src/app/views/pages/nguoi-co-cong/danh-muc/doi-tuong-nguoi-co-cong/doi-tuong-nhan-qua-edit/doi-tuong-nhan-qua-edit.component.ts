@@ -9,8 +9,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'kt-doi-tuong-nhan-qua-edit',
-  templateUrl: './doi-tuong-nhan-qua-edit.component.html',
+    selector: 'kt-doi-tuong-nhan-qua-edit',
+    templateUrl: './doi-tuong-nhan-qua-edit.component.html',
+    standalone: false
 })
 export class DoiTuongNhanQuaEditComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

@@ -10,9 +10,10 @@ import { CauHinhSMSModel } from '../Model/cau-hinh-sms.model';
 import { CauHinhSMSPopupDVCComponent } from '../cau-hinh-sms-popup-donvicon/cau-hinh-sms-popup-donvicon.component';
 
 @Component({
-	selector: 'kt-cau-hinh-sms-edit',
-	templateUrl: './cau-hinh-sms-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-cau-hinh-sms-edit',
+    templateUrl: './cau-hinh-sms-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class CauHinhSMSEditComponent implements OnInit, OnDestroy {

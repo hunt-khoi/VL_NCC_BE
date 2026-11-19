@@ -13,9 +13,10 @@ import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trin
 import { DieuKienEditDialogComponent } from '../dieu-kien-edit/dieu-kien-edit.dialog.component';
 
 @Component({
-	selector: 'm-dieu-kien-list',
-	templateUrl: './dieu-kien-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-dieu-kien-list',
+    templateUrl: './dieu-kien-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DieuKienListComponent implements OnInit, OnChanges, OnDestroy {

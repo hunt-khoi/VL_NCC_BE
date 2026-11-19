@@ -17,8 +17,9 @@ import { ChiTietThongKeDataSource } from '../Model/data-sources/chi-tiet-thong-k
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-chi-tiet-thong-ke',
-	templateUrl: './chi-tiet-thong-ke.component.html',
+    selector: 'kt-chi-tiet-thong-ke',
+    templateUrl: './chi-tiet-thong-ke.component.html',
+    standalone: false
 })
 export class ChiTietThongKeComponent implements OnInit {
 	// Table fields

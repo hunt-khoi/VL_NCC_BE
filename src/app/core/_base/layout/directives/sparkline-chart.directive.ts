@@ -14,8 +14,9 @@ export interface SparklineChartOptions {
 }
 
 @Directive({
-	selector: '[ktSparklineChart]',
-	exportAs: 'ktSparklineChart'
+    selector: '[ktSparklineChart]',
+    exportAs: 'ktSparklineChart',
+    standalone: false
 })
 export class SparklineChartDirective implements AfterViewInit {
 	@Input() options: SparklineChartOptions | undefined;

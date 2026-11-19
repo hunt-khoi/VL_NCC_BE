@@ -17,8 +17,9 @@ import { LoaiQuyetDinhDetailComponent } from './../loai-quyet-dinh-detail/loai-q
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-loai-quyet-dinh-list',
-	templateUrl: './loai-quyet-dinh-list.component.html'
+    selector: 'kt-loai-quyet-dinh-list',
+    templateUrl: './loai-quyet-dinh-list.component.html',
+    standalone: false
 })
 
 export class LoaiQuyetDinhListComponent implements OnInit, OnDestroy {

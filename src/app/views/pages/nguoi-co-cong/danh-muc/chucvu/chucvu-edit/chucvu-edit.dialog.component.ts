@@ -10,8 +10,9 @@ import { chucvuService } from '../Services/chucvu.service';
 import { CommonService } from '../../../services/common.service';
 
 @Component({
-	selector: 'm-chucvu-edit-dialog',
-	templateUrl: './chucvu-edit.dialog.component.html',
+    selector: 'm-chucvu-edit-dialog',
+    templateUrl: './chucvu-edit.dialog.component.html',
+    standalone: false
 })
 
 export class chucvuEditDialogComponent implements OnInit, OnDestroy {

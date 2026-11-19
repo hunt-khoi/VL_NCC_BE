@@ -21,10 +21,11 @@ import { TokenStorage } from '../../../../../../core/auth/_services/token-storag
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-nhom-nguoi-dung-dps-list',
-	templateUrl: './nhom-nguoi-dung-dps-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-nhom-nguoi-dung-dps-list',
+    templateUrl: './nhom-nguoi-dung-dps-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 
 export class NhomNguoiDungDPSListComponent implements OnInit, OnDestroy {

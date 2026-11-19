@@ -8,9 +8,10 @@ import { DeXuatModel } from '../Model/de-xuat.model';
 import { DeXuatService } from '../Services/de-xuat.service';
 
 @Component({
-	selector: 'm-de-xuat-import-dialog',
-	templateUrl: './de-xuat-import.dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'm-de-xuat-import-dialog',
+    templateUrl: './de-xuat-import.dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DeXuatImportDialogComponent implements OnInit, OnDestroy {

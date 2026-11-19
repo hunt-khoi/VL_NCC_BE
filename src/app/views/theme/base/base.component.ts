@@ -7,10 +7,11 @@ import { LayoutConfig } from '../../../core/_config/layout.config';
 import { MenuConfig } from '../../../core/_config/menu.config';
 
 @Component({
-	selector: 'kt-base',
-	templateUrl: './base.component.html',
-	styleUrls: ['./base.component.scss'],
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-base',
+    templateUrl: './base.component.html',
+    styleUrls: ['./base.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class BaseComponent implements OnInit, OnDestroy {
 	// Public variables

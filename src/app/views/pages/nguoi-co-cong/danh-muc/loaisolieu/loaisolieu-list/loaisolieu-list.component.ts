@@ -20,7 +20,8 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'm-loaisolieu-list',
     templateUrl: './loaisolieu-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class loaisolieuListComponent implements OnInit, OnDestroy {

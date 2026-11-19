@@ -11,8 +11,9 @@ import moment from 'moment';
 import { Moment } from 'moment'
 
 @Component({
-	selector: 'kt-tong-hop',
-	templateUrl: './tong-hop.component.html',
+    selector: 'kt-tong-hop',
+    templateUrl: './tong-hop.component.html',
+    standalone: false
 })
 export class TongHopComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

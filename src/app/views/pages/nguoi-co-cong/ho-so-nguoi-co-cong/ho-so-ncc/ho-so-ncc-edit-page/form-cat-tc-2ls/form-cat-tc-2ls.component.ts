@@ -11,9 +11,10 @@ import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-cat-tc-2ls',
-	templateUrl: './form-cat-tc-2ls.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-cat-tc-2ls',
+    templateUrl: './form-cat-tc-2ls.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormCatTC_2LietSyComponent extends FormBaseComponent implements OnInit, OnDestroy {

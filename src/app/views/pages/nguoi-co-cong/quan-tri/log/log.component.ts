@@ -4,8 +4,9 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { LogService } from './Services/log.service';
 
 @Component({
-  selector: 'kt-log',
-  templateUrl: './log.component.html',
+    selector: 'kt-log',
+    templateUrl: './log.component.html',
+    standalone: false
 })
 export class LogComponent implements OnInit {
 

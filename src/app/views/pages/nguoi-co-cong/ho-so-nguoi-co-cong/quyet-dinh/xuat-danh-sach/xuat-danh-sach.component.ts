@@ -9,9 +9,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-xuat-danh-sach',
-	templateUrl: './xuat-danh-sach.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-xuat-danh-sach',
+    templateUrl: './xuat-danh-sach.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class XuatDanhSachComponent implements OnInit {

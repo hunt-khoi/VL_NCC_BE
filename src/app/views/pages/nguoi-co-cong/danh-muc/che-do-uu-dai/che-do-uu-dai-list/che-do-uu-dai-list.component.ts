@@ -19,7 +19,8 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'm-che-do-uu-dai-list',
     templateUrl: './che-do-uu-dai-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class chedouudaiListComponent implements OnInit, OnDestroy {

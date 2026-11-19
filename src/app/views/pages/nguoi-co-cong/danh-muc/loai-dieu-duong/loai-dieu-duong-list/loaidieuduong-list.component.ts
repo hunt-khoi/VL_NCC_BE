@@ -19,9 +19,10 @@ import { LoaiDieuDuongEditDialogComponent } from '../loai-dieu-duong-edit/loaidi
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-loai-dieu-duong-list',
-	templateUrl: './loaidieuduong-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-loai-dieu-duong-list',
+    templateUrl: './loaidieuduong-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class LoaiDieuDuongListComponent implements OnInit, OnDestroy {

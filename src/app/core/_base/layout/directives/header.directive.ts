@@ -8,8 +8,9 @@ export interface HeaderOptions {
 }
 
 @Directive({
-	selector: '[ktHeader]',
-	exportAs: 'ktHeader',
+    selector: '[ktHeader]',
+    exportAs: 'ktHeader',
+    standalone: false
 })
 export class HeaderDirective implements AfterViewInit {
 	@Input() options: HeaderOptions = {};

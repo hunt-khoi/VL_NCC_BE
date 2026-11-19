@@ -19,9 +19,10 @@ import { dottangquaEditDialogComponent } from '../dot-tang-qua-edit/dot-tang-qua
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-dot-tang-qua-list',
-	templateUrl: './dot-tang-qua-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-dot-tang-qua-list',
+    templateUrl: './dot-tang-qua-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class dottangquaListComponent implements OnInit, OnDestroy {

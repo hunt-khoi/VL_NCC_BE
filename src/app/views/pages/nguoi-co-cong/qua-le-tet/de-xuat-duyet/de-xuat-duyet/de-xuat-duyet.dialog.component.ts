@@ -9,8 +9,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'm-de-xuat-duyet-dialog',
-	templateUrl: './de-xuat-duyet.dialog.component.html',
+    selector: 'm-de-xuat-duyet-dialog',
+    templateUrl: './de-xuat-duyet.dialog.component.html',
+    standalone: false
 })
 
 export class DeXuatDuyetDialogComponent implements OnInit, OnDestroy {

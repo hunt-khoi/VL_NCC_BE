@@ -17,9 +17,10 @@ import { environment } from '../../../../../../../environments/environment';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-xuat-quyet-dinh',
-	templateUrl: './xuat-quyet-dinh.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-xuat-quyet-dinh',
+    templateUrl: './xuat-quyet-dinh.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class XuatQuyetDinhComponent implements OnInit {

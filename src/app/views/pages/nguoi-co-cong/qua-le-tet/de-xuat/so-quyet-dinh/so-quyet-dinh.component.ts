@@ -11,6 +11,7 @@ import { DeXuatService } from '../Services/de-xuat.service';
     selector: 'kt-so-quyet-dinh',
     templateUrl: './so-quyet-dinh.component.html',
     encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 
 export class SoQuyetDinhComponent implements OnInit, OnDestroy {

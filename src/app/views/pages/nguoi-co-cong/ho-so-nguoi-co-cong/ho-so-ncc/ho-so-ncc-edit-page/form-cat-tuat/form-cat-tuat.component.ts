@@ -12,9 +12,10 @@ import { FormBaseComponent } from '../form-base.component';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-form-cat-tuat',
-	templateUrl: './form-cat-tuat.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-cat-tuat',
+    templateUrl: './form-cat-tuat.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormCatTuatComponent extends FormBaseComponent implements OnInit, OnDestroy {

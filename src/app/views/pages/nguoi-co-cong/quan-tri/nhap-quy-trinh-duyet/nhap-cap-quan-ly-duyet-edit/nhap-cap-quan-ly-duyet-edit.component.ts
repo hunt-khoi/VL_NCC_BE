@@ -10,9 +10,10 @@ import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.servi
 import { NhapCapQuanLyDuyetModel } from '../Model/nhap-quy-trinh-duyet.model';
 
 @Component({
-	selector: 'm-nhap-cap-quan-ly-duyet-edit',
-	templateUrl: './nhap-cap-quan-ly-duyet-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-nhap-cap-quan-ly-duyet-edit',
+    templateUrl: './nhap-cap-quan-ly-duyet-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NhapCapQuanLyDuyetEditComponent implements OnInit, OnDestroy {

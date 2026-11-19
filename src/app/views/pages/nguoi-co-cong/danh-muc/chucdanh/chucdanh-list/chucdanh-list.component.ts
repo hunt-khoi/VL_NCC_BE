@@ -14,9 +14,10 @@ import { ChucDanhDataSource } from '../Model/data-sources/chucdanh.datasource';
 import { ChucDanhEditDialogComponent } from '../chucdanh-edit/chucdanh-edit.dialog.component';
 
 @Component({
-	selector: 'm-chucdanh-list',
-	templateUrl: './chucdanh-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-chucdanh-list',
+    templateUrl: './chucdanh-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class ChucDanhListComponent implements OnInit, OnDestroy {

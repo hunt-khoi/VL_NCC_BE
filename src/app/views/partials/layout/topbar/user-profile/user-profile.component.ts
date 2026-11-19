@@ -12,8 +12,9 @@ import { environment } from '../../../../../../environments/environment';
 
 var swRegistration: any = null;
 @Component({
-	selector: 'kt-user-profile',
-	templateUrl: './user-profile.component.html',
+    selector: 'kt-user-profile',
+    templateUrl: './user-profile.component.html',
+    standalone: false
 })
 export class UserProfileComponent implements OnInit {
 	// Public properties

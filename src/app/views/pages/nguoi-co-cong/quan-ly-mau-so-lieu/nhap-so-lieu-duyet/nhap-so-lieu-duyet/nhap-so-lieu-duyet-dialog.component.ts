@@ -10,9 +10,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-nhap-so-lieu-duyet',
-	templateUrl: './nhap-so-lieu-duyet-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nhap-so-lieu-duyet',
+    templateUrl: './nhap-so-lieu-duyet-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NhapSoLieuDuyetDialogComponent implements OnInit, OnDestroy {

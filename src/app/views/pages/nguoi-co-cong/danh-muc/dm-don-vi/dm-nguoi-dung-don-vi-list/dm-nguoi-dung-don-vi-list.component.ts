@@ -14,8 +14,9 @@ import { DM_NguoiDungDonViDataSource } from '../Model/data-sources/dm-nguoi-dung
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-dm-nguoi-dung-don-vi-list',
-	templateUrl: './dm-nguoi-dung-don-vi-list.component.html',
+    selector: 'kt-dm-nguoi-dung-don-vi-list',
+    templateUrl: './dm-nguoi-dung-don-vi-list.component.html',
+    standalone: false
 })
 
 export class DmNguoiDungDonViListComponent implements OnChanges {

@@ -4,8 +4,9 @@ import { QueryParamsModel } from '../../../../../core/_base/crud';
 import { QuaTrinhKhongCoNguoiDuyetService } from './Services/qua-trinh-khong-co-nguoi-duyet.service';
 
 @Component({
-	selector: 'kt-qua-trinh-khong-co-nguoi-duyet',
-	templateUrl: './qua-trinh-khong-co-nguoi-duyet.component.html',
+    selector: 'kt-qua-trinh-khong-co-nguoi-duyet',
+    templateUrl: './qua-trinh-khong-co-nguoi-duyet.component.html',
+    standalone: false
 })
 export class QuaTrinhKhongCoNguoiDuyetComponent implements OnInit {
 

@@ -18,9 +18,10 @@ import { KhomApEditDialogComponent } from '../khom-ap-edit/khom-ap-edit.dialog.c
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-khom-ap-list',
-	templateUrl: './khom-ap-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'kt-khom-ap-list',
+    templateUrl: './khom-ap-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KhomApListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

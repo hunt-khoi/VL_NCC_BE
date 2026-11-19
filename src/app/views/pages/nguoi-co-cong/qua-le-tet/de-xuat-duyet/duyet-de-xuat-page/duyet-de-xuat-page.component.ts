@@ -9,9 +9,10 @@ import { takeUntil } from 'rxjs/operators';
 import { DeXuatDuyetService } from '../Services/de-xuat-duyet.service';
 
 @Component({
-	selector: 'kt-duyet-de-xuat-page',
-	templateUrl: './duyet-de-xuat-page.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-duyet-de-xuat-page',
+    templateUrl: './duyet-de-xuat-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DuyetDeXuatPageComponent implements OnInit, OnDestroy {

@@ -4,9 +4,10 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { QueryParamsModel } from 'app/core/_base/crud';
 
 @Component({
-	selector: 'kt-dm-don-vi',
-	templateUrl: './dm-don-vi.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-dm-don-vi',
+    templateUrl: './dm-don-vi.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DM_DonViComponent implements OnInit {
 	donvi: string = "";

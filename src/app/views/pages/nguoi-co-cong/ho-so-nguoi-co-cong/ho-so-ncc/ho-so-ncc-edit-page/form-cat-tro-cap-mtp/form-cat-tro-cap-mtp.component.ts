@@ -11,9 +11,10 @@ import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-cat-tro-cap-mtp',
-	templateUrl: './form-cat-tro-cap-mtp.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-cat-tro-cap-mtp',
+    templateUrl: './form-cat-tro-cap-mtp.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormCatTC_MTPComponent extends FormBaseComponent implements OnInit, OnDestroy {

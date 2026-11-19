@@ -9,8 +9,9 @@ import { tongiaoModel } from '../Model/tongiao.model';
 import { tongiaoService } from '../Services/tongiao.service';
 
 @Component({
-	selector: 'm-tongiao-edit-dialog',
-	templateUrl: './tongiao-edit.dialog.component.html',
+    selector: 'm-tongiao-edit-dialog',
+    templateUrl: './tongiao-edit.dialog.component.html',
+    standalone: false
 })
 
 export class tongiaoEditDialogComponent implements OnInit, OnDestroy {

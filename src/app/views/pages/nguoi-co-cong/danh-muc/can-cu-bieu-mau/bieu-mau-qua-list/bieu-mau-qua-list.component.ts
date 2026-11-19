@@ -17,8 +17,9 @@ import { BieuMauQuaEditDialogComponent } from '../bieu-mau-qua-edit/bieu-mau-qua
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-bieu-mau-qua-list',
-	templateUrl: './bieu-mau-qua-list.component.html'
+    selector: 'kt-bieu-mau-qua-list',
+    templateUrl: './bieu-mau-qua-list.component.html',
+    standalone: false
 })
 export class BieuMauQuaListComponent implements OnInit, OnDestroy {
 	dataSource: CanCuBieuMauDataSource | undefined;

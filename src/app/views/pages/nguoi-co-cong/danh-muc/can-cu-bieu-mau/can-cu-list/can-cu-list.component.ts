@@ -18,8 +18,9 @@ import { CanCuEditDialogComponent } from '../can-cu-edit/can-cu-edit.dialog.comp
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-can-cu-list',
-	templateUrl: './can-cu-list.component.html'
+    selector: 'kt-can-cu-list',
+    templateUrl: './can-cu-list.component.html',
+    standalone: false
 })
 export class CanCuListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

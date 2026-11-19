@@ -2,10 +2,11 @@ import { Component, OnInit,  Input, ViewChild, ElementRef, Renderer2, ChangeDete
 import { Subject } from 'rxjs';
 
 @Component({
-	selector: 'm-tree-don-vi-node',
-	templateUrl: 'tree-don-vi-node.component.html',
-	styleUrls: ['./tree-don-vi-node.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-tree-don-vi-node',
+    templateUrl: 'tree-don-vi-node.component.html',
+    styleUrls: ['./tree-don-vi-node.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class TreeDonViNodeComponent implements OnInit {

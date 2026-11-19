@@ -11,8 +11,9 @@ import { DanhmuckhacModel } from './../Models/danh-muc-khac.model';
 import { ChonNhieuBieuMauListComponent, ChonNhieuDoiTuongListComponent } from '../../../components';
 
 @Component({
-	selector: 'kt-danhmuckhac-detail',
-	templateUrl: './danhmuckhac-detail.component.html',
+    selector: 'kt-danhmuckhac-detail',
+    templateUrl: './danhmuckhac-detail.component.html',
+    standalone: false
 })
 
 export class DanhmuckhacDetailComponent implements OnInit, OnDestroy {

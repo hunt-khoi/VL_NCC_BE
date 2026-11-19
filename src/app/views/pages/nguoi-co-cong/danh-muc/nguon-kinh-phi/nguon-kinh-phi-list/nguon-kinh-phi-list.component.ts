@@ -18,9 +18,10 @@ import { NguonKinhPhiEditDialogComponent } from './../nguon-kinh-phi-edit/nguon-
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-nguon-kinh-phi-list',
-	templateUrl: './nguon-kinh-phi-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nguon-kinh-phi-list',
+    templateUrl: './nguon-kinh-phi-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NguonKinhPhiListComponent implements OnInit, OnDestroy {

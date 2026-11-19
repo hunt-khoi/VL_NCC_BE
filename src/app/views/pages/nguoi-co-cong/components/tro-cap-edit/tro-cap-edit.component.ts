@@ -10,9 +10,10 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-tro-cap-edit',
-	templateUrl: './tro-cap-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-tro-cap-edit',
+    templateUrl: './tro-cap-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class TroCapEditComponent implements OnInit {

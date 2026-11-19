@@ -3,8 +3,9 @@ import { LayoutConfigService } from '../../../core/_base/layout';
 import objectPath from 'object-path';
 
 @Component({
-	selector: 'kt-subheader',
-	templateUrl: './subheader.component.html',
+    selector: 'kt-subheader',
+    templateUrl: './subheader.component.html',
+    standalone: false
 })
 export class SubheaderComponent implements OnInit {
 	layout: string = "";

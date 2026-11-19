@@ -9,14 +9,11 @@ import { Moment } from 'moment';
 import moment from 'moment';
 
 @Component({
-	// eslint-disable-next-line @angular-eslint/component-selector
-	selector: 'tr[tro-cap-row-edit]',
-	templateUrl: './tro-cap-row-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	//gán theo dưới đây làm format các datepicker có trong component
-	// providers: [
-	// 	{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
-	// ],
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'tr[tro-cap-row-edit]',
+    templateUrl: './tro-cap-row-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class TroCapRowEditComponent implements OnInit {

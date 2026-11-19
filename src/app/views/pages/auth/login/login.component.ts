@@ -17,10 +17,11 @@ const DEMO_PARAMS = {
 };
 
 @Component({
-	selector: 'kt-login',
-	templateUrl: './login.component.html',
-	styleUrls: ['./login.component.scss'],
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class LoginComponent implements OnInit, OnDestroy {
 	@ViewChild(ReCaptchaComponent) recaptcha: ReCaptchaComponent | undefined;

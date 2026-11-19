@@ -9,8 +9,9 @@ import { CommonService } from '../../../services/common.service';
 import { NhapQuyTrinhDuyetService } from '../Services/nhap-quy-trinh-duyet.service';
 
 @Component({
-	selector: 'kt-dieu-kien-edit',
-	templateUrl: './dieu-kien-edit.dialog.component.html',
+    selector: 'kt-dieu-kien-edit',
+    templateUrl: './dieu-kien-edit.dialog.component.html',
+    standalone: false
 })
 
 export class DieuKienEditDialogComponent implements OnInit, OnDestroy {

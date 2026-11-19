@@ -20,7 +20,8 @@ import { FormControl, NgControl, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS } 
             useExisting: forwardRef(() => DropdownTreeComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: false
 })
 export class DropdownTreeComponent implements OnChanges, AfterViewInit {
     @Input() data: any;

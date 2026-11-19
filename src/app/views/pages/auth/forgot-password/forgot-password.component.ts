@@ -9,9 +9,10 @@ import { LayoutConfigService } from '../../../../core/_base/layout';
 import objectPath from 'object-path';
 
 @Component({
-	selector: 'kt-forgot-password',
-	templateUrl: './forgot-password.component.html',
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-forgot-password',
+    templateUrl: './forgot-password.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
 	itemForm: FormGroup = new FormGroup({});

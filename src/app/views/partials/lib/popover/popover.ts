@@ -25,8 +25,9 @@ export class PopoverPlacement {
 }
 
 @Component({
-	selector: 'popover-content',
-	template: ``,
+    selector: 'popover-content',
+    template: ``,
+    standalone: false
 })
 export class PopoverContentComponent {
 	[key: string]: any;
@@ -692,8 +693,9 @@ export class PopoverContentComponent {
 }
 
 @Directive({
-	selector: '[popover]',
-	exportAs: 'popover',
+    selector: '[popover]',
+    exportAs: 'popover',
+    standalone: false
 })
 export class PopoverDirective {
 	[key: string]: any;

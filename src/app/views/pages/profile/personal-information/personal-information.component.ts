@@ -4,9 +4,10 @@ import { CommonService } from '../../nguoi-co-cong/services/common.service';
 import { LayoutUtilsService } from 'app/core/_base/crud';
 
 @Component({
-	selector: 'kt-personal-information',
-	templateUrl: './personal-information.component.html',
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-personal-information',
+    templateUrl: './personal-information.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class PersonalInformationComponent implements OnInit {
 	user$: Observable<any> | undefined;

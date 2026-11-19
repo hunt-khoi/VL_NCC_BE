@@ -8,9 +8,10 @@ import { DM_DonViService } from '../Services/dm-don-vi.service';
 import { DM_DonViModel } from '../Model/dm-don-vi.model';
 
 @Component({
-	selector: 'kt-dm-don-vi-import',
-	templateUrl: './dm-don-vi-import.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-dm-don-vi-import',
+    templateUrl: './dm-don-vi-import.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DM_DonViImportComponent implements OnInit, OnDestroy {

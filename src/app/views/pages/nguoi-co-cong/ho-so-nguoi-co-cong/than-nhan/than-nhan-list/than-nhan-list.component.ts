@@ -19,9 +19,10 @@ import { ThanNhanEditDialogComponent } from './../than-nhan-edit/than-nhan-edit-
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-than-nhan-list',
-	templateUrl: './than-nhan-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-than-nhan-list',
+    templateUrl: './than-nhan-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class ThanNhanListComponent implements OnInit {

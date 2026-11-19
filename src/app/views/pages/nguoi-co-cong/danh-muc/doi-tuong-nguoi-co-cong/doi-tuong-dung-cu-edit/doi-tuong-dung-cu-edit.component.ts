@@ -10,8 +10,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'kt-doi-tuong-dung-cu-edit',
-  templateUrl: './doi-tuong-dung-cu-edit.component.html',
+    selector: 'kt-doi-tuong-dung-cu-edit',
+    templateUrl: './doi-tuong-dung-cu-edit.component.html',
+    standalone: false
 })
 
 export class DoiTuongDungCuEditComponent implements OnInit, OnDestroy {

@@ -8,8 +8,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-noi-dung-chi-detail',
-	templateUrl: './noi-dung-chi-detail.component.html',
+    selector: 'kt-noi-dung-chi-detail',
+    templateUrl: './noi-dung-chi-detail.component.html',
+    standalone: false
 })
 
 export class NoiDungChiDetailComponent implements OnInit, OnDestroy {

@@ -13,9 +13,10 @@ import { NhapQuyTrinhDuyetDataSource } from '../Model/data-sources/nhap-quy-trin
 import { NhapQuyTrinhDuyetEditComponent } from '../nhap-quy-trinh-duyet-edit/nhap-quy-trinh-duyet-edit.component';
 
 @Component({
-	selector: 'm-nhap-quy-trinh-duyet-list',
-	templateUrl: './nhap-quy-trinh-duyet-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-nhap-quy-trinh-duyet-list',
+    templateUrl: './nhap-quy-trinh-duyet-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class NhapQuyTrinhDuyetListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

@@ -4,7 +4,8 @@ import { Pipe, PipeTransform } from '@angular/core';
  * Returns only first letter of string
  */
 @Pipe({
-	name: 'firstLetter'
+    name: 'firstLetter',
+    standalone: false
 })
 export class FirstLetterPipe implements PipeTransform {
 

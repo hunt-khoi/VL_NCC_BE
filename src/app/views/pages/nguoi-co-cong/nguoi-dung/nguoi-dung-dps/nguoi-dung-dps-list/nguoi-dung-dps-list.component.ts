@@ -24,10 +24,11 @@ import { NguoiDungDPSResetPasswordComponent } from '../nguoi-dung-dps-reset-pass
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-nguoi-dung-dps-list',
-	templateUrl: './nguoi-dung-dps-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-nguoi-dung-dps-list',
+    templateUrl: './nguoi-dung-dps-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 
 export class NguoiDungDPSListComponent implements OnInit, OnDestroy {

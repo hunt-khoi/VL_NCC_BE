@@ -7,9 +7,10 @@ import { dottangquaService } from '../dot-tang-qua/Services/dot-tang-qua.service
 import moment from 'moment';
 
 @Component({
-	selector: 'm-thong-ke-tang-giam',
-	templateUrl: './thong-ke-tang-giam.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-thong-ke-tang-giam',
+    templateUrl: './thong-ke-tang-giam.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class thongkeComponent implements OnInit {

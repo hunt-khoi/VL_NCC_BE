@@ -9,8 +9,9 @@ export interface MenuOptions {
 }
 
 @Directive({
-	selector: '[ktMenu]',
-	exportAs: 'ktMenu',
+    selector: '[ktMenu]',
+    exportAs: 'ktMenu',
+    standalone: false
 })
 export class MenuDirective implements AfterViewInit {
 	@Input() options: MenuOptions | undefined;

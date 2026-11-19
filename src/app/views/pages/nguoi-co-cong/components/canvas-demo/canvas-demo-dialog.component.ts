@@ -5,9 +5,10 @@ import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { DynamicProcessService } from '../../services/dynamic-process.service';
 
 @Component({
-	// eslint-disable-next-line @angular-eslint/component-selector
-	selector: 'canvas-demo-dialog',
-	templateUrl: 'canvas-demo-dialog.component.html',
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'canvas-demo-dialog',
+    templateUrl: 'canvas-demo-dialog.component.html',
+    standalone: false
 })
 export class CanvasDemoDialogComponent implements OnInit {
 	itemForm: FormGroup = new FormGroup({});

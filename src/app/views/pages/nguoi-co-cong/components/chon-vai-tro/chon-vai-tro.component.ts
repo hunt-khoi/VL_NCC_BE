@@ -14,10 +14,11 @@ import { LayoutUtilsService, QueryParamsModel } from 'app/core/_base/crud';
 import { CommonService } from '../../services/common.service';
 
 @Component({
-	selector: 'm-chon-vai-tro',
-	templateUrl: './chon-vai-tro.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-chon-vai-tro',
+    templateUrl: './chon-vai-tro.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 export class ChonVaiTroComponent implements OnInit {
 	// Table fields

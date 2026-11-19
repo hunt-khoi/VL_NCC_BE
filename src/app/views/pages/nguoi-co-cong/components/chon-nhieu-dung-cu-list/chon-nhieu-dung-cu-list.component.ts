@@ -10,8 +10,9 @@ import { CommonService } from '../../services/common.service';
 import { ChonNhieuDungCuListDataSource } from './chon-nhieu-dung-cu-list.datasource';
 
 @Component({
-	selector: 'm-chon-nhieu-dung-cu-list',
-	templateUrl: './chon-nhieu-dung-cu-list.component.html',
+    selector: 'm-chon-nhieu-dung-cu-list',
+    templateUrl: './chon-nhieu-dung-cu-list.component.html',
+    standalone: false
 })
 export class ChonNhieuDungCuListComponent implements OnInit {
 	item: any;

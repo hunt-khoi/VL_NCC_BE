@@ -14,9 +14,10 @@ export class TodoItemNode {
 	data?: any;
 }
 @Component({
-	selector: 'kt-nguoi-dung-don-vi',
-	templateUrl: './nguoi-dung-don-vi.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nguoi-dung-don-vi',
+    templateUrl: './nguoi-dung-don-vi.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class NguoiDungDonViComponent implements OnInit {
 	loadingSubject = new BehaviorSubject<boolean>(true);

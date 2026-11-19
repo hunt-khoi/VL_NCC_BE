@@ -11,8 +11,9 @@ import { ChonNhieuBieuMauListModel } from './chon-nhieu-bieu-mau-list.model';
 import { ChonNhieuBieuMauListDataSource } from './chon-nhieu-bieu-mau-list.datasource';
 
 @Component({
-	selector: 'm-chon-nhieu-bieu-mau-list',
-	templateUrl: './chon-nhieu-bieu-mau-list.component.html',
+    selector: 'm-chon-nhieu-bieu-mau-list',
+    templateUrl: './chon-nhieu-bieu-mau-list.component.html',
+    standalone: false
 })
 export class ChonNhieuBieuMauListComponent implements OnInit {
 	item: ChonNhieuBieuMauListModel | undefined;

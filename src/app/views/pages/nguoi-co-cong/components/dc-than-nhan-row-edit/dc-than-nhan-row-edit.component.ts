@@ -7,9 +7,10 @@ import { Subject } from 'rxjs';
 import { CommonService } from '../../services/common.service';
 
 @Component({
-	// eslint-disable-next-line @angular-eslint/component-selector
-	selector: 'tr[dc-than-nhan-row-edit]',
-	templateUrl: './dc-than-nhan-row-edit.component.html',
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'tr[dc-than-nhan-row-edit]',
+    templateUrl: './dc-than-nhan-row-edit.component.html',
+    standalone: false
 })
 
 export class DCThanNhanRowEditComponent implements OnInit {

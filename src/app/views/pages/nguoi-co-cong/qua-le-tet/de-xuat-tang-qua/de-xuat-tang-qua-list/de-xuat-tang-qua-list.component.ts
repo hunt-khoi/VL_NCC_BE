@@ -18,9 +18,10 @@ import { DeXuatEditDialogComponent } from '../../de-xuat/de-xuat-edit/de-xuat-ed
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-de-xuat-tang-qua-list',
-	templateUrl: './de-xuat-tang-qua-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-de-xuat-tang-qua-list',
+    templateUrl: './de-xuat-tang-qua-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DeXuatTQListComponent implements OnInit, OnChanges, OnDestroy {

@@ -20,8 +20,9 @@ import { DanhmuckhacDetailComponent } from './../danhmuckhac-detail/danhmuckhac-
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-danh-muc-khac-list',
-	templateUrl: './danh-muc-khac-list.component.html'
+    selector: 'kt-danh-muc-khac-list',
+    templateUrl: './danh-muc-khac-list.component.html',
+    standalone: false
 })
 export class DanhMucKhacListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

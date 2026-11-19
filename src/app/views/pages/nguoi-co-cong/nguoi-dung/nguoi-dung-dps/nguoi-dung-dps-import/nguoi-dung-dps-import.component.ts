@@ -7,9 +7,10 @@ import { NguoiDungDPSService } from '../Services/nguoi-dung-dps.service';
 import { NguoiDungDPSModel } from '../Model/nguoi-dung-dps.model';
 
 @Component({
-	selector: 'kt-nguoi-dung-dps-import',
-	templateUrl: './nguoi-dung-dps-import.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nguoi-dung-dps-import',
+    templateUrl: './nguoi-dung-dps-import.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NguoiDungDPSImportComponent implements OnInit, OnDestroy {

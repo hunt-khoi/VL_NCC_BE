@@ -10,9 +10,10 @@ import { TokenStorage } from '../../../../../core/auth/_services/token-storage.s
 import { xuatDotTangQuaService } from './Services/xuat-dot-tang-qua.service';
 
 @Component({
-	selector: 'm-xuat-dot-tang-qua',
-	templateUrl: './xuat-dot-tang-qua.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-xuat-dot-tang-qua',
+    templateUrl: './xuat-dot-tang-qua.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class xuatDotTangQuaComponent implements OnInit, OnDestroy {

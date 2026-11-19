@@ -3,8 +3,9 @@ import { LayoutConfigService, ToggleOptions } from '../../../core/_base/layout';
 import { HtmlClassService } from '../html-class.service';
 
 @Component({
-	selector: 'kt-brand',
-	templateUrl: './brand.component.html',
+    selector: 'kt-brand',
+    templateUrl: './brand.component.html',
+    standalone: false
 })
 export class BrandComponent implements OnInit {
 	headerLogo: string = "";

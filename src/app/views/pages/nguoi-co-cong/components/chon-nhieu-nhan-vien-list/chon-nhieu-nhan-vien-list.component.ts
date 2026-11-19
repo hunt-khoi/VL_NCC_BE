@@ -12,8 +12,9 @@ import { ChonNhieuNhanVienListModel } from './chon-nhieu-nhan-vien-list.model';
 import { ChonNhieuNhanVienListDataSource } from './chon-nhieu-nhan-vien-list.datasource';
 
 @Component({
-	selector: 'm-chon-nhieu-nhan-vien-list',
-	templateUrl: './chon-nhieu-nhan-vien-list.component.html',
+    selector: 'm-chon-nhieu-nhan-vien-list',
+    templateUrl: './chon-nhieu-nhan-vien-list.component.html',
+    standalone: false
 })
 export class ChonNhieuNhanVienListComponent implements OnInit {
 	item: ChonNhieuNhanVienListModel | undefined;

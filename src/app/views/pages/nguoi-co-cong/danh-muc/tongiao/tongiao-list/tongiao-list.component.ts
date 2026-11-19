@@ -14,9 +14,10 @@ import { tongiaoDataSource } from '../Model/data-sources/tongiao.datasource';
 import { tongiaoEditDialogComponent } from '../tongiao-edit/tongiao-edit.dialog.component';
 
 @Component({
-	selector: 'm-tongiao-list',
-	templateUrl: './tongiao-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-tongiao-list',
+    templateUrl: './tongiao-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class tongiaoListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

@@ -12,9 +12,10 @@ import { FormBaseComponent } from '../form-base.component';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-form-tho-cung',
-	templateUrl: './form-tho-cung.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-tho-cung',
+    templateUrl: './form-tho-cung.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormThoCungComponent extends FormBaseComponent implements OnInit, OnDestroy {

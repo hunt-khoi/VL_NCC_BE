@@ -19,10 +19,11 @@ import { DM_DonViImportComponent } from '../dm-don-vi-import/dm-don-vi-import.co
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-dm-don-vi-list',
-	templateUrl: './dm-don-vi-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-dm-don-vi-list',
+    templateUrl: './dm-don-vi-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 export class DM_DonViListComponent implements OnChanges, OnDestroy {
 	private destroy$ = new Subject<void>();

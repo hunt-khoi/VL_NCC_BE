@@ -8,8 +8,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'm-list-phien-ban-dialog',
-	templateUrl: './list-phien-ban.dialog.component.html',
+    selector: 'm-list-phien-ban-dialog',
+    templateUrl: './list-phien-ban.dialog.component.html',
+    standalone: false
 })
 
 export class ListPhienBanDialogComponent implements OnInit, OnDestroy {

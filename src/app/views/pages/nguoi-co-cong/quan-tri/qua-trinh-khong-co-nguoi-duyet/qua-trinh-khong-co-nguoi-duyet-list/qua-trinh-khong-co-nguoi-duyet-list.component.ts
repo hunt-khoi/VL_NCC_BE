@@ -17,10 +17,11 @@ import { QuaTrinhKhongCoNguoiDuyetService } from '../Services/qua-trinh-khong-co
 import { QuaTrinhKhongCoNguoiDuyetEditComponent } from '../qua-trinh-khong-co-nguoi-duyet-edit/qua-trinh-khong-co-nguoi-duyet-edit.component';
 
 @Component({
-	selector: 'm-qua-trinh-khong-co-nguoi-duyet-list',
-	templateUrl: './qua-trinh-khong-co-nguoi-duyet-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-qua-trinh-khong-co-nguoi-duyet-list',
+    templateUrl: './qua-trinh-khong-co-nguoi-duyet-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 
 export class QuaTrinhKhongCoNguoiDuyetListComponent implements OnInit, OnDestroy {

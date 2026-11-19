@@ -8,11 +8,12 @@ import { QueryParamsModel } from '../../../core/_base/crud';
 import 'chartjs-plugin-labels';
 
 @Component({
-	selector: 'kt-dashboard',
-	templateUrl: './dashboard.component.html',
-	styleUrls: ['dashboard.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-dashboard',
+    templateUrl: './dashboard.component.html',
+    styleUrls: ['dashboard.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class DashboardComponent implements OnInit {
 	ThongKeDashboard: any[] = [];

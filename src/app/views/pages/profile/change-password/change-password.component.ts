@@ -9,9 +9,10 @@ import { AuthService } from '../../../../core/auth';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-change-password',
-	templateUrl: './change-password.component.html',
-	encapsulation: ViewEncapsulation.None
+    selector: 'kt-change-password',
+    templateUrl: './change-password.component.html',
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 
 export class ChangePasswordComponent implements OnInit {

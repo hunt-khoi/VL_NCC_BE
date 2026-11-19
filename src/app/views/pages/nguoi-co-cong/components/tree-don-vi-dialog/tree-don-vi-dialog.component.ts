@@ -5,8 +5,9 @@ import { Subscription } from 'rxjs';
 import { DM_DonViService } from '../../danh-muc/dm-don-vi/Services/dm-don-vi.service';
 
 @Component({
-	selector: 'kt-tree-don-vi-dialog',
-	templateUrl: './tree-don-vi-dialog.component.html',
+    selector: 'kt-tree-don-vi-dialog',
+    templateUrl: './tree-don-vi-dialog.component.html',
+    standalone: false
 })
 	
 export class TreeDonViDialogComponent implements OnInit, OnDestroy {

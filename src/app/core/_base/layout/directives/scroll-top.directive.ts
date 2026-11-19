@@ -6,7 +6,8 @@ export interface ScrollTopOptions {
 }
 
 @Directive({
-	selector: '[ktScrollTop]'
+    selector: '[ktScrollTop]',
+    standalone: false
 })
 export class ScrollTopDirective implements AfterViewInit {
 	@Input() options: ScrollTopOptions | undefined;

@@ -8,8 +8,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'kt-update-bieu-mau-dialog',
-	templateUrl: './update-bieu-mau-dialog.component.html',
+    selector: 'kt-update-bieu-mau-dialog',
+    templateUrl: './update-bieu-mau-dialog.component.html',
+    standalone: false
 })
 export class UpdateBieuMauDialogComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

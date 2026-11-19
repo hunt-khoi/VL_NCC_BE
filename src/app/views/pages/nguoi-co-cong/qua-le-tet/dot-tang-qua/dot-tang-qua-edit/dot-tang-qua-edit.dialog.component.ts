@@ -12,8 +12,9 @@ import { dottangquaModel, dottangqua_NCCModel } from '../../dot-tang-qua/Model/d
 import { SoToTrinhEditDialogComponent } from '../so-to-trinh-edit/so-to-trinh-edit.dialog.component';
 
 @Component({
-	selector: 'm-dot-tang-qua-edit-dialog',
-	templateUrl: './dot-tang-qua-edit.dialog.component.html',
+    selector: 'm-dot-tang-qua-edit-dialog',
+    templateUrl: './dot-tang-qua-edit.dialog.component.html',
+    standalone: false
 })
 
 export class dottangquaEditDialogComponent implements OnInit, OnDestroy {

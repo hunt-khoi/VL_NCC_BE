@@ -8,8 +8,9 @@ import { BieuMauService } from '../Services/bieu-mau.service';
 import { BieuMauQuaService } from '../Services/bieu-mau-qua.service';
 
 @Component({
-	selector: 'kt-key-word-list',
-	templateUrl: './key-word-list.component.html',
+    selector: 'kt-key-word-list',
+    templateUrl: './key-word-list.component.html',
+    standalone: false
 })
 
 export class KeyWordListComponent implements OnInit, OnDestroy {

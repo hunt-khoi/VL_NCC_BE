@@ -33,7 +33,10 @@ import {Key} from '../util/key';
 
 import {NgbDropdownConfig} from './dropdown-config';
 
-@Directive({selector: '.navbar'})
+@Directive({
+    selector: '.navbar',
+    standalone: false
+})
 export class NgbNavbar {
 }
 
@@ -43,7 +46,10 @@ export class NgbNavbar {
  *
  * @since 4.1.0
  */
-@Directive({selector: '[ngbDropdownItem]', host: {'class': 'dropdown-item', '[class.disabled]': 'disabled'}})
+@Directive({
+    selector: '[ngbDropdownItem]', host: { 'class': 'dropdown-item', '[class.disabled]': 'disabled' },
+    standalone: false
+})
 export class NgbDropdownItem {
   private _disabled = false;
 
@@ -61,18 +67,19 @@ export class NgbDropdownItem {
  * A directive that wraps dropdown menu content and dropdown items.
  */
 @Directive({
-  selector: '[ngbDropdownMenu]',
-  host: {
-    '[class.dropdown-menu]': 'true',
-    '[class.show]': 'dropdown.isOpen()',
-    '[attr.x-placement]': 'placement',
-    '(keydown.ArrowUp)': 'dropdown.onKeyDown($event)',
-    '(keydown.ArrowDown)': 'dropdown.onKeyDown($event)',
-    '(keydown.Home)': 'dropdown.onKeyDown($event)',
-    '(keydown.End)': 'dropdown.onKeyDown($event)',
-    '(keydown.Enter)': 'dropdown.onKeyDown($event)',
-    '(keydown.Space)': 'dropdown.onKeyDown($event)'
-  }
+    selector: '[ngbDropdownMenu]',
+    host: {
+        '[class.dropdown-menu]': 'true',
+        '[class.show]': 'dropdown.isOpen()',
+        '[attr.x-placement]': 'placement',
+        '(keydown.ArrowUp)': 'dropdown.onKeyDown($event)',
+        '(keydown.ArrowDown)': 'dropdown.onKeyDown($event)',
+        '(keydown.Home)': 'dropdown.onKeyDown($event)',
+        '(keydown.End)': 'dropdown.onKeyDown($event)',
+        '(keydown.Enter)': 'dropdown.onKeyDown($event)',
+        '(keydown.Space)': 'dropdown.onKeyDown($event)'
+    },
+    standalone: false
 })
 export class NgbDropdownMenu {
   placement: Placement = 'bottom';
@@ -93,8 +100,9 @@ export class NgbDropdownMenu {
  * @since 1.1.0
  */
 @Directive({
-  selector: '[ngbDropdownAnchor]',
-  host: {'class': 'dropdown-toggle', 'aria-haspopup': 'true', '[attr.aria-expanded]': 'dropdown.isOpen()'}
+    selector: '[ngbDropdownAnchor]',
+    host: { 'class': 'dropdown-toggle', 'aria-haspopup': 'true', '[attr.aria-expanded]': 'dropdown.isOpen()' },
+    standalone: false
 })
 export class NgbDropdownAnchor {
   anchorEl;
@@ -112,18 +120,19 @@ export class NgbDropdownAnchor {
  * You can also use `NgbDropdownAnchor` as an alternative.
  */
 @Directive({
-  selector: '[ngbDropdownToggle]',
-  host: {
-    'class': 'dropdown-toggle',
-    'aria-haspopup': 'true',
-    '[attr.aria-expanded]': 'dropdown.isOpen()',
-    '(click)': 'dropdown.toggle()',
-    '(keydown.ArrowUp)': 'dropdown.onKeyDown($event)',
-    '(keydown.ArrowDown)': 'dropdown.onKeyDown($event)',
-    '(keydown.Home)': 'dropdown.onKeyDown($event)',
-    '(keydown.End)': 'dropdown.onKeyDown($event)'
-  },
-  providers: [{provide: NgbDropdownAnchor, useExisting: forwardRef(() => NgbDropdownToggle)}]
+    selector: '[ngbDropdownToggle]',
+    host: {
+        'class': 'dropdown-toggle',
+        'aria-haspopup': 'true',
+        '[attr.aria-expanded]': 'dropdown.isOpen()',
+        '(click)': 'dropdown.toggle()',
+        '(keydown.ArrowUp)': 'dropdown.onKeyDown($event)',
+        '(keydown.ArrowDown)': 'dropdown.onKeyDown($event)',
+        '(keydown.Home)': 'dropdown.onKeyDown($event)',
+        '(keydown.End)': 'dropdown.onKeyDown($event)'
+    },
+    providers: [{ provide: NgbDropdownAnchor, useExisting: forwardRef(() => NgbDropdownToggle) }],
+    standalone: false
 })
 export class NgbDropdownToggle extends NgbDropdownAnchor {
   constructor(@Inject(forwardRef(() => NgbDropdown)) dropdown, elementRef: ElementRef<HTMLElement>) {
@@ -134,7 +143,10 @@ export class NgbDropdownToggle extends NgbDropdownAnchor {
 /**
  * A directive that provides contextual overlays for displaying lists of links and more.
  */
-@Directive({selector: '[ngbDropdown]', exportAs: 'ngbDropdown', host: {'[class.show]': 'isOpen()'}})
+@Directive({
+    selector: '[ngbDropdown]', exportAs: 'ngbDropdown', host: { '[class.show]': 'isOpen()' },
+    standalone: false
+})
 export class NgbDropdown implements AfterContentInit, OnDestroy {
   private _closed$ = new Subject<void>();
   private _zoneSubscription: Subscription;

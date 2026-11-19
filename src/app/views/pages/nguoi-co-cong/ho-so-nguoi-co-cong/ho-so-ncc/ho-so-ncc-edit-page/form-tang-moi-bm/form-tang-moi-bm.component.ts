@@ -11,9 +11,10 @@ import { TroCapRowEditComponent, CanCuLSRowEditComponent } from '../../../../com
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-tang-moi-bm',
-	templateUrl: './form-tang-moi-bm.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-tang-moi-bm',
+    templateUrl: './form-tang-moi-bm.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormTangMoiBMComponent extends FormBaseComponent implements OnInit, OnDestroy {

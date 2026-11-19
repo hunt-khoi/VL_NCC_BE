@@ -10,8 +10,9 @@ import { CommonService } from '../../../services/common.service';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
-	selector: 'm-nhomletet-edit-dialog',
-	templateUrl: './nhomletet-edit.dialog.component.html',
+    selector: 'm-nhomletet-edit-dialog',
+    templateUrl: './nhomletet-edit.dialog.component.html',
+    standalone: false
 })
 
 export class nhomletetEditDialogComponent implements OnInit, OnDestroy {

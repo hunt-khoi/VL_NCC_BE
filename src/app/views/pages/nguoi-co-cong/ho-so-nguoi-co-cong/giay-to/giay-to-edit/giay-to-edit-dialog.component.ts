@@ -9,9 +9,10 @@ import { GiayToModel } from '../Model/giay-to.model';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-giay-to-edit',
-	templateUrl: './giay-to-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-giay-to-edit',
+    templateUrl: './giay-to-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class GiayToEditDialogComponent implements OnInit {

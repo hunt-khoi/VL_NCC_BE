@@ -1,8 +1,9 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-	selector: 'kt-quick-action',
-	templateUrl: './quick-action.component.html',
+    selector: 'kt-quick-action',
+    templateUrl: './quick-action.component.html',
+    standalone: false
 })
 export class QuickActionComponent {
 	// Public properties

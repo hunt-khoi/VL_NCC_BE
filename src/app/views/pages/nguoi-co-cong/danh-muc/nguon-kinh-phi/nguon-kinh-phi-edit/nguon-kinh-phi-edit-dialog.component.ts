@@ -9,9 +9,10 @@ import { takeUntil } from 'rxjs/operators';
 import { LayoutUtilsService } from '../../../../../../core/_base/crud';
 
 @Component({
-	selector: 'kt-nguon-kinh-phi-edit',
-	templateUrl: './nguon-kinh-phi-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nguon-kinh-phi-edit',
+    templateUrl: './nguon-kinh-phi-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NguonKinhPhiEditDialogComponent implements OnInit, OnDestroy {

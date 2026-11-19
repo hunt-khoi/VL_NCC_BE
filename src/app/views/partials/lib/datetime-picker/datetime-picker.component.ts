@@ -47,7 +47,9 @@ export class NgbTimeStringAdapter extends NgbTimeAdapter<string> {
             provide: NG_VALIDATORS,
             useExisting: forwardRef(() => DatetimePickerComponent),
             multi: true
-        }]
+        }
+    ],
+    standalone: false
 })
 export class DatetimePickerComponent implements OnChanges {
     @Input() value: any;

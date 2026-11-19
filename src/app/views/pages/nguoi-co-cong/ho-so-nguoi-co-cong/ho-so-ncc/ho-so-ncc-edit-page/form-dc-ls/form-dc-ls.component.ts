@@ -14,9 +14,10 @@ import { FormBaseComponent } from '../form-base.component';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-form-dc-ls',
-	templateUrl: './form-dc-ls.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-dc-ls',
+    templateUrl: './form-dc-ls.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormDC_LSComponent extends FormBaseComponent implements OnInit, OnDestroy {

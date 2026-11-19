@@ -8,9 +8,10 @@ import { CauHinhSMSService } from '../Services/cau-hinh-sms.service';
 import { CauHinhSMSModel } from '../Model/cau-hinh-sms.model';
 
 @Component({
-	selector: 'kt-cau-hinh-sms-popup-donvicon',
-	templateUrl: './cau-hinh-sms-popup-donvicon.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-cau-hinh-sms-popup-donvicon',
+    templateUrl: './cau-hinh-sms-popup-donvicon.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class CauHinhSMSPopupDVCComponent implements OnInit, OnDestroy {

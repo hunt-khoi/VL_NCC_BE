@@ -3,9 +3,9 @@ import { KtDialogService, StickyDirective } from '../../../../../core/_base/layo
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
-	selector: 'kt-portlet-header',
-	styleUrls: ['portlet-header.component.scss'],
-	template: `
+    selector: 'kt-portlet-header',
+    styleUrls: ['portlet-header.component.scss'],
+    template: `
 		<div class="kt-portlet__head-label" [hidden]="noTitle">
 			<span class="kt-portlet__head-icon" #refIcon [hidden]="hideIcon">
 				<ng-content *ngIf="!icon" select="[ktPortletIcon]"></ng-content>
@@ -16,7 +16,8 @@ import { Observable, Subscription } from 'rxjs';
 		</div>
 		<div class="kt-portlet__head-toolbar" #refTools [hidden]="hideTools">
 			<ng-content select="[ktPortletTools]"></ng-content>
-		</div>`
+		</div>`,
+    standalone: false
 })
 export class PortletHeaderComponent implements OnInit, AfterViewInit, OnDestroy {
 	// append html class to the portlet header

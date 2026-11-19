@@ -1,8 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
-	selector: 'kt-alert',
-	templateUrl: './alert.component.html'
+    selector: 'kt-alert',
+    templateUrl: './alert.component.html',
+    standalone: false
 })
 export class AlertComponent implements OnInit {
 	@Input() type: string = 'primary | accent | warn';

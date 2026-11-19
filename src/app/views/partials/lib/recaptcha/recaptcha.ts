@@ -41,8 +41,9 @@ export class ReCaptchaService {
 }
 
 @Component({
-	selector: 're-captcha',
-	template: '<div #target></div>',
+    selector: 're-captcha',
+    template: '<div #target></div>',
+    standalone: false
 })
 export class ReCaptchaComponent implements OnInit {
 	@Input() site_key: string | null = null;

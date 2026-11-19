@@ -19,8 +19,9 @@ import { DoiTuongNhanQuaMucQuaComponent } from '../doi-tuong-nhan-qua-muc-qua/do
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-  selector: 'kt-dm-doi-tuong-nhan-qua-list',
-  templateUrl: './doi-tuong-nhan-qua-list.component.html',
+    selector: 'kt-dm-doi-tuong-nhan-qua-list',
+    templateUrl: './doi-tuong-nhan-qua-list.component.html',
+    standalone: false
 })
 
 export class DoiTuongNhanQuaListComponent implements OnInit, OnDestroy {

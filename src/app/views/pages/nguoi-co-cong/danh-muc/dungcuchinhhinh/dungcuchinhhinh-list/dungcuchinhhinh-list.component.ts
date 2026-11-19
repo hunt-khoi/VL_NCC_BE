@@ -20,7 +20,8 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
     selector: 'm-dungcuchinhhinh-list',
     templateUrl: './dungcuchinhhinh-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class dungcuchinhhinhListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

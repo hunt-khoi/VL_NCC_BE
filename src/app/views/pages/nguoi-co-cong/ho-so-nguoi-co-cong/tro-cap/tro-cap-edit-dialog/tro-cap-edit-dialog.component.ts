@@ -7,9 +7,10 @@ import { TroCapService } from '../Services/tro-cap.service';
 import { TroCapEditComponent } from '../../../components';
 
 @Component({
-	selector: 'kt-tro-cap-edit-dialog',
-	templateUrl: './tro-cap-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-tro-cap-edit-dialog',
+    templateUrl: './tro-cap-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TroCapEditDialogComponent implements OnInit {
 	ChildComponentInstance: any;

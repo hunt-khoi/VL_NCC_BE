@@ -6,8 +6,9 @@ import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 import { DanhMucKhacService } from './Services/danh-muc-khac.service';
 
 @Component({
-  selector: 'kt-danh-muc-khac',
-  templateUrl: './danh-muc-khac.component.html'
+    selector: 'kt-danh-muc-khac',
+    templateUrl: './danh-muc-khac.component.html',
+    standalone: false
 })
 export class DanhMucKhacComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

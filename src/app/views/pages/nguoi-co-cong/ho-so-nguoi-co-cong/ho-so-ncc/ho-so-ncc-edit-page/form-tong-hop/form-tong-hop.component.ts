@@ -11,9 +11,10 @@ import { TroCapRowEditComponent, DCThanNhanRowEditComponent } from '../../../../
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-tong-hop',
-	templateUrl: './form-tong-hop.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-tong-hop',
+    templateUrl: './form-tong-hop.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormTongHopComponent extends FormBaseComponent implements OnInit, OnDestroy {

@@ -4,10 +4,11 @@ import { ActivatedRoute } from '@angular/router';
 import { HoSoNCCService } from '../ho-so-ncc/Services/ho-so-ncc.service';
 
 @Component({
-	selector: 'kt-ho-so-ncc-view-detail',
-	templateUrl: './ho-so-ncc-view-detail.component.html',
-	styleUrls: ['./ho-so-ncc-view-detail.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc-view-detail',
+    templateUrl: './ho-so-ncc-view-detail.component.html',
+    styleUrls: ['./ho-so-ncc-view-detail.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class HoSoNccViewDetailComponent implements OnInit {

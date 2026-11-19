@@ -7,9 +7,10 @@ import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-form-base',
-	template: '',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-base',
+    template: '',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FormBaseComponent {
 	itemForm: FormGroup = new FormGroup({});

@@ -11,8 +11,9 @@ import { PhatQuaService } from './../Services/phat-qua.service';
 import { TangQuaDialogComponent } from './../tang-qua-dialog/tang-qua-dialog.component';
 
 @Component({
-	selector: 'kt-danh-sach-tang-qua',
-	templateUrl: './danh-sach-tang-qua.component.html'
+    selector: 'kt-danh-sach-tang-qua',
+    templateUrl: './danh-sach-tang-qua.component.html',
+    standalone: false
 })
 
 export class DanhSachTangQuaComponent implements OnInit, OnDestroy {

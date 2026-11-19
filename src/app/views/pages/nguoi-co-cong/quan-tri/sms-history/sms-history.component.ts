@@ -4,8 +4,9 @@ import { QueryParamsModel } from 'app/core/_base/crud';
 import { SMSHistoryService } from './Services/sms-history.service';
 
 @Component({
-  selector: 'kt-sms-history',
-  templateUrl: './sms-history.component.html',
+    selector: 'kt-sms-history',
+    templateUrl: './sms-history.component.html',
+    standalone: false
 })
 export class SMSHistoryComponent implements OnInit {
 

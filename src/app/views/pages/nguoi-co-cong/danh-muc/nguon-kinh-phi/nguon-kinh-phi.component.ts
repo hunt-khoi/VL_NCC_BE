@@ -1,9 +1,10 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-	selector: 'kt-nguon-kinh-phi',
-	templateUrl: './nguon-kinh-phi.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nguon-kinh-phi',
+    templateUrl: './nguon-kinh-phi.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NguonKinhPhiComponent { }

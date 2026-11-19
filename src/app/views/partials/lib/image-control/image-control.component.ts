@@ -34,7 +34,8 @@ const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
             useExisting: forwardRef(() => ImageControlComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: false
 })
 export class ImageControlComponent implements OnInit {
     @Input() data: any;

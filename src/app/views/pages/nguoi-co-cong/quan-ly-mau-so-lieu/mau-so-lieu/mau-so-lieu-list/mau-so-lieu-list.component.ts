@@ -21,9 +21,10 @@ import { MauSoLieuEditDialogComponent } from './../mau-so-lieu-edit/mau-so-lieu-
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-mau-so-lieu-list',
-	templateUrl: './mau-so-lieu-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-mau-so-lieu-list',
+    templateUrl: './mau-so-lieu-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class MauSoLieuListComponent implements OnInit, OnDestroy {

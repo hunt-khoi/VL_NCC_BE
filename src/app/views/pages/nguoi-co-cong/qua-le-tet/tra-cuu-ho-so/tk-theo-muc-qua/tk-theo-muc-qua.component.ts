@@ -10,7 +10,8 @@ import { tracuuHoSoService } from '../../tra-cuu-ho-so/Services/tra-cuu-ho-so.se
 @Component({
     selector: 'm-tk-theo-muc-qua',
     templateUrl: './tk-theo-muc-qua.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class thongKeTheoMucQuaComponent implements OnInit, OnDestroy {

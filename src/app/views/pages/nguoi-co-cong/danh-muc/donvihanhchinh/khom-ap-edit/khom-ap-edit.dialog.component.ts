@@ -10,8 +10,9 @@ import { CommonService } from '../../../services/common.service';
 import { donvihanhchinhService } from '../Services/donvihanhchinh.service';
 
 @Component({
-	selector: 'kt-khom-ap-edit-dialog',
-	templateUrl: './khom-ap-edit.dialog.component.html',
+    selector: 'kt-khom-ap-edit-dialog',
+    templateUrl: './khom-ap-edit.dialog.component.html',
+    standalone: false
 })
 
 export class KhomApEditDialogComponent implements OnInit, OnDestroy {

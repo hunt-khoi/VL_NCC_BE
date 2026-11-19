@@ -19,10 +19,11 @@ import { SMSHistoryEditComponent } from '../sms-history-edit/sms-history-edit.co
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-sms-history-list',
-	templateUrl: './sms-history-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-sms-history-list',
+    templateUrl: './sms-history-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 
 export class SMSHistoryListComponent implements OnInit, OnDestroy {

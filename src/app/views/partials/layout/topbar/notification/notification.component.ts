@@ -8,10 +8,11 @@ import { MenuHorizontalService } from '../../../../../core/_base/layout';
 import { TokenStorage } from 'app/core/auth/_services/token-storage.service';
 
 @Component({
-	selector: 'kt-notification',
-	templateUrl: './notification.component.html',
-	styleUrls: ['notification.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-notification',
+    templateUrl: './notification.component.html',
+    styleUrls: ['notification.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class NotificationComponent implements OnInit, OnDestroy {
 	// Show dot on top of the icon

@@ -1,9 +1,10 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-	selector: 'kt-nhap-so-lieu-duyet',
-	templateUrl: './nhap-so-lieu-duyet.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nhap-so-lieu-duyet',
+    templateUrl: './nhap-so-lieu-duyet.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NhapSoLieuDuyetComponent { }

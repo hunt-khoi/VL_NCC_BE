@@ -20,11 +20,12 @@ FormControlName.prototype.ngOnChanges = function (changes: any) {
 };
 
 @Component({
-	// eslint-disable-next-line @angular-eslint/component-selector
-	selector: 'body[kt-root]',
-	templateUrl: './app.component.html',
-	styleUrls: ['./app.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'body[kt-root]',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class AppComponent implements OnInit, OnDestroy {
 	title: string = "";

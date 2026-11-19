@@ -14,9 +14,10 @@ import { dantocDataSource } from '../Model/data-sources/dantoc.datasource';
 import { dantocEditDialogComponent } from '../dantoc-edit/dantoc-edit.dialog.component';
 
 @Component({
-	selector: 'm-dantoc-list',
-	templateUrl: './dantoc-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-dantoc-list',
+    templateUrl: './dantoc-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class dantocListComponent implements OnInit, OnDestroy {

@@ -21,9 +21,10 @@ import { QuyetDinhEditDialogComponent } from '../../quyet-dinh/quyet-dinh-edit/q
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-di-chuyen-list',
-	templateUrl: './di-chuyen-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-di-chuyen-list',
+    templateUrl: './di-chuyen-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class DiChuyenListComponent implements OnInit {

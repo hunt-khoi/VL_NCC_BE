@@ -6,9 +6,10 @@ import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import moment from 'moment';
 
 @Component({
-	selector: 'kt-than-nhan-edit',
-	templateUrl: './than-nhan-edit.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-than-nhan-edit',
+    templateUrl: './than-nhan-edit.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class ThanNhanEditComponent implements OnInit {

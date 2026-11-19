@@ -11,9 +11,10 @@ import { TroCapRowEditComponent } from '../../../../components';
 import { FormBaseComponent } from '../form-base.component';
 
 @Component({
-	selector: 'kt-form-giay-bt',
-	templateUrl: './form-giay-bt.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-form-giay-bt',
+    templateUrl: './form-giay-bt.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class FormGiayBTComponent extends FormBaseComponent implements OnInit, OnDestroy {

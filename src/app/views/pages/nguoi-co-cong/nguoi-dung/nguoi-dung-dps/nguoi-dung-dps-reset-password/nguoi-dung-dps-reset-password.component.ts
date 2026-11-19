@@ -9,9 +9,10 @@ import { ConfirmPasswordValidator } from '../../../../auth/register/confirm-pass
 import { CommonService } from '../../../services/common.service';
 
 @Component({
-	selector: 'kt-nguoi-dung-dps-reset-password',
-	templateUrl: './nguoi-dung-dps-reset-password.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-nguoi-dung-dps-reset-password',
+    templateUrl: './nguoi-dung-dps-reset-password.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NguoiDungDPSResetPasswordComponent implements OnInit, OnDestroy {

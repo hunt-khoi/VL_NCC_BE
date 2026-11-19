@@ -17,9 +17,10 @@ import { NhapSoLieuEditDialogComponent } from '../../nhap-so-lieu/nhap-so-lieu-e
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'kt-new-nhap-so-lieu-list',
-	templateUrl: './new-nhap-so-lieu-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-new-nhap-so-lieu-list',
+    templateUrl: './new-nhap-so-lieu-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NhapSoLieuListComponent implements OnInit, OnDestroy {

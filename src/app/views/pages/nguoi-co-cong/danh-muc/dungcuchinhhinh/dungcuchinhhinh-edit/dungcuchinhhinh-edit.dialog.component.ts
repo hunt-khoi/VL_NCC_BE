@@ -11,8 +11,9 @@ import { dungcuchinhhinhService } from '../Services/dungcuchinhhinh.service';
 import moment from 'moment';
 
 @Component({
-	selector: 'm-dungcuchinhhinh-edit-dialog',
-	templateUrl: './dungcuchinhhinh-edit.dialog.component.html',
+    selector: 'm-dungcuchinhhinh-edit-dialog',
+    templateUrl: './dungcuchinhhinh-edit.dialog.component.html',
+    standalone: false
 })
 
 export class dungcuchinhhinhEditDialogComponent implements OnInit, OnDestroy {

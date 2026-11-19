@@ -15,9 +15,10 @@ import { NotifyDataSource } from '../Model/data-sources/notify.datasource';
 import moment from 'moment';
 
 @Component({
-	selector: 'm-notify-list',
-	templateUrl: './notify-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-notify-list',
+    templateUrl: './notify-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class NotifyListComponent implements OnInit {

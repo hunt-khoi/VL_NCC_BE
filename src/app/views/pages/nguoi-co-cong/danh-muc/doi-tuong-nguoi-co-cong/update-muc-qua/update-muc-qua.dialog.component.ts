@@ -10,8 +10,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-	selector: 'm-update-muc-qua',
-	templateUrl: './update-muc-qua.dialog.component.html',
+    selector: 'm-update-muc-qua',
+    templateUrl: './update-muc-qua.dialog.component.html',
+    standalone: false
 })
 export class UpdateMucQuaDialogComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();

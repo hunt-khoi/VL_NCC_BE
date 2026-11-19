@@ -9,9 +9,10 @@ export interface ISearchResult {
 }
 
 @Component({
-	selector: 'kt-search-result',
-	templateUrl: './search-result.component.html',
-	styleUrls: ['./search-result.component.scss']
+    selector: 'kt-search-result',
+    templateUrl: './search-result.component.html',
+    styleUrls: ['./search-result.component.scss'],
+    standalone: false
 })
 export class SearchResultComponent {
 	// Public properties

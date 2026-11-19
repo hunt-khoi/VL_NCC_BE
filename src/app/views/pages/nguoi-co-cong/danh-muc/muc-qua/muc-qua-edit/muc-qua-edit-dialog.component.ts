@@ -10,9 +10,10 @@ import { MucQuaService } from './../Services/muc-qua.service';
 import { MucQuaModel } from './../Model/muc-qua.model';
 
 @Component({
-	selector: 'kt-muc-qua-edit',
-	templateUrl: './muc-qua-edit-dialog.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-muc-qua-edit',
+    templateUrl: './muc-qua-edit-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class MucQuaEditDialogComponent implements OnInit, OnDestroy {

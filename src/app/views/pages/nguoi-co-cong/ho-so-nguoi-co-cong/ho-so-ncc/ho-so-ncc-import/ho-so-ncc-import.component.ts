@@ -8,9 +8,10 @@ import { HoSoNCCService } from '../Services/ho-so-ncc.service';
 import { HoSoNCCModel } from '../Model/ho-so-ncc.model';
 
 @Component({
-	selector: 'kt-ho-so-ncc-import',
-	templateUrl: './ho-so-ncc-import.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kt-ho-so-ncc-import',
+    templateUrl: './ho-so-ncc-import.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class HoSoNCCImportComponent implements OnInit, OnDestroy {
 

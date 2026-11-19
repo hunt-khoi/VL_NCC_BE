@@ -17,8 +17,9 @@ const DEFAULT_CONFIG: PerfectScrollbar.Options = {
 };
 
 @Directive({
-	selector: '[perfectScrollbar]',
-	exportAs: 'ngxPerfectScrollbar',
+    selector: '[perfectScrollbar]',
+    exportAs: 'ngxPerfectScrollbar',
+    standalone: false
 })
 export class PerfectScrollbarDirective implements AfterViewInit, OnChanges, OnDestroy {
 	/** Cau hinh rieng cho phan tu nay, gop de len cau hinh mac dinh. De trong ('') thi dung mac dinh. */

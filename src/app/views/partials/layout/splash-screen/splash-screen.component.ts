@@ -3,9 +3,10 @@ import { LayoutConfigService, SplashScreenService } from '../../../../core/_base
 import objectPath from 'object-path';
 
 @Component({
-	selector: 'kt-splash-screen',
-	templateUrl: './splash-screen.component.html',
-	styleUrls: ['./splash-screen.component.scss']
+    selector: 'kt-splash-screen',
+    templateUrl: './splash-screen.component.html',
+    styleUrls: ['./splash-screen.component.scss'],
+    standalone: false
 })
 export class SplashScreenComponent implements OnInit {
 	loaderLogo: string = "";

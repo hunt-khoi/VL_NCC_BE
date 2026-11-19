@@ -19,10 +19,11 @@ import { CauHinhSMSModel } from '../Model/cau-hinh-sms.model';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-cau-hinh-sms-list',
-	templateUrl: './cau-hinh-sms-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [DatePipe]
+    selector: 'm-cau-hinh-sms-list',
+    templateUrl: './cau-hinh-sms-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [DatePipe],
+    standalone: false
 })
 
 export class CauHinhSMSListComponent implements OnInit, OnDestroy {

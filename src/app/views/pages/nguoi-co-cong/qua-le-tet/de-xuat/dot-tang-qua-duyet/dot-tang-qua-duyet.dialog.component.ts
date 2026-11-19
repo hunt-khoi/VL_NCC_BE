@@ -9,8 +9,9 @@ import { DeXuatModel } from '../Model/de-xuat.model';
 import { DeXuatService } from '../Services/de-xuat.service';
 
 @Component({
-	selector: 'm-dot-tang-qua-duyet-dialog',
-	templateUrl: './dot-tang-qua-duyet.dialog.component.html',
+    selector: 'm-dot-tang-qua-duyet-dialog',
+    templateUrl: './dot-tang-qua-duyet.dialog.component.html',
+    standalone: false
 })
 
 export class DeXuatDuyetDialogComponent implements OnInit, OnDestroy {

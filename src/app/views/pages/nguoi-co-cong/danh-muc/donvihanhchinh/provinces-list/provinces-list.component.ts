@@ -15,9 +15,10 @@ import { donvihanhchinhDataSource } from '../Model/data-sources/donvihanhchinh.d
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
-	selector: 'm-provinces-list',
-	templateUrl: './provinces-list.component.html',
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'm-provinces-list',
+    templateUrl: './provinces-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 
 export class provincesListComponent implements OnInit {

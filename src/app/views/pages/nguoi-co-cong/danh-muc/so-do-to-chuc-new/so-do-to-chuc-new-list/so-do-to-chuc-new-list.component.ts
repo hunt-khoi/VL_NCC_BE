@@ -185,11 +185,12 @@ export class ChecklistDatabase {
 }
 
 @Component({
-	selector: 'm-so-do-to-chuc-new-list',
-	templateUrl: './so-do-to-chuc-new-list.component.html',
-	styleUrls: ['./so-do-to-chuc-new-list.component.scss'],
-	providers: [ChecklistDatabase],
-	encapsulation: ViewEncapsulation.None
+    selector: 'm-so-do-to-chuc-new-list',
+    templateUrl: './so-do-to-chuc-new-list.component.html',
+    styleUrls: ['./so-do-to-chuc-new-list.component.scss'],
+    providers: [ChecklistDatabase],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class SodotochucListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();
