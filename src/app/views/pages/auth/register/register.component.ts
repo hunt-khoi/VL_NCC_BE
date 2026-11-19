@@ -20,7 +20,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 	itemForm: FormGroup = new FormGroup({});
 	loading = false;
 	errors: any = [];
-	private unsubscribe: Subject<any>;
+	private unsubscribe: Subject<void>;
 
 	constructor(
 		private authNoticeService: AuthNoticeService,

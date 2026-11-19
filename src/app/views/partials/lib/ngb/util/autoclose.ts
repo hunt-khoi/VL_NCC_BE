@@ -69,7 +69,7 @@ export function ngbAutoClose(
                                        takeUntil(closed$)) as Observable<MouseEvent>;
 
 
-      race<Event>([escapes$, closeableClicks$]).subscribe(() => zone.run(close));
+      race([escapes$, closeableClicks$]).subscribe(() => zone.run(close));
     }));
   }
 }

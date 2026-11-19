@@ -33,7 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 	logo: string = "";
 	constants: any;
 	expression: boolean = false;
-	private unsubscribe: Subject<any>;
+	private unsubscribe: Subject<void>;
 	private returnUrl: any;
 	showCaptcha: boolean = false;
 	numShowRecaptcha: number = 0;

@@ -21,7 +21,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 	errors: any = [];
 	constants: any;
 	error_txt: any = { username: "" };
-	private unsubscribe: Subject<any>;
+	private unsubscribe: Subject<void>;
 
 	constructor(
 		private authService: AuthService,
