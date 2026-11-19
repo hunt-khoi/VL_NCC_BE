@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-19):** đã lên **Angular 22.3**; cả 6 cấu hình build qua (Task 20). Phần **chưa xong**: smoke test bằng tay theo `docs/plan/angular_22_smoke_checklist.md` (cần backend và người dùng thật), bộ e2e (Task 1C) đã viết nhưng chưa chạy với backend. Tag `upgrade/ng22` (commit `35b31b3`) chưa có trên GitHub, cần push từ máy người phụ trách. **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
+> **Trạng thái (2026-11-19, tạm dừng để tiếp tục ở phiên mới):** đã lên **Angular 22.3**, cả 6 cấu hình build qua với 0 lỗi; bộ e2e đã viết. **Chưa nghiệm thu:** chưa smoke test với backend, bộ e2e chưa chạy với backend, nhiều thư viện bên thứ ba chưa nâng theo bảng version. Việc tiếp theo: mục "Tiếp tục từ đâu". **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -14,13 +14,13 @@
 
 ## Trạng thái thực hiện (cập nhật 2026-11-19)
 
-Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` với 0 lỗi. Chi tiết từng quyết định nằm trong sổ theo dõi `.superpowers/sdd/2026-11-14-angular-22-implementation-plan/progress.md` (không commit); bảng dưới là bản tóm tắt.
+Nhánh `upgrade-angular-22` (trùng với nhánh phiên cloud `ccr-4b9d79c1-rjbqa4`, cùng commit `6a78ada` trở về sau). Mọi task đã xong đều qua `yarn verify:dev` với 0 lỗi. Chi tiết từng quyết định nằm trong sổ theo dõi `.superpowers/sdd/2026-11-14-angular-22-implementation-plan/progress.md` (không commit); bảng dưới là bản tóm tắt.
 
 | Task | Nội dung | Commit | Kết quả |
 |---|---|---|---|
 | 1 | Script `verify:dev`/`verify:prod`, `.yarnrc`, commit `yarn.lock`, checklist smoke | `404ca04` | Xong |
 | 1B | Công cụ chụp và so ảnh `tools/visual/` | `489ca4e`, `845a129` | Công cụ xong; **bỏ bộ ảnh gốc và cổng giao diện** theo quyết định người phụ trách |
-| 1C | Bộ test e2e `tools/e2e/` | (xem git log) | Đã viết 83 test (8 file) trên Angular 22; mới chạy được 2 test `@nologin` vì môi trường làm không có backend (xem `tools/e2e/KNOWN_ISSUES.md`) |
+| 1C | Bộ test e2e `tools/e2e/` | `6a78ada` | Đã viết 83 test (8 file) trên Angular 22; mới chạy được 2 test `@nologin` vì môi trường làm không có backend (xem `tools/e2e/KNOWN_ISSUES.md`) |
 | 2 | Gỡ custom-webpack, ESLint, e2e Protractor, `ngrx-store-freeze`, `@angular/platform-server` | `7623c24` | Xong |
 | 3 | Xoá `entryComponents` (55 file) | `4e3bcf2` | Xong (người phụ trách commit với tên `temp`) |
 | 4 | Import mặc định cho moment (28 file) và `jwt-decode` 4 | `4e3bcf2`, `8ae925c` | Xong |
@@ -39,11 +39,24 @@ Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` v
 | 17 | Angular 19 → 20 | `9620de7` | Xong; `PortalInjector` (đã bị CDK 20 xoá) thay bằng `Injector.create` trong `LoadingService` |
 | 18 | Angular 20 → 21 | `928a949`, `681753a`, `78b9bb2` | Xong; NgRx 21.1.1; migration Material không đổi gì; sửa 2 lỗi template do migration control flow (xem dưới) |
 | 19 | Angular 21 → 22 | `177eef7` | Xong; Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0; chỉ kiểm màn hình đăng nhập (không có backend) |
-| 20 | Hoàn thiện, nghiệm thu | (xem git log) | Build xong cả 6 cấu hình; ESLint 22; **smoke test tay chưa làm** |
+| 20 | Hoàn thiện, nghiệm thu | `980bbe4` | Build xong cả 6 cấu hình; ESLint 22; README; **smoke test tay chưa làm, thư viện bên thứ ba chưa nâng** (xem "Tiếp tục từ đâu") |
 
 ### Tiếp tục từ đâu
 
-Đầu nhánh đang ở Angular 22.3. Kết quả Task 20 (chạy trong container Linux, Node 22.23.5, 2026-11-19):
+#### Hiện trạng (2026-11-19)
+
+| Hạng mục | Trạng thái |
+|---|---|
+| Nhánh | `upgrade-angular-22` trên GitHub, đầu nhánh có commit `6a78ada` (e2e) và các commit docs sau đó |
+| Phiên bản | Angular/CLI 22.3.0, Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0.3, angular-eslint 22.8.0, RxJS 6.6.7, zone.js 0.15.1 |
+| Build | 6/6 cấu hình PASS, 0 lỗi (bảng dưới) |
+| Chạy thử | Màn hình đăng nhập của bản `dev` và `prod` lên được, không lỗi JS. Chưa đăng nhập vào app lần nào sau khi nâng cấp (môi trường làm không có backend) |
+| Smoke test tay | **Chưa làm.** Giao diện chưa được kiểm bằng mắt từ Task 5 |
+| E2E | 83 test đã viết (`tools/e2e/`); mới chạy 2 test `@nologin` (PASS) |
+| Lint | `yarn lint` chạy được; 409 lỗi có từ trước (361 là `template/eqeqeq`), không chặn build |
+| Tag | `upgrade/ng22` chưa có trên GitHub (xem việc số 2) |
+
+Kết quả build Task 20 (container Linux, Node 22.23.5):
 
 | Cấu hình | Kết quả | Thời gian |
 |---|---|---|
@@ -54,24 +67,43 @@ Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` v
 | `prod_SOTBVL` | PASS, 0 lỗi | 23 giây |
 | `prod_KG` | PASS, 0 lỗi | 22 giây |
 
-Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation, và 5 thư viện CommonJS (`moment`, `html2canvas`, `chartjs-plugin-labels`, `dompurify`, `rgbcolor`). Bản `dev` và `prod` mở lên màn hình đăng nhập trong Chromium, không có lỗi JS (ngoài lỗi không gọi được API vì không có backend). `yarn start` phục vụ được ở cổng 3105. Output `prod` có đủ `.htaccess`, `sw.js`, `tinymce/`.
+Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation, 5 thư viện CommonJS (`moment`, `html2canvas`, `chartjs-plugin-labels`, `dompurify`, `rgbcolor`). Output `prod` có đủ `.htaccess`, `sw.js`, `tinymce/`.
 
-Còn lại trước khi phát hành:
-- Đi hết `docs/plan/angular_22_smoke_checklist.md` bằng tay trên máy có backend. Giao diện chưa được kiểm bằng mắt từ Task 5.
-- Tag `upgrade/ng22` (Step 8) trỏ vào `35b31b3`. Phiên cloud không được phép push tag (GitHub trả 403), nên tạo từ máy người phụ trách: `git fetch origin`, `git tag -a upgrade/ng22 35b31b3 -m "Angular 22.3"`, `git push origin upgrade/ng22`. Nhánh `upgrade-angular-22` đã được đưa lên cùng nội dung. Bản build `prod` không lưu trong repo (`build/` bị ignore): build lại từ tag bằng `yarn build-prod` khi cần.
-- E2E: `tools/e2e/` (Task 1C) đã viết, cần chạy lần đầu trên máy có backend: điền `tools/e2e/.env`, `yarn --cwd tools/e2e test:ro`, sửa selector/cách chờ theo `tools/e2e/KNOWN_ISSUES.md`.
-- Lint: `yarn lint` chạy được, còn 409 lỗi có từ trước (361 là `template/eqeqeq`); lint không chặn build.
-- **Node:** Angular 22 yêu cầu Node `^22.22.3 || ^24.15.0 || >=26`. Máy đang dùng 24.14.0 phải nâng Node trước khi `yarn install`/`yarn start`.
-- Khi chạy `ng update` trên máy có prettier cài toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Bỏ `NODE_PATH` khi chạy để diff gọn.
+#### Việc còn lại, theo thứ tự
 
-- **Node:** Angular 22 yêu cầu Node `^22.22.3 || ^24.15.0 || >=26`. Máy đang dùng 24.14.0 phải nâng Node trước khi `yarn install`/`yarn start`.
-- Khi chạy `ng update` trên máy có prettier cài toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Bỏ `NODE_PATH` khi chạy để diff gọn.
+1. **Nâng Node trên máy phát triển** lên `>= 24.15.0` (hoặc `^22.22.3`); máy đang dùng 24.14.0 không chạy được Angular 22. Rồi `yarn install`, `yarn start`.
+2. **Tag `upgrade/ng22`** trỏ vào `35b31b3` (bản build được sau Task 20). Phiên cloud bị GitHub chặn push tag (403), nên tạo từ máy người phụ trách: `git fetch origin`, `git tag -a upgrade/ng22 35b31b3 -m "Angular 22.3"`, `git push origin upgrade/ng22`. Bản build `prod` không lưu trong repo (`build/` bị ignore); build lại từ tag khi cần.
+3. **Chạy bộ e2e lần đầu với backend:** điền `tools/e2e/.env` (xem `tools/e2e/README.md`), `yarn --cwd tools/e2e install`, `npx --prefix tools/e2e playwright install chromium`, `yarn --cwd tools/e2e test:ro`. Selector lấy từ mã nguồn, chưa chạy thật: sửa selector/cách chờ theo `tools/e2e/KNOWN_ISSUES.md`, chạy 3 lần liên tiếp PASS thì coi là baseline. Nhóm `@rw` cần database bản sao và `E2E_RESTORE_CMD`; viết nốt test sửa/xoá đang `test.fixme`.
+4. **Smoke test tay** theo `docs/plan/angular_22_smoke_checklist.md` (mục không có `(e2e)` bắt buộc làm tay). Ưu tiên: 33 chỗ SCSS có comment `// MDC:`; 2 dialog chọn nhiều có nút đóng vừa sửa (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`); các nút In (đổi sang `this.in(...)`); tooltip/tab/dropdown của `NgbLiteModule` (`ComponentFactoryResolver` đã bỏ); icon SVG (`ng-inline-svg-2` 20); 2 template còn cú pháp cũ (`config-edit`, `comment`).
+5. **Thư viện bên thứ ba chưa nâng theo bảng version.** Build Angular 22 vẫn qua (linker xử lý được bản partial-Ivy cũ) nhưng có thể lỗi lúc chạy; đây là rủi ro lớn nhất còn lại. Kiểm các màn hình dùng chúng ở bước 4 trước, rồi quyết định nâng từng gói:
 
-- Cài gói: cache yarn của máy đã chuyển sang `D:\DPS_Project\.yarn-cache`; khi build/cài dài nên đặt `TEMP`/`TMP` sang ổ D: vì ổ C: gần đầy.
-- Giao diện **chưa được kiểm bằng mắt** từ Task 5 (người phụ trách đã bỏ qua các mốc smoke). Trước khi phát hành phải đi hết `docs/plan/angular_22_smoke_checklist.md`; 33 chỗ SCSS dễ lệch nhất có comment `// MDC:`. Tag nội bộ `smoke-a` (cuối Chặng 1) và `smoke-b` (sau MDC) giúp khoanh vùng lỗi; hai tag này chưa push.
-- Chưa build `prod` lần nào kể từ khi nâng cấp (quyết định người phụ trách); lần build `prod` đầu tiên có thể lộ lỗi chỉ có ở cấu hình `prod`.
+   | Gói | Plan dự kiến ở 22 | Đang cài | Ghi chú |
+   |---|---|---|---|
+   | `@ngx-translate/core` | 18.1.0 | 14.0.0 | 15+ đổi API (`provideTranslateService`) |
+   | `ng2-file-upload` | 12.0.0 | 3.0.0 | Peer `@angular/core ^14` |
+   | `@kolkov/angular-editor` | 3.4.0 | 2.1.0 | |
+   | `@tinymce/tinymce-angular` | 9.1.2 | 7.0.0 | Đi cùng `tinymce` |
+   | `tinymce` | ^6.8 | 5.10.9 | Dừng ở 6.x vì 7+ là GPL (mục "Quyết định") |
+   | `@ng-idle/core`, `@ng-idle/keepalive` | 16.0.0 | 12.0.4 | |
+   | `@ngx-loading-bar/core` | 7.0.1 | 6.0.2 | |
+   | `ngx-mat-select-search` | 9.0.0 | 7.0.10 | Peer Material `<= 19` |
+   | `ngx-avatars` | 1.10.3 | 1.4.1 | |
+   | `ngx-print` | ^22 | 1.3.1 | |
+   | `ckeditor4-angular` | 5.2.1 | 4.0.1 | Ghim `editorUrl` CDN 4.21.0 (Task 10) |
+   | `chart.js`, `ng2-charts` | 4 / 11 | 2.9.4 / mã chép | Cố ý giữ (Task 7) |
 
-Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smoke-b` = sau MDC (`d4fb968`). Chưa tạo các tag `upgrade/ng<N>` của mục "Phương án rollback".
+   Cũng chưa nâng: `ngx-cookie-service` 14, `ngx-drag-drop` 14, `ngx-permissions` 14, `ngx-mask` 14, RxJS 6 (Angular 22 vẫn hỗ trợ `^6.5.3`).
+6. **Karma/`ng test`:** chưa xử lý. `src/test.ts` dùng `require.context` nên `ng test` không chạy với builder esbuild; quyết định xoá hoặc chuyển Vitest (`ng update @angular/cli --name migrate-karma-to-vitest`).
+7. Tuỳ chọn, không chặn phát hành: sửa lỗi lint; chuyển 2 template còn `*ngIf`/`*ngFor`; Sass `@import` → `@use` cho theme Metronic; bỏ `baseUrl` (TypeScript 7 sẽ không hỗ trợ).
+
+#### Ghi chú cho phiên làm việc mới
+
+- **Phiên cloud (Claude Code trên web):** không gọi được backend (`vinh-long-ncc-api.vts-demo.com` bị chặn mạng), không có tài khoản test, không push được tag. Push nhánh thì được. Muốn chạy e2e ở đó cần cho phép host API trong cài đặt môi trường và có tài khoản test.
+- **Linux phân biệt hoa/thường đường dẫn:** Windows thì không. Đã sửa 52 import ở Task 18; import mới phải viết đúng tên thư mục.
+- **`ng update` và prettier:** nếu máy có prettier toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Chạy với `NODE_PATH` rỗng (`env -u NODE_PATH npx ng update ...`).
+- **Build:** `yarn verify:dev` (khoảng 20 giây trong container) là kiểm tra nhanh nhất; `--output-path` của script `verify:*` làm output có thêm thư mục con `browser/`, còn các script `build*` ra đúng thư mục trong `angular.json`.
+- **Máy người phụ trách:** cache yarn ở `D:\DPS_Project\.yarn-cache`; khi cài/build dài nên đặt `TEMP`/`TMP` sang ổ D: vì ổ C: gần đầy.
+- **Tag nội bộ (chưa push, chỉ có trên máy người phụ trách):** `smoke-a` = cuối Chặng 1 (`b94edbf`), `smoke-b` = sau MDC (`d4fb968`), dùng để khoanh vùng lỗi giao diện. Chưa tạo các tag `upgrade/ng<N>` của mục "Phương án rollback"; điểm rollback dùng commit trong bảng trên.
 
 ### Những chỗ thực tế khác plan
 
@@ -118,6 +150,9 @@ Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smok
 - 2026-11-19: không chạy `yarn verify:prod` ở bất kỳ bước nào.
 - 2026-11-19: dồn smoke A vào smoke B, rồi bỏ qua luôn smoke B ("tiếp lun"); giao diện sẽ được xem một lần ở cuối.
 - 2026-11-19: dùng lại tên `FormGroup`/`FormBuilder`/`FormControl`/`FormArray`, không dùng `Untyped*`.
+- 2026-11-19: làm tiếp Angular 21 từ commit WIP (không revert); nâng tiếp lên 22 và làm Task 20, cho phép build `prod`.
+- 2026-11-19: đưa toàn bộ nhánh phiên cloud về `upgrade-angular-22` (fast-forward); tạo tag `upgrade/ng22`.
+- 2026-11-19: làm Task 1C (e2e) dù không có backend; chạy và sửa ở phiên sau trên máy có backend.
 
 ## Global Constraints
 
@@ -588,10 +623,10 @@ Plan đã chọn sẵn phương án mặc định cho từng mục; chỉ cần 
 | ng-bootstrap | **Đã làm:** gỡ package, chép mã ng-bootstrap 5.3.1 giữ nguyên markup Bootstrap 4 (Task 6) | Giữ và nâng theo từng bản; kéo theo nâng theme lên Bootstrap 5 |
 | Giao diện sau MDC | Đã chốt 2026-11-14: phải giống giao diện hiện tại. **Cập nhật 2026-11-19:** người phụ trách bỏ cổng so ảnh và smoke test sau MDC; xem giao diện một lần ở cuối. 33 chỗ SCSS dễ lệch nhất có comment `// MDC:` | — |
 | Biểu đồ | **Đã làm:** giữ Chart.js 2.9, không đổi giao diện (Task 7) | Nâng Chart.js 4 thành một đợt riêng, chấp nhận biểu đồ đổi giao diện, có bản vá bảo mật |
-| Karma và 6 file spec | Giữ nguyên, không dùng làm điều kiện nghiệm thu. Lưu ý `src/test.ts` dùng `require.context` nên `ng test` sẽ không chạy được sau Task 15 | Xoá hẳn ở Task 20, hoặc chuyển sang Vitest |
-| Test e2e | Playwright trong `tools/e2e/` (Task 1C), nhóm `@ro` làm cổng ở mọi task, nhóm `@rw` ở các mốc smoke. **Chưa làm** tính đến 2026-11-19: cần baseline chạy trên Angular 13 mà nhánh đã qua bản 15; có thể dựng baseline từ tag `smoke-a` trong một git worktree riêng | Chỉ smoke test tay ở cuối |
+| Karma và 6 file spec | Giữ nguyên, không dùng làm điều kiện nghiệm thu. `src/test.ts` dùng `require.context` nên `ng test` không chạy được từ Task 15. **Chưa quyết định** (việc số 6 trong "Tiếp tục từ đâu") | Xoá hẳn ở Task 20, hoặc chuyển sang Vitest |
+| Test e2e | Playwright trong `tools/e2e/` (Task 1C). **Đã viết** 2026-11-19 trên Angular 22 (83 test); chưa chạy với backend. Baseline là lần chạy ổn định đầu tiên trên 22 | Chỉ smoke test tay ở cuối |
 | Database cho nhóm e2e `@rw` | Bản sao riêng, khôi phục trước mỗi lượt bằng `E2E_RESTORE_CMD` do người phụ trách backend cung cấp | Không chạy `@rw`, kiểm tay các thao tác ghi |
-| TinyMCE | Dừng ở 6.x (giấy phép MIT) | Lên 8.x, chấp nhận GPL hoặc mua license |
+| TinyMCE | Dừng ở 6.x (giấy phép MIT). **Thực tế vẫn ở 5.10.9**, chưa nâng (việc số 5) | Lên 8.x, chấp nhận GPL hoặc mua license |
 
 ## Nhật ký vướng mắc
 
