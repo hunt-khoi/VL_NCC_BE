@@ -11,7 +11,7 @@ const isKnown = (msg: string) =>
 
 // E2E_OFFLINE=1: chay khi khong co backend (chi dung cho nhom @nologin), bo qua loi do khong goi duoc API.
 const offline = process.env.E2E_OFFLINE === '1';
-const OFFLINE_NOISE = /HttpErrorResponse|Failed to load resource|ERR_CONNECTION|ERR_TUNNEL|ERR_NAME_NOT_RESOLVED|ERR_PROXY|^(ERROR )?\w{1,4}\$\d+$/;
+const OFFLINE_NOISE = /HttpErrorResponse|Failed to load resource|ERR_CONNECTION|ERR_TUNNEL|ERR_NAME_NOT_RESOLVED|ERR_PROXY/;
 
 type Fixtures = {
 	/** Loi bat duoc trong luc chay test; test tu fail neu con loi luc ket thuc. */
@@ -29,11 +29,24 @@ export const test = base.extend<Fixtures>({
 			const appOrigin = new URL(baseURL!).origin;
 
 			page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
+			// Ban build prod rut gon ten class (HttpErrorResponse thanh "al", "nl$1"...),
+			// nen khi offline phai xem chinh doi tuong loi chu khong chi chu in ra.
+			const pending: Promise<void>[] = [];
 			page.on('console', (msg) => {
 				if (msg.type() !== 'error') return;
 				const text = msg.text();
 				if (isKnown(text) || (offline && OFFLINE_NOISE.test(text))) return;
-				errors.push(`console.error: ${text.slice(0, 300)}`);
+				pending.push(
+					(async () => {
+						if (offline) {
+							const names = await Promise.all(
+								msg.args().map((a) => a.evaluate((v: any) => (v && typeof v === 'object' ? v.name : undefined)).catch(() => undefined)),
+							);
+							if (names.includes('HttpErrorResponse')) return;
+						}
+						errors.push(`console.error: ${text.slice(0, 300)}`);
+					})(),
+				);
 			});
 			page.on('response', (res) => {
 				const type = res.request().resourceType();
@@ -46,6 +59,7 @@ export const test = base.extend<Fixtures>({
 			});
 
 			await use(errors);
+			await Promise.all(pending);
 
 			expect(errors, 'loi luc chay (JS, console, API >= 500, chunk)').toEqual([]);
 		},
