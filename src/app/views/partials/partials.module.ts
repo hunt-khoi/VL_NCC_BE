@@ -62,7 +62,7 @@ import { ErrorComponent } from './content/general/error/error.component';
 import { InlineSVGModule } from 'ng-inline-svg-2';
 import { CommonService } from '../pages/nguoi-co-cong/services/common.service';
 import { UploadFileComponent } from '../pages/nguoi-co-cong/components/upload-file/upload-file.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { AvatarModule } from 'ngx-avatars';
 import { LibModule } from './lib/lib.module';
@@ -152,7 +152,7 @@ import { LibModule } from './lib/lib.module';
         MatChipsModule,
         // ng-bootstrap modules
         NgbLiteModule,
-        TranslateModule,
+        TranslatePipe, TranslateDirective,
         ScrollingModule,
         LibModule
     ],

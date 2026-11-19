@@ -8,7 +8,6 @@ import { CommonModule, } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
-import { TranslateModule } from '@ngx-translate/core';
 import { DPSCommonModule } from '../../dps-common.module';
 import { DanhMucKhacService } from './services/danh-muc-khac.service';
 import { DanhMucLoaiTroCapComponent } from './danh-muc-loai-tro-cap/danh-muc-loai-tro-cap.component';

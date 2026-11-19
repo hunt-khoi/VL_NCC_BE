@@ -10,7 +10,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 // Translate
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 // CRUD
 import { InterceptService } from '../../../core/_base/crud/';
 // Module components
@@ -64,7 +64,7 @@ const routes: Routes = [
 		MatFormFieldModule,
 		MatCheckboxModule,
 		ReCaptchaModule,
-		TranslateModule.forChild()
+		TranslatePipe, TranslateDirective
 	],
 	providers: [
 		InterceptService,

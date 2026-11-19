@@ -9,7 +9,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgbLiteModule } from '../partials/lib/ngb/ngb-lite.module';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 import { LoadingBarModule } from '@ngx-loading-bar/core';
 import { PerfectScrollbarModule } from '../partials/lib/perfect-scrollbar/perfect-scrollbar';
 import { InlineSVGModule } from 'ng-inline-svg-2';
@@ -86,7 +86,7 @@ import { SignalRService } from '../pages/nguoi-co-cong/services/signalR.service'
 		MatTabsModule,
 		MatButtonModule,
 		MatTooltipModule,
-		TranslateModule.forChild(),
+		TranslatePipe, TranslateDirective,
 		LoadingBarModule,
 		InlineSVGModule,
 

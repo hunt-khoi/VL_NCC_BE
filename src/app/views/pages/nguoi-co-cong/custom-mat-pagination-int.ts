@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class CustomMatPaginatorIntl extends MatPaginatorIntl {
 	constructor(private translate: TranslateService) {
 		super();
-		this.translate.onLangChange.subscribe((e: Event) => {
+		this.translate.onLangChange.subscribe(() => {
 			this.getAndInitTranslations();
 		});
 		this.getAndInitTranslations();

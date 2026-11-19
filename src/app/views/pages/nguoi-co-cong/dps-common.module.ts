@@ -8,7 +8,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CdkTableModule } from '@angular/cdk/table';
 import { CdkTreeModule } from '@angular/cdk/tree';
 // Translate Module
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 // UI
 import { PartialsModule } from '../../../views/partials/partials.module';
 // Core => Utils
@@ -159,7 +159,7 @@ import { CKEditorModule } from 'ckeditor4-angular';
         NgxMatSelectSearchModule,
         FormsModule,
         ReactiveFormsModule,
-        TranslateModule,
+        TranslatePipe, TranslateDirective,
         MatButtonModule,
         MatMenuModule,
         MatSelectModule,
@@ -240,7 +240,7 @@ import { CKEditorModule } from 'ckeditor4-angular';
         NgxMatSelectSearchModule,
         FormsModule,
         ReactiveFormsModule,
-        TranslateModule.forChild(),
+        TranslatePipe, TranslateDirective,
         MatButtonModule,
         MatMenuModule,
         MatSelectModule,

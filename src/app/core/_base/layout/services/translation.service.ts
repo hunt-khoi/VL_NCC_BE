@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslationObject } from '@ngx-translate/core';
 
 export interface Locale {
 	lang: string;
-	data: Object;
+	data: TranslationObject;
 }
 
 @Injectable({
@@ -16,7 +16,7 @@ export class TranslationService {
 		// add new langIds to the list
 		this.translate.addLangs(['vi']);
 		// this language will be used as a fallback when a translation isn't found in the current language
-		this.translate.setDefaultLang('vi');
+		this.translate.setFallbackLang('vi');
 	}
 
 	/**
@@ -43,7 +43,7 @@ export class TranslationService {
 	 */
 	setLanguage(lang: any) {
 		if (lang) {
-			this.translate.use(this.translate.getDefaultLang());
+			this.translate.use(this.translate.getFallbackLang());
 			this.translate.use(lang);
 			localStorage.setItem('language', lang);
 		}
@@ -53,6 +53,6 @@ export class TranslationService {
 	 * Returns selected language
 	 */
 	getSelectedLanguage(): any {
-		return localStorage.getItem('language') || this.translate.getDefaultLang();
+		return localStorage.getItem('language') || this.translate.getFallbackLang();
 	}
 }

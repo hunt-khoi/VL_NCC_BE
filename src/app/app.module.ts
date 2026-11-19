@@ -1,7 +1,7 @@
 // Angular
 import { BrowserModule } from '@angular/platform-browser';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -75,7 +75,6 @@ export function initializeLayoutConfig(appConfig: LayoutConfigService) {
         StoreRouterConnectingModule.forRoot({ stateKey: 'router' }),
         !environment.production ? StoreDevtoolsModule.instrument({ connectInZone: true }) : [],
         AuthModule.forRoot(),
-        TranslateModule.forRoot(),
         MatProgressSpinnerModule,
         InlineSVGModule.forRoot(),
         NgIdleKeepaliveModule.forRoot()], providers: [
@@ -101,6 +100,8 @@ export function initializeLayoutConfig(appConfig: LayoutConfigService) {
         LayoutUtilsService,
         PermissionUrl,
         UserProfileService,
-        provideHttpClient(withXhr(), withInterceptorsFromDi())
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
+        // ngx-translate 17+ bo TranslateModule; ngon ngu du phong 'vi' dat trong TranslationService.
+        provideTranslateService()
     ] })
 export class AppModule { }

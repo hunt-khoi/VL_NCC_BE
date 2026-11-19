@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe, TranslateDirective } from '@ngx-translate/core';
 import { PartialsModule } from '../../../../partials/partials.module';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -45,7 +45,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         NgxPermissionsModule.forChild(),
         FormsModule,
         ReactiveFormsModule,
-        TranslateModule.forChild(),
+        TranslatePipe, TranslateDirective,
         MatButtonModule,
         MatMenuModule,
         MatSelectModule,

@@ -1312,10 +1312,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@ngx-translate/core@14.0.0":
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/@ngx-translate/core/-/core-14.0.0.tgz#af421d0e1a28376843f0fed375cd2fae7630a5ff"
-  integrity sha512-UevdwNCXMRCdJv//0kC8h2eSfmi02r29xeE8E9gJ1Al4D4jEJ7eiLPdjslTMc21oJNGguqqWeEVjf64SFtvw2w==
+"@ngx-translate/core@18.1.0":
+  version "18.1.0"
+  resolved "https://registry.yarnpkg.com/@ngx-translate/core/-/core-18.1.0.tgz#d3531d2e0c120a4eadd46942845035aac53d2260"
+  integrity sha512-UYbxYUmobUboO9aa8LO+rJBfvxbwRsIrbCI7+fC5lGzwwcVbQ0FiPysYFgZC+JWsGBw/+z7u1a6vciJZzqXrcQ==
   dependencies:
     tslib "^2.3.0"
 
