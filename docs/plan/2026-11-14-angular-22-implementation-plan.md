@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái:** đang làm, đã tới Angular 18 + esbuild (Task 15). Xem mục "Trạng thái thực hiện".
+> **Trạng thái:** đang làm, đã tới Angular 19 (Task 16). Xem mục "Trạng thái thực hiện".
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -35,7 +35,8 @@ Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` v
 | 13 | Angular 15 → 16 | `ac357c7` | Xong; không đổi gì thêm (không còn thư viện View Engine nên bỏ ngcc không ảnh hưởng) |
 | 14 | Angular 16 → 17 | `9848a70` | Xong; xoá import thừa `_ParseAST` (API nội bộ đã bị bỏ); migration mã hoá ký tự `@` trong 2 template |
 | 15 | Angular 17 → 18, chuyển sang esbuild | `2d188eb`, `e2e095b` | Xong; output giữ đúng thư mục cũ (`outputPath.browser = ""`); build `dev` còn 101 giây |
-| 16–20 | Angular 19 → 22, hoàn thiện | — | Đang làm |
+| 16 | Angular 18 → 19 | `c51cb1c` | Xong; `standalone: false` ở 387 file; sửa style trong thẻ `<style>` của template (xem dưới) |
+| 17–20 | Angular 20 → 22, hoàn thiện | — | Đang làm |
 
 Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smoke-b` = sau MDC (`d4fb968`). Chưa tạo các tag `upgrade/ng<N>` của mục "Phương án rollback".
 
@@ -55,6 +56,8 @@ Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smok
 | 12 | Schematic MDC rồi chỉnh SCSS | Thêm: đổi 29 `mat-chip-list` còn sót sang `mat-chip-listbox`/`mat-chip-option`; `MatChipList` → `MatChipGrid`; trả lại tên class Metronic mà schematic đổi nhầm (`.mat-table__*`, `.mat-form-field-invalid`); 36 quy tắc SCSS đổi sang class MDC, đánh dấu `// MDC:` | Schematic đổi nhầm class riêng của theme, bỏ sót một số selector |
 | 15 | — | Xoá `HttpClientModule` còn sót trong `exports` của `DPSCommonModule` | Migration sang `provideHttpClient` quên xoá, gây hơn 500 lỗi dây chuyền |
 | 15 | Kiểm `tinymce/`, `sw.js`, `index.html` trong output | Đã kiểm, kèm `.htaccess`, CKEditor local và script toàn cục | `favicon.ico` không có trong mã nguồn lẫn bản build cũ, không phải lỗi mới |
+| 16 | — | Sửa 46 chỗ trong thẻ `<style>` của 24 template: `>>>` → `::ng-deep`, class Material cũ → MDC | Schematic MDC chỉ xét file `.scss`/`.css`; các quy tắc này đã mất tác dụng từ Task 12 |
+| 16 | — | Ổ C: đầy làm hỏng lần cài đầu; cache yarn chuyển sang `D:\DPS_Project\.yarn-cache`, thêm `network-timeout` vào `.yarnrc` | Theo yêu cầu người phụ trách dùng ổ D: |
 | Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
 
 ### Quyết định của người phụ trách trong lúc làm
