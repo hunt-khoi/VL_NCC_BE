@@ -19,6 +19,7 @@
 - Vẫn dùng NgModule và zone.js. Không chuyển standalone, không chuyển zoneless, không gõ type cho forms, không đổi sang control flow mới.
 - Giữ nguyên CSS Bootstrap 4 của theme Metronic. Không nâng Bootstrap.
 - Mỗi task kết thúc bằng một commit. Không gộp hai bản major vào một commit.
+- **Cập nhật 2026-11-19 (người phụ trách quyết định):** không chạy `yarn verify:prod` ở bất kỳ bước nào; mọi bước "verify:prod" bên dưới bỏ qua. Chỉ dùng `yarn verify:dev`.
 - Build `prod` rất nặng trên máy phát triển (tối đa 8 GB RAM, chiếm CPU nhiều phút). Chỉ chạy `yarn verify:prod` ở 4 chỗ: cuối Chặng 1 (Task 9), sau MDC (Task 12), sau khi đổi builder (Task 15), nghiệm thu (Task 20). Trước mỗi lần chạy phải báo người phụ trách và chờ họ đồng ý. Các task khác chỉ chạy `yarn verify:dev`.
 - Lệnh kiểm tra chuẩn (tạo ở Task 1): `yarn verify:dev` và `yarn verify:prod`. "PASS" nghĩa là exit code 0 và log không có dòng `Error:`.
 - Thông báo commit theo kiểu hiện có của repo, ví dụ `upgrade angular 13 to 14`.
