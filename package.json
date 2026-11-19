@@ -1,12 +1,12 @@
 {
   "name": "ncc",
-  "version": "13.0.0",
+  "version": "22.0.0",
   "description": "Packages used by Angular",
   "scripts": {
     "ng": "ng",
     "postinstall": "node -e \"const fs=require('fs'),path=require('path'),dir='node_modules/moment/locale';fs.readdirSync(dir).forEach(f=>{if(f!=='vi.js')fs.unlinkSync(path.join(dir,f))});console.log('moment locales cleaned');\"",
     "start": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve --port 3105",
-    "build": "yarn -s postinstall && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod",
+    "build": "yarn -s postinstall && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=production",
     "build-test": "yarn -s postinstall && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=test",
     "build-prod": "yarn -s postinstall && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=prod",
     "build-kg": "yarn -s postinstall && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=prod_KG",
@@ -15,7 +15,7 @@
     "verify:prod": "yarn -s postinstall && node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --configuration=prod --output-path build/_verify_prod",
     "test": "ng test",
     "bundle-report": "webpack-bundle-analyzer dist/stats.json",
-    "rtl": "webpack"
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -73,6 +73,7 @@
     "zone.js": "~0.15.1"
   },
   "devDependencies": {
+    "@angular-eslint/builder": "22.8.0",
     "@angular/build": "^22.3.0",
     "@angular/cli": "^22.3.0",
     "@angular/compiler-cli": "^22.3.0",
@@ -85,7 +86,8 @@
     "@types/minimatch": "3",
     "@types/node": "^26.6.6",
     "@types/object-path": "^0.11.0",
-    "css-loader": "^3.2.0",
+    "angular-eslint": "22.8.0",
+    "eslint": "^10.14.0",
     "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
@@ -96,10 +98,8 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "ts-node": "~8.2.0",
     "typescript": "~6.0.3",
-    "webpack-bundle-analyzer": "^3.6.0",
-    "webpack-cli": "^3.3.10",
-    "webpack-messages": "^2.0.4",
-    "webpack-rtl-plugin": "^2.0.0"
+    "typescript-eslint": "8.72.2",
+    "webpack-bundle-analyzer": "^3.6.0"
   },
   "resolutions": {
     "caniuse-lite": "1.0.30001793",

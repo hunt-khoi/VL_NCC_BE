@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-19):** đã lên **Angular 22.3** và build `dev` được (Task 19, commit `177eef7`). Còn Task 20 (dọn dẹp, build đủ 6 cấu hình, smoke test). **Cần Node `^22.22.3` hoặc `>= 24.15.0`.** Xem mục "Trạng thái thực hiện".
+> **Trạng thái (2026-11-19):** đã lên **Angular 22.3**; cả 6 cấu hình build qua (Task 20). Phần **chưa xong**: smoke test bằng tay theo `docs/plan/angular_22_smoke_checklist.md` (cần backend và người dùng thật), bộ e2e (Task 1C) chưa làm, tag `upgrade/ng22` chưa tạo. **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -39,11 +39,29 @@ Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` v
 | 17 | Angular 19 → 20 | `9620de7` | Xong; `PortalInjector` (đã bị CDK 20 xoá) thay bằng `Injector.create` trong `LoadingService` |
 | 18 | Angular 20 → 21 | `928a949`, `681753a`, `78b9bb2` | Xong; NgRx 21.1.1; migration Material không đổi gì; sửa 2 lỗi template do migration control flow (xem dưới) |
 | 19 | Angular 21 → 22 | `177eef7` | Xong; Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0; chỉ kiểm màn hình đăng nhập (không có backend) |
-| 20 | Hoàn thiện, nghiệm thu | — | Chưa làm |
+| 20 | Hoàn thiện, nghiệm thu | (xem git log) | Build xong cả 6 cấu hình; ESLint 22; **smoke test tay chưa làm** |
 
 ### Tiếp tục từ đâu
 
-Đầu nhánh đang ở Angular 22.3, `yarn verify:dev` qua với 0 lỗi; màn hình đăng nhập chạy được, không có lỗi JS. Bước tiếp theo là Task 20.
+Đầu nhánh đang ở Angular 22.3. Kết quả Task 20 (chạy trong container Linux, Node 22.23.5, 2026-11-19):
+
+| Cấu hình | Kết quả | Thời gian |
+|---|---|---|
+| `dev` | PASS, 0 lỗi | 24 giây |
+| `production` | PASS, 0 lỗi | 25 giây |
+| `test` | PASS, 0 lỗi | 21 giây |
+| `prod` | PASS, 0 lỗi; initial 3,21 MB (535 kB nén) | 22 giây |
+| `prod_SOTBVL` | PASS, 0 lỗi | 23 giây |
+| `prod_KG` | PASS, 0 lỗi | 22 giây |
+
+Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation, và 5 thư viện CommonJS (`moment`, `html2canvas`, `chartjs-plugin-labels`, `dompurify`, `rgbcolor`). Bản `dev` và `prod` mở lên màn hình đăng nhập trong Chromium, không có lỗi JS (ngoài lỗi không gọi được API vì không có backend). `yarn start` phục vụ được ở cổng 3105. Output `prod` có đủ `.htaccess`, `sw.js`, `tinymce/`.
+
+Còn lại trước khi phát hành:
+- Đi hết `docs/plan/angular_22_smoke_checklist.md` bằng tay trên máy có backend. Giao diện chưa được kiểm bằng mắt từ Task 5.
+- Tag `upgrade/ng22` và lưu bản build `prod` (Step 8): chưa làm.
+- Lint: `yarn lint` chạy được, còn 409 lỗi có từ trước (361 là `template/eqeqeq`); lint không chặn build.
+- **Node:** Angular 22 yêu cầu Node `^22.22.3 || ^24.15.0 || >=26`. Máy đang dùng 24.14.0 phải nâng Node trước khi `yarn install`/`yarn start`.
+- Khi chạy `ng update` trên máy có prettier cài toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Bỏ `NODE_PATH` khi chạy để diff gọn.
 
 - **Node:** Angular 22 yêu cầu Node `^22.22.3 || ^24.15.0 || >=26`. Máy đang dùng 24.14.0 phải nâng Node trước khi `yarn install`/`yarn start`.
 - Khi chạy `ng update` trên máy có prettier cài toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Bỏ `NODE_PATH` khi chạy để diff gọn.
@@ -85,6 +103,9 @@ Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smok
 | 19 | — | 22 chỗ `(click)="in(...)"` → `this.in(...)` | Từ 22, `in` là toán tử trong template |
 | 19 | — | 2 nút đóng (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`) có cả `mat-button`, `mat-raised-button`, `mat-mini-fab`; chỉ giữ `mat-mini-fab` như mọi dialog khác | Lỗi NG8023. Nhiều khả năng từ Material MDC (Task 12) hai dialog này đã lỗi NG0300 lúc mở (chưa kiểm chứng) |
 | 19 | — | Migration thêm `changeDetection: ChangeDetectionStrategy.Eager` vào 144 component, `withXhr()` vào `provideHttpClient` | Giữ hành vi trước 22 |
+| 20 | `ng add angular-eslint`, chuyển rule | `eslint.config.js` chỉ dùng bộ khuyến nghị của angular-eslint (như `.eslintrc.json` cũ), tắt `prefer-inject`, `prefer-standalone`, `prefer-on-push-component-change-detection`, `template/prefer-control-flow`; bỏ qua `src/assets/` | Các rule mới này đòi viết lại code (gần 4.800 lỗi); bộ rule cũ không có |
+| 20 | Xoá `webpack.config.js` nếu script `rtl` không còn dùng | Đã xoá cùng script `rtl` và `webpack-cli`, `webpack-messages`, `webpack-rtl-plugin`, `css-loader` | Script đã hỏng sẵn (thiếu `webpack`, `mini-css-extract-plugin`, `del`); SCSS theme do `angular.json` biên dịch |
+| 20 | Step 4b, Step 5 (cổng giao diện, smoke E) | Không làm | Cổng ảnh đã bỏ theo quyết định người phụ trách; smoke cần backend và làm tay |
 | Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
 
 ### Quyết định của người phụ trách trong lúc làm

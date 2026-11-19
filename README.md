@@ -1,27 +1,44 @@
-# Metronic Angular
+# VL_NCC_BE (frontend)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.7.
+Angular 22, Angular Material 22 (MDC), NgRx 22, TypeScript 6. Build bằng `@angular/build:application` (esbuild).
 
-## Development server
+## Yêu cầu
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- Node `^22.22.3` hoặc `>= 24.15.0` (yêu cầu của Angular 22)
+- yarn 1.22 (`.yarnrc` đã bật `ignore-engines`)
 
-## Code scaffolding
+```bash
+yarn install
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Chạy dev
+
+```bash
+yarn start
+```
+
+Mở `http://localhost:3105/`.
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+| Lệnh | Cấu hình | Thư mục output |
+|---|---|---|
+| `yarn build` | `production` | `build/prod_260428` |
+| `yarn build-test` | `test` | `build/ncc_test` |
+| `yarn build-prod` | `prod` | `build/ncc_dev` |
+| `yarn build-kg` | `prod_KG` | `build/proKG_210817` |
+| `yarn build-sotbvl` | `prod_SOTBVL` | `build/prodSOTBVL_260427` |
 
-## Running unit tests
+Kiểm tra nhanh, không ghi đè thư mục output thật: `yarn verify:dev`, `yarn verify:prod` (ra `build/_verify_*`).
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Lint
 
-## Running end-to-end tests
+```bash
+yarn lint
+```
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Cấu hình ở `eslint.config.js`, giữ bộ rule cũ (bộ khuyến nghị của angular-eslint, prefix `kt`/`m`). Code hiện còn khoảng 400 lỗi lint có từ trước, chủ yếu `template/eqeqeq`; lint không chặn build.
 
-## Further help
+## Lịch sử nâng cấp
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Nâng từ Angular 13 lên 22 theo `docs/plan/2026-11-14-angular-22-implementation-plan.md`; các chỗ làm khác plan và việc còn lại ghi trong file đó. Checklist kiểm tra tay: `docs/plan/angular_22_smoke_checklist.md`.
