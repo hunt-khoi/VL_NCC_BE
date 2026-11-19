@@ -62,3 +62,8 @@ yarn-error.log
 /tools/visual/reference
 /tools/visual/.env
 /tools/visual/node_modules
+/tools/e2e/node_modules
+/tools/e2e/.env
+/tools/e2e/.auth
+/tools/e2e/report
+/tools/e2e/test-results

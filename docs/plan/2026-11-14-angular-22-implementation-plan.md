@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-19):** đã lên **Angular 22.3**; cả 6 cấu hình build qua (Task 20). Phần **chưa xong**: smoke test bằng tay theo `docs/plan/angular_22_smoke_checklist.md` (cần backend và người dùng thật), bộ e2e (Task 1C) chưa làm. Tag `upgrade/ng22` (commit `35b31b3`) chưa có trên GitHub, cần push từ máy người phụ trách. **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
+> **Trạng thái (2026-11-19):** đã lên **Angular 22.3**; cả 6 cấu hình build qua (Task 20). Phần **chưa xong**: smoke test bằng tay theo `docs/plan/angular_22_smoke_checklist.md` (cần backend và người dùng thật), bộ e2e (Task 1C) đã viết nhưng chưa chạy với backend. Tag `upgrade/ng22` (commit `35b31b3`) chưa có trên GitHub, cần push từ máy người phụ trách. **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -20,7 +20,7 @@ Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` v
 |---|---|---|---|
 | 1 | Script `verify:dev`/`verify:prod`, `.yarnrc`, commit `yarn.lock`, checklist smoke | `404ca04` | Xong |
 | 1B | Công cụ chụp và so ảnh `tools/visual/` | `489ca4e`, `845a129` | Công cụ xong; **bỏ bộ ảnh gốc và cổng giao diện** theo quyết định người phụ trách |
-| 1C | Bộ test e2e `tools/e2e/` | — | **Chưa làm** (xem "Quyết định cần người phụ trách xác nhận") |
+| 1C | Bộ test e2e `tools/e2e/` | (xem git log) | Đã viết 83 test (8 file) trên Angular 22; mới chạy được 2 test `@nologin` vì môi trường làm không có backend (xem `tools/e2e/KNOWN_ISSUES.md`) |
 | 2 | Gỡ custom-webpack, ESLint, e2e Protractor, `ngrx-store-freeze`, `@angular/platform-server` | `7623c24` | Xong |
 | 3 | Xoá `entryComponents` (55 file) | `4e3bcf2` | Xong (người phụ trách commit với tên `temp`) |
 | 4 | Import mặc định cho moment (28 file) và `jwt-decode` 4 | `4e3bcf2`, `8ae925c` | Xong |
@@ -59,6 +59,7 @@ Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation, và
 Còn lại trước khi phát hành:
 - Đi hết `docs/plan/angular_22_smoke_checklist.md` bằng tay trên máy có backend. Giao diện chưa được kiểm bằng mắt từ Task 5.
 - Tag `upgrade/ng22` (Step 8) trỏ vào `35b31b3`. Phiên cloud không được phép push tag (GitHub trả 403), nên tạo từ máy người phụ trách: `git fetch origin`, `git tag -a upgrade/ng22 35b31b3 -m "Angular 22.3"`, `git push origin upgrade/ng22`. Nhánh `upgrade-angular-22` đã được đưa lên cùng nội dung. Bản build `prod` không lưu trong repo (`build/` bị ignore): build lại từ tag bằng `yarn build-prod` khi cần.
+- E2E: `tools/e2e/` (Task 1C) đã viết, cần chạy lần đầu trên máy có backend: điền `tools/e2e/.env`, `yarn --cwd tools/e2e test:ro`, sửa selector/cách chờ theo `tools/e2e/KNOWN_ISSUES.md`.
 - Lint: `yarn lint` chạy được, còn 409 lỗi có từ trước (361 là `template/eqeqeq`); lint không chặn build.
 - **Node:** Angular 22 yêu cầu Node `^22.22.3 || ^24.15.0 || >=26`. Máy đang dùng 24.14.0 phải nâng Node trước khi `yarn install`/`yarn start`.
 - Khi chạy `ng update` trên máy có prettier cài toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Bỏ `NODE_PATH` khi chạy để diff gọn.
@@ -106,6 +107,9 @@ Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smok
 | 20 | `ng add angular-eslint`, chuyển rule | `eslint.config.js` chỉ dùng bộ khuyến nghị của angular-eslint (như `.eslintrc.json` cũ), tắt `prefer-inject`, `prefer-standalone`, `prefer-on-push-component-change-detection`, `template/prefer-control-flow`; bỏ qua `src/assets/` | Các rule mới này đòi viết lại code (gần 4.800 lỗi); bộ rule cũ không có |
 | 20 | Xoá `webpack.config.js` nếu script `rtl` không còn dùng | Đã xoá cùng script `rtl` và `webpack-cli`, `webpack-messages`, `webpack-rtl-plugin`, `css-loader` | Script đã hỏng sẵn (thiếu `webpack`, `mini-css-extract-plugin`, `del`); SCSS theme do `angular.json` biên dịch |
 | 20 | Step 4b, Step 5 (cổng giao diện, smoke E) | Không làm | Cổng ảnh đã bỏ theo quyết định người phụ trách; smoke cần backend và làm tay |
+| 1C | Viết và chốt baseline trên Angular 13 | Viết sau khi đã lên 22; baseline sẽ là lần chạy đầu trên 22 | Nhánh đã qua bản 15 trước khi làm Task 1C |
+| 1C | Đủ các nhóm test trong Step 4–5 | Có: routes, auth, layout, list, form, widgets, realtime, 1 test `@rw` (thêm mới). Chưa có: lọc, sửa/xoá (`test.fixme`), editor, upload, in/PDF, chip, mask, bình luận | Không có backend để xác định selector cho các thao tác phức tạp; các mục này vẫn kiểm tay |
+| 1C | `@playwright/test` mới nhất | Ghim 1.63.0 | Trùng bản Chromium có sẵn trong môi trường làm |
 | Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
 
 ### Quyết định của người phụ trách trong lúc làm

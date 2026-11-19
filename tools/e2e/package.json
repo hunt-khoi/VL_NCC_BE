@@ -1,0 +1,17 @@
+{
+  "name": "ncc-e2e",
+  "private": true,
+  "description": "Test e2e (Playwright) cho app NCC sau nang cap Angular 22",
+  "scripts": {
+    "test": "playwright test",
+    "test:ro": "playwright test --grep @ro",
+    "test:rw": "playwright test --grep @rw",
+    "test:routes": "playwright test tests/routes.spec.ts",
+    "test:nologin": "playwright test --grep @nologin",
+    "report": "playwright show-report report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "dotenv": "^16.4.5"
+  }
+}
