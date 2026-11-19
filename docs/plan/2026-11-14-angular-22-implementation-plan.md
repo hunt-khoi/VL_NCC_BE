@@ -4,18 +4,67 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
+> **Trạng thái:** đang làm, đã tới Angular 15 + MDC (Task 12). Xem mục "Trạng thái thực hiện".
+
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
 **Tech Stack:** Angular CLI, Angular Material (MDC), NgRx, RxJS, yarn 1.22, Node 24.
 
 **Spec:** Không có tài liệu spec riêng; plan này là tài liệu duy nhất. Hiện trạng lúc lập plan (2026-11-14): 1006 file TS, 495 component, 159 module, 6 file spec; Material dùng ở 323 file; build `dev` trên Angular 13 thành công trên Node 24.14.0.
 
+## Trạng thái thực hiện (cập nhật 2026-11-19)
+
+Nhánh `upgrade-angular-22`. Mọi task đã xong đều qua `yarn verify:dev` với 0 lỗi. Chi tiết từng quyết định nằm trong sổ theo dõi `.superpowers/sdd/2026-11-14-angular-22-implementation-plan/progress.md` (không commit); bảng dưới là bản tóm tắt.
+
+| Task | Nội dung | Commit | Kết quả |
+|---|---|---|---|
+| 1 | Script `verify:dev`/`verify:prod`, `.yarnrc`, commit `yarn.lock`, checklist smoke | `404ca04` | Xong |
+| 1B | Công cụ chụp và so ảnh `tools/visual/` | `489ca4e`, `845a129` | Công cụ xong; **bỏ bộ ảnh gốc và cổng giao diện** theo quyết định người phụ trách |
+| 1C | Bộ test e2e `tools/e2e/` | — | **Chưa làm** (xem "Quyết định cần người phụ trách xác nhận") |
+| 2 | Gỡ custom-webpack, ESLint, e2e Protractor, `ngrx-store-freeze`, `@angular/platform-server` | `7623c24` | Xong |
+| 3 | Xoá `entryComponents` (55 file) | `4e3bcf2` | Xong (người phụ trách commit với tên `temp`) |
+| 4 | Import mặc định cho moment (28 file) và `jwt-decode` 4 | `4e3bcf2`, `8ae925c` | Xong |
+| 5 | Thay thư viện ngừng bảo trì | `6943e4b` | Xong, khác plan (xem dưới) |
+| 6 | Gỡ package ng-bootstrap | `b0c266d` | Xong, khác plan (xem dưới) |
+| 7 | Biểu đồ | `b0ccd4a` | Xong, khác plan: **giữ Chart.js 2.9** |
+| 8 | Thư viện lên bản Ivy cho Angular 13 | `ba289ad` | Xong; 5 thư viện giữ bản View Engine tới Task 10 |
+| 9 | Theme Material sang `@use` | `b94edbf` | Xong; `styles.css` biên dịch ra giống hệt từng byte |
+| 10 | Angular 13 → 14 | `f126980` | Xong; không còn thư viện View Engine |
+| 11 | Angular 14 → 15 (Material legacy) | `3bb717c` | Xong |
+| 12 | Material legacy → MDC | `d4fb968` | Build xong; **người phụ trách bỏ qua smoke test và duyệt giao diện** |
+| 13–20 | Angular 16 → 22, hoàn thiện | — | Đang làm |
+
+Tag git nội bộ (chưa push): `smoke-a` = cuối Chặng 1 (`b94edbf`), `smoke-b` = sau MDC (`d4fb968`). Chưa tạo các tag `upgrade/ng<N>` của mục "Phương án rollback".
+
+### Những chỗ thực tế khác plan
+
+| Task | Plan ghi | Đã làm | Lý do |
+|---|---|---|---|
+| 5 | Popover bình luận → `mat-menu` | Chép mã `ngx-smart-popover` 1.5.0 (MIT) vào `src/app/views/partials/lib/popover/` | Popover còn làm khung gợi ý `@nhắc tên` theo vị trí con trỏ; đổi sang `mat-menu` phải viết lại logic và đổi giao diện |
+| 5 | Directive perfect-scrollbar tự viết | Như plan, thêm input `[disabled]` | Menu trái dùng `[disabled]` của thư viện cũ, plan bỏ sót |
+| 5 | Chỉ đổi thẻ avatar ở 2 template | Đổi ở 5 template | Còn `nguoi-dung-dps-list`, `profile`, `user-profile` |
+| 6 | Thay ng-bootstrap bằng Material và markup tự viết | Chép mã TypeScript ng-bootstrap **5.3.1** (MIT) cho dropdown, tooltip, progressbar, tabset, carousel, timepicker vào `src/app/views/partials/lib/ngb/` (`NgbLiteModule`); 19 template không đổi | ng-bootstrap 12+ bỏ `ngb-tabset` và chuyển tooltip, progressbar sang markup Bootstrap 5; theme dùng Bootstrap 4 |
+| 7 | Chart.js 2 → 3/4 | Giữ Chart.js 2.9.4 + `chartjs-plugin-labels`; chép mã `ng2-charts` 2.4.3 (ISC) vào `src/app/views/partials/lib/ng2-charts/` | Chart.js 3/4 đổi giao diện biểu đồ. Đổi lại Chart.js 2 không còn bản vá bảo mật |
+| 8 | Nâng mọi thư viện lên bản cho Angular 13 | `@ng-idle`, `ngx-print`, `ckeditor4-angular`, `ng2-file-upload` giữ bản cũ tới Task 10 | Bản Ivy của chúng được build bằng Angular 14–16 dù peer dependency ghi `*`/`>=9`. Kiểm tra phiên bản build thật trong gói trước khi nâng |
+| 10 | Giữ `UntypedFormGroup`… do migration tạo | Đổi lại về `FormGroup`/`FormBuilder`/`FormControl`/`FormArray` | Người phụ trách yêu cầu; build 0 lỗi kiểu |
+| 10 | — | `resolutions` ghim `caniuse-lite` 1.0.30001793 và `browserslist` 4.28.2 | Angular 14 kéo về bản dữ liệu mới, lệch với bản cũ, làm mọi file CSS lỗi `Unknown version 148 of android` |
+| 10 | — | CKEditor ghim `editorUrl` CDN 4.21.0 | Bản cũ tải 4.21.0; `ckeditor4-angular` 4 mặc định tải 4.22.1 có banner cảnh báo bảo mật |
+| 12 | Schematic MDC rồi chỉnh SCSS | Thêm: đổi 29 `mat-chip-list` còn sót sang `mat-chip-listbox`/`mat-chip-option`; `MatChipList` → `MatChipGrid`; trả lại tên class Metronic mà schematic đổi nhầm (`.mat-table__*`, `.mat-form-field-invalid`); 36 quy tắc SCSS đổi sang class MDC, đánh dấu `// MDC:` | Schematic đổi nhầm class riêng của theme, bỏ sót một số selector |
+| Mọi task | Xoá `.angular/cache` không có trong plan | Xoá sau mỗi lần cài/gỡ package | Cache giữ lại file đã xoá (137 locale moment, +0,5 MB `vendor.js`) |
+
+### Quyết định của người phụ trách trong lúc làm
+
+- 2026-11-19: bỏ cổng so sánh ảnh và bộ ảnh gốc (chụp quá lâu).
+- 2026-11-19: không chạy `yarn verify:prod` ở bất kỳ bước nào.
+- 2026-11-19: dồn smoke A vào smoke B, rồi bỏ qua luôn smoke B ("tiếp lun"); giao diện sẽ được xem một lần ở cuối.
+- 2026-11-19: dùng lại tên `FormGroup`/`FormBuilder`/`FormControl`/`FormArray`, không dùng `Untyped*`.
+
 ## Global Constraints
 
 - Nhánh làm việc: `upgrade-angular-22` (tách từ `upgrade-2026` sau commit tài liệu). Không đụng `main`.
 - Package manager: `yarn` 1.22 với `--ignore-engines`. Không dùng `npm install`.
 - Node: dùng Node 24 cho toàn bộ quá trình (baseline Angular 13 đã build được trên Node 24.14.0). Trước Task 19 phải nâng Node lên `>= 24.15.0`. Nếu một bản CLI trung gian từ chối chạy trên Node 24, cài nvm-windows và dùng Node 18.20 (Angular 14–17) hoặc Node 20.19 (Angular 18–19) cho riêng bản đó.
-- Đích: `@angular/core` 22.2.x, TypeScript `>=6.0 <6.1`, zone.js `~0.15.0 || ~0.16.0`, RxJS `^7.4.0`.
+- Đích: `@angular/core` 22.2.x, TypeScript `>=6.0 <6.1`, zone.js `~0.15.0 || ~0.16.0`, RxJS `^6.5.3 || ^7.4.0` (đang giữ 6.6.7, xem "Các quyết định chính").
 - Vẫn dùng NgModule và zone.js. Không chuyển standalone, không chuyển zoneless, không gõ type cho forms, không đổi sang control flow mới.
 - Giữ nguyên CSS Bootstrap 4 của theme Metronic. Không nâng Bootstrap.
 - Mỗi task kết thúc bằng một commit. Không gộp hai bản major vào một commit.
@@ -38,12 +87,15 @@
 | Đổi Node theo từng bản (16, 18, 20, 22) | Dùng Node 24 suốt, có phương án dự phòng | Baseline 13 đã build được trên Node 24; máy không có nvm |
 | Chuyển MDC ở bản 16 | Chuyển MDC ngay ở bản 15 | `ngx-mat-select-search` 7.x (bản cho MDC) hỗ trợ từ 15, tránh một bản chạy lệch |
 | Giữ custom-webpack tới khi lên 22 | Gỡ ngay ở Task 2 | Plugin lọc locale moment là thừa: script `postinstall` đã xoá mọi locale trừ `vi` |
-| Giữ ng-bootstrap, nâng theo từng bản | Gỡ ở Task 6 (19 template, 6 module) | Bản mới bắt buộc Bootstrap 5 và đã bỏ `ngb-tabset`; theme Metronic dựng trên Bootstrap 4 |
+| Giữ ng-bootstrap, nâng theo từng bản | Gỡ package ở Task 6, thay bằng mã chép ng-bootstrap 5.3.1 (19 template không đổi) | Bản mới bắt buộc Bootstrap 5 và đã bỏ `ngb-tabset`; theme Metronic dựng trên Bootstrap 4 |
+| Nâng RxJS lên 7 ở Angular 16 | Giữ RxJS 6.6.7 tới khi một thư viện bắt buộc RxJS 7 | Angular 16–22 vẫn nhận `rxjs ^6.5.3`; tránh thay đổi không cần thiết |
+| Nâng thư viện bên thứ ba ở mọi bản major | Chỉ nâng khi bản đang dùng không chạy được với bản Angular mới | Bản build bằng Angular cũ hơn vẫn chạy được qua linker; ít thay đổi thì ít rủi ro giao diện |
 | `toPromise()` → `firstValueFrom` (14 file) | Bỏ | RxJS 7 vẫn còn `toPromise()`, chỉ deprecated |
 | `ckeditor4-angular` gộp về TinyMCE | Giữ, chỉ nâng version | Có bản Ivy; gộp là đổi hành vi, không cần cho việc nâng cấp |
 | `ngx-perfect-scrollbar` → `ngx-scrollbar` | Directive tự viết cùng selector | 3 chỗ dùng, không phải sửa template |
 | Giữ angular-eslint, nâng theo từng bản | Gỡ ở Task 2, cài lại bản 22 ở Task 20 | Bớt một nhóm package phải khớp version ở mỗi bản |
-| Build đủ cấu hình sau mỗi bước | `dev` + `prod` mỗi bước, đủ 6 cấu hình ở Task 20 | 4 cấu hình còn lại chỉ khác file environment |
+| Build đủ cấu hình sau mỗi bước | Chỉ `dev` mỗi bước; không build `prod` (quyết định người phụ trách 2026-11-19) | Build `prod` quá nặng trên máy phát triển. Lỗi chỉ có ở `prod` sẽ lộ ra lúc build để deploy |
+| Kiểm giao diện bằng so ảnh | So file `styles.css` biên dịch ra trước và sau ở các bước chỉ đổi cú pháp (Task 9, 10) | Rẻ và chắc chắn: CSS giống hệt thì giao diện không đổi |
 
 ## Review Focus
 
@@ -473,10 +525,11 @@ Plan đã chọn sẵn phương án mặc định cho từng mục; chỉ cần 
 
 | Mục | Mặc định trong plan | Phương án khác |
 |---|---|---|
-| ng-bootstrap | Gỡ, thay bằng Material và markup Bootstrap 4 (Task 6) | Giữ và nâng theo từng bản; kéo theo nâng theme lên Bootstrap 5 |
-| Giao diện sau MDC | **Đã chốt 2026-11-14:** phải giống giao diện hiện tại và giao diện mẫu; kiểm bằng cổng giao diện, người phụ trách duyệt từng màn hình còn lệch | — |
+| ng-bootstrap | **Đã làm:** gỡ package, chép mã ng-bootstrap 5.3.1 giữ nguyên markup Bootstrap 4 (Task 6) | Giữ và nâng theo từng bản; kéo theo nâng theme lên Bootstrap 5 |
+| Giao diện sau MDC | Đã chốt 2026-11-14: phải giống giao diện hiện tại. **Cập nhật 2026-11-19:** người phụ trách bỏ cổng so ảnh và smoke test sau MDC; xem giao diện một lần ở cuối. 33 chỗ SCSS dễ lệch nhất có comment `// MDC:` | — |
+| Biểu đồ | **Đã làm:** giữ Chart.js 2.9, không đổi giao diện (Task 7) | Nâng Chart.js 4 thành một đợt riêng, chấp nhận biểu đồ đổi giao diện, có bản vá bảo mật |
 | Karma và 6 file spec | Giữ nguyên, không dùng làm điều kiện nghiệm thu. Lưu ý `src/test.ts` dùng `require.context` nên `ng test` sẽ không chạy được sau Task 15 | Xoá hẳn ở Task 20, hoặc chuyển sang Vitest |
-| Test e2e | Playwright trong `tools/e2e/` (Task 1C), nhóm `@ro` làm cổng ở mọi task, nhóm `@rw` ở các mốc smoke | Chỉ smoke test tay ở 5 mốc như bản plan cũ |
+| Test e2e | Playwright trong `tools/e2e/` (Task 1C), nhóm `@ro` làm cổng ở mọi task, nhóm `@rw` ở các mốc smoke. **Chưa làm** tính đến 2026-11-19: cần baseline chạy trên Angular 13 mà nhánh đã qua bản 15; có thể dựng baseline từ tag `smoke-a` trong một git worktree riêng | Chỉ smoke test tay ở cuối |
 | Database cho nhóm e2e `@rw` | Bản sao riêng, khôi phục trước mỗi lượt bằng `E2E_RESTORE_CMD` do người phụ trách backend cung cấp | Không chạy `@rw`, kiểm tay các thao tác ghi |
 | TinyMCE | Dừng ở 6.x (giấy phép MIT) | Lên 8.x, chấp nhận GPL hoặc mua license |
 
