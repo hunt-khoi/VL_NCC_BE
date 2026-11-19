@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-19):** đã lên **Angular 22.3**; cả 6 cấu hình build qua (Task 20). Phần **chưa xong**: smoke test bằng tay theo `docs/plan/angular_22_smoke_checklist.md` (cần backend và người dùng thật), bộ e2e (Task 1C) chưa làm. Tag `upgrade/ng22` đã tạo và push. **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
+> **Trạng thái (2026-11-19):** đã lên **Angular 22.3**; cả 6 cấu hình build qua (Task 20). Phần **chưa xong**: smoke test bằng tay theo `docs/plan/angular_22_smoke_checklist.md` (cần backend và người dùng thật), bộ e2e (Task 1C) chưa làm. Tag `upgrade/ng22` (commit `35b31b3`) chưa có trên GitHub, cần push từ máy người phụ trách. **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -58,7 +58,7 @@ Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation, và
 
 Còn lại trước khi phát hành:
 - Đi hết `docs/plan/angular_22_smoke_checklist.md` bằng tay trên máy có backend. Giao diện chưa được kiểm bằng mắt từ Task 5.
-- Tag `upgrade/ng22` (Step 8) đã tạo và push, trỏ vào commit ghi dòng này; nhánh `upgrade-angular-22` đã được đưa lên cùng commit. Bản build `prod` không lưu trong repo (`build/` bị ignore): build lại từ tag bằng `yarn build-prod` khi cần.
+- Tag `upgrade/ng22` (Step 8) trỏ vào `35b31b3`. Phiên cloud không được phép push tag (GitHub trả 403), nên tạo từ máy người phụ trách: `git fetch origin`, `git tag -a upgrade/ng22 35b31b3 -m "Angular 22.3"`, `git push origin upgrade/ng22`. Nhánh `upgrade-angular-22` đã được đưa lên cùng nội dung. Bản build `prod` không lưu trong repo (`build/` bị ignore): build lại từ tag bằng `yarn build-prod` khi cần.
 - Lint: `yarn lint` chạy được, còn 409 lỗi có từ trước (361 là `template/eqeqeq`); lint không chặn build.
 - **Node:** Angular 22 yêu cầu Node `^22.22.3 || ^24.15.0 || >=26`. Máy đang dùng 24.14.0 phải nâng Node trước khi `yarn install`/`yarn start`.
 - Khi chạy `ng update` trên máy có prettier cài toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Bỏ `NODE_PATH` khi chạy để diff gọn.
