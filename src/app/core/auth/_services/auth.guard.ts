@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 import { Store } from '@ngrx/store';
 import { AppState } from '../../reducers';
 import { TokenStorage } from './token-storage.service';
-import * as jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../../../environments/environment';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class AuthGuard implements CanActivate {
 	}
 
 	getTokenExpirationDate(token: string): Date | null {
-		const decoded = jwt_decode(token);
+		const decoded = jwtDecode(token);
 		if (decoded.exp === undefined) 
 			return null;
 		const date = new Date(0);
