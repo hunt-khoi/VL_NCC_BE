@@ -81,7 +81,7 @@
 								<mat-label>Nội dung</mat-label>
 							</div>
 							<div class="col-lg-12 m--margin-bottom-20-mobile" *ngFor="let content of arr; let i=index">
-								<ckeditor formControlName="content{{i}}" [config]="commonService.ckeditor"></ckeditor>
+								<ckeditor formControlName="content{{i}}" [config]="commonService.ckeditor" editorUrl="https://cdn.ckeditor.com/4.21.0/standard-all/ckeditor.js"></ckeditor>
 							</div>
 						</div>
 						<div *ngIf="!allowEdit" class="col-lg-12 m--margin-bottom-20-mobile" style="overflow: scroll;">
