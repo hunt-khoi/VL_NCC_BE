@@ -1,8 +1,7 @@
 {
 	"extends": "./tsconfig.app.json",
-	"compilerOptions": {
-		"target": "es2020",
-		"sourceMap": false,
+  "compilerOptions": {
+    "sourceMap": false,
 		"incremental": true,
 		"tsBuildInfoFile": "../.tsbuildinfo"
 	}

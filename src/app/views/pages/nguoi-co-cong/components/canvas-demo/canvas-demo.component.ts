@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation, OnChanges,
 import { DiagramCanVas } from './canvas.class';
 import { CanvasDemoService } from './canvas-demo.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { LayoutUtilsService } from '../../../../../../../src/app/core/_base/crud';
 import { CanvasDemoDialogComponent } from './canvas-demo-dialog.component';
 import { TokenStorage } from '../../../../../core/auth/_services/token-storage.service';

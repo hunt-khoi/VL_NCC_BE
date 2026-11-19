@@ -1,8 +1,8 @@
 
 import { Component, OnInit, ViewChild, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
 import { MatSort } from '@angular/material/sort';
 import { QueryParamsModel } from './../../../../../core/_base/crud/models/query-models/query-params.model';
 import { tap } from 'rxjs/operators';

@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef, Output, Input, EventEmitter, SimpleChange, AfterViewInit, ElementRef, ViewChild, Pipe, OnChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Observable, BehaviorSubject, Subscription, Subject } from 'rxjs';
 import { LayoutUtilsService } from '../../../../../core/_base/crud';
 import { CommentService } from './comment.service';
