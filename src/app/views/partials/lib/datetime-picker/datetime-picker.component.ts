@@ -2,7 +2,7 @@ import { Component, ViewEncapsulation, forwardRef, Input, Output, EventEmitter, 
 import { FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validators } from '@angular/forms';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatCalendar } from '@angular/material/datepicker';
-import { NgbTimeAdapter, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTimeAdapter, NgbTimeStruct } from '../ngb/ngb-lite.module';
 import moment$1 from 'moment';
 
 const moment = moment$1;

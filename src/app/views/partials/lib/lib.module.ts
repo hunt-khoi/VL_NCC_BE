@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgbModule, NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbLiteModule } from './ngb/ngb-lite.module';
 import { CdkTreeModule } from '@angular/cdk/tree';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -38,8 +38,7 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
         HttpClientModule,
         FormsModule,
         ReactiveFormsModule,
-        NgbModule,
-        NgbProgressbarModule,
+        NgbLiteModule,
         CdkTreeModule,
         MatFormFieldModule,
         MatInputModule,

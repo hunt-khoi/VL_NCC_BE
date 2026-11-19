@@ -26,7 +26,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 // NgBootstrap
-import { NgbDropdownModule, NgbTabsetModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbLiteModule } from './lib/ngb/ngb-lite.module';
 // Perfect Scrollbar
 import { PerfectScrollbarModule } from './lib/perfect-scrollbar/perfect-scrollbar';
 // Core module
@@ -151,9 +151,7 @@ import { LibModule } from './lib/lib.module';
         MatBadgeModule,
         MatChipsModule,
         // ng-bootstrap modules
-        NgbDropdownModule,
-        NgbTabsetModule,
-        NgbTooltipModule,
+        NgbLiteModule,
         TranslateModule,
         ScrollingModule,
         LibModule

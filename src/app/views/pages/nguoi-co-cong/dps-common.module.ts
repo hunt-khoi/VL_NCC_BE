@@ -20,7 +20,7 @@ import {
 } from '../../../core/_base/crud';
 
 import { NgxPermissionsModule } from 'ngx-permissions';
-import { NgbProgressbarModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbLiteModule } from '../../partials/lib/ngb/ngb-lite.module';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 // Material
@@ -118,7 +118,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
 @NgModule({
     imports: [
         RouterModule,
-        NgbModule,
+        NgbLiteModule,
         MatDialogModule,
         CommonModule,
         HttpClientModule,
@@ -147,7 +147,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
         MatSnackBarModule,
         MatTabsModule,
         MatTooltipModule,
-        NgbProgressbarModule,
+        NgbLiteModule,
         MatChipsModule,
         MatListModule,
         DragDropModule,
@@ -246,7 +246,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
     ],
     exports: [
         RouterModule,
-        NgbModule,
+        NgbLiteModule,
         MatDialogModule,
         CommonModule,
         HttpClientModule,
@@ -275,7 +275,7 @@ export const options: Partial<IConfig> | (() => Partial<IConfig>) | null = null;
         MatSnackBarModule,
         MatTabsModule,
         MatTooltipModule,
-        NgbProgressbarModule,
+        NgbLiteModule,
         MatChipsModule,
         MatListModule,
         DragDropModule,

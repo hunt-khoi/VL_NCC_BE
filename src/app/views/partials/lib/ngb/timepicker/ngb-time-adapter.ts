@@ -1,0 +1,60 @@
+/*
+ * Chep nguyen tu ng-bootstrap 5.3.1 (https://github.com/ng-bootstrap/ng-bootstrap/tree/5.3.1/src),
+ * giay phep MIT, xem LICENSE trong thu muc nay. Giu ban nay de HTML va giao dien khong doi
+ * (tu ban 12 ng-bootstrap bo ngb-tabset va chuyen sang markup Bootstrap 5).
+ */
+/* eslint-disable */
+import {Injectable} from '@angular/core';
+import {NgbTimeStruct} from './ngb-time-struct';
+import {isInteger} from '../util/util';
+
+export function NGB_DATEPICKER_TIME_ADAPTER_FACTORY() {
+  return new NgbTimeStructAdapter();
+}
+
+/**
+ * An abstract service that does the conversion between the internal timepicker `NgbTimeStruct` model and
+ * any provided user time model `T`, ex. a string, a native date, etc.
+ *
+ * The adapter is used **only** for conversion when binding timepicker to a form control,
+ * ex. `[(ngModel)]="userTimeModel"`. Here `userTimeModel` can be of any type.
+ *
+ * The default timepicker implementation assumes we use `NgbTimeStruct` as a user model.
+ *
+ * See the [custom time adapter demo](#/components/timepicker/examples#adapter) for an example.
+ *
+ * @since 2.2.0
+ */
+@Injectable({providedIn: 'root', useFactory: NGB_DATEPICKER_TIME_ADAPTER_FACTORY})
+export abstract class NgbTimeAdapter<T> {
+  /**
+   * Converts a user-model time of type `T` to an `NgbTimeStruct` for internal use.
+   */
+  abstract fromModel(value: T): NgbTimeStruct;
+
+  /**
+   * Converts an internal `NgbTimeStruct` time to a user-model time of type `T`.
+   */
+  abstract toModel(time: NgbTimeStruct): T;
+}
+
+@Injectable()
+export class NgbTimeStructAdapter extends NgbTimeAdapter<NgbTimeStruct> {
+  /**
+   * Converts a NgbTimeStruct value into NgbTimeStruct value
+   */
+  fromModel(time: NgbTimeStruct): NgbTimeStruct {
+    return (time && isInteger(time.hour) && isInteger(time.minute)) ?
+        {hour: time.hour, minute: time.minute, second: isInteger(time.second) ? time.second : null} :
+        null;
+  }
+
+  /**
+   * Converts a NgbTimeStruct value into NgbTimeStruct value
+   */
+  toModel(time: NgbTimeStruct): NgbTimeStruct {
+    return (time && isInteger(time.hour) && isInteger(time.minute)) ?
+        {hour: time.hour, minute: time.minute, second: isInteger(time.second) ? time.second : null} :
+        null;
+  }
+}

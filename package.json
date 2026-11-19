@@ -31,7 +31,6 @@
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@kolkov/angular-editor": "^1.1.3",
     "@microsoft/signalr": "^8.0.7",
-    "@ng-bootstrap/ng-bootstrap": "^5.1.2",
     "@ng-idle/core": "^8.0.0-beta.4",
     "@ng-idle/keepalive": "^8.0.0-beta.4",
     "@ngrx/effects": "~13.2.0",

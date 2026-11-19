@@ -25,7 +25,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NgxPermissionsModule } from 'ngx-permissions';
-import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbLiteModule } from '../../../../partials/lib/ngb/ngb-lite.module';
 import { CanvasDemoComponent } from './canvas-demo.component';
 import { CanvasDemoService } from './canvas-demo.service';
 import { TypesUtilsService, LayoutUtilsService, HttpUtilsService, InterceptService } from '../../../../../../../src/app/core/_base/crud';
@@ -61,7 +61,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         MatSnackBarModule,
         MatTabsModule,
         MatTooltipModule,
-        NgbProgressbarModule,
+        NgbLiteModule,
         DragDropModule
     ],
     providers: [

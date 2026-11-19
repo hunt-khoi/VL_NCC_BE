@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbLiteModule } from '../../partials/lib/ngb/ngb-lite.module';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -24,7 +24,7 @@ import { PerfectScrollbarModule } from '../../partials/lib/perfect-scrollbar/per
 		MatBadgeModule,
 		PerfectScrollbarModule,
 		AvatarModule,
-		NgbModule,
+		NgbLiteModule,
 		ChartsModule,
 		RouterModule.forChild([
 			{

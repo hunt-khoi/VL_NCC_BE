@@ -1296,13 +1296,6 @@
     node-fetch "^2.6.7"
     ws "^7.5.10"
 
-"@ng-bootstrap/ng-bootstrap@^5.1.2":
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/@ng-bootstrap/ng-bootstrap/-/ng-bootstrap-5.3.1.tgz#4cf2929583e9572475d1d0f3c905b05885a086bb"
-  integrity sha512-xlhBJb4oNcOQk04h5sQcq9P1E97sGB1HjqBCqgL0+S2w2uvLWME9F9SuH7wU4S1+eYe7WG9SKFpq+R4BjG2kMw==
-  dependencies:
-    tslib "^1.9.0"
-
 "@ng-idle/core@^8.0.0-beta.4":
   version "8.0.0-beta.4"
   resolved "https://registry.yarnpkg.com/@ng-idle/core/-/core-8.0.0-beta.4.tgz#c856bb2dd3c8407321380faac8c5692a5728fd0d"
