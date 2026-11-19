@@ -140,7 +140,7 @@ export class DanhSachTangQuaComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	trackByIndex(index: number): number {
+	trackByIndex(index: number, _item?: unknown): number {
 		return index;
 	}
 
