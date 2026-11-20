@@ -1,7 +1,7 @@
 # Checklist smoke test — nâng cấp Angular 22
 
-Chạy `yarn start` (cổng 3105), đăng nhập, rồi đi hết các mục. Dùng ở các mốc A–E của
-[kế hoạch nâng cấp](2026-11-14-angular-22-implementation-plan.md). Mỗi mốc chép lại danh sách này và đánh dấu.
+Chạy `yarn start` (cổng 3105), đăng nhập, rồi đi hết các mục. Dùng cho Task 3 của
+[kế hoạch nâng cấp](2026-11-20-angular-22-acceptance-plan.md). Chép danh sách này thành file kết quả rồi đánh dấu.
 
 Mục có `(e2e)` đã có test tự động trong `tools/e2e/` (xem `tools/e2e/README.md`); vẫn kiểm tay cho tới khi bộ e2e chạy ổn định với backend (`tools/e2e/KNOWN_ISSUES.md`). Mục không đánh dấu luôn phải kiểm tay.
 

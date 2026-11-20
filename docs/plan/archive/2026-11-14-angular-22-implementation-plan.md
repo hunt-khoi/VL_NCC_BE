@@ -4,7 +4,9 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-20, tạm dừng để tiếp tục ở phiên mới):** đã lên **Angular 22.3**; RxJS 7 và mọi thư viện bên thứ ba đã lên bản cho Angular 22 (trừ Chart.js 2.9, cố ý giữ); cả 6 cấu hình build qua với 0 lỗi (lần build đủ 6 cấu hình cuối là 2026-11-19; từ đó chỉ chạy `verify:dev`). Đã chạy bộ e2e `test:ro` với backend .NET 10 thật trên máy người phụ trách, theo từng vai trò, và sửa các lỗi frontend lộ ra. **Chưa nghiệm thu:** smoke test tay chưa làm; nhóm `@rw` chưa chạy. Lỗi do API ghi ở `api-errors.md`. **Quy tắc: chỉ sửa frontend, cấm đụng tới API.** Việc tiếp theo: mục "Tiếp tục từ đâu" → "Bắt đầu phiên mới". **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
+> **ĐÃ XONG — LƯU TRỮ.** Task 1–20 và 20b hoàn thành (Angular 22.3, build 6/6). File này chỉ để tra cứu: kế hoạch gốc, chỗ làm khác plan, quyết định của người phụ trách. **Trạng thái hiện tại:** [`../README.md`](../README.md). **Việc còn lại:** [`../2026-11-20-angular-22-acceptance-plan.md`](../2026-11-20-angular-22-acceptance-plan.md).
+>
+> Từ mục "Global Constraints" trở xuống là bản kế hoạch gốc (2026-11-14). Các mục sau **đã hết hiệu lực**: cổng so ảnh và bộ ảnh gốc (bỏ 2026-11-19); `verify:prod` ở từng bước (bỏ); giữ RxJS 6 (đã lên 7.8); bảng tag `upgrade/ng<N>` (thực tế chỉ có `upgrade/ng22`, `smoke-a`, `smoke-b`).
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -12,7 +14,7 @@
 
 **Spec:** Không có tài liệu spec riêng; plan này là tài liệu duy nhất. Hiện trạng lúc lập plan (2026-11-14): 1006 file TS, 495 component, 159 module, 6 file spec; Material dùng ở 323 file; build `dev` trên Angular 13 thành công trên Node 24.14.0.
 
-## Trạng thái thực hiện (cập nhật 2026-11-19)
+## Kết quả thực hiện Task 1–20b
 
 Nhánh `upgrade-angular-22` (trùng với nhánh phiên cloud `ccr-4b9d79c1-rjbqa4`, cùng commit `6a78ada` trở về sau). Mọi task đã xong đều qua `yarn verify:dev` với 0 lỗi. Chi tiết từng quyết định nằm trong sổ theo dõi `.superpowers/sdd/2026-11-14-angular-22-implementation-plan/progress.md` (không commit); bảng dưới là bản tóm tắt.
 
@@ -20,7 +22,7 @@ Nhánh `upgrade-angular-22` (trùng với nhánh phiên cloud `ccr-4b9d79c1-rjbq
 |---|---|---|---|
 | 1 | Script `verify:dev`/`verify:prod`, `.yarnrc`, commit `yarn.lock`, checklist smoke | `404ca04` | Xong |
 | 1B | Công cụ chụp và so ảnh `tools/visual/` | `489ca4e`, `845a129` | Công cụ xong; **bỏ bộ ảnh gốc và cổng giao diện** theo quyết định người phụ trách |
-| 1C | Bộ test e2e `tools/e2e/` | `6a78ada` | Đã viết 83 test (8 file) trên Angular 22; mới chạy được 2 test `@nologin` vì môi trường làm không có backend (xem `tools/e2e/KNOWN_ISSUES.md`) |
+| 1C | Bộ test e2e `tools/e2e/` | `6a78ada` | 83 test (8 file), viết trên Angular 22; đã chạy `test:ro` với backend .NET 10 ngày 2026-11-20 (kết quả: `../README.md`) |
 | 2 | Gỡ custom-webpack, ESLint, e2e Protractor, `ngrx-store-freeze`, `@angular/platform-server` | `7623c24` | Xong |
 | 3 | Xoá `entryComponents` (55 file) | `4e3bcf2` | Xong (người phụ trách commit với tên `temp`) |
 | 4 | Import mặc định cho moment (28 file) và `jwt-decode` 4 | `4e3bcf2`, `8ae925c` | Xong |
@@ -42,103 +44,46 @@ Nhánh `upgrade-angular-22` (trùng với nhánh phiên cloud `ccr-4b9d79c1-rjbq
 | 20 | Hoàn thiện, nghiệm thu | `980bbe4` | Build xong cả 6 cấu hình; ESLint 22; README; **smoke test tay chưa làm** |
 | 20b | RxJS 7 và thư viện bên thứ ba lên bản cho Angular 22 (ngoài plan gốc: các task 10–19 đã bỏ sót bảng version) | `73f4b03` … `2613038` | Xong; build 6/6, chỉ kiểm được trang đăng nhập và TinyMCE trên trang thử (xem dưới) |
 
-### Tiếp tục từ đâu
+### Sửa lỗi lúc chạy với backend .NET 10 (2026-11-20)
 
-#### Bắt đầu phiên mới (cập nhật 2026-11-20)
+Ghi lại để tra cứu. Trạng thái hiện tại và việc còn lại: [`../README.md`](../README.md), [`../2026-11-20-angular-22-acceptance-plan.md`](../2026-11-20-angular-22-acceptance-plan.md).
 
-1. **Quy tắc người phụ trách:** chỉ sửa giao diện (frontend); **cấm sửa hoặc đề xuất sửa API** (`D:\NCC_API`). Lỗi API → ghi vào [`api-errors.md`](api-errors.md) rồi làm tiếp. Không tự đặt thời gian chờ/ngưỡng mới cho bộ test mà không hỏi.
-2. **Môi trường máy người phụ trách:** Node 24.15.0; `yarn start` ở cổng 3105; backend .NET 10 ở `https://localhost:7243` (người phụ trách tự chạy, hay khởi động lại giữa chừng — test lỗi `ERR_CONNECTION_REFUSED` hàng loạt thì kiểm backend trước). Cache yarn `D:\DPS_Project\.yarn-cache`, đặt `TEMP`/`TMP` sang ổ D: khi build.
-3. **Chạy e2e:** `tools/e2e/.env` đã có `E2E_USER=admin`, mật khẩu và `E2E_VAITRO=Chuyên viên sở` (file không commit). Tài khoản `admin` có 2 vai trò, mỗi vai trò thấy một phần menu: chạy hai lượt.
-   - `cd tools/e2e && yarn test:ro` (vai trò trong `.env`, khoảng 10 phút, 3 luồng song song)
-   - `E2E_VAITRO=Administrator yarn test:ro` (khoảng 12 phút)
-   - Lấy lý do bỏ qua/lỗi từng test: thêm `PLAYWRIGHT_JSON_OUTPUT_NAME=<file> ... --reporter=line,json`.
-4. **Việc tiếp theo, theo thứ tự:**
-   1. Chạy lại lượt **Administrator** (lần chạy cuối là trước commit `e737599`, sửa cây `cdk-tree` + `user-manager`).
-   2. Xem 3 lỗi frontend còn mở của lượt Administrator: test "đăng nhập rồi đăng xuất" (nút Đăng xuất trong dropdown topbar không hiện trong 10 giây); `/vai-tro` và `/xuat-du-lieu` hết 30 giây trong `open()` khi chờ guard `PermissionUrl`.
-   3. Lỗi API mới gặp thì ghi `api-errors.md` (hiện 12 mục; #5 — 37 tham số `string` bị bắt buộc — sẽ còn lộ ở các ô chọn phụ thuộc nhau khi test tay).
-   4. Smoke test tay theo `docs/plan/angular_22_smoke_checklist.md` (việc số 4 bên dưới).
-   5. Nhóm `@rw` (cần database bản sao + `E2E_RESTORE_CMD`); SignalR và ng-idle đang `test.fixme` (người phụ trách: "kệ nó test sau").
-5. **Công cụ dò lỗi** (so route frontend ↔ backend, lấy stack lỗi trên trang đang chạy): `tools/route-diff/README.md`.
-6. Các commit từ 2026-11-20 trên nhánh `upgrade-angular-22` **chưa push** (16 commit tính tới `docs: handoff`) (người phụ trách tự push).
+- **Lỗi thật của app, đã sửa:** `ReferenceError: $localize is not defined` khi mở dashboard. Mã ng-bootstrap chép ở Task 6 (`ngb/carousel`, `ngb/progressbar`, `ngb/timepicker`) còn thuộc tính `i18n`, mà app không cài `@angular/localize`. Đã bỏ các thuộc tính `i18n`; chữ hiển thị không đổi.
+- **Lỗi đến từ API:** ghi riêng trong [`api-errors.md`](api-errors.md). **Quy tắc (người phụ trách, 2026-11-20): chỉ sửa frontend, cấm đụng tới API; lỗi API thì ghi log.** Backend ở 7243 là bản .NET 10 (`D:\NCC_API`), không phải `VL_NCC_API` (.NET Core 3.1); frontend trước đó đã được chỉnh theo backend này ở commit `2e21a10` (2026-09-04).
+- **Token chỉ sống 10 phút:** lượt chạy quá 10 phút thì các test sau bị đá về trang đăng nhập. Cần chạy nhanh hơn (sửa các lỗi trên để bớt retry) hoặc cho bộ e2e đăng nhập lại khi token hết hạn.
+- **Quyết định 2026-11-20 (người phụ trách):** backend .NET 10 (`D:\NCC_API`) sẽ thay backend cũ trên server, nên **frontend đổi theo API mới** (commit `46f0f51`, `4d68ff6`). Đã đổi: không gửi `sortField`/`sortOrder` rỗng (`HttpUtilsService.getFindHTTPParams`); `lite/get-dictionary`, `lite/lite_emotion` → `comment/...`; `quan-ly-quy/*` → `quanlyquy/*` (21 API, đổi cả verb/tham số); `dm_donvi/DM_DonVi_*` → REST (`GET/POST /`, `PUT/DELETE /{id}`, `deletes`, `get-users`, `upload`, `import`, `download-template`); `dm_wards` → `wards`; `sl-tong-hop/*` → `bh-bao-cao/so-luong-doi-tuong`; `ho-tro` → `ho-tro/list`, `ho-tro/detail?id=`, `ho-tro/canhotro?ids=`; `PUT dt-chinh-hinh/{id}` → `PUT dt-chinh-hinh`; `danh-sach-nguoi-lite`/`danh-sach-don-vi-lite` POST → GET; trang HDSD bỏ gọi `lite/get-version` (backend đã comment), dòng "Phiên bản" tự ẩn. Gửi body JSON có chuỗi rỗng/`null` **không** bị lỗi 400 (đã thử `PUT dantoc/999999`), chỉ tham số query mới bị.
+- API bị xoá mà frontend còn dùng (`get-range`, `get-don-de-nghi`, `GetListShift` — ô "Chế độ làm việc" ở `/co-cau-to-chuc`; ghi chú cũ nói màn này không có route là **sai**): xem `api-errors.md` #1–#3. Sau đó frontend còn đổi theo route mới: `user-manager/list` → `GET user-manager`, `bao-hiem/download-template` → `bao-hiem/download-import` (commit `e737599`).
+- **Cây `cdk-tree` (CDK 22, commit `e737599`):** báo `A valid data source must be provided` khi `dataSource` chưa có lúc khởi tạo (bản cũ chỉ hiện cây rỗng). Khởi tạo sẵn `new ArrayDataSource([])` ở 8 component có cây (chọn đơn vị, chọn nhiều đơn vị, người dùng–đơn vị, cơ cấu tổ chức, map cơ cấu, sơ đồ tổ chức, phân quyền, `dropdown-tree`).
+- **Ngày dạng chuỗi (commit `626d304`):** backend .NET 10 trả `NgayCapNhat`/`LastModified` đã định dạng (`"14/12/2017 11:56"`) thay cho DateTime ISO ở 5 trường (cấp quản lý, dân tộc, tôn giáo, chức vụ, chức danh, khóm ấp). Pipe `date` báo NG02100 khi ngày > 12 và **đảo ngày/tháng** khi ngày <= 12. Thêm pipe `viDate` (`nguoi-co-cong/pipes/vi-date.pipe.ts`, xuất qua `DPSCommonModule`) đọc cả ISO lẫn `dd/MM/yyyy[ HH:mm[:ss][ SA/CH]]`; thay 11/12 chỗ `| date` trong template (chỗ còn lại ở danh sách tặng quà đã tự đọc bằng `parseViDate`). `NgayKhaiBao` (nhóm lễ Tết) là cột `varchar` nên không đổi.
+- **Bộ e2e (commit `b0abb4a`):** tự đăng nhập lại khi token còn < 3 phút (fixture `storageState`); biến `E2E_VAITRO` đổi vai trò qua giao diện sau khi đăng nhập (`admin` có 2 vai trò: Administrator = nhóm 1, Chuyên viên sở = nhóm 26; Hồ sơ NCC cần quyền 1086 chỉ có ở nhóm 26); trang 403 thì test **bỏ qua** kèm lý do, chạy một lượt cho mỗi vai trò; test SignalR sửa lại vì app dùng `skipNegotiation` (không có request `negotiate`).
+- **Tốc độ và độ tin cậy của bộ e2e (commit `c1afd3d`, `612d0be`, `8f9fd9c`, người phụ trách duyệt 2026-11-20):** mỗi thao tác chờ tối đa 10 giây, mỗi test 30 giây, bỏ `retries` (trước là 60 giây + chạy lại, do phiên cloud tự đặt, không ai duyệt). `test:ro` chạy 3 luồng song song, mỗi luồng giữ phiên riêng `.auth/user-<n>.json`; `test:rw` ép `--workers=1`. Sửa selector "đang tải": thẻ vỏ `<kt-splash-screen>` luôn còn trong DOM nên `settle()` luôn chờ hết 15 giây; đổi thành `div.kt-splash-screen` (cả `tools/visual/capture.mjs`). `open()` chờ request `user/PermissionUrl` xong mới xét URL 403, báo riêng trang 404. Lượt đầy đủ từ 31 phút còn 8,3 phút. Test SignalR và ng-idle tạm `test.fixme` (người phụ trách: "SignalR kệ nó test sau", xem `tools/e2e/KNOWN_ISSUES.md`). Test menu trái tự bỏ qua vì `aside.self.display = false` (có từ trước nâng cấp).
+- **Lỗi template đọc dữ liệu chưa có (đã sửa):** `kt-column-option` dùng chung nhận `gridService` undefined ở lần render đầu (bọc `@if (gridService)`); `ho-so-ncc-list`, `hdsd-list` đọc `dataSource`/`gridService` trước khi tạo (có từ trước nâng cấp, nay dùng `?.`); `mau-so-lieu-list` kiểm `MaxChild === undefined` trong khi backend .NET 10 trả `null` (lỗi hiển thị và khoá/mở nút sai).
+- **Kết quả e2e `test:ro` (2026-11-20, 3 luồng):** vai trò Chuyên viên sở 36 qua / 41 bỏ qua / 3 lỗi (10 phút); Administrator 48 qua / 24 bỏ qua / 8 lỗi (12 phút) trước khi sửa cây `cdk-tree` và `user-manager`. Lỗi còn lại đều thuộc `api-errors.md` (#5, #7, #8, #11) trừ test "đăng nhập rồi đăng xuất" (Administrator, nút Đăng xuất không hiện trong 10 giây — chưa xem) và `/vai-tro`, `/xuat-du-lieu` hết 30 giây khi chờ guard (chưa xem).
 
-#### Hiện trạng (2026-11-20)
+### Thư viện bên thứ ba đã nâng ở Task 20b (2026-11-19)
 
-| Hạng mục | Trạng thái |
-|---|---|
-| Nhánh | `upgrade-angular-22`; commit hôm 2026-11-20 chưa push; xem `git log` để biết commit cuối |
-| Phiên bản | Angular/CLI 22.3.0, Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0.3, angular-eslint 22.8.0, RxJS 7.8.2, zone.js 0.15.1; thư viện bên thứ ba xem bảng ở việc số 5 |
-| Build | 6/6 cấu hình PASS, 0 lỗi (bảng dưới) |
-| Chạy thử | Đã đăng nhập và mở các màn với backend .NET 10 thật qua bộ e2e (2026-11-20). Lỗi frontend lộ ra đã sửa: `$localize`, ngày dạng chuỗi (`viDate`), template đọc dữ liệu chưa có, cây `cdk-tree` CDK 22, route API đổi tên (xem việc số 3) |
-| Smoke test tay | **Chưa làm.** Giao diện chưa được kiểm bằng mắt từ Task 5 |
-| E2E | `test:ro`: Chuyên viên sở 36 qua / 41 bỏ qua / 3 lỗi (lỗi đều do API); Administrator 48 qua / 24 bỏ qua / 8 lỗi (trước khi sửa cây + `user-manager`, cần chạy lại). `@rw` chưa chạy |
-| Lint | `yarn lint` chạy được; 409 lỗi có từ trước (361 là `template/eqeqeq`), không chặn build |
-| Tag | `upgrade/ng22` (trỏ `35b31b3`) đã push lên GitHub ngày 2026-11-20 |
+Các điểm "cần kiểm" ở cột cuối được gom vào Task 3 (smoke test tay) của kế hoạch nghiệm thu.
 
-Kết quả build sau khi nâng thư viện (container Linux, Node 22.23.5, 2026-11-19):
+| Gói | Trước | Sau | Đổi mã / rủi ro cần kiểm |
+|---|---|---|---|
+| `rxjs` | 6.6.7 | 7.8.2 | `Subject<void>` ở 3 màn auth; `race()` trong `ngb/util/autoclose.ts`. 20 chỗ `toPromise()` giữ nguyên (deprecated, vẫn chạy) |
+| `@ngx-translate/core` | 14.0.0 | 18.1.0 | Bỏ `TranslateModule`: `provideTranslateService()` ở `AppModule`, các module import `TranslatePipe`/`TranslateDirective`; `setDefaultLang` → `setFallbackLang`. Đã kiểm: trang đăng nhập dịch đúng. Kiểm thêm: nhãn trong app, phân trang (`CustomMatPaginatorIntl`) |
+| `ngx-mask` | 14.3.3 | 22.2.5 | Bỏ `NgxMaskModule.forRoot()`: `DPSCommonModule` dùng `NgxMaskDirective`/`NgxMaskPipe` + `provideNgxMask()`. **Kiểm kỹ:** 26 template có `mask=` (nhất là `separator,3` với `thousandSeparator` ở form trợ cấp: giá trị lưu xuống có đúng là số không) và pipe `mask` ở hồ sơ nhà ở |
+| `tinymce` / `@tinymce/tinymce-angular` | 5.10.9 / 7.0.0 | 6.8.6 / 9.1.2 | Config ở `CommonService.tinyConfig`: bỏ plugin đã vào core (`print`, `hr`, `textpattern`, `noneditable`) hoặc trả phí (`toc`, `imagetools`); đổi tên nút toolbar và tuỳ chọn; `promotion: false`. Giao diện editor của bản 6 khác bản 5 (skin oxide mới). Kiểm ở Căn cứ biểu mẫu → Biểu mẫu |
+| `ckeditor4-angular` | 4.0.1 | 5.2.1 | Không đổi mã; thẻ `<ckeditor>` duy nhất vẫn ghim CDN 4.21.0 (mặc định mới là 4.25.1-lts, bản thương mại) |
+| `@ng-idle/core`, `keepalive` | 12.0.4 | 16.0.0 | Không đổi mã. Kiểm tự đăng xuất khi hết phiên (e2e có test) |
+| `ng2-file-upload` | 3.0.0 | 12.0.0 | Không đổi mã. Kiểm upload file |
+| `@kolkov/angular-editor` | 2.1.0 | 3.4.0 | Không đổi mã. Kiểm thanh công cụ editor |
+| `ngx-print` | 1.3.1 | 22.2.1 | Không đổi mã. Kiểm các nút In |
+| `ngx-avatars` | 1.4.1 | 1.10.3 | Không đổi mã |
+| `ngx-mat-select-search` | 7.0.10 | 9.0.0 | Không đổi mã. Kiểm ô chọn có tìm kiếm |
+| `@ngx-loading-bar/core` | 6.0.2 | 7.0.1 | Không đổi mã |
+| `ngx-cookie-service` | 14.0.1 | 22.2.0 | Không đổi mã |
+| `ngx-drag-drop` | 14.0.0 | 22.1.0 | Không đổi mã. Kiểm kéo thả ở Sơ đồ tổ chức |
+| `ngx-permissions` | 14.1.0 | 19.0.0 | Không đổi mã. Kiểm ẩn/hiện menu và nút theo quyền |
+| `chart.js`, `ng2-charts` | 2.9.4 / mã chép | giữ nguyên | Cố ý giữ (Task 7) |
 
-| Cấu hình | Kết quả | Thời gian |
-|---|---|---|
-| `dev` | PASS, 0 lỗi | 19 giây |
-| `production` | PASS, 0 lỗi; initial 3,21 MB (539 kB nén) | 24 giây |
-| `test` | PASS, 0 lỗi | 22 giây |
-| `prod` | PASS, 0 lỗi; initial 3,21 MB (539 kB nén) | 24 giây |
-| `prod_SOTBVL` | PASS, 0 lỗi | 24 giây |
-| `prod_KG` | PASS, 0 lỗi | 22 giây |
-
-Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation; 5 thư viện CommonJS (`moment`, `html2canvas`, `chartjs-plugin-labels`, `dompurify`, `rgbcolor`); ở các cấu hình tối ưu có 3 dòng `Unable to locate stylesheet` cho `line-awesome.css`, `flaticon.css`, `flaticon2.css` (bước inline critical CSS chạy trước khi chép `assets`; file vẫn có trong output, không ảnh hưởng). Output `prod` có đủ `.htaccess`, `sw.js`, `tinymce/`.
-
-#### Việc còn lại, theo thứ tự
-
-1. ~~Nâng Node, `yarn install`, `yarn start`~~ **Xong 2026-11-20** trên máy người phụ trách (Windows, Node 24.15.0): `yarn install` 317 giây; `yarn verify:dev` PASS, 0 lỗi, 135 giây; `yarn start` lên ở cổng 3105.
-2. ~~Tag `upgrade/ng22`~~ **Xong 2026-11-20:** tag trỏ `35b31b3`, đã push. Bản build `prod` không lưu trong repo (`build/` bị ignore); build lại từ tag khi cần.
-3. **Chạy bộ e2e lần đầu với backend.** Đã làm (2026-11-20, máy người phụ trách): tạo `tools/e2e/.env` từ `.env.example` (chưa điền tài khoản), cài gói và Chromium. `test:nologin` với `yarn start`: 1 PASS, 1 FAIL do `ERR_CONNECTION_REFUSED` — cấu hình `dev` gọi backend `https://localhost:44371`. Người phụ trách xác nhận backend local đúng là `https://localhost:7243/`; đã đổi `ApiRoot`/`SignalR` trong `src/environments/environment.ts`. Chạy lại vẫn FAIL vì CORS: backend đang chạy ở 7243 chỉ trả `Access-Control-Allow-Origin` cho `localhost:4200`, không cho `http://localhost:3105` (dù `VL_NCC_API/NCC_API/Startup.cs` có ghi 3105, tức bản backend đang chạy khác mã nguồn). Người phụ trách đã sửa CORS ở backend; chạy lại `test:nologin` với backend thật: **2/2 PASS**. Lượt `test:ro` đầu (tài khoản `admin`, dừng ở 59/80) lộ ra:
-   - **Lỗi thật của app, đã sửa:** `ReferenceError: $localize is not defined` khi mở dashboard. Mã ng-bootstrap chép ở Task 6 (`ngb/carousel`, `ngb/progressbar`, `ngb/timepicker`) còn thuộc tính `i18n`, mà app không cài `@angular/localize`. Đã bỏ các thuộc tính `i18n`; chữ hiển thị không đổi.
-   - **Lỗi đến từ API:** ghi riêng trong [`api-errors.md`](api-errors.md). **Quy tắc (người phụ trách, 2026-11-20): chỉ sửa frontend, cấm đụng tới API; lỗi API thì ghi log.** Backend ở 7243 là bản .NET 10 (`D:\NCC_API`), không phải `VL_NCC_API` (.NET Core 3.1); frontend trước đó đã được chỉnh theo backend này ở commit `2e21a10` (2026-09-04).
-   - **Token chỉ sống 10 phút:** lượt chạy quá 10 phút thì các test sau bị đá về trang đăng nhập. Cần chạy nhanh hơn (sửa các lỗi trên để bớt retry) hoặc cho bộ e2e đăng nhập lại khi token hết hạn.
-   - **Quyết định 2026-11-20 (người phụ trách):** backend .NET 10 (`D:\NCC_API`) sẽ thay backend cũ trên server, nên **frontend đổi theo API mới** (commit `46f0f51`, `4d68ff6`). Đã đổi: không gửi `sortField`/`sortOrder` rỗng (`HttpUtilsService.getFindHTTPParams`); `lite/get-dictionary`, `lite/lite_emotion` → `comment/...`; `quan-ly-quy/*` → `quanlyquy/*` (21 API, đổi cả verb/tham số); `dm_donvi/DM_DonVi_*` → REST (`GET/POST /`, `PUT/DELETE /{id}`, `deletes`, `get-users`, `upload`, `import`, `download-template`); `dm_wards` → `wards`; `sl-tong-hop/*` → `bh-bao-cao/so-luong-doi-tuong`; `ho-tro` → `ho-tro/list`, `ho-tro/detail?id=`, `ho-tro/canhotro?ids=`; `PUT dt-chinh-hinh/{id}` → `PUT dt-chinh-hinh`; `danh-sach-nguoi-lite`/`danh-sach-don-vi-lite` POST → GET; trang HDSD bỏ gọi `lite/get-version` (backend đã comment), dòng "Phiên bản" tự ẩn. Gửi body JSON có chuỗi rỗng/`null` **không** bị lỗi 400 (đã thử `PUT dantoc/999999`), chỉ tham số query mới bị.
-   - API bị xoá mà frontend còn dùng (`get-range`, `get-don-de-nghi`, `GetListShift` — ô "Chế độ làm việc" ở `/co-cau-to-chuc`; ghi chú cũ nói màn này không có route là **sai**): xem `api-errors.md` #1–#3. Sau đó frontend còn đổi theo route mới: `user-manager/list` → `GET user-manager`, `bao-hiem/download-template` → `bao-hiem/download-import` (commit `e737599`).
-   - **Cây `cdk-tree` (CDK 22, commit `e737599`):** báo `A valid data source must be provided` khi `dataSource` chưa có lúc khởi tạo (bản cũ chỉ hiện cây rỗng). Khởi tạo sẵn `new ArrayDataSource([])` ở 8 component có cây (chọn đơn vị, chọn nhiều đơn vị, người dùng–đơn vị, cơ cấu tổ chức, map cơ cấu, sơ đồ tổ chức, phân quyền, `dropdown-tree`).
-   - **Ngày dạng chuỗi (commit `626d304`):** backend .NET 10 trả `NgayCapNhat`/`LastModified` đã định dạng (`"14/12/2017 11:56"`) thay cho DateTime ISO ở 5 trường (cấp quản lý, dân tộc, tôn giáo, chức vụ, chức danh, khóm ấp). Pipe `date` báo NG02100 khi ngày > 12 và **đảo ngày/tháng** khi ngày <= 12. Thêm pipe `viDate` (`nguoi-co-cong/pipes/vi-date.pipe.ts`, xuất qua `DPSCommonModule`) đọc cả ISO lẫn `dd/MM/yyyy[ HH:mm[:ss][ SA/CH]]`; thay 11/12 chỗ `| date` trong template (chỗ còn lại ở danh sách tặng quà đã tự đọc bằng `parseViDate`). `NgayKhaiBao` (nhóm lễ Tết) là cột `varchar` nên không đổi.
-   - **Bộ e2e (commit `b0abb4a`):** tự đăng nhập lại khi token còn < 3 phút (fixture `storageState`); biến `E2E_VAITRO` đổi vai trò qua giao diện sau khi đăng nhập (`admin` có 2 vai trò: Administrator = nhóm 1, Chuyên viên sở = nhóm 26; Hồ sơ NCC cần quyền 1086 chỉ có ở nhóm 26); trang 403 thì test **bỏ qua** kèm lý do, chạy một lượt cho mỗi vai trò; test SignalR sửa lại vì app dùng `skipNegotiation` (không có request `negotiate`).
-   - **Tốc độ và độ tin cậy của bộ e2e (commit `c1afd3d`, `612d0be`, `8f9fd9c`, người phụ trách duyệt 2026-11-20):** mỗi thao tác chờ tối đa 10 giây, mỗi test 30 giây, bỏ `retries` (trước là 60 giây + chạy lại, do phiên cloud tự đặt, không ai duyệt). `test:ro` chạy 3 luồng song song, mỗi luồng giữ phiên riêng `.auth/user-<n>.json`; `test:rw` ép `--workers=1`. Sửa selector "đang tải": thẻ vỏ `<kt-splash-screen>` luôn còn trong DOM nên `settle()` luôn chờ hết 15 giây; đổi thành `div.kt-splash-screen` (cả `tools/visual/capture.mjs`). `open()` chờ request `user/PermissionUrl` xong mới xét URL 403, báo riêng trang 404. Lượt đầy đủ từ 31 phút còn 8,3 phút. Test SignalR và ng-idle tạm `test.fixme` (người phụ trách: "SignalR kệ nó test sau", xem `tools/e2e/KNOWN_ISSUES.md`). Test menu trái tự bỏ qua vì `aside.self.display = false` (có từ trước nâng cấp).
-   - **Lỗi template đọc dữ liệu chưa có (đã sửa):** `kt-column-option` dùng chung nhận `gridService` undefined ở lần render đầu (bọc `@if (gridService)`); `ho-so-ncc-list`, `hdsd-list` đọc `dataSource`/`gridService` trước khi tạo (có từ trước nâng cấp, nay dùng `?.`); `mau-so-lieu-list` kiểm `MaxChild === undefined` trong khi backend .NET 10 trả `null` (lỗi hiển thị và khoá/mở nút sai).
-   - **Kết quả e2e `test:ro` (2026-11-20, 3 luồng):** vai trò Chuyên viên sở 36 qua / 41 bỏ qua / 3 lỗi (10 phút); Administrator 48 qua / 24 bỏ qua / 8 lỗi (12 phút) trước khi sửa cây `cdk-tree` và `user-manager`. Lỗi còn lại đều thuộc `api-errors.md` (#5, #7, #8, #11) trừ test "đăng nhập rồi đăng xuất" (Administrator, nút Đăng xuất không hiện trong 10 giây — chưa xem) và `/vai-tro`, `/xuat-du-lieu` hết 30 giây khi chờ guard (chưa xem).
-   - Công cụ so route (không commit, trong scratchpad của phiên): so route backend cũ/mới theo controller + action, và URL frontend với route backend mới. Hai lỗ hổng đã biết: route có `{id}` nuốt mất đường dẫn con, và controller đổi tên class.
-   Hướng dẫn gốc: điền `tools/e2e/.env` (xem `tools/e2e/README.md`), `yarn --cwd tools/e2e install`, `npx --prefix tools/e2e playwright install chromium`, `yarn --cwd tools/e2e test:ro`. Selector lấy từ mã nguồn, chưa chạy thật: sửa selector/cách chờ theo `tools/e2e/KNOWN_ISSUES.md`, chạy 3 lần liên tiếp PASS thì coi là baseline. Nhóm `@rw` cần database bản sao và `E2E_RESTORE_CMD`; viết nốt test sửa/xoá đang `test.fixme`.
-4. **Smoke test tay** theo `docs/plan/angular_22_smoke_checklist.md` (mục không có `(e2e)` bắt buộc làm tay). Ưu tiên: 33 chỗ SCSS có comment `// MDC:`; 2 dialog chọn nhiều có nút đóng vừa sửa (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`); các nút In (đổi sang `this.in(...)`); tooltip/tab/dropdown của `NgbLiteModule` (`ComponentFactoryResolver` đã bỏ); icon SVG (`ng-inline-svg-2` 20); 2 template còn cú pháp cũ (`config-edit`, `comment`); các thư viện vừa nâng ở việc số 5, nhất là ô có mask, TinyMCE, upload, in.
-5. **Kiểm lúc chạy các thư viện vừa nâng (2026-11-19).** Build qua nhưng chưa chạy với backend; gộp vào smoke test (việc số 4). Đã nâng:
-
-   | Gói | Trước | Sau | Đổi mã / rủi ro cần kiểm |
-   |---|---|---|---|
-   | `rxjs` | 6.6.7 | 7.8.2 | `Subject<void>` ở 3 màn auth; `race()` trong `ngb/util/autoclose.ts`. 20 chỗ `toPromise()` giữ nguyên (deprecated, vẫn chạy) |
-   | `@ngx-translate/core` | 14.0.0 | 18.1.0 | Bỏ `TranslateModule`: `provideTranslateService()` ở `AppModule`, các module import `TranslatePipe`/`TranslateDirective`; `setDefaultLang` → `setFallbackLang`. Đã kiểm: trang đăng nhập dịch đúng. Kiểm thêm: nhãn trong app, phân trang (`CustomMatPaginatorIntl`) |
-   | `ngx-mask` | 14.3.3 | 22.2.5 | Bỏ `NgxMaskModule.forRoot()`: `DPSCommonModule` dùng `NgxMaskDirective`/`NgxMaskPipe` + `provideNgxMask()`. **Kiểm kỹ:** 26 template có `mask=` (nhất là `separator,3` với `thousandSeparator` ở form trợ cấp: giá trị lưu xuống có đúng là số không) và pipe `mask` ở hồ sơ nhà ở |
-   | `tinymce` / `@tinymce/tinymce-angular` | 5.10.9 / 7.0.0 | 6.8.6 / 9.1.2 | Config ở `CommonService.tinyConfig`: bỏ plugin đã vào core (`print`, `hr`, `textpattern`, `noneditable`) hoặc trả phí (`toc`, `imagetools`); đổi tên nút toolbar và tuỳ chọn; `promotion: false`. Giao diện editor của bản 6 khác bản 5 (skin oxide mới). Kiểm ở Căn cứ biểu mẫu → Biểu mẫu |
-   | `ckeditor4-angular` | 4.0.1 | 5.2.1 | Không đổi mã; thẻ `<ckeditor>` duy nhất vẫn ghim CDN 4.21.0 (mặc định mới là 4.25.1-lts, bản thương mại) |
-   | `@ng-idle/core`, `keepalive` | 12.0.4 | 16.0.0 | Không đổi mã. Kiểm tự đăng xuất khi hết phiên (e2e có test) |
-   | `ng2-file-upload` | 3.0.0 | 12.0.0 | Không đổi mã. Kiểm upload file |
-   | `@kolkov/angular-editor` | 2.1.0 | 3.4.0 | Không đổi mã. Kiểm thanh công cụ editor |
-   | `ngx-print` | 1.3.1 | 22.2.1 | Không đổi mã. Kiểm các nút In |
-   | `ngx-avatars` | 1.4.1 | 1.10.3 | Không đổi mã |
-   | `ngx-mat-select-search` | 7.0.10 | 9.0.0 | Không đổi mã. Kiểm ô chọn có tìm kiếm |
-   | `@ngx-loading-bar/core` | 6.0.2 | 7.0.1 | Không đổi mã |
-   | `ngx-cookie-service` | 14.0.1 | 22.2.0 | Không đổi mã |
-   | `ngx-drag-drop` | 14.0.0 | 22.1.0 | Không đổi mã. Kiểm kéo thả ở Sơ đồ tổ chức |
-   | `ngx-permissions` | 14.1.0 | 19.0.0 | Không đổi mã. Kiểm ẩn/hiện menu và nút theo quyền |
-   | `chart.js`, `ng2-charts` | 2.9.4 / mã chép | giữ nguyên | Cố ý giữ (Task 7) |
-
-   Lỗi có từ trước, chưa sửa: config TinyMCE đặt `language: 'vi'` nhưng gói `tinymce` (cả bản 5 lẫn 6) không có `langs/vi.js`, nên trình duyệt báo `Unexpected token '<'` (server trả `index.html`) và editor hiện tiếng Anh. Muốn editor tiếng Việt thì thêm gói ngôn ngữ (ví dụ `tinymce-i18n`) vào `assets`; nếu không thì bỏ dòng `language`.
-6. **Karma/`ng test`:** chưa xử lý. `src/test.ts` dùng `require.context` nên `ng test` không chạy với builder esbuild; quyết định xoá hoặc chuyển Vitest (`ng update @angular/cli --name migrate-karma-to-vitest`).
-7. Tuỳ chọn, không chặn phát hành: sửa lỗi lint; chuyển 2 template còn `*ngIf`/`*ngFor`; Sass `@import` → `@use` cho theme Metronic; bỏ `baseUrl` (TypeScript 7 sẽ không hỗ trợ).
-
-#### Ghi chú cho phiên làm việc mới
-
-- **Phiên cloud (Claude Code trên web):** không gọi được backend (`vinh-long-ncc-api.vts-demo.com` bị chặn mạng), không có tài khoản test, không push được tag. Push nhánh thì được. Muốn chạy e2e ở đó cần cho phép host API trong cài đặt môi trường và có tài khoản test.
-- **Linux phân biệt hoa/thường đường dẫn:** Windows thì không. Đã sửa 52 import ở Task 18; import mới phải viết đúng tên thư mục.
-- **`ng update` và prettier:** nếu máy có prettier toàn cục (hoặc qua `NODE_PATH`), CLI tự format mọi file migration đụng tới. Chạy với `NODE_PATH` rỗng (`env -u NODE_PATH npx ng update ...`).
-- **Build:** `yarn verify:dev` (khoảng 20 giây trong container) là kiểm tra nhanh nhất; `--output-path` của script `verify:*` làm output có thêm thư mục con `browser/`, còn các script `build*` ra đúng thư mục trong `angular.json`.
-- **Máy người phụ trách:** cache yarn ở `D:\DPS_Project\.yarn-cache`; khi cài/build dài nên đặt `TEMP`/`TMP` sang ổ D: vì ổ C: gần đầy.
-- **Tag nội bộ (chưa push, chỉ có trên máy người phụ trách):** `smoke-a` = cuối Chặng 1 (`b94edbf`), `smoke-b` = sau MDC (`d4fb968`), dùng để khoanh vùng lỗi giao diện. Chưa tạo các tag `upgrade/ng<N>` của mục "Phương án rollback"; điểm rollback dùng commit trong bảng trên.
+Lỗi có từ trước, chưa sửa: config TinyMCE đặt `language: 'vi'` nhưng gói `tinymce` (cả bản 5 lẫn 6) không có `langs/vi.js`, nên trình duyệt báo `Unexpected token '<'` (server trả `index.html`) và editor hiện tiếng Anh. Muốn editor tiếng Việt thì thêm gói ngôn ngữ (ví dụ `tinymce-i18n`) vào `assets`; nếu không thì bỏ dòng `language`.
 
 ### Những chỗ thực tế khác plan
 
