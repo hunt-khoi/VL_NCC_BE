@@ -55,7 +55,7 @@
             <span translate="COMMON.UPDATED_DATE"></span>
           </th>
           <td mat-cell *matCellDef="let item" style="justify-content: center">
-            {{item.NgayCapNhat | date: 'dd/MM/yyyy HH:mm' }}
+            {{item.NgayCapNhat | viDate: 'dd/MM/yyyy HH:mm' }}
           </td>
         </ng-container>
 

@@ -101,6 +101,7 @@ import { CommentService } from './components/comment/comment.service';
 import { DynamicProcessService } from './services/dynamic-process.service';
 import { RouterModule } from '@angular/router';
 import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
+import { ViDatePipe } from './pipes/vi-date.pipe';
 import { AvatarModule } from 'ngx-avatars';
 import { LoadingService } from './services/loading.service';
 import { LoadingInterceptor } from './services/loading.interceptor';
@@ -193,6 +194,7 @@ import { CKEditorModule } from 'ckeditor4-angular';
         PopoverModule,
         NgxMaskDirective,
         NgxMaskPipe,
+        ViDatePipe,
         AngularEditorModule,
         AvatarModule,
         ChartsModule,
@@ -276,6 +278,7 @@ import { CKEditorModule } from 'ckeditor4-angular';
         PopoverModule,
         NgxMaskDirective,
         NgxMaskPipe,
+        ViDatePipe,
         //NgIdleKeepaliveModule.forRoot(),
         AngularEditorModule,
         EditorModule,

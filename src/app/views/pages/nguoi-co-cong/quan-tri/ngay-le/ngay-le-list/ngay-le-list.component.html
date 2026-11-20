@@ -31,7 +31,7 @@
         </ng-container>
         <ng-container matColumnDef="Ngay">
           <th mat-header-cell *matHeaderCellDef mat-sort-header><span translate="NGAYLE.ngay"></span></th>
-          <td mat-cell *matCellDef="let object">{{object.Ngay | date: 'dd/MM/yyyy'}}</td>
+          <td mat-cell *matCellDef="let object">{{object.Ngay | viDate: 'dd/MM/yyyy'}}</td>
         </ng-container>
         <ng-container matColumnDef="GhiChu">
           <th mat-header-cell *matHeaderCellDef mat-sort-header ><span translate="NGAYLE.ghichu"></span></th>

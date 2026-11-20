@@ -45,7 +45,7 @@
           <th mat-header-cell *matHeaderCellDef>
             <span translate="COMMON.UPDATED_DATE"></span>
           </th>
-          <td mat-cell *matCellDef="let item">{{item.NgayCapNhat | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td mat-cell *matCellDef="let item">{{item.NgayCapNhat | viDate: 'dd/MM/yyyy HH:mm' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="actions">
