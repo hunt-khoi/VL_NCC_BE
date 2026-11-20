@@ -198,10 +198,10 @@ background-color: rgb(225, 224, 224);
             </div>
           </div>
 
-		<div id="print-section" class="example-container mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter ? 'auto' : 'auto', 
+		<div id="print-section" class="example-container mat-table__wrapper" [ngStyle]="{'overflow-x': gridService?.model?.haveFilter ? 'auto' : 'auto', 
 			'display': dataSource?.hasItems? 'flex':'unset'}" style="overflow-x: auto !important;">
             <table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="SoHoSo" matSortDirection="asc"
-              matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" >
+              matSortDisableClear [ngClass]="{'dl-table-flt': gridService?.model?.haveFilter}" >
               <ng-container matColumnDef="select">
                 <th mat-header-cell *matHeaderCellDef class="mat-column-checkbox hiden-print" style="padding-right: 20px;">
                   <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
@@ -398,8 +398,8 @@ background-color: rgb(225, 224, 224);
                 </td>
               </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="gridService.model.displayedColumns; sticky: true"></tr>
-              <tr mat-row *matRowDef="let row; columns: gridService.model.displayedColumns" (click)="row.highlighted = !row.highlighted"
+              <tr mat-header-row *matHeaderRowDef="gridService?.model?.displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: gridService?.model?.displayedColumns" (click)="row.highlighted = !row.highlighted"
                 [ngClass]="{ hovered: row.hovered, highlighted: row.highlighted }" (mouseover)="row.hovered = true" (mouseout)="row.hovered = false">
               </tr>
             </table>
@@ -409,8 +409,8 @@ background-color: rgb(225, 224, 224);
             }
           </div>
 
-          <div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService.model.haveFilter}">
-            @if (gridService.model.haveFilter) {
+          <div class="mat-table__bottom" [ngClass]="{'exist-flt': gridService?.model?.haveFilter}">
+            @if (gridService?.model?.haveFilter) {
               <div class="flt-selected" style="max-width:50%;">
                 <kt-chip-filter [gridService]="gridService"></kt-chip-filter>
               </div>

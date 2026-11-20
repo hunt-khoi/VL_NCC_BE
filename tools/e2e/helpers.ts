@@ -9,7 +9,7 @@ export const LOGIN = {
 };
 
 // Cac thanh phan bao hieu trang con dang tai (giong tools/visual/capture.mjs).
-const BUSY = 'kt-splash-screen, mat-progress-bar, mat-spinner, mat-progress-spinner, .kt-page-loader, .kt-spinner';
+const BUSY = 'div.kt-splash-screen, mat-progress-bar, mat-spinner, mat-progress-spinner, .kt-page-loader, .kt-spinner';
 
 export async function settle(page: Page) {
 	await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
@@ -21,9 +21,26 @@ export async function settle(page: Page) {
 }
 
 export async function open(page: Page, path: string) {
-	await page.goto(path, { waitUntil: 'domcontentloaded' });
-	await settle(page);
+	// Guard PermissionUrl goi API roi moi chuyen sang /error/403: neu co request kiem tra quyen thi cho no xong
+	// roi moi xet URL (trang khong co guard thi khong phai cho).
+	const pending: Promise<unknown>[] = [];
+	const onRequest = (req: Request) => {
+		if (/\/user\/PermissionUrl/i.test(req.url())) pending.push(req.response().catch(() => null));
+	};
+	page.on('request', onRequest);
+	try {
+		await page.goto(path, { waitUntil: 'domcontentloaded' });
+		await settle(page);
+		if (pending.length) {
+			await Promise.all(pending);
+			await page.waitForTimeout(300); // router chuyen trang sau khi guard tra ve
+			await settle(page);
+		}
+	} finally {
+		page.off('request', onRequest);
+	}
 	const pathname = new URL(page.url()).pathname;
+	expect(pathname, `${path}: frontend khong co route nay (trang 404)`).not.toBe('/error/404');
 	expect(pathname, `mo ${path} bi day ve trang dang nhap (het phien)`).not.toContain('/auth');
 	// Moi vai tro chi thay mot phan menu: chay lai voi E2E_VAITRO khac de phu man nay.
 	test.skip(pathname.startsWith('/error/403'), `vai tro hien tai (E2E_VAITRO=${process.env.E2E_VAITRO || 'mac dinh'}) khong co quyen vao ${path}`);

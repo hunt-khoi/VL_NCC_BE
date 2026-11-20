@@ -8,6 +8,8 @@ test.beforeEach(async ({ page }) => {
 test('@ro menu trai thu gon va mo lai', async ({ page }) => {
 	const body = page.locator('body');
 	const toggler = page.locator('#kt_aside_toggler');
+	// layout.config.ts dat aside.self.display = false (tu truoc nang cap): app dung menu ngang, khong co menu trai.
+	test.skip((await toggler.count()) === 0, 'layout tat menu trai (aside.self.display = false)');
 	const minimized = () => body.evaluate((b) => b.classList.contains('kt-aside--minimize'));
 	const before = await minimized();
 	await toggler.click();

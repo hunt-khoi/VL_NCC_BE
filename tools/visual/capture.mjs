@@ -50,7 +50,7 @@ const FREEZE_CSS = `
 }`;
 
 // Cac thanh phan bao hieu trang con dang tai.
-const BUSY = 'kt-splash-screen, mat-progress-bar, mat-spinner, mat-progress-spinner, .kt-page-loader, .kt-spinner';
+const BUSY = 'div.kt-splash-screen, mat-progress-bar, mat-spinner, mat-progress-spinner, .kt-page-loader, .kt-spinner';
 
 const slug = (p) => p.replace(/^\/+|\/+$/g, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'home';
 
