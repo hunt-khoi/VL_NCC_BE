@@ -10,31 +10,33 @@ Cập nhật: 2026-11-20. **Nơi duy nhất ghi trạng thái.** Sau mỗi task:
 
 ## Hiện trạng
 
-**Giai đoạn:** nghiệm thu. Đã lên Angular 22.3, build 6/6. Đang chạy e2e với backend .NET 10 thật và sửa lỗi lúc chạy. **Việc tiếp theo:** Task 1 của kế hoạch.
+**Giai đoạn:** nghiệm thu. Đã lên Angular 22.3, build 6/6. Đang chạy e2e với backend .NET 10 thật và sửa lỗi lúc chạy. **Việc tiếp theo:** Task 2 (lỗi frontend còn mở) và các quyết định ở Task 4.
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Nhánh | `upgrade-angular-22`, đã push hết. Tag `upgrade/ng22` → `35b31b3` (đã push); `smoke-a` (`b94edbf`, cuối Chặng 1), `smoke-b` (`d4fb968`, sau MDC) chỉ có trên máy |
+| Nhánh | `upgrade-angular-22`; các commit dọn tài liệu ngày 2026-11-20 chưa push (người phụ trách tự push). Nhánh cloud thừa `ccr-4b9d79c1-rjbqa4` đã xoá trên GitHub (đã gộp hết từ 2026-11-19). Tag `upgrade/ng22` → `35b31b3` (đã push); `smoke-a` (`b94edbf`, cuối Chặng 1), `smoke-b` (`d4fb968`, sau MDC) chỉ có trên máy |
 | Phiên bản | Angular/CLI/Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0.3, RxJS 7.8.2, zone.js 0.15.1, angular-eslint 22.8.0. Thư viện bên thứ ba đã lên bản cho 22, trừ Chart.js 2.9 (cố ý giữ) |
 | Build | 6/6 cấu hình PASS, 0 lỗi (lần cuối 2026-11-19); từ đó chỉ chạy `verify:dev` |
-| E2E `test:ro` | Chuyên viên sở: 36 qua / 41 bỏ qua / 3 lỗi (đều do API). Administrator: 48 qua / 24 bỏ qua / 8 lỗi, **chạy trước `e737599`, cần chạy lại** |
-| Lỗi frontend còn mở | 3: nút Đăng xuất không hiện; `/vai-tro`, `/xuat-du-lieu` treo khi chờ guard |
+| E2E `test:ro` (2026-11-20, sau khi dọn file) | Administrator: **50 qua / 26 bỏ qua / 4 lỗi** (3 do API: #5, #8, #11; 1 frontend: đăng xuất). Chuyên viên sở: **42 / 32 / 6** (3 do API: #7, #8, #11; 3 timeout ở `beforeEach` của `layout.spec.ts`). Kết quả **chưa ổn định**: lượt Chuyên viên sở chạy ngay sau khi dev server build lại có 11 timeout lúc dựng phiên (`storageState`). Chưa đạt yêu cầu 3 lượt liên tiếp |
+| Lỗi frontend còn mở | (a) nút Đăng xuất không hiện (Administrator); (b) `layout.spec.ts`: `beforeEach` hết 30 giây ở vai trò Chuyên viên sở (menu trái, dropdown người dùng), lúc có lúc không; (c) dựng phiên `storageState` hết giờ khi server vừa build lại. `/vai-tro`, `/xuat-du-lieu` không còn lỗi |
 | Lỗi API | 12 mục trong `api-errors.md` |
 | Kiểm tay | Chưa làm. Giao diện chưa được xem bằng mắt kể từ Task 5 |
 | E2E `@rw` | Chưa chạy, chờ database bản sao |
-| Chờ quyết định | TinyMCE tiếng Việt; Karma hay Vitest |
-| Lint | 409 lỗi có từ trước (361 là `template/eqeqeq`), không chặn build |
+| Bảo mật | Đã kiểm 2026-11-20 (Task 6): `yarn audit` gói chạy trong app 2 critical / 12 high / 18 moderate / 6 low; **stored XSS ở bình luận** (S1); chưa sửa mục nào |
+| Chờ quyết định | TinyMCE tiếng Việt; Karma hay Vitest; TinyMCE 6 hay 7+ (lỗ hổng XSS); CKEditor giữ hay thay |
+| Lint | 409 lỗi có từ trước (361 là `template/eqeqeq`), không chặn build; kiểm lại 2026-11-20: vẫn 409 |
 
 ### Tiến độ theo task (kế hoạch nghiệm thu)
 
 | Task | Nội dung | Trạng thái |
 |---|---|---|
-| 1 | Chạy lại `test:ro` vai trò Administrator | Chưa làm |
-| 2 | Sửa 3 lỗi frontend còn mở | Đang dò lỗi (a), file `tools/e2e/tests/zz-diag.spec.ts` chưa commit |
+| 1 | Chạy lại `test:ro` vai trò Administrator | **Xong 2026-11-20**: 50 / 26 / 4 |
+| 2 | Sửa lỗi frontend còn mở (a), (b), (c) | Chưa làm (file chẩn đoán `zz-diag.spec.ts` đã xoá theo yêu cầu người phụ trách) |
 | 3 | Kiểm tay (người phụ trách) | Chưa làm |
-| 4 | Quyết định TinyMCE, Karma | Chờ người phụ trách |
+| 4 | Quyết định TinyMCE, Karma/Vitest, CKEditor | Chờ người phụ trách |
 | 5 | E2E `@rw` | Bị chặn: cần database bản sao + `E2E_RESTORE_CMD` |
-| 6 | Build 6 cấu hình, tag nghiệm thu | Chưa làm |
+| 6 | Bảo mật (S1–S11) | Đã kiểm, chưa sửa |
+| 7 | Build 6 cấu hình, tag nghiệm thu | Chưa làm |
 
 ## Môi trường (máy người phụ trách)
 
@@ -102,6 +104,9 @@ Mọi task đều qua `yarn verify:dev` với 0 lỗi. Kế hoạch gốc chi ti
 | 2026-11-20 | Backend .NET 10 (`D:\NCC_API`) sẽ thay backend cũ: frontend đổi theo route API mới |
 | 2026-11-20 | E2E: thao tác 10 s, test 30 s, không retry; SignalR, ng-idle tạm `test.fixme` ("kệ nó test sau") |
 | 2026-11-20 | Tài liệu gọn còn 3 file: kế hoạch, lỗi API, tiến độ |
+| 2026-11-20 | Xoá file thừa: công cụ so ảnh `tools/visual` (`screens.json`, `serve.mjs` chuyển sang `tools/e2e`), CKEditor 4.13.1 trong `assets` (không được tải), file chẩn đoán e2e. **Giữ:** `certificates/`, `.claude/` (phiên cloud cần), `.superpowers/` (không có trên git) |
+| 2026-11-20 | Mọi thay đổi code phải qua "Cổng test bắt buộc" trong kế hoạch; kiểm bảo mật thành Task 6 |
+| 2026-11-20 | Sau khi dọn file: `verify:dev` PASS (95 giây), lint 409 lỗi (không tăng), e2e như bảng "Hiện trạng" |
 
 ## Nhật ký
 
