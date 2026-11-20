@@ -33,7 +33,8 @@ export class CoCauMapDialogComponent implements OnInit, OnDestroy {
 	lstNhomLoaiDoiTuongNCC: any[] = [];
 	lstConstLoaiHoSo: any[] = [];
 	treeControl: NestedTreeControl<TodoItemNode> | undefined;
-	dataSource: ArrayDataSource<TodoItemNode> | undefined;
+	// CDK 22 bao loi "A valid data source must be provided" neu cay chua co dataSource luc khoi tao.
+	dataSource: ArrayDataSource<TodoItemNode> = new ArrayDataSource<TodoItemNode>([]);
 
 	hasChild = (_: number, node: TodoItemNode) => !!node.children && node.children.length > 0;
 	TREE_DATA: TodoItemNode[] = [];

@@ -34,7 +34,8 @@ export class cocautochucmoitreeComponent implements OnInit, OnDestroy {
 
 	private destroy$ = new Subject<void>();
 	treeControl = new NestedTreeControl<TreeNode>(node => node.Children);
-	dataSource: any;
+	// CDK 22 bao loi "A valid data source must be provided" neu cay chua co dataSource luc khoi tao.
+	dataSource: any = new ArrayDataSource<any>([]);
 	Title: string = "";
 	selectedNode: any;
 	Visible: boolean = false;

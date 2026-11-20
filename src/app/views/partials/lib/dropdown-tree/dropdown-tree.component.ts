@@ -37,7 +37,8 @@ export class DropdownTreeComponent implements OnChanges, AfterViewInit {
     focus = false;
     valid = false;
     treeControl = new NestedTreeControl<any>(node => node[this.FieldChildren]);
-    dataSource: any;
+    // CDK 22 bao loi "A valid data source must be provided" neu cay chua co dataSource luc khoi tao.
+    dataSource: any = new ArrayDataSource<any>([]);
     Title = "";
     Placement = "bottom-left";
     selectedNode: any = {};

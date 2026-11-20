@@ -196,7 +196,8 @@ export class ChecklistDatabase {
 export class SodotochucListComponent implements OnInit, OnDestroy {
 	private destroy$ = new Subject<void>();
 	treeControl = new NestedTreeControl<TreeNode>(node => node.children);
-	dataSource: any;
+	// CDK 22 bao loi "A valid data source must be provided" neu cay chua co dataSource luc khoi tao.
+	dataSource: any = new ArrayDataSource<any>([]);
 	selectedNode: any;
 	positionFrom: string = '';
 	parentFrom: string = '';

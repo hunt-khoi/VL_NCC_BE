@@ -25,7 +25,8 @@ export class ChonNhieuDonViComponent implements OnInit {
 	viewLoading: boolean = false;
 	isZoomSize: boolean = false;
 	treeControl: NestedTreeControl<TodoItemNode> | undefined;
-	dataSource: ArrayDataSource<TodoItemNode> | undefined;
+	// CDK 22 bao loi "A valid data source must be provided" neu cay chua co dataSource luc khoi tao.
+	dataSource: ArrayDataSource<TodoItemNode> = new ArrayDataSource<TodoItemNode>([]);
 
 	hasChild = (_: number, node: TodoItemNode) => !!node.data && node.data.length > 0;
 

@@ -119,7 +119,7 @@ export class NhapBaoHiemService {
 
 	downloadTemplate(idDot): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders()
-		return this.http.get(API_PRODUCTS_URL + `/download-template?id=` + idDot, {
+		return this.http.get(API_PRODUCTS_URL + `/download-import?id=` + idDot, {
 			headers: httpHeaders,
 			responseType: 'blob',
 			observe: 'response'

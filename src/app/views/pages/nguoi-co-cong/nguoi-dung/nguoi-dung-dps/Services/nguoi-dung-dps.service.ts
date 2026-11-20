@@ -23,7 +23,7 @@ export class NguoiDungDPSService {
 	getData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParms = this.httpUtils.getFindHTTPParams(queryParams)
-		return this.http.get<any>(API_URL + '/list', { headers: httpHeaders, params: httpParms });
+		return this.http.get<any>(API_URL, { headers: httpHeaders, params: httpParms });
 
 	}
 	getById(itemId: any): Observable<any> {

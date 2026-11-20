@@ -31,7 +31,8 @@ export class PhanQuyenComponent implements OnInit {
 	isZoomSize: boolean = false;
 	NhomNguoiDungDPS: NhomNguoiDungDPSModel = new NhomNguoiDungDPSModel();
 	treeControl: NestedTreeControl<TodoItemNode> | undefined;
-	dataSource: ArrayDataSource<TodoItemNode> | undefined;
+	// CDK 22 bao loi "A valid data source must be provided" neu cay chua co dataSource luc khoi tao.
+	dataSource: ArrayDataSource<TodoItemNode> = new ArrayDataSource<TodoItemNode>([]);
 
 	hasChild = (_: number, node: TodoItemNode) => !!node.children && node.children.length > 0;
 	TREE_DATA: TodoItemNode[] = [];
