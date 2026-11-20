@@ -1,14 +1,14 @@
 import { expect, test, type Browser, type BrowserContext, type Page, type Request } from '@playwright/test';
 import fs from 'node:fs';
 
-// Cung selector voi tools/visual/capture.mjs.
+// Selector cac thanh phan cua theme Metronic.
 export const LOGIN = {
 	user: 'input[formcontrolname="username"]',
 	pass: 'input[formcontrolname="password"]',
 	submit: '#kt_login_signin_submit',
 };
 
-// Cac thanh phan bao hieu trang con dang tai (giong tools/visual/capture.mjs).
+// Cac thanh phan bao hieu trang con dang tai.
 const BUSY = 'div.kt-splash-screen, mat-progress-bar, mat-spinner, mat-progress-spinner, .kt-page-loader, .kt-spinner';
 
 export async function settle(page: Page) {

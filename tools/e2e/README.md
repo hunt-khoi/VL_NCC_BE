@@ -11,11 +11,11 @@ npx playwright install chromium
 cp .env.example .env   # rồi điền E2E_USER, E2E_PASS
 ```
 
-Dùng tài khoản test có quyền xem đủ menu (danh sách màn hình lấy từ `tools/visual/screens.json`). Mỗi lượt chạy chỉ đăng nhập **một lần**; đăng nhập sai nhiều lần sẽ bật reCAPTCHA hoặc khoá tài khoản.
+Dùng tài khoản test có quyền xem đủ menu (danh sách màn hình ở `tools/e2e/screens.json`, lấy từ menu của tài khoản test; sửa tay khi menu đổi). Mỗi lượt chạy chỉ đăng nhập **một lần**; đăng nhập sai nhiều lần sẽ bật reCAPTCHA hoặc khoá tài khoản.
 
 ## Chạy
 
-Mở app trước (`yarn start` ở thư mục gốc, cổng 3105), hoặc phục vụ một bản build: `node tools/visual/serve.mjs build/<thư mục>/ 3106` và đặt `E2E_BASE_URL=http://localhost:3106`.
+Mở app trước (`yarn start` ở thư mục gốc, cổng 3105), hoặc phục vụ một bản build: `node tools/e2e/serve.mjs build/<thư mục>/ 3106` và đặt `E2E_BASE_URL=http://localhost:3106`.
 
 | Lệnh | Nội dung |
 |---|---|

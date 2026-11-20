@@ -3,10 +3,10 @@ import path from 'node:path';
 import { test, expect } from '../fixtures';
 import { open } from '../helpers';
 
-// Mo moi man hinh trong tools/visual/screens.json (lay tu menu cua tai khoan test).
+// Mo moi man hinh trong tools/e2e/screens.json (lay tu menu cua tai khoan test).
 // Bat loi rong nhat: module lazy-load hong, component thieu provider, template loi luc chay.
 type Screen = { name: string; path: string; steps?: unknown[] };
-const screens: Screen[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../../visual/screens.json'), 'utf8')).filter(
+const screens: Screen[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../screens.json'), 'utf8')).filter(
 	(s: Screen) => !s.steps?.length,
 );
 

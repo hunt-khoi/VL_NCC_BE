@@ -48,7 +48,6 @@ export class CommonService {
 			// Make the editing area bigger than default.
 			height: 300,
 		},
-		editorUrl: './assets/plugins/ckeditor/ckeditor.js'
 	}
 	editorConfig: AngularEditorConfig = {
 		editable: true,
