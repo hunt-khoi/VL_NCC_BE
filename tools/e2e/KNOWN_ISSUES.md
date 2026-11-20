@@ -30,3 +30,10 @@ Plan gốc yêu cầu chốt baseline trên Angular 13; không làm được vì
 
 - Giao diện không có bộ chọn ngôn ngữ; test chỉ kiểm không còn khoá dịch (dạng `COMMON.CREATE`) trên trang đăng nhập và dashboard.
 - Nhóm `@rw` chưa chạy: chưa có database bản sao và `E2E_RESTORE_CMD`.
+
+## SignalR (tạm gác, người phụ trách quyết định 2026-11-20)
+
+Hai test đang `test.fixme`, sẽ xem lại sau:
+
+- `realtime.spec.ts` — SignalR kết nối được: app dùng `skipNegotiation` + WebSockets (không có request `negotiate`); test đã viết lại để chờ socket `/signalr` và gói bắt tay, chưa chạy được lượt nào ổn định.
+- `auth.spec.ts` — hết phiên do không thao tác (ng-idle): test tua đồng hồ của trang khoảng 15 phút; trong lúc tua, kết nối SignalR báo `Server timeout elapsed without receiving a message from the server` liên tục (do đồng hồ giả, không phải lỗi app) và việc tua mất hơn 30 giây thật. Muốn bật lại cần người phụ trách duyệt: bỏ qua lỗi đó riêng cho test này, hoặc cho test này thời gian dài hơn.

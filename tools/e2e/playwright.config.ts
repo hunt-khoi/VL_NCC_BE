@@ -12,14 +12,17 @@ export default defineConfig({
 	// Backend va du lieu dung chung: chay tuan tu.
 	workers: 1,
 	fullyParallel: false,
-	retries: 1,
-	timeout: 60_000,
-	expect: { timeout: 15_000 },
+	// Khong chay lai test loi va cho toi da 10 giay moi thao tac (nguoi phu trach duyet 2026-11-20).
+	retries: 0,
+	timeout: 30_000,
+	expect: { timeout: 10_000 },
 	reporter: [['list'], ['html', { outputFolder: 'report', open: 'never' }]],
 	outputDir: 'test-results',
 	globalSetup: require.resolve('./global-setup'),
 	use: {
 		baseURL: BASE_URL,
+		actionTimeout: 10_000,
+		navigationTimeout: 15_000,
 		viewport: { width: 1440, height: 900 },
 		locale: 'vi-VN',
 		timezoneId: 'Asia/Ho_Chi_Minh',

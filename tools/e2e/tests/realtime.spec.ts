@@ -2,7 +2,8 @@ import { test, expect } from '../fixtures';
 
 // signalR.service.ts dung skipNegotiation + WebSockets nen khong co request "negotiate":
 // kiem tra socket mo toi /signalr va backend tra goi bat tay (handshake) thanh cong.
-test('@ro SignalR ket noi duoc sau khi vao app', async ({ page }) => {
+// Tam gac theo nguoi phu trach (2026-11-20): xem KNOWN_ISSUES.md muc SignalR.
+test.fixme('@ro SignalR ket noi duoc sau khi vao app', async ({ page }) => {
 	const socketPromise = page.waitForEvent('websocket', { predicate: (ws) => /\/signalr/i.test(ws.url()), timeout: 30_000 });
 	await page.goto('/');
 	const socket = await socketPromise;

@@ -36,7 +36,8 @@ test.describe('chua dang nhap', () => {
 		await page.waitForURL(/\/auth\/login/);
 	});
 
-	test('@ro het phien do khong thao tac (ng-idle) thi bi dua ve dang nhap', async ({ page }) => {
+	// Tam gac theo nguoi phu trach (2026-11-20): xem KNOWN_ISSUES.md muc SignalR.
+	test.fixme('@ro het phien do khong thao tac (ng-idle) thi bi dua ve dang nhap', async ({ page }) => {
 		test.skip(!user || !pass, 'chua co E2E_USER/E2E_PASS');
 		// Dieu khien dong ho cua trang de khong phai cho that.
 		await page.clock.install();

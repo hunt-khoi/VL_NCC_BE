@@ -18,7 +18,7 @@ background-color: rgb(225, 224, 224);
 }
 </style>
 <kt-portlet [options]="{headLarge: true}">
-  <kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource.loading$">
+  <kt-portlet-header [sticky]="true" [class]="'kt-portlet__head--lg'" [viewLoading$]="dataSource?.loading$">
     <ng-container ktPortletTitle>
       <div class="kt-form__filtration">
         <h3 class="kt-portlet__head-title">
@@ -199,7 +199,7 @@ background-color: rgb(225, 224, 224);
           </div>
 
 		<div id="print-section" class="example-container mat-table__wrapper" [ngStyle]="{'overflow-x': gridService.model.haveFilter ? 'auto' : 'auto', 
-			'display': dataSource.hasItems? 'flex':'unset'}" style="overflow-x: auto !important;">
+			'display': dataSource?.hasItems? 'flex':'unset'}" style="overflow-x: auto !important;">
             <table mat-table class="lmat-elevation-z8" [dataSource]="dataSource" matSort matSortActive="SoHoSo" matSortDirection="asc"
               matSortDisableClear [ngClass]="{'dl-table-flt': gridService.model.haveFilter}" >
               <ng-container matColumnDef="select">
@@ -404,7 +404,7 @@ background-color: rgb(225, 224, 224);
               </tr>
             </table>
 
-            @if (!dataSource.hasItems) {
+            @if (!dataSource?.hasItems) {
               <div class="mat-table__message"><span translate="COMMON.NO_RECORD_FOUND"></span></div>
             }
           </div>
@@ -416,11 +416,11 @@ background-color: rgb(225, 224, 224);
               </div>
             }
             <div class="flt-page" style="width: 50%;">
-              @if (dataSource.loading$ | async) {
+              @if (dataSource?.loading$ | async) {
                 <mat-spinner [diameter]="20"></mat-spinner>
               }
               <mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"
-                [length]="dataSource.paginatorTotal$ | async" [showFirstLastButtons]="true">
+                [length]="dataSource?.paginatorTotal$ | async" [showFirstLastButtons]="true">
               </mat-paginator>
             </div>
           </div>
