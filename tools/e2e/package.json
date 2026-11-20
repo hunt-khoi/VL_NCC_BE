@@ -5,7 +5,7 @@
   "scripts": {
     "test": "playwright test",
     "test:ro": "playwright test --grep @ro",
-    "test:rw": "playwright test --grep @rw",
+    "test:rw": "playwright test --grep @rw --workers=1",
     "test:routes": "playwright test tests/routes.spec.ts",
     "test:nologin": "playwright test --grep @nologin",
     "report": "playwright show-report report"

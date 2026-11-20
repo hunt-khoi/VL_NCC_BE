@@ -9,8 +9,8 @@ export const AUTH_FILE = path.join(__dirname, '.auth', 'user.json');
 
 export default defineConfig({
 	testDir: './tests',
-	// Backend va du lieu dung chung: chay tuan tu.
-	workers: 1,
+	// test:ro chay song song (chi doc); nhom @rw ghi du lieu nen package.json ep --workers=1.
+	workers: 3,
 	fullyParallel: false,
 	// Khong chay lai test loi va cho toi da 10 giay moi thao tac (nguoi phu trach duyet 2026-11-20).
 	retries: 0,

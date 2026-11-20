@@ -1,8 +1,10 @@
 <button mat-icon-button [matMenuTriggerFor]="menu" #trigger="matMenuTrigger"
-  (menuOpened)="gridService.menuChange()" (menuClosed)="gridService.menuChange()">
+  (menuOpened)="gridService?.menuChange()" (menuClosed)="gridService?.menuChange()">
   <mat-icon>more_vert</mat-icon>
 </button>
 <mat-menu #menu="matMenu">
+  <!-- gridService co the chua duoc tao o lan render dau (cac man tao TableService trong callback) -->
+  @if (gridService) {
   <button mat-menu-item (click)="$event.stopPropagation()">
     <mat-checkbox #ckAll (change)="$event ? gridService.CheckAllColumns() : null"
       [checked]="gridService.model.selectedColumns.hasValue() && gridService.IsAllColumnsChecked()"
@@ -23,4 +25,5 @@
     <mat-icon>autorenew</mat-icon>
     <span>{{'COMMON.APDUNG' | translate}}</span>
   </button>
+  }
 </mat-menu>

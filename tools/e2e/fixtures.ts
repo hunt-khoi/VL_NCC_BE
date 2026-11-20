@@ -25,12 +25,17 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
 	// Chi lam moi phien da luu (khong dong vao test tu truyen storageState rieng, vi du nhom @nologin).
-	storageState: async ({ storageState, browser, baseURL }, use) => {
+	// Moi luong chay song song giu phien rieng (.auth/user-<n>.json) de khong ghi de file cua nhau.
+	storageState: async ({ storageState, browser, baseURL }, use, testInfo) => {
 		const usesSavedLogin = typeof storageState === 'string' && path.resolve(storageState) === path.resolve(AUTH_FILE);
-		if (usesSavedLogin && process.env.E2E_USER && process.env.E2E_PASS && tokenSecondsLeft(AUTH_FILE) < TOKEN_MARGIN_SECONDS) {
-			await loginAndSave(browser, baseURL!, AUTH_FILE);
+		if (!usesSavedLogin || !process.env.E2E_USER || !process.env.E2E_PASS) {
+			await use(storageState);
+			return;
 		}
-		await use(storageState);
+		const file = AUTH_FILE.replace(/\.json$/, `-${testInfo.parallelIndex}.json`);
+		if (!fs.existsSync(file) && fs.existsSync(AUTH_FILE)) fs.copyFileSync(AUTH_FILE, file);
+		if (tokenSecondsLeft(file) < TOKEN_MARGIN_SECONDS) await loginAndSave(browser, baseURL!, file);
+		await use(file);
 	},
 	context: async ({ context }, use) => {
 		await routeApi(context);
