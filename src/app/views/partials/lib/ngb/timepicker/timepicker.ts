@@ -46,14 +46,14 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
               class="btn btn-link" [class.btn-sm]="isSmallSize" [class.btn-lg]="isLargeSize" [class.disabled]="disabled"
               [disabled]="disabled">
               <span class="chevron ngb-tp-chevron"></span>
-              <span class="sr-only" i18n="@@ngb.timepicker.increment-hours">Increment hours</span>
+              <span class="sr-only">Increment hours</span>
             </button>
           }
           <input type="text" class="ngb-tp-input form-control" [class.form-control-sm]="isSmallSize"
             [class.form-control-lg]="isLargeSize"
-            maxlength="2" inputmode="numeric" placeholder="HH" i18n-placeholder="@@ngb.timepicker.HH"
+            maxlength="2" inputmode="numeric" placeholder="HH"
             [value]="formatHour($safeNavigationMigration(model?.hour))" (change)="updateHour($event.target.value)"
-            [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Hours" i18n-aria-label="@@ngb.timepicker.hours"
+            [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Hours"
             (input)="formatInput($event.target)"
             (keydown.ArrowUp)="changeHour(hourStep); $event.preventDefault()"
             (keydown.ArrowDown)="changeHour(-hourStep); $event.preventDefault()">
@@ -62,7 +62,7 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
               class="btn btn-link" [class.btn-sm]="isSmallSize" [class.btn-lg]="isLargeSize" [class.disabled]="disabled"
               [disabled]="disabled">
               <span class="chevron ngb-tp-chevron bottom"></span>
-              <span class="sr-only" i18n="@@ngb.timepicker.decrement-hours">Decrement hours</span>
+              <span class="sr-only">Decrement hours</span>
             </button>
           }
         </div>
@@ -73,13 +73,13 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
               class="btn btn-link" [class.btn-sm]="isSmallSize" [class.btn-lg]="isLargeSize" [class.disabled]="disabled"
               [disabled]="disabled">
               <span class="chevron ngb-tp-chevron"></span>
-              <span class="sr-only" i18n="@@ngb.timepicker.increment-minutes">Increment minutes</span>
+              <span class="sr-only">Increment minutes</span>
             </button>
           }
           <input type="text" class="ngb-tp-input form-control" [class.form-control-sm]="isSmallSize" [class.form-control-lg]="isLargeSize"
-            maxlength="2" inputmode="numeric" placeholder="MM" i18n-placeholder="@@ngb.timepicker.MM"
+            maxlength="2" inputmode="numeric" placeholder="MM"
             [value]="formatMinSec($safeNavigationMigration(model?.minute))" (change)="updateMinute($event.target.value)"
-            [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Minutes" i18n-aria-label="@@ngb.timepicker.minutes"
+            [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Minutes"
             (input)="formatInput($event.target)"
             (keydown.ArrowUp)="changeMinute(minuteStep); $event.preventDefault()"
             (keydown.ArrowDown)="changeMinute(-minuteStep); $event.preventDefault()">
@@ -88,7 +88,7 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
               class="btn btn-link" [class.btn-sm]="isSmallSize" [class.btn-lg]="isLargeSize"  [class.disabled]="disabled"
               [disabled]="disabled">
               <span class="chevron ngb-tp-chevron bottom"></span>
-              <span class="sr-only"  i18n="@@ngb.timepicker.decrement-minutes">Decrement minutes</span>
+              <span class="sr-only">Decrement minutes</span>
             </button>
           }
         </div>
@@ -102,13 +102,13 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
                 class="btn btn-link" [class.btn-sm]="isSmallSize" [class.btn-lg]="isLargeSize" [class.disabled]="disabled"
                 [disabled]="disabled">
                 <span class="chevron ngb-tp-chevron"></span>
-                <span class="sr-only" i18n="@@ngb.timepicker.increment-seconds">Increment seconds</span>
+                <span class="sr-only">Increment seconds</span>
               </button>
             }
             <input type="text" class="ngb-tp-input form-control" [class.form-control-sm]="isSmallSize" [class.form-control-lg]="isLargeSize"
-              maxlength="2" inputmode="numeric" placeholder="SS" i18n-placeholder="@@ngb.timepicker.SS"
+              maxlength="2" inputmode="numeric" placeholder="SS"
               [value]="formatMinSec($safeNavigationMigration(model?.second))" (change)="updateSecond($event.target.value)"
-              [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Seconds" i18n-aria-label="@@ngb.timepicker.seconds"
+              [readOnly]="readonlyInputs" [disabled]="disabled" aria-label="Seconds"
               (input)="formatInput($event.target)"
               (keydown.ArrowUp)="changeSecond(secondStep); $event.preventDefault()"
               (keydown.ArrowDown)="changeSecond(-secondStep); $event.preventDefault()">
@@ -117,7 +117,7 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
                 class="btn btn-link" [class.btn-sm]="isSmallSize" [class.btn-lg]="isLargeSize"  [class.disabled]="disabled"
                 [disabled]="disabled">
                 <span class="chevron ngb-tp-chevron bottom"></span>
-                <span class="sr-only" i18n="@@ngb.timepicker.decrement-seconds">Decrement seconds</span>
+                <span class="sr-only">Decrement seconds</span>
               </button>
             }
           </div>
@@ -131,9 +131,9 @@ const NGB_TIMEPICKER_VALUE_ACCESSOR = {
               [disabled]="disabled" [class.disabled]="disabled"
               (click)="toggleMeridian()">
               @if (model?.hour >= 12) {
-                <ng-container i18n="@@ngb.timepicker.PM">{{ i18n.getAfternoonPeriod() }}</ng-container>
+                <ng-container>{{ i18n.getAfternoonPeriod() }}</ng-container>
               } @else {
-                <ng-container i18n="@@ngb.timepicker.AM">{{ i18n.getMorningPeriod() }}</ng-container>
+                <ng-container>{{ i18n.getMorningPeriod() }}</ng-container>
               }
             </button>
           </div>
