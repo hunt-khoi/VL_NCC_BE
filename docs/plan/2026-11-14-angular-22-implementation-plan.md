@@ -4,7 +4,7 @@
 
 **Goal:** Đưa dự án `VL_NCC_BE` từ Angular 13.3.12 lên Angular 22.2.x, app chạy đúng như hiện tại ở cả 6 cấu hình build.
 
-> **Trạng thái (2026-11-19, tạm dừng để tiếp tục ở phiên mới):** đã lên **Angular 22.3**; RxJS 7 và mọi thư viện bên thứ ba đã lên bản cho Angular 22 (trừ Chart.js 2.9, cố ý giữ); cả 6 cấu hình build qua với 0 lỗi; bộ e2e đã viết. **Chưa nghiệm thu:** chưa đăng nhập vào app lần nào sau nâng cấp (chưa smoke test với backend), bộ e2e chưa chạy với backend. Việc tiếp theo: mục "Tiếp tục từ đâu". **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
+> **Trạng thái (2026-11-20, tạm dừng để tiếp tục ở phiên mới):** đã lên **Angular 22.3**; RxJS 7 và mọi thư viện bên thứ ba đã lên bản cho Angular 22 (trừ Chart.js 2.9, cố ý giữ); cả 6 cấu hình build qua với 0 lỗi (lần build đủ 6 cấu hình cuối là 2026-11-19; từ đó chỉ chạy `verify:dev`). Đã chạy bộ e2e `test:ro` với backend .NET 10 thật trên máy người phụ trách, theo từng vai trò, và sửa các lỗi frontend lộ ra. **Chưa nghiệm thu:** smoke test tay chưa làm; nhóm `@rw` chưa chạy. Lỗi do API ghi ở `api-errors.md`. **Quy tắc: chỉ sửa frontend, cấm đụng tới API.** Việc tiếp theo: mục "Tiếp tục từ đâu" → "Bắt đầu phiên mới". **Cần Node `^22.22.3` hoặc `>= 24.15.0`.**
 
 **Architecture:** Ba chặng. (1) Dọn dẹp ngay trên Angular 13: gỡ mọi thứ sẽ chặn đường (thư viện View Engine, `entryComponents`, custom-webpack, ng-bootstrap) trong lúc app còn chạy được. (2) Nâng từng bản major bằng `ng update`, mỗi bản một commit, build `dev` + `prod` sau mỗi bản. (3) Hoàn thiện sau khi tới 22. Vì dự án gần như không có test tự động, "test" của mỗi task là build thành công, cổng giao diện, bộ e2e tự động (Task 1C) và 5 mốc smoke test tay cho những gì e2e không tự động được. Mỗi bản major có một tag git làm điểm rollback (xem mục "Phương án rollback").
 
@@ -44,16 +44,33 @@ Nhánh `upgrade-angular-22` (trùng với nhánh phiên cloud `ccr-4b9d79c1-rjbq
 
 ### Tiếp tục từ đâu
 
-#### Hiện trạng (2026-11-19)
+#### Bắt đầu phiên mới (cập nhật 2026-11-20)
+
+1. **Quy tắc người phụ trách:** chỉ sửa giao diện (frontend); **cấm sửa hoặc đề xuất sửa API** (`D:\NCC_API`). Lỗi API → ghi vào [`api-errors.md`](api-errors.md) rồi làm tiếp. Không tự đặt thời gian chờ/ngưỡng mới cho bộ test mà không hỏi.
+2. **Môi trường máy người phụ trách:** Node 24.15.0; `yarn start` ở cổng 3105; backend .NET 10 ở `https://localhost:7243` (người phụ trách tự chạy, hay khởi động lại giữa chừng — test lỗi `ERR_CONNECTION_REFUSED` hàng loạt thì kiểm backend trước). Cache yarn `D:\DPS_Project\.yarn-cache`, đặt `TEMP`/`TMP` sang ổ D: khi build.
+3. **Chạy e2e:** `tools/e2e/.env` đã có `E2E_USER=admin`, mật khẩu và `E2E_VAITRO=Chuyên viên sở` (file không commit). Tài khoản `admin` có 2 vai trò, mỗi vai trò thấy một phần menu: chạy hai lượt.
+   - `cd tools/e2e && yarn test:ro` (vai trò trong `.env`, khoảng 10 phút, 3 luồng song song)
+   - `E2E_VAITRO=Administrator yarn test:ro` (khoảng 12 phút)
+   - Lấy lý do bỏ qua/lỗi từng test: thêm `PLAYWRIGHT_JSON_OUTPUT_NAME=<file> ... --reporter=line,json`.
+4. **Việc tiếp theo, theo thứ tự:**
+   1. Chạy lại lượt **Administrator** (lần chạy cuối là trước commit `e737599`, sửa cây `cdk-tree` + `user-manager`).
+   2. Xem 3 lỗi frontend còn mở của lượt Administrator: test "đăng nhập rồi đăng xuất" (nút Đăng xuất trong dropdown topbar không hiện trong 10 giây); `/vai-tro` và `/xuat-du-lieu` hết 30 giây trong `open()` khi chờ guard `PermissionUrl`.
+   3. Lỗi API mới gặp thì ghi `api-errors.md` (hiện 12 mục; #5 — 37 tham số `string` bị bắt buộc — sẽ còn lộ ở các ô chọn phụ thuộc nhau khi test tay).
+   4. Smoke test tay theo `docs/plan/angular_22_smoke_checklist.md` (việc số 4 bên dưới).
+   5. Nhóm `@rw` (cần database bản sao + `E2E_RESTORE_CMD`); SignalR và ng-idle đang `test.fixme` (người phụ trách: "kệ nó test sau").
+5. **Công cụ dò lỗi** (so route frontend ↔ backend, lấy stack lỗi trên trang đang chạy): `tools/route-diff/README.md`.
+6. Các commit từ 2026-11-20 trên nhánh `upgrade-angular-22` **chưa push** (16 commit tính tới `docs: handoff`) (người phụ trách tự push).
+
+#### Hiện trạng (2026-11-20)
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Nhánh | `upgrade-angular-22` trên GitHub (trùng `ccr-4b9d79c1-rjbqa4`); xem `git log` để biết commit cuối |
+| Nhánh | `upgrade-angular-22`; commit hôm 2026-11-20 chưa push; xem `git log` để biết commit cuối |
 | Phiên bản | Angular/CLI 22.3.0, Material/CDK 22.3.0, NgRx 22.0.1, TypeScript 6.0.3, angular-eslint 22.8.0, RxJS 7.8.2, zone.js 0.15.1; thư viện bên thứ ba xem bảng ở việc số 5 |
 | Build | 6/6 cấu hình PASS, 0 lỗi (bảng dưới) |
-| Chạy thử | Màn hình đăng nhập của bản `dev` và `prod` lên được, chữ dịch đúng, không lỗi JS (e2e `@nologin` PASS). TinyMCE 6 khởi tạo được với đúng config của app trên một trang thử. Chưa đăng nhập vào app lần nào sau khi nâng cấp (môi trường làm không có backend) |
+| Chạy thử | Đã đăng nhập và mở các màn với backend .NET 10 thật qua bộ e2e (2026-11-20). Lỗi frontend lộ ra đã sửa: `$localize`, ngày dạng chuỗi (`viDate`), template đọc dữ liệu chưa có, cây `cdk-tree` CDK 22, route API đổi tên (xem việc số 3) |
 | Smoke test tay | **Chưa làm.** Giao diện chưa được kiểm bằng mắt từ Task 5 |
-| E2E | 83 test đã viết (`tools/e2e/`); mới chạy 2 test `@nologin` (PASS) |
+| E2E | `test:ro`: Chuyên viên sở 36 qua / 41 bỏ qua / 3 lỗi (lỗi đều do API); Administrator 48 qua / 24 bỏ qua / 8 lỗi (trước khi sửa cây + `user-manager`, cần chạy lại). `@rw` chưa chạy |
 | Lint | `yarn lint` chạy được; 409 lỗi có từ trước (361 là `template/eqeqeq`), không chặn build |
 | Tag | `upgrade/ng22` (trỏ `35b31b3`) đã push lên GitHub ngày 2026-11-20 |
 
