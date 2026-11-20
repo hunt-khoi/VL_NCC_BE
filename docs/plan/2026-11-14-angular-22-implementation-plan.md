@@ -55,7 +55,7 @@ Nhánh `upgrade-angular-22` (trùng với nhánh phiên cloud `ccr-4b9d79c1-rjbq
 | Smoke test tay | **Chưa làm.** Giao diện chưa được kiểm bằng mắt từ Task 5 |
 | E2E | 83 test đã viết (`tools/e2e/`); mới chạy 2 test `@nologin` (PASS) |
 | Lint | `yarn lint` chạy được; 409 lỗi có từ trước (361 là `template/eqeqeq`), không chặn build |
-| Tag | `upgrade/ng22` chưa có trên GitHub (xem việc số 2) |
+| Tag | `upgrade/ng22` (trỏ `35b31b3`) đã push lên GitHub ngày 2026-11-20 |
 
 Kết quả build sau khi nâng thư viện (container Linux, Node 22.23.5, 2026-11-19):
 
@@ -72,9 +72,9 @@ Cảnh báo còn lại đều có từ trước: Sass `@import` deprecation; 5 t
 
 #### Việc còn lại, theo thứ tự
 
-1. **Nâng Node trên máy phát triển** lên `>= 24.15.0` (hoặc `^22.22.3`); máy đang dùng 24.14.0 không chạy được Angular 22. Rồi `yarn install`, `yarn start`.
-2. **Tag `upgrade/ng22`** trỏ vào `35b31b3` (bản build được sau Task 20). Phiên cloud bị GitHub chặn push tag (403), nên tạo từ máy người phụ trách: `git fetch origin`, `git tag -a upgrade/ng22 35b31b3 -m "Angular 22.3"`, `git push origin upgrade/ng22`. Bản build `prod` không lưu trong repo (`build/` bị ignore); build lại từ tag khi cần.
-3. **Chạy bộ e2e lần đầu với backend:** điền `tools/e2e/.env` (xem `tools/e2e/README.md`), `yarn --cwd tools/e2e install`, `npx --prefix tools/e2e playwright install chromium`, `yarn --cwd tools/e2e test:ro`. Selector lấy từ mã nguồn, chưa chạy thật: sửa selector/cách chờ theo `tools/e2e/KNOWN_ISSUES.md`, chạy 3 lần liên tiếp PASS thì coi là baseline. Nhóm `@rw` cần database bản sao và `E2E_RESTORE_CMD`; viết nốt test sửa/xoá đang `test.fixme`.
+1. ~~Nâng Node, `yarn install`, `yarn start`~~ **Xong 2026-11-20** trên máy người phụ trách (Windows, Node 24.15.0): `yarn install` 317 giây; `yarn verify:dev` PASS, 0 lỗi, 135 giây; `yarn start` lên ở cổng 3105.
+2. ~~Tag `upgrade/ng22`~~ **Xong 2026-11-20:** tag trỏ `35b31b3`, đã push. Bản build `prod` không lưu trong repo (`build/` bị ignore); build lại từ tag khi cần.
+3. **Chạy bộ e2e lần đầu với backend.** Đã làm (2026-11-20, máy người phụ trách): tạo `tools/e2e/.env` từ `.env.example` (chưa điền tài khoản), cài gói và Chromium. `test:nologin` với `yarn start`: 1 PASS, 1 FAIL do `ERR_CONNECTION_REFUSED` — cấu hình `dev` gọi backend `https://localhost:44371`, lúc chạy backend không bật. Còn lại: bật backend local, điền `E2E_USER`/`E2E_PASS`, rồi chạy tiếp. Hướng dẫn gốc: điền `tools/e2e/.env` (xem `tools/e2e/README.md`), `yarn --cwd tools/e2e install`, `npx --prefix tools/e2e playwright install chromium`, `yarn --cwd tools/e2e test:ro`. Selector lấy từ mã nguồn, chưa chạy thật: sửa selector/cách chờ theo `tools/e2e/KNOWN_ISSUES.md`, chạy 3 lần liên tiếp PASS thì coi là baseline. Nhóm `@rw` cần database bản sao và `E2E_RESTORE_CMD`; viết nốt test sửa/xoá đang `test.fixme`.
 4. **Smoke test tay** theo `docs/plan/angular_22_smoke_checklist.md` (mục không có `(e2e)` bắt buộc làm tay). Ưu tiên: 33 chỗ SCSS có comment `// MDC:`; 2 dialog chọn nhiều có nút đóng vừa sửa (`chon-nhieu-nhan-vien-list`, `chon-nhieu-bieu-mau-list`); các nút In (đổi sang `this.in(...)`); tooltip/tab/dropdown của `NgbLiteModule` (`ComponentFactoryResolver` đã bỏ); icon SVG (`ng-inline-svg-2` 20); 2 template còn cú pháp cũ (`config-edit`, `comment`); các thư viện vừa nâng ở việc số 5, nhất là ô có mask, TinyMCE, upload, in.
 5. **Kiểm lúc chạy các thư viện vừa nâng (2026-11-19).** Build qua nhưng chưa chạy với backend; gộp vào smoke test (việc số 4). Đã nâng:
 
