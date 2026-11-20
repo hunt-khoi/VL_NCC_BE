@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { QueryParamsModel, HttpUtilsService, QueryResultsModel } from '../../../../../../core/_base/crud';
 import { environment } from '../../../../../../../environments/environment';
 
-const API_TK = environment.ApiRoot + '/sl-tong-hop';
+const API_TK = environment.ApiRoot + '/bh-bao-cao';
 
 @Injectable()
 export class SoLuongTongHopService {
@@ -22,7 +22,7 @@ export class SoLuongTongHopService {
 	tkTheoDoiTuong(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = `${API_TK}/tk-theo-doi-tuong`;
+		const url = `${API_TK}/so-luong-doi-tuong`;
 		return this.http.get<QueryResultsModel>(url, {
 			headers: httpHeaders,
 			params: httpParams
@@ -33,7 +33,7 @@ export class SoLuongTongHopService {
 	exportTKTheoDoiTuong(queryParams: QueryParamsModel): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders()
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		const url = `${API_TK}/export-tk-theo-doi-tuong`;
+		const url = `${API_TK}/export-so-luong-doi-tuong`;
 		return this.http.get(url, {
 			headers: httpHeaders,
 			params: httpParams,

@@ -48,10 +48,7 @@ export class HDSDListComponent implements OnInit {
 		this.list_button = CommonService.list_button();
 		this.btnClass = this.list_button ? 'mat-raised-button' : 'mat-icon-button';
 
-		this.apiService.getVersion().subscribe(res => {
-			this.ver = res.data;
-			this.changeDetectorRefs.detectChanges();
-		})
+		// Backend .NET 10 đã bỏ api/lite/get-version nên không gọi nữa; dòng "Phiên bản" tự ẩn khi không có dữ liệu.
 		this.tokenStorage.getUserRolesObject().subscribe(t => {
 			this.rR = t;
 			this.changeDetectorRefs.detectChanges();

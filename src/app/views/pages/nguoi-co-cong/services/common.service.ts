@@ -346,7 +346,7 @@ export class CommonService {
 
 	lite_emotion(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = environment.ApiRoot + '/lite/lite_emotion';
+		const url = environment.ApiRoot + '/comment/lite_emotion';
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	//#endregion
@@ -850,13 +850,13 @@ export class CommonService {
 	getDSNguoiDungLite(useVaiTro: boolean = true, idDV: number = 0): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + `/lite/danh-sach-nguoi-lite?useVaiTro=${useVaiTro}&idDV=${idDV}`;
-		return this.http.post<any>(url, null, { headers: httpHeaders });
+		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	//drop  đơn vị (auto complete)
 	getDSDonViLite(): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = environment.ApiRoot + '/lite/danh-sach-don-vi-lite';
-		return this.http.post<any>(url, null, { headers: httpHeaders });
+		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	getTreeNguoiDungDonVi(itemId: any, useVaiTro: boolean = true): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();

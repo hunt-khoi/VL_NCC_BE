@@ -22,7 +22,7 @@ export class DM_DonViService {
 	getData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		return this.http.get<any>(API_ROOT_URL + '/DM_DonVi_List', {
+		return this.http.get<any>(API_ROOT_URL, {
 			headers: httpHeaders,
 			params: httpParams
 		});
@@ -31,7 +31,7 @@ export class DM_DonViService {
 	getData_User(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		return this.http.get<any>(API_ROOT_URL + '/DM_User_DonVi', {
+		return this.http.get<any>(API_ROOT_URL + '/get-users', {
 			headers: httpHeaders,
 			params: httpParams
 		});
@@ -39,44 +39,44 @@ export class DM_DonViService {
 
 	getById(itemId: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.get<any>(API_ROOT_URL + `/DM_DonVi_Detail?Id=${itemId}`, { headers: httpHeaders });
+		return this.http.get<any>(`${API_ROOT_URL}/${itemId}`, { headers: httpHeaders });
 	}
 
 	delete(itemId: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_ROOT_URL}/DM_DonVi_Delete?Id=${itemId}`;
-		return this.http.post<any>(url, null, { headers: httpHeaders });
+		const url = `${API_ROOT_URL}/${itemId}`;
+		return this.http.delete<any>(url, { headers: httpHeaders });
 	}
 
 	deletes(ids: any[] = []): Observable<any> {
-		const url = API_ROOT_URL + '/DM_DonVi_Multi_Delete';
+		const url = API_ROOT_URL + '/deletes';
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<QueryResultsModel>(url, ids, { headers: httpHeaders });
 	}
 
 	create(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<DM_DonViModel>(API_ROOT_URL + '/DM_DonVi_Insert', item, { headers: httpHeaders });
+		return this.http.post<DM_DonViModel>(API_ROOT_URL, item, { headers: httpHeaders });
 	}
 
 	update(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<DM_DonViModel>(API_ROOT_URL + '/DM_DonVi_Update', item, { headers: httpHeaders });
+		return this.http.put<DM_DonViModel>(`${API_ROOT_URL}/${item.Id}`, item, { headers: httpHeaders });
 	}
 
 	uploadFile(data: any): Observable<any> {
-		const url = API_ROOT_URL + '/DM_DonVi_UploadFile';
+		const url = API_ROOT_URL + '/upload';
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		return this.http.post<any>(url, data, { headers: httpHeaders });
 	}
 
 	import(item: any): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.post<DM_DonViModel>(API_ROOT_URL + '/DM_DonVi_Import', item, { headers: httpHeaders });
+		return this.http.post<DM_DonViModel>(API_ROOT_URL + '/import', item, { headers: httpHeaders });
 	}
 
 	downloadTemplate(): string {
-		return API_ROOT_URL + `/DownLoadFileImportMau`;
+		return API_ROOT_URL + `/download-template`;
 	}
 
 	getTreeDonVi() {

@@ -8,7 +8,9 @@
       </div>
     </ng-container>
     <ng-container ktPortletTools>
-      <span>Phiên bản <b>{{ver.Version}}</b> - Cập nhật ngày <b>{{ver.Date}}</b></span>&nbsp;&nbsp;
+      @if (ver?.Version) {
+        <span>Phiên bản <b>{{ver.Version}}</b> - Cập nhật ngày <b>{{ver.Date}}</b></span>&nbsp;&nbsp;
+      }
       @if (rR.r1122) {
         <button mat-raised-button (click)="Add()" matTooltip="{{ 'COMMON.CREATE' | translate }}"
           color="accent" type="button">

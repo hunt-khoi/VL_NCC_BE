@@ -49,7 +49,7 @@ export class DoiTuongTrangCapService {
 	UpdateDoiTuongTrangCap(item: DoiTuongTrangCapModel): Observable<any> {
 		// Note: Add headers if needed (tokens/bearer)
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		return this.http.put(API_URL + `/${item.Id}`, item, { headers: httpHeaders });
+		return this.http.put(API_URL, item, { headers: httpHeaders });
 	}
 
 	// DELETE => delete the product from the server

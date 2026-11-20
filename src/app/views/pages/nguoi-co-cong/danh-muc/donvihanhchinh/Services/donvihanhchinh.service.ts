@@ -5,7 +5,7 @@ import { QueryResultsModel, QueryParamsModel, HttpUtilsService } from '../../../
 import { environment } from '../../../../../../../environments/environment';
 
 const API_provinces = environment.ApiRoot + '/provinces';
-const API_ward = environment.ApiRoot + '/dm_wards';
+const API_ward = environment.ApiRoot + '/wards';
 const API_KhomAp = environment.ApiRoot + '/dm-khom-ap';
 
 @Injectable()

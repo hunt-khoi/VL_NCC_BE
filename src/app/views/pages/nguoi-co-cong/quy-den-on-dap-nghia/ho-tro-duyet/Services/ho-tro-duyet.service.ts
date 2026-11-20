@@ -25,7 +25,7 @@ export class HoTroDTDuyetService {
 	detail(id): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const url = API_URL;
-		return this.http.get<any>(url + "/" + id, { headers: httpHeaders });
+		return this.http.get<any>(url + "/detail?id=" + id, { headers: httpHeaders });
 	}
 	traLai(id, note) {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();

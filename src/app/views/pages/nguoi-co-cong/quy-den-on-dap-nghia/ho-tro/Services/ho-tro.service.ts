@@ -20,7 +20,7 @@ export class HoTroService {
 	findData(queryParams: QueryParamsModel): Observable<QueryResultsModel> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
 		const httpParams = this.httpUtils.getFindHTTPParams(queryParams);
-		return this.http.get<QueryResultsModel>(API_PRODUCTS_URL, {
+		return this.http.get<QueryResultsModel>(API_PRODUCTS_URL + "/list", {
 			headers: httpHeaders,
 			params: httpParams
 		});
@@ -28,7 +28,7 @@ export class HoTroService {
 
 	getItem(itemId: number): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_PRODUCTS_URL}/${itemId}`;
+		const url = `${API_PRODUCTS_URL}/detail?id=${itemId}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 
@@ -50,7 +50,7 @@ export class HoTroService {
 
 	getListHoTro(ids: string=""): Observable<any> {
 		const httpHeaders = this.httpUtils.getHTTPHeaders();
-		const url = `${API_PRODUCTS_URL}/list-can-ho-tro/${ids}`;
+		const url = `${API_PRODUCTS_URL}/canhotro?ids=${ids}`;
 		return this.http.get<any>(url, { headers: httpHeaders });
 	}
 	
