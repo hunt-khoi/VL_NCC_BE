@@ -3,7 +3,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { AUTH_FILE, BASE_URL } from './playwright.config';
-import { LOGIN, routeApi } from './helpers';
+import { loginAndSave } from './helpers';
 
 const runsWriteTests = () => process.argv.some((a) => a.includes('@rw')) || process.env.E2E_RUN_RW === '1';
 
@@ -31,18 +31,7 @@ export default async function globalSetup(_config: FullConfig) {
 
 	const browser = await chromium.launch();
 	try {
-		const context = await browser.newContext({ ignoreHTTPSErrors: true, locale: 'vi-VN' });
-		await routeApi(context);
-		const page = await context.newPage();
-		await page.goto(`${BASE_URL}/auth/login`, { waitUntil: 'domcontentloaded' });
-		await page.locator(LOGIN.user).fill(user);
-		await page.locator(LOGIN.pass).fill(pass);
-		await page.locator(LOGIN.submit).click();
-		// Chi thu mot lan: dang nhap sai nhieu lan se bat reCAPTCHA hoac khoa tai khoan.
-		await page.waitForURL((url) => !url.pathname.includes('/auth'), { timeout: 30_000 }).catch(() => {
-			throw new Error('Dang nhap khong thanh cong voi E2E_USER/E2E_PASS (kiem tra tai khoan va backend).');
-		});
-		await context.storageState({ path: AUTH_FILE });
+		await loginAndSave(browser, BASE_URL, AUTH_FILE);
 	} finally {
 		await browser.close();
 	}

@@ -1,7 +1,12 @@
 import { test as base, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { routeApi } from './helpers';
+import { loginAndSave, routeApi, tokenSecondsLeft } from './helpers';
+import { AUTH_FILE } from './playwright.config';
+
+// Token cua backend chi song 10 phut, ca luot test lau hon: con it hon muc nay thi dang nhap lai.
+// Lon hon thoi gian mot test ke ca lan chay lai (2 x 60 giay).
+const TOKEN_MARGIN_SECONDS = 180;
 
 // Loi console da biet va duoc chap nhan: moi muc la mot chuoi con hoac regex dang "/.../".
 // Chi duoc thu hep danh sach nay; them muc moi phai duoc nguoi phu trach duyet.
@@ -19,6 +24,14 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
+	// Chi lam moi phien da luu (khong dong vao test tu truyen storageState rieng, vi du nhom @nologin).
+	storageState: async ({ storageState, browser, baseURL }, use) => {
+		const usesSavedLogin = typeof storageState === 'string' && path.resolve(storageState) === path.resolve(AUTH_FILE);
+		if (usesSavedLogin && process.env.E2E_USER && process.env.E2E_PASS && tokenSecondsLeft(AUTH_FILE) < TOKEN_MARGIN_SECONDS) {
+			await loginAndSave(browser, baseURL!, AUTH_FILE);
+		}
+		await use(storageState);
+	},
 	context: async ({ context }, use) => {
 		await routeApi(context);
 		await use(context);

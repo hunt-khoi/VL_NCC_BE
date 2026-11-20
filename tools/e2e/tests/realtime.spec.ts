@@ -1,9 +1,14 @@
 import { test, expect } from '../fixtures';
 
+// signalR.service.ts dung skipNegotiation + WebSockets nen khong co request "negotiate":
+// kiem tra socket mo toi /signalr va backend tra goi bat tay (handshake) thanh cong.
 test('@ro SignalR ket noi duoc sau khi vao app', async ({ page }) => {
-	const negotiate = page.waitForResponse((r) => /negotiate/i.test(r.url()), { timeout: 30_000 });
-	const socket = page.waitForEvent('websocket', { timeout: 30_000 });
+	const socketPromise = page.waitForEvent('websocket', { predicate: (ws) => /\/signalr/i.test(ws.url()), timeout: 30_000 });
 	await page.goto('/');
-	expect((await negotiate).status()).toBe(200);
-	expect((await socket).url()).toMatch(/^wss?:/);
+	const socket = await socketPromise;
+	expect(socket.url()).toMatch(/^wss?:/);
+	// Goi bat tay thanh cong cua SignalR la "{}" (ket thuc bang ky tu 0x1E); co "error" la that bai.
+	const frame = await socket.waitForEvent('framereceived', { timeout: 15_000 });
+	const text = typeof frame.payload === 'string' ? frame.payload : frame.payload.toString('utf8');
+	expect(text, 'goi bat tay SignalR').not.toContain('"error"');
 });

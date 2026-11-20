@@ -1,4 +1,5 @@
-import { expect, type BrowserContext, type Page, type Request } from '@playwright/test';
+import { expect, test, type Browser, type BrowserContext, type Page, type Request } from '@playwright/test';
+import fs from 'node:fs';
 
 // Cung selector voi tools/visual/capture.mjs.
 export const LOGIN = {
@@ -22,7 +23,68 @@ export async function settle(page: Page) {
 export async function open(page: Page, path: string) {
 	await page.goto(path, { waitUntil: 'domcontentloaded' });
 	await settle(page);
-	expect(new URL(page.url()).pathname, `mo ${path} bi day ve trang dang nhap (het phien hoac thieu quyen)`).not.toContain('/auth');
+	const pathname = new URL(page.url()).pathname;
+	expect(pathname, `mo ${path} bi day ve trang dang nhap (het phien)`).not.toContain('/auth');
+	// Moi vai tro chi thay mot phan menu: chay lai voi E2E_VAITRO khac de phu man nay.
+	test.skip(pathname.startsWith('/error/403'), `vai tro hien tai (E2E_VAITRO=${process.env.E2E_VAITRO || 'mac dinh'}) khong co quyen vao ${path}`);
+}
+
+/**
+ * Dang nhap bang E2E_USER/E2E_PASS roi luu phien (localStorage) vao authFile.
+ * Chi thu mot lan: dang nhap sai nhieu lan se bat reCAPTCHA hoac khoa tai khoan.
+ */
+export async function loginAndSave(browser: Browser, baseURL: string, authFile: string) {
+	const context = await browser.newContext({ ignoreHTTPSErrors: true, locale: 'vi-VN' });
+	try {
+		await routeApi(context);
+		const page = await context.newPage();
+		await page.goto(`${baseURL}/auth/login`, { waitUntil: 'domcontentloaded' });
+		await page.locator(LOGIN.user).fill(process.env.E2E_USER!);
+		await page.locator(LOGIN.pass).fill(process.env.E2E_PASS!);
+		await page.locator(LOGIN.submit).click();
+		await page.waitForURL((url) => !url.pathname.includes('/auth'), { timeout: 30_000 }).catch(() => {
+			throw new Error('Dang nhap khong thanh cong voi E2E_USER/E2E_PASS (kiem tra tai khoan va backend).');
+		});
+		// App tai lai trang ngay sau khi dang nhap; cho on dinh roi moi luu phien.
+		await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+		const vaiTro = process.env.E2E_VAITRO?.trim();
+		if (vaiTro) await switchVaiTro(page, vaiTro);
+		await context.storageState({ path: authFile });
+	} finally {
+		await context.close();
+	}
+}
+
+/**
+ * Doi vai tro nhu nguoi dung: topbar > "Doi vai tro" > bam dong co ten vai tro (GroupName).
+ * App goi user/doi-vai-tro, luu token moi roi tai lai trang. Vai tro dang dung thi chi dong dialog.
+ */
+export async function switchVaiTro(page: Page, groupName: string) {
+	await page.locator('kt-user-profile [ngbdropdowntoggle]').click();
+	await page.getByText(/^\s*Đổi vai trò\s*$/).click();
+	const row = dialog(page).locator('tr[mat-row]').filter({ hasText: groupName }).first();
+	await expect(row, `khong co vai tro "${groupName}" (E2E_VAITRO) trong danh sach doi vai tro`).toBeVisible({ timeout: 15_000 });
+	if (await row.evaluate((r) => r.classList.contains('row-in-use'))) {
+		await page.keyboard.press('Escape');
+		return;
+	}
+	await Promise.all([page.waitForEvent('load', { timeout: 30_000 }), row.click()]);
+	await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+}
+
+/** So giay con lai cua token trong phien da luu; -1 neu khong doc duoc. */
+export function tokenSecondsLeft(authFile: string): number {
+	try {
+		const state = JSON.parse(fs.readFileSync(authFile, 'utf8'));
+		for (const o of state.origins ?? []) {
+			for (const { name, value } of o.localStorage ?? []) {
+				if (!name.startsWith('auth') || value.split('.').length !== 3) continue;
+				const { exp } = JSON.parse(Buffer.from(value.split('.')[1], 'base64url').toString('utf8'));
+				if (exp) return exp - Date.now() / 1000;
+			}
+		}
+	} catch {}
+	return -1;
 }
 
 /** Ban build co the goi API o dia chi khac voi backend dang chay; chuyen huong ma khong sua ma nguon. */

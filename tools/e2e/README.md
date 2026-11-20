@@ -37,6 +37,7 @@ Test lỗi: chạy lại riêng test đó kèm trace, ví dụ `npx playwright t
 |---|---|
 | `E2E_BASE_URL` | Địa chỉ app, mặc định `http://localhost:3105` |
 | `E2E_USER`, `E2E_PASS` | Tài khoản test |
+| `E2E_VAITRO` | Tên vai trò (cột "Vai trò" trong hộp thoại Đổi vai trò, ví dụ `Chuyên viên sở`) sẽ đổi sang sau khi đăng nhập. Màn nào vai trò này không có quyền (trang 403) thì test bị **bỏ qua** kèm lý do; chạy thêm một lượt với vai trò khác để phủ các màn đó |
 | `E2E_ALLOW_WRITE` | `1` mới cho chạy nhóm `@rw` |
 | `E2E_RESTORE_CMD` | Lệnh khôi phục database bản sao, chạy trước mỗi lượt `@rw` |
 | `E2E_API_FROM`, `E2E_API_TO` | Chuyển hướng API khi bản build gọi địa chỉ khác backend đang chạy |
