@@ -34,7 +34,12 @@ export const test = base.extend<Fixtures>({
 		}
 		const file = AUTH_FILE.replace(/\.json$/, `-${testInfo.parallelIndex}.json`);
 		if (!fs.existsSync(file) && fs.existsSync(AUTH_FILE)) fs.copyFileSync(AUTH_FILE, file);
-		if (tokenSecondsLeft(file) < TOKEN_MARGIN_SECONDS) await loginAndSave(browser, baseURL!, file);
+		if (tokenSecondsLeft(file) < TOKEN_MARGIN_SECONDS) {
+			// Dang nhap + doi vai tro mat 15-20 giay: khong tinh vao thoi gian cua chinh test.
+			const t = Date.now();
+			await loginAndSave(browser, baseURL!, file);
+			testInfo.setTimeout(testInfo.timeout + (Date.now() - t));
+		}
 		await use(file);
 	},
 	context: async ({ context }, use) => {

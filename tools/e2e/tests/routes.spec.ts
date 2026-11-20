@@ -13,7 +13,8 @@ const screens: Screen[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../..
 for (const screen of screens) {
 	test(`@ro mo trang ${screen.path}`, async ({ page }) => {
 		await open(page, screen.path);
-		const content = page.locator('kt-portlet, table[mat-table], .kt-portlet__head-title, canvas, kt-dashboard').first();
+		// Chi xet phan tu dang hien: topbar co san .kt-portlet__head-title an (khung Thong bao) dung truoc trong DOM.
+		const content = page.locator('kt-portlet, .kt-portlet, table[mat-table], .kt-portlet__head-title, canvas, kt-dashboard').filter({ visible: true }).first();
 		await expect(content, 'trang khong co tieu de, bang hay noi dung').toBeVisible();
 	});
 }
