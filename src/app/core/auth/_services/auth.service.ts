@@ -202,6 +202,6 @@ export class AuthService {
 			'Authorization': 'Bearer ' + userToken,
 		});
 		httpHeaders.append("Content-Type", "application/json");
-		return this.http.get<any>(environment.ApiRoot + '/lite/get-dictionary', { headers: httpHeaders });
+		return this.http.get<any>(environment.ApiRoot + '/comment/get-dictionary', { headers: httpHeaders });
 	}
 }

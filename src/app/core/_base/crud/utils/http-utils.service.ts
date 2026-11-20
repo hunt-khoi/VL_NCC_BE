@@ -14,11 +14,16 @@ export class HttpUtilsService {
 	 */
 	getFindHTTPParams(queryParams: any): HttpParams {
 		let params = new HttpParams()
-			.set('sortOrder', queryParams.sortOrder)
-			.set('sortField', queryParams.sortField)
 			.set('page', (queryParams.pageNumber + 1).toString())
 			.set('record', queryParams.pageSize.toString());
-			
+		// Backend .NET 10 (nullable bật) trả 400 khi gửi sortField/sortOrder rỗng; bỏ trống thì không gửi.
+		if (queryParams.sortOrder) {
+			params = params.set('sortOrder', queryParams.sortOrder);
+		}
+		if (queryParams.sortField) {
+			params = params.set('sortField', queryParams.sortField);
+		}
+
 		let keys: string[] = [], values: string[] = [];
 		if (queryParams.more) {
 			params = params.append('more', 'true');
