@@ -1,6 +1,6 @@
 # Test e2e (Playwright)
 
-Bộ test tự động cho các mục trong `docs/plan/angular_22_smoke_checklist.md` (mục có ghi `(e2e)`). Có `package.json` riêng để `ng update` không đụng tới.
+Bộ test tự động cho các mục trong checklist kiểm tay ở cuối `docs/plan/2026-11-20-angular-22-acceptance-plan.md` (mục có ghi `(e2e)`). Có `package.json` riêng để `ng update` không đụng tới.
 
 ## Cài đặt (một lần)
 

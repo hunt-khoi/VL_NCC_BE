@@ -19,4 +19,4 @@ Cập nhật: 2026-11-20.
 | 11 | 2026-11-20 | Thống kê số lượng hồ sơ (`/thong-ke-so-luong-ho-so`) | — | Trang 404 ở frontend | Có trong `Dps_Menu` nhưng frontend không có route (có từ trước nâng cấp) |
 | 12 | 2026-11-20 | — | `PUT api/dantoc/999999` (id không tồn tại, chỉ để thử) | `status 0`, `"Có gì đó không đúng"` (mã `0000`, lỗi hệ thống) | Sửa bản ghi không tồn tại bị báo là lỗi hệ thống thay vì "không tồn tại"; có thể kéo theo email báo lỗi |
 
-Các route backend đã đổi tên và frontend đã đổi theo (theo yêu cầu "làm cho khớp api mới"): xem mục "Sửa lỗi lúc chạy với backend .NET 10" trong `archive/2026-11-14-angular-22-implementation-plan.md` và commit `46f0f51`, `4d68ff6`, `e737599`.
+Các route backend đã đổi tên và frontend đã đổi theo (theo yêu cầu "làm cho khớp api mới"): xem mục "Đã xong: sửa lỗi lúc chạy" trong `progress.md` và commit `46f0f51`, `4d68ff6`, `e737599`.

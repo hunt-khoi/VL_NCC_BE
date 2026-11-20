@@ -41,4 +41,4 @@ Cấu hình ở `eslint.config.js`, giữ bộ rule cũ (bộ khuyến nghị c�
 
 ## Lịch sử nâng cấp
 
-Đã nâng từ Angular 13 lên 22. Trạng thái hiện tại và việc còn lại: `docs/plan/README.md`. **Chưa nghiệm thu:** đã chạy e2e với backend .NET 10, chưa kiểm tay. Lịch sử nâng cấp: `docs/plan/archive/2026-11-14-angular-22-implementation-plan.md`. Checklist kiểm tay: `docs/plan/angular_22_smoke_checklist.md`. Test e2e: `tools/e2e/README.md`.
+Đã nâng từ Angular 13 lên 22. **Chưa nghiệm thu:** đã chạy e2e với backend .NET 10, chưa kiểm tay. Tiến độ và lịch sử: `docs/plan/progress.md`. Việc còn lại và checklist kiểm tay: `docs/plan/2026-11-20-angular-22-acceptance-plan.md`. Lỗi API: `docs/plan/api-errors.md`. Test e2e: `tools/e2e/README.md`.
